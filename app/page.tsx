@@ -96,35 +96,91 @@ export default async function HomePage() {
       <section className="pt-16 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-          <p className="section-subheading mb-3">Style Edits</p>
-          <h2 className="mb-10 section-heading">Shop by Occasion</h2>
+          <p className="section-subheading text-left mb-3">Style Edits</p>
+          <h2 className="mb-10 section-heading text-left">Shop by Occasion</h2>
           <OccasionCarousel occasions={occasions} />
         </div>
       </section>
 
       {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
-      <section className="pt-10 pb-10 bg-white border-t border-gray-100">
+      <section className="pt-10 pb-10 bg-[#1a1a1a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-subheading text-left">Collections</p>
-          <h2 className="section-heading text-left mt-2 mb-10">Shop by Category</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {siteCategories.map((cat) => (
-              <Link key={cat.slug} href={`/shop/${cat.slug}`}
-                className="group relative overflow-hidden bg-classie-light"
-                style={{ aspectRatio: "3 / 4" }}
+          <p className="section-subheading text-left" style={{ color: "rgba(59,83,115,0.6)" }}>Collections</p>
+          <h2 className="section-heading text-left mt-2 mb-10 text-white">Shop by Category</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: "1px" }}>
+            {siteCategories.map((cat, catIdx) => (
+              <Link
+                key={cat.slug}
+                href={`/shop/${cat.slug}`}
+                className="group relative overflow-hidden block transition-colors duration-300 hover:bg-[#3B5373]/[0.12]"
+                style={{
+                  padding: "52px",
+                  border: "1px solid rgba(59,83,115,0.2)",
+                  minHeight: "300px",
+                }}
               >
+                {/* Background image when available */}
                 {cat.image_url && (
-                  <Image src={cat.image_url} alt={cat.name} fill
-                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
+                  <>
+                    <Image
+                      src={cat.image_url}
+                      alt={cat.name}
+                      fill
+                      className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  </>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                <div className="absolute bottom-6 left-6 text-white">
-                  <h3 className="font-serif text-3xl mb-1">{cat.name}</h3>
-                  <p className="text-sm text-white/75">{cat.description}</p>
+
+                {/* Number watermark */}
+                <span
+                  className="absolute top-3 right-5 select-none pointer-events-none leading-none"
+                  style={{
+                    fontFamily: "var(--font-cormorant)",
+                    fontSize: "88px",
+                    fontWeight: 300,
+                    color: "rgba(59,83,115,0.2)",
+                    lineHeight: 1,
+                  }}
+                >
+                  {String(catIdx + 1).padStart(2, "0")}
+                </span>
+
+                {/* Card content */}
+                <div className="relative h-full flex flex-col justify-end" style={{ minHeight: "180px" }}>
+                  <h3
+                    className="mb-3"
+                    style={{
+                      fontFamily: "var(--font-cormorant)",
+                      fontSize: "28px",
+                      fontWeight: 300,
+                      color: "white",
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {cat.name}
+                  </h3>
+                  {cat.description && (
+                    <p
+                      className="mb-5"
+                      style={{
+                        fontFamily: "var(--font-poppins)",
+                        fontSize: "13px",
+                        color: "rgba(255,255,255,0.38)",
+                        lineHeight: 1.75,
+                      }}
+                    >
+                      {cat.description}
+                    </p>
+                  )}
+                  <span
+                    className="text-xs tracking-[0.2em] uppercase transition-colors duration-300 text-white/50 group-hover:text-white"
+                    style={{ fontFamily: "var(--font-poppins)" }}
+                  >
+                    Explore →
+                  </span>
                 </div>
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-500" />
               </Link>
             ))}
           </div>
@@ -201,7 +257,7 @@ export default async function HomePage() {
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <p className="section-subheading mb-10">What They Say</p>
-          <blockquote className="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8" style={{fontFamily:"'Playfair Display', serif", fontWeight:400}}>
+          <blockquote className="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8" style={{fontFamily:"var(--font-cormorant)", fontWeight:300}}>
             &ldquo;The most elegant heels I&apos;ve owned. Wore them all evening at a wedding — zero discomfort, endless compliments.&rdquo;
           </blockquote>
           <p className="text-xs tracking-[0.3em] uppercase text-gray-400">— Priya S., Delhi</p>

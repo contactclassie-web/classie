@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Serif+Display:ital@0;1&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,6 +9,7 @@
   --primary-dark: #2a3d55;
   --font-poppins: 'Poppins', sans-serif;
   --font-serif: 'DM Serif Display', serif;
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
 }
 
 * { box-sizing: border-box; }
@@ -28,8 +29,8 @@ body {
 /* Headings — DM Serif Display */
 h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; }
 
-/* Sub-headings — Playfair Display */
-h4, h5, h6 { font-family: 'Playfair Display', serif; font-weight: 400; }
+/* Sub-headings — Cormorant Garamond */
+h4, h5, h6 { font-family: var(--font-cormorant); font-weight: 400; }
 
 /* Thin scrollbar */
 ::-webkit-scrollbar { width: 3px; }
@@ -76,12 +77,12 @@ h4, h5, h6 { font-family: 'Playfair Display', serif; font-weight: 400; }
 
   /* ── Section headings */
   .section-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
-    letter-spacing: 0.01em;
+    font-family: var(--font-cormorant);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    letter-spacing: 0.02em;
     color: #111111;
-    line-height: 1.2;
-    font-weight: 400;
+    line-height: 1.15;
+    font-weight: 300;
   }
 
   .section-subheading {
@@ -111,4 +112,38 @@ h4, h5, h6 { font-family: 'Playfair Display', serif; font-weight: 400; }
 @keyframes fadeSlide {
   from { opacity: 0; transform: translateX(20px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Luxury cursor — desktop only ───────────────────────────────── */
+@media (min-width: 768px) {
+  body { cursor: none; }
+
+  .luxury-cursor-dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 6px; height: 6px;
+    background: #3B5373;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-200px, -200px);
+  }
+
+  .luxury-cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 28px; height: 28px;
+    border: 1px solid #3B5373;
+    border-radius: 50%;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-200px, -200px);
+    transition: width 0.15s ease, height 0.15s ease, opacity 0.15s ease;
+  }
+}
+
+@media (max-width: 767px) {
+  .luxury-cursor-dot,
+  .luxury-cursor-ring { display: none; }
 }

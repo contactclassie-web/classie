@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans:     ["Poppins", "sans-serif"],
-        serif:    ['"DM Serif Display"', "serif"],
-        display:  ['"Playfair Display"', "serif"],
+        sans:    ["Poppins", "sans-serif"],
+        serif:   ["var(--font-cormorant)", "Georgia", "serif"],
+        display: ['"DM Serif Display"', "serif"],
       },
       colors: {
         primary: {
