@@ -125,28 +125,60 @@ export default function OccasionCarousel({
     );
   }
 
-  // 3–4 items → 1 big left + rest stacked right
-  if (displayItems.length >= 3) {
-    const rightItems = displayItems.slice(1);
+  // 4 items → 1 big left + 2 top-right + 1 wide bottom-right
+  if (displayItems.length === 4) {
+    return (
+      <>
+        <div
+          className="hidden md:grid"
+          style={{
+            gridTemplateColumns: "1.65fr 1fr 1fr",
+            gridTemplateRows: "1fr 1fr",
+            height: "580px",
+            gap: "3px",
+          }}
+        >
+          {/* Big left card spans both rows */}
+          <div style={{ gridRow: "1 / 3", position: "relative" }}>
+            <OccasionCard occ={displayItems[0]} large={true} />
+          </div>
+          {/* Top right: 2 cards */}
+          <div className="relative"><OccasionCard occ={displayItems[1]} large={false} /></div>
+          <div className="relative"><OccasionCard occ={displayItems[2]} large={false} /></div>
+          {/* Bottom right: spans 2 cols */}
+          <div className="relative" style={{ gridColumn: "2 / 4" }}>
+            <OccasionCard occ={displayItems[3]} large={false} />
+          </div>
+        </div>
+        <div className="flex flex-col gap-[3px] md:hidden">
+          {displayItems.map((occ) => (
+            <div key={occ.href} className="relative" style={{ height: "220px" }}>
+              <OccasionCard occ={occ} large={false} />
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  // 3 items → 1 big left + 2 stacked right
+  if (displayItems.length === 3) {
     return (
       <>
         <div
           className="hidden md:grid"
           style={{
             gridTemplateColumns: "1.65fr 1fr",
-            gridTemplateRows: `repeat(${rightItems.length}, 1fr)`,
+            gridTemplateRows: "1fr 1fr",
             height: "580px",
             gap: "3px",
           }}
         >
-          <div style={{ gridRow: `1 / ${rightItems.length + 1}`, position: "relative" }}>
+          <div style={{ gridRow: "1 / 3", position: "relative" }}>
             <OccasionCard occ={displayItems[0]} large={true} />
           </div>
-          {rightItems.map((occ) => (
-            <div key={occ.href} className="relative">
-              <OccasionCard occ={occ} large={false} />
-            </div>
-          ))}
+          <div className="relative"><OccasionCard occ={displayItems[1]} large={false} /></div>
+          <div className="relative"><OccasionCard occ={displayItems[2]} large={false} /></div>
         </div>
         <div className="flex flex-col gap-[3px] md:hidden">
           {displayItems.map((occ) => (
