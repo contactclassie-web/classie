@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "./CartContext";
@@ -22,25 +21,22 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-classie-border">
       {/* ── Announcement Bar ── */}
-      <div className="bg-[#3D4F5F] text-white text-center text-[11px] py-2 px-4 leading-snug">
-        Welcome to Classie — Use code{" "}
-        <span className="font-semibold">FIRST10</span> for 10% OFF &nbsp;|&nbsp;
-        Free Shipping above ₹999 &nbsp;|&nbsp; Easy Returns &amp; Exchange
+      <div className="bg-[#3D4F5F] text-white text-center text-[11px] py-2 px-4 leading-snug tracking-wide">
+        ✦ Welcome to Classie — One Heel. Endless Looks. &nbsp;|&nbsp;
+        Use code <span className="font-semibold">FIRST10</span> for 10% OFF &nbsp;|&nbsp;
+        🚢 Free Shipping above ₹999 &nbsp;|&nbsp;
+        😊 Easy Returns &amp; Exchange
       </div>
 
       {/* ── Main nav row ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Image
-              src="/logo.jpg"
-              alt="Classie"
-              width={130}
-              height={44}
-              className="h-11 w-auto object-contain"
-              priority
-            />
+
+          {/* Logo — elegant letter-spaced text */}
+          <Link href="/" className="flex-shrink-0 group">
+            <span className="text-[15px] font-light tracking-[0.35em] text-[#3D4F5F] group-hover:opacity-80 transition-opacity select-none">
+              ✦ C L A S S I E
+            </span>
           </Link>
 
           {/* Desktop links */}
@@ -49,7 +45,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-[13px] font-medium text-[#1a1a1a] hover:text-[#3D4F5F] transition-colors tracking-wider"
+                className="text-[12px] font-medium text-[#1a1a1a] hover:text-[#3D4F5F] transition-colors tracking-[0.08em] uppercase"
               >
                 {l.label}
               </Link>
@@ -90,7 +86,7 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="py-4 text-sm font-medium text-[#1a1a1a] border-b border-classie-border last:border-0 tracking-wider hover:text-[#3D4F5F] transition-colors"
+                className="py-4 text-[12px] font-medium text-[#1a1a1a] border-b border-classie-border last:border-0 tracking-[0.1em] uppercase hover:text-[#3D4F5F] transition-colors"
               >
                 {l.label}
               </Link>
