@@ -1334,7 +1334,124 @@ export default function AdminPage() {
               HERO SLIDES TAB
           ══════════════════════════════════════ */}
           {tab === "slides" && (
-            <div className="space-y-4">
+            <div className="space-y-6">
+
+              {/* ── Hero Text Content ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <div className="flex items-center gap-2">
+                  <LayoutTemplate className="w-4 h-4 text-[#3B5373]" />
+                  <h2 className="font-semibold text-gray-700">Hero Text Content</h2>
+                </div>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                  <div className="space-y-4">
+                    <div>
+                      <label className={labelCls}>Eyebrow Text</label>
+                      <input type="text" value={siteSettings.hero_eyebrow} className={inputCls}
+                        onChange={(e) => setSiteSettings((s) => ({ ...s, hero_eyebrow: e.target.value }))}
+                        placeholder="e.g. New Collection" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className={labelCls}>Heading Line 1</label>
+                        <input type="text" value={siteSettings.hero_heading_line1} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_line1: e.target.value }))}
+                          placeholder="One Heel." />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Italic (navy)</label>
+                        <input type="text" value={siteSettings.hero_heading_italic} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_italic: e.target.value }))}
+                          placeholder="Endless" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Heading Line 3</label>
+                        <input type="text" value={siteSettings.hero_heading_line3} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_line3: e.target.value }))}
+                          placeholder="Looks." />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Subtitle</label>
+                      <textarea rows={2} value={siteSettings.hero_subtitle} className={`${inputCls} resize-none`}
+                        onChange={(e) => setSiteSettings((s) => ({ ...s, hero_subtitle: e.target.value }))}
+                        placeholder="Switch the clip-ons. Transform the story…" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={labelCls}>Button 1 Text</label>
+                        <input type="text" value={siteSettings.hero_cta1_text} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta1_text: e.target.value }))}
+                          placeholder="Shop Collection" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Button 1 URL</label>
+                        <input type="text" value={siteSettings.hero_cta1_url} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta1_url: e.target.value }))}
+                          placeholder="/shop/heels" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Button 2 Text <span className="normal-case text-gray-400 font-normal">(leave empty to hide)</span></label>
+                        <input type="text" value={siteSettings.hero_cta2_text} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta2_text: e.target.value }))}
+                          placeholder="View Lookbook" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Button 2 URL</label>
+                        <input type="text" value={siteSettings.hero_cta2_url} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta2_url: e.target.value }))}
+                          placeholder="/collections" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={labelCls}>Promo Code <span className="normal-case text-gray-400 font-normal">(empty = hide chip)</span></label>
+                        <input type="text" value={siteSettings.hero_chip_code} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_chip_code: e.target.value }))}
+                          placeholder="FIRST10" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Chip Text</label>
+                        <input type="text" value={siteSettings.hero_chip_text} className={inputCls}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_chip_text: e.target.value }))}
+                          placeholder="10% off · First order" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Trust Band <span className="normal-case text-gray-400 font-normal">(items separated by · )</span></label>
+                      <textarea rows={2} value={siteSettings.band_text} className={`${inputCls} resize-none`}
+                        onChange={(e) => setSiteSettings((s) => ({ ...s, band_text: e.target.value }))}
+                        placeholder="Free Shipping · Easy Returns · Premium Quality" />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Stats (optional — leave empty to hide)</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {([1, 2, 3] as const).map((n) => (
+                          <div key={n} className="space-y-1.5">
+                            <input type="text"
+                              value={(siteSettings as unknown as Record<string, string>)[`hero_stat${n}_number`]}
+                              className={inputCls} placeholder={`e.g. 5K+`}
+                              onChange={(e) => setSiteSettings((s) => ({ ...s, [`hero_stat${n}_number`]: e.target.value }))} />
+                            <input type="text"
+                              value={(siteSettings as unknown as Record<string, string>)[`hero_stat${n}_label`]}
+                              className={inputCls} placeholder={`Label`}
+                              onChange={(e) => setSiteSettings((s) => ({ ...s, [`hero_stat${n}_label`]: e.target.value }))} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button onClick={saveHero} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Hero Text"}
+                </button>
+              </div>
+
+              {/* ── Hero Slides (images/videos) ── */}
+              <div className="space-y-4">
               {/* Page filter buttons */}
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex flex-wrap gap-2">
@@ -1427,7 +1544,8 @@ export default function AdminPage() {
                     </table>
                   </div>
                 )}
-              </div>
+              </div>{/* closes bg-white table card */}
+              </div>{/* closes inner space-y-4 slides wrapper */}
             </div>
           )}
 
@@ -2051,140 +2169,6 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* ── Hero Section ── */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-                <h2 className="font-semibold text-gray-700">Hero Section</h2>
-
-                {/* Eyebrow */}
-                <div>
-                  <label className={labelCls}>Eyebrow Text</label>
-                  <input type="text" value={siteSettings.hero_eyebrow} className={inputCls}
-                    onChange={(e) => setSiteSettings((s) => ({ ...s, hero_eyebrow: e.target.value }))}
-                    placeholder="e.g. New Collection 2025" />
-                </div>
-
-                {/* Heading lines */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className={labelCls}>Heading Line 1</label>
-                    <input type="text" value={siteSettings.hero_heading_line1} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_line1: e.target.value }))}
-                      placeholder="Step Into" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Italic Line (navy)</label>
-                    <input type="text" value={siteSettings.hero_heading_italic} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_italic: e.target.value }))}
-                      placeholder="Elegance" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Heading Line 3</label>
-                    <input type="text" value={siteSettings.hero_heading_line3} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_line3: e.target.value }))}
-                      placeholder="Redefined" />
-                  </div>
-                </div>
-
-                {/* Subtitle */}
-                <div>
-                  <label className={labelCls}>Subtitle</label>
-                  <textarea rows={2} value={siteSettings.hero_subtitle} className={`${inputCls} resize-none`}
-                    onChange={(e) => setSiteSettings((s) => ({ ...s, hero_subtitle: e.target.value }))}
-                    placeholder="Premium heels crafted for the modern woman…" />
-                </div>
-
-                {/* CTAs */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>CTA 1 Text</label>
-                    <input type="text" value={siteSettings.hero_cta1_text} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta1_text: e.target.value }))}
-                      placeholder="Shop Now" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>CTA 1 URL</label>
-                    <input type="text" value={siteSettings.hero_cta1_url} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta1_url: e.target.value }))}
-                      placeholder="/shop" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>CTA 2 Text</label>
-                    <input type="text" value={siteSettings.hero_cta2_text} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta2_text: e.target.value }))}
-                      placeholder="View Collection" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>CTA 2 URL</label>
-                    <input type="text" value={siteSettings.hero_cta2_url} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta2_url: e.target.value }))}
-                      placeholder="/shop" />
-                  </div>
-                </div>
-
-                {/* Hero image */}
-                <div>
-                  <label className={labelCls}>Hero Image URL</label>
-                  <input type="text" value={siteSettings.hero_image_url} className={inputCls}
-                    onChange={(e) => setSiteSettings((s) => ({ ...s, hero_image_url: e.target.value }))}
-                    placeholder="https://cdn.shopify.com/…/image.jpg" />
-                  {siteSettings.hero_image_url && (
-                    <div className="mt-3 relative w-40 h-24 overflow-hidden border border-gray-200">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={siteSettings.hero_image_url} alt="Hero preview" className="w-full h-full object-cover object-top" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-3">
-                  {([1, 2, 3] as const).map((n) => (
-                    <div key={n} className="space-y-2">
-                      <label className={labelCls}>Stat {n} Number</label>
-                      <input type="text"
-                        value={(siteSettings as unknown as Record<string, string>)[`hero_stat${n}_number`]}
-                        className={inputCls} placeholder="500+"
-                        onChange={(e) => setSiteSettings((s) => ({ ...s, [`hero_stat${n}_number`]: e.target.value }))} />
-                      <label className={labelCls}>Stat {n} Label</label>
-                      <input type="text"
-                        value={(siteSettings as unknown as Record<string, string>)[`hero_stat${n}_label`]}
-                        className={inputCls} placeholder="Styles"
-                        onChange={(e) => setSiteSettings((s) => ({ ...s, [`hero_stat${n}_label`]: e.target.value }))} />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Promo chip */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>Chip Code <span className="normal-case text-gray-400 font-normal">(e.g. SAVE10 — leave empty to hide)</span></label>
-                    <input type="text" value={siteSettings.hero_chip_code} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_chip_code: e.target.value }))}
-                      placeholder="SAVE10" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Chip Text</label>
-                    <input type="text" value={siteSettings.hero_chip_text} className={inputCls}
-                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_chip_text: e.target.value }))}
-                      placeholder="Use code for 10% off" />
-                  </div>
-                </div>
-
-                {/* Trust band */}
-                <div>
-                  <label className={labelCls}>Trust Band Text <span className="normal-case text-gray-400 font-normal">(separate items with ` · `)</span></label>
-                  <textarea rows={2} value={siteSettings.band_text} className={`${inputCls} resize-none`}
-                    onChange={(e) => setSiteSettings((s) => ({ ...s, band_text: e.target.value }))}
-                    placeholder="Free Shipping · Easy Returns · Premium Quality" />
-                </div>
-
-                <button
-                  onClick={saveHero} disabled={settingsSaving}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
-                >
-                  <Save className="w-4 h-4" />
-                  {settingsSaving ? "Saving…" : "Save Hero Section"}
-                </button>
-              </div>
             </div>
           )}
 
