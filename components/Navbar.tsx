@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "./CartContext";
+import AnnouncementBar from "./AnnouncementBar";
 
 const navLinks = [
   { label: "Heels",       href: "/shop/heels" },
@@ -20,13 +21,8 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-classie-border">
-      {/* ── Announcement Bar ── */}
-      <div className="bg-[#3D4F5F] text-white text-center text-[11px] py-2 px-4 leading-snug tracking-wide">
-        ✦ Welcome to Classie — One Heel. Endless Looks. &nbsp;|&nbsp;
-        Use code <span className="font-semibold">FIRST10</span> for 10% OFF &nbsp;|&nbsp;
-        🚢 Free Shipping above ₹999 &nbsp;|&nbsp;
-        😊 Easy Returns &amp; Exchange
-      </div>
+      {/* ── Scrolling Announcement Bar ── */}
+      <AnnouncementBar />
 
       {/* ── Main nav row ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">

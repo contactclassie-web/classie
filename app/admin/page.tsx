@@ -70,6 +70,9 @@ interface HeroSlide {
 
 interface SiteSettings {
   announcement_text: string;
+  announcement_1: string;
+  announcement_2: string;
+  announcement_3: string;
   whatsapp_number: string;
   instagram_url: string;
 }
@@ -166,6 +169,7 @@ export default function AdminPage() {
   // Site Settings
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     announcement_text: "", whatsapp_number: "", instagram_url: "",
+    announcement_1: "", announcement_2: "", announcement_3: "",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -214,7 +218,7 @@ export default function AdminPage() {
     try {
       const { data, error } = await supabase.from("site_settings").select("*");
       if (!error && data) {
-        const merged: SiteSettings = { announcement_text: "", whatsapp_number: "", instagram_url: "" };
+        const merged: SiteSettings = { announcement_text: "", whatsapp_number: "", instagram_url: "", announcement_1: "", announcement_2: "", announcement_3: "" };
         data.forEach((row: { key: string; value: string }) => {
           if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
         });
@@ -924,12 +928,20 @@ export default function AdminPage() {
                 ) : (
                   <>
                     <div>
-                      <label className={labelCls}>Announcement Text</label>
-                      <input
-                        type="text" value={siteSettings.announcement_text} className={inputCls}
-                        onChange={(e) => setSiteSettings((s) => ({ ...s, announcement_text: e.target.value }))}
-                        placeholder="e.g. Free shipping on orders above ₹999"
-                      />
+                      <label className={labelCls}>📢 Scrolling Announcements (teen messages scroll honge)</label>
+                      <div className="space-y-2 mt-1">
+                        {([1,2,3] as const).map((n) => {
+                          const k = `announcement_${n}` as keyof SiteSettings;
+                          return (
+                            <div key={n} className="flex gap-2 items-center">
+                              <span className="text-xs font-medium text-gray-400 w-4 flex-shrink-0">{n}.</span>
+                              <input type="text" value={siteSettings[k] as string ?? ""} className={inputCls}
+                                placeholder={n===1?"✦ Welcome to Classie — One Heel. Endless Looks.":n===2?"Use code FIRST10 for 10% OFF!":"🚢 Free Shipping above ₹999 | 😊 Easy Returns"}
+                                onChange={(e) => setSiteSettings((s) => ({ ...s, [k]: e.target.value }))} />
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                     <div>
                       <label className={labelCls}>WhatsApp Number</label>
