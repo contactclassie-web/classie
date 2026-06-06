@@ -293,24 +293,24 @@ export default async function HomePage() {
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-8 sm:px-16">
-          {/* Header row: heading left, VIEW ALL EDITS right */}
-          <div className="flex items-end justify-between mb-14">
-            <div>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-7 h-px bg-[#3B5373]" />
-                <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
-                  Curated Edits
-                </span>
+          {/* Header */}
+          <div className="px-6 sm:px-12 mb-14">
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-7 h-px bg-[#3B5373]" />
+                  <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
+                    Curated Edits
+                  </span>
+                </div>
+                <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.6rem)] font-light leading-[1.08] text-[#1a1a1a]">
+                  Shop by <em className="italic text-[#3B5373]">Occasion</em>
+                </h2>
               </div>
-              <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.6rem)] font-light leading-[1.08] text-[#1a1a1a]">
-                Shop by <em className="italic text-[#3B5373]">Occasion</em>
-              </h2>
             </div>
-
           </div>
+          {/* Full-width grid */}
           <OccasionCarousel occasions={occasions} />
-        </div>
       </section>
 
       {/* ══ 4. SHOP BY CATEGORY ════════════════════════════════════════════ */}
