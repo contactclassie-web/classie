@@ -2671,19 +2671,39 @@ export default function AdminPage() {
                 <textarea rows={2} value={collectionModal.data.description ?? ""} onChange={(e) => setCollectionField("description", e.target.value)} className={inputCls} placeholder="Collection description…" />
               </div>
               <div>
-                <label className={labelCls}>Image URL</label>
-                <label className={labelCls}>Main Image URL (circle mein dikhegi)</label>
+                <label className={labelCls}>Main Image URL</label>
                 <input type="text" value={collectionModal.data.image_url ?? ""} onChange={(e) => setCollectionField("image_url", e.target.value)} className={inputCls} placeholder="https://cdn.shopify.com/…" />
                 {collectionModal.data.image_url && (
-                  <div className="mt-2 relative w-full h-28 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={collectionModal.data.image_url}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                    />
-                    <p className="absolute top-1 left-2 text-[10px] text-white bg-black/50 px-1.5 py-0.5 rounded">Preview</p>
+                  <div className="mt-3 space-y-2">
+                    <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-gray-400">Card Preview (exactly site pe aise dikhegi)</p>
+                    {/* Card preview — matches site card exactly */}
+                    <div className="relative overflow-hidden bg-gray-900" style={{ width: "100%", paddingBottom: "120%", borderRadius: 0 }}>
+                      <div className="absolute inset-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={collectionModal.data.image_url}
+                          alt="Card Preview"
+                          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                        />
+                        {/* Gradient overlay */}
+                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, transparent 38%, rgba(26,26,26,0.75) 100%)" }} />
+                        {/* Tag + Title overlay at bottom */}
+                        <div style={{ position: "absolute", bottom: 0, left: 0, padding: "20px" }}>
+                          {collectionModal.data.tag_label && (
+                            <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", color: "white", opacity: 0.7, marginBottom: "6px" }}>
+                              {collectionModal.data.tag_label}
+                            </p>
+                          )}
+                          <p style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: 300, color: "white", lineHeight: 1.2, marginBottom: "10px" }}>
+                            {collectionModal.data.title || "Collection Name"}
+                          </p>
+                          <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>
+                            Shop Now →
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
