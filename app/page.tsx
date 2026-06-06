@@ -121,7 +121,7 @@ export default async function HomePage() {
               { label: "Bow Collection", sub: "Satin swirls & bloom bows", href: "/shop/bow", image: bowImage, count: accessories.filter(p => ["fauxbow","satin-swirl","glitzknot"].some(s=>p.slug.includes(s))).length },
             ].map((cat) => (
               <Link key={cat.href} href={cat.href}
-                className="group relative overflow-hidden rounded-2xl bg-classie-light"
+                className="group relative overflow-hidden bg-classie-light"
                 style={{ aspectRatio: "4 / 3" }}
               >
                 {cat.image && (
