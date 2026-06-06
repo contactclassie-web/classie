@@ -155,7 +155,7 @@ export default async function HomePage() {
       {/* ══ TESTIMONIALS ═════════════════════════════════════════════════ */}
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-10">What They Say</p>
+          <p className="section-subheading mb-10">What They Say</p>
           <blockquote className="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8" style={{fontFamily:"'Playfair Display', serif", fontWeight:400}}>
             &ldquo;The most elegant heels I&apos;ve owned. Wore them all evening at a wedding — zero discomfort, endless compliments.&rdquo;
           </blockquote>
@@ -167,9 +167,8 @@ export default async function HomePage() {
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="mb-10">
-            <h2 className="mb-2" style={{fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.5rem, 2.8vw, 2.25rem)", fontWeight:400, letterSpacing:"0.01em", color:"#111"}}>
-              As Seen on Instagram
-            </h2>
+            <p className="section-subheading mb-3">Instagram</p>
+            <h2 className="section-heading mb-2">As Seen on Instagram</h2>
             <p className="text-gray-400 text-xs tracking-wide" style={{fontFamily:"'Poppins', sans-serif", fontWeight:300}}>Tag us @_classie_in to be featured</p>
           </div>
 
