@@ -97,6 +97,7 @@ export default async function HomePage() {
             href: `/shop/${c.slug}`,
             image: c.image_url ?? "",
             tag_label: c.tag_label ?? "",
+            image_position: c.image_position ?? "top",
           })
         )
       : FALLBACK_OCCASIONS;

@@ -126,6 +126,7 @@ interface Collection {
   image_url?: string;
   hover_image_url?: string;
   tag_label?: string;
+  image_position?: string;
   display_order: number;
   active: boolean;
 }
@@ -1561,7 +1562,7 @@ export default function AdminPage() {
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
                     <RefreshCw className={`w-3.5 h-3.5 ${collectionsLoading ? "animate-spin" : ""}`} /> Refresh
                   </button>
-                  <button onClick={() => { setCollectionModalMode("add"); setCollectionModal({ open: true, data: { title: "", slug: "", description: "", image_url: "", hover_image_url: "", display_order: collections.length + 1, active: true } }); setSlugManuallyEdited(false); }}
+                  <button onClick={() => { setCollectionModalMode("add"); setCollectionModal({ open: true, data: { title: "", slug: "", description: "", image_url: "", hover_image_url: "", tag_label: "", image_position: "top", display_order: collections.length + 1, active: true } }); setSlugManuallyEdited(false); }}
                     className="flex items-center gap-1.5 px-4 py-1.5 bg-[#3B5373] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
                     <Plus className="w-3.5 h-3.5" /> Add Collection
                   </button>
@@ -2674,33 +2675,55 @@ export default function AdminPage() {
                 <label className={labelCls}>Main Image URL</label>
                 <input type="text" value={collectionModal.data.image_url ?? ""} onChange={(e) => setCollectionField("image_url", e.target.value)} className={inputCls} placeholder="https://cdn.shopify.com/…" />
                 {collectionModal.data.image_url && (
-                  <div className="mt-3 space-y-2">
-                    <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-gray-400">Card Preview (exactly site pe aise dikhegi)</p>
+                  <div className="mt-3 space-y-3">
+                    {/* Crop position selector */}
+                    <div>
+                      <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-gray-400 mb-2">Image Focus — site pe kaisi crop hogi</p>
+                      <div className="flex gap-2">
+                        {(["top","center","bottom"] as const).map((pos) => (
+                          <button key={pos} type="button"
+                            onClick={() => setCollectionField("image_position", pos)}
+                            className={`flex-1 py-2 text-xs font-medium capitalize rounded-lg border transition-all ${
+                              (collectionModal.data.image_position ?? "top") === pos
+                                ? "bg-[#3B5373] text-white border-[#3B5373]"
+                                : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373]"
+                            }`}>
+                            {pos === "top" ? "⬆ Top" : pos === "center" ? "⬛ Center" : "⬇ Bottom"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     {/* Card preview — matches site card exactly */}
-                    <div className="relative overflow-hidden bg-gray-900" style={{ width: "100%", paddingBottom: "120%", borderRadius: 0 }}>
+                    <div className="relative overflow-hidden bg-gray-900" style={{ width: "100%", paddingBottom: "115%" }}>
                       <div className="absolute inset-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={collectionModal.data.image_url}
                           alt="Card Preview"
-                          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
+                          style={{
+                            position: "absolute", inset: 0, width: "100%", height: "100%",
+                            objectFit: "cover",
+                            objectPosition: collectionModal.data.image_position ?? "top",
+                            transition: "object-position 0.3s"
+                          }}
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />
-                        {/* Gradient overlay */}
-                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, transparent 38%, rgba(26,26,26,0.75) 100%)" }} />
-                        {/* Tag + Title overlay at bottom */}
-                        <div style={{ position: "absolute", bottom: 0, left: 0, padding: "20px" }}>
+                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, transparent 38%, rgba(26,26,26,0.78) 100%)" }} />
+                        <div style={{ position: "absolute", bottom: 0, left: 0, padding: "22px" }}>
                           {collectionModal.data.tag_label && (
-                            <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", color: "white", opacity: 0.7, marginBottom: "6px" }}>
+                            <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.65)", marginBottom: "7px" }}>
                               {collectionModal.data.tag_label}
                             </p>
                           )}
-                          <p style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: 300, color: "white", lineHeight: 1.2, marginBottom: "10px" }}>
+                          <p style={{ fontFamily: "Georgia,serif", fontSize: "22px", fontWeight: 300, color: "white", lineHeight: 1.2, marginBottom: "10px" }}>
                             {collectionModal.data.title || "Collection Name"}
                           </p>
-                          <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>
+                          <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)" }}>
                             Shop Now →
                           </p>
+                        </div>
+                        <div style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(0,0,0,0.5)", color: "white", fontSize: "9px", padding: "3px 8px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                          Preview
                         </div>
                       </div>
                     </div>
