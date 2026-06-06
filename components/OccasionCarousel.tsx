@@ -160,8 +160,8 @@ export default function OccasionCarousel({
           <div style={{ gridColumn: "3/4", gridRow: "1/2", position: "relative" }}>
             <OccasionCard occ={displayItems[2]} large={false} />
           </div>
-          {/* Bloom & Bow: cols 2-3, row 2 (wide) */}
-          <div style={{ gridColumn: "2/4", gridRow: "2/3", position: "relative" }}>
+          {/* 4th card: col 2, row 2 only */}
+          <div style={{ gridColumn: "2/3", gridRow: "2/3", position: "relative" }}>
             <OccasionCard occ={displayItems[3]} large={false} />
           </div>
         </div>
