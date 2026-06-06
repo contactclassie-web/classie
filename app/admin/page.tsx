@@ -7,7 +7,7 @@ import {
   CheckCircle2, Truck, AlertCircle,
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
-  LayoutDashboard, ShoppingCart, Layers, Grid3x3,
+  LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -166,7 +166,7 @@ const EMPTY_SLIDE: HeroSlide = {
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "settings" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages";
 
 // ── Main Component ─────────────────────────────────────────────────────────
 
@@ -257,6 +257,18 @@ export default function AdminPage() {
     saving: boolean;
   }>({ open: false, collection: null, selectedSlugs: [], saving: false });
 
+  // Featured Picks
+  const [latestProducts, setLatestProducts] = useState<DbProduct[]>([]);
+  const [bestSellerProducts, setBestSellerProducts] = useState<DbProduct[]>([]);
+  const [allActiveProducts, setAllActiveProducts] = useState<DbProduct[]>([]);
+  const [featuredPicksModal, setFeaturedPicksModal] = useState<{
+    open: boolean;
+    tab: 'latest' | 'bestseller';
+    selectedIds: string[];
+    search: string;
+    saving: boolean;
+  }>({ open: false, tab: 'latest', selectedIds: [], search: '', saving: false });
+
   // Messages
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
@@ -334,6 +346,17 @@ export default function AdminPage() {
     finally { setCollectionsLoading(false); }
   }, []);
 
+  const fetchFeaturedPicks = useCallback(async () => {
+    const [{ data: latest }, { data: best }, { data: all }] = await Promise.all([
+      supabase.from('products').select('*').eq('featured_tab', 'latest').eq('active', true),
+      supabase.from('products').select('*').eq('featured_tab', 'bestseller').eq('active', true),
+      supabase.from('products').select('*').eq('active', true).order('title'),
+    ]);
+    if (latest) setLatestProducts(latest as DbProduct[]);
+    if (best) setBestSellerProducts(best as DbProduct[]);
+    if (all) setAllActiveProducts(all as DbProduct[]);
+  }, []);
+
   const fetchMessages = useCallback(async () => {
     setMessagesLoading(true);
     try {
@@ -384,7 +407,8 @@ export default function AdminPage() {
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
     if (tab === "categories") fetchCategories();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories]);
+    if (tab === "featured-picks") fetchFeaturedPicks();
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -709,6 +733,7 @@ export default function AdminPage() {
     { id: "slides",      label: "Hero Slides", icon: LayoutTemplate },
     { id: "collections", label: "Collections", icon: Layers, badge: collections.length },
     { id: "categories",  label: "Categories",  icon: Grid3x3, badge: siteCategories.length },
+    { id: "featured-picks", label: "Featured Picks", icon: Sparkles },
     { id: "settings",    label: "Settings",    icon: Settings },
     { id: "messages",    label: "Messages",    icon: MessageSquare, badge: messages.length },
   ];
@@ -776,7 +801,7 @@ export default function AdminPage() {
         <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
           <div>
             <h1 className="font-semibold text-gray-800 capitalize">
-              {tab === "dashboard" ? "Dashboard Overview" : tab.replace("-", " ")}
+              {tab === "dashboard" ? "Dashboard Overview" : tab === "featured-picks" ? "Featured Picks" : tab.replace("-", " ")}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">Classie Admin Panel</p>
           </div>
@@ -1416,6 +1441,135 @@ export default function AdminPage() {
           )}
 
           {/* ══════════════════════════════════════
+              FEATURED PICKS TAB
+          ══════════════════════════════════════ */}
+          {tab === "featured-picks" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500">Manage products shown in Latest Styles and Best Sellers sections</p>
+                <button onClick={fetchFeaturedPicks} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
+                  <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                {/* Latest Styles Panel */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#3B5373]" />
+                      <h2 className="font-semibold text-gray-700 text-sm">Latest Styles</h2>
+                      <span className="text-xs bg-[#3B5373]/10 text-[#3B5373] px-2 py-0.5 rounded-full font-medium">{latestProducts.length}</span>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2 min-h-[200px]">
+                    {latestProducts.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-8">No products assigned yet.</p>
+                    ) : (
+                      latestProducts.map((p) => (
+                        <div key={p.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 group">
+                          {p.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.image} alt={p.title} className="w-10 h-10 object-cover rounded flex-shrink-0" />
+                          ) : (
+                            <div className="w-10 h-10 rounded bg-gray-100 flex-shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-gray-800 truncate">{p.title}</p>
+                            <p className="text-[11px] text-gray-400">₹{p.price.toLocaleString('en-IN')}</p>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              await supabase.from('products').update({ featured_tab: null }).eq('id', p.id);
+                              setLatestProducts(prev => prev.filter(x => x.id !== p.id));
+                            }}
+                            className="p-1 rounded hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                            title="Remove"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="px-4 pb-4">
+                    <button
+                      onClick={() => {
+                        setFeaturedPicksModal({
+                          open: true,
+                          tab: 'latest',
+                          selectedIds: latestProducts.map(p => p.id!),
+                          search: '',
+                          saving: false,
+                        });
+                      }}
+                      className="w-full py-2 border border-[#3B5373] text-[#3B5373] text-xs font-medium rounded-lg hover:bg-[#3B5373] hover:text-white transition-colors"
+                    >
+                      Manage Latest Styles
+                    </button>
+                  </div>
+                </div>
+
+                {/* Best Sellers Panel */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-500" />
+                      <h2 className="font-semibold text-gray-700 text-sm">Best Sellers</h2>
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">{bestSellerProducts.length}</span>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2 min-h-[200px]">
+                    {bestSellerProducts.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-8">No products assigned yet.</p>
+                    ) : (
+                      bestSellerProducts.map((p) => (
+                        <div key={p.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 group">
+                          {p.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.image} alt={p.title} className="w-10 h-10 object-cover rounded flex-shrink-0" />
+                          ) : (
+                            <div className="w-10 h-10 rounded bg-gray-100 flex-shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-gray-800 truncate">{p.title}</p>
+                            <p className="text-[11px] text-gray-400">₹{p.price.toLocaleString('en-IN')}</p>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              await supabase.from('products').update({ featured_tab: null }).eq('id', p.id);
+                              setBestSellerProducts(prev => prev.filter(x => x.id !== p.id));
+                            }}
+                            className="p-1 rounded hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                            title="Remove"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="px-4 pb-4">
+                    <button
+                      onClick={() => {
+                        setFeaturedPicksModal({
+                          open: true,
+                          tab: 'bestseller',
+                          selectedIds: bestSellerProducts.map(p => p.id!),
+                          search: '',
+                          saving: false,
+                        });
+                      }}
+                      className="w-full py-2 border border-amber-400 text-amber-600 text-xs font-medium rounded-lg hover:bg-amber-50 transition-colors"
+                    >
+                      Manage Best Sellers
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
               SETTINGS TAB
           ══════════════════════════════════════ */}
           {tab === "settings" && (
@@ -1842,19 +1996,6 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              {/* Featured Picks Tab */}
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Featured Picks Tab</label>
-                <select
-                  value={productModal.data.featured_tab ?? ""}
-                  onChange={(e) => setProductField("featured_tab", e.target.value || null)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#3B5373] transition-colors"
-                >
-                  <option value="">None — don&apos;t show in Featured Picks</option>
-                  <option value="latest">Latest Styles tab</option>
-                  <option value="bestseller">Best Sellers tab</option>
-                </select>
-              </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
               <button onClick={closeProductModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3B5373] transition-colors">
@@ -2291,6 +2432,101 @@ export default function AdminPage() {
               </button>
               <button onClick={() => deleteCategory(deleteCategoryConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          FEATURED PICKS MANAGE MODAL
+      ══════════════════════════════════════════════════ */}
+      {featuredPicksModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <div>
+                <h2 className="font-semibold text-gray-800">
+                  {featuredPicksModal.tab === 'latest' ? 'Manage Latest Styles' : 'Manage Best Sellers'}
+                </h2>
+                <p className="text-xs text-gray-400 mt-0.5">{featuredPicksModal.selectedIds.length} selected</p>
+              </div>
+              <button onClick={() => setFeaturedPicksModal(m => ({ ...m, open: false }))} className="p-2 rounded-lg hover:bg-gray-100">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            {/* Search */}
+            <div className="px-5 py-3 border-b border-gray-50">
+              <input
+                type="text"
+                value={featuredPicksModal.search}
+                onChange={(e) => setFeaturedPicksModal(m => ({ ...m, search: e.target.value }))}
+                placeholder="Search products…"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors"
+              />
+            </div>
+            {/* Product list */}
+            <div className="overflow-y-auto flex-1 p-5 space-y-1">
+              {allActiveProducts
+                .filter(p => !featuredPicksModal.search || p.title.toLowerCase().includes(featuredPicksModal.search.toLowerCase()))
+                .map(p => {
+                  const checked = featuredPicksModal.selectedIds.includes(p.id!);
+                  return (
+                    <label key={p.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer group">
+                      <input type="checkbox"
+                        checked={checked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFeaturedPicksModal(m => ({ ...m, selectedIds: [...m.selectedIds, p.id!] }));
+                          } else {
+                            setFeaturedPicksModal(m => ({ ...m, selectedIds: m.selectedIds.filter(id => id !== p.id) }));
+                          }
+                        }}
+                        className="w-4 h-4 accent-[#3B5373] cursor-pointer flex-shrink-0"
+                      />
+                      {p.image && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.image} alt={p.title} className="w-10 h-10 object-cover rounded flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-800 truncate">{p.title}</p>
+                        <p className="text-xs text-gray-400">₹{p.price.toLocaleString('en-IN')} · {p.category}</p>
+                      </div>
+                      {p.featured_tab && p.featured_tab !== featuredPicksModal.tab && (
+                        <span className="text-[10px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full flex-shrink-0">
+                          {p.featured_tab === 'latest' ? 'Latest' : 'Best Seller'}
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
+            </div>
+            {/* Footer */}
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setFeaturedPicksModal(m => ({ ...m, open: false }))} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+              <button
+                onClick={async () => {
+                  setFeaturedPicksModal(m => ({ ...m, saving: true }));
+                  const { tab: picksTab, selectedIds } = featuredPicksModal;
+                  // Products that were in this tab before
+                  const wasInTab = (picksTab === 'latest' ? latestProducts : bestSellerProducts).map(p => p.id!);
+                  // Assign selected ones
+                  for (const id of selectedIds) {
+                    await supabase.from('products').update({ featured_tab: picksTab }).eq('id', id);
+                  }
+                  // Clear ones that were in tab but are now unchecked (don't touch the other tab)
+                  const toRemove = wasInTab.filter(id => !selectedIds.includes(id));
+                  for (const id of toRemove) {
+                    await supabase.from('products').update({ featured_tab: null }).eq('id', id);
+                  }
+                  await fetchFeaturedPicks();
+                  setFeaturedPicksModal(m => ({ ...m, open: false, saving: false }));
+                }}
+                disabled={featuredPicksModal.saving}
+                className="px-6 py-2 bg-[#3B5373] text-white rounded-lg text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50"
+              >
+                {featuredPicksModal.saving ? 'Saving…' : `Save (${featuredPicksModal.selectedIds.length} selected)`}
               </button>
             </div>
           </div>

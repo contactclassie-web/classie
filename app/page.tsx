@@ -91,7 +91,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
-      <section className="pt-10 pb-20 bg-white border-t border-gray-100">
+      <section className="pt-10 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="section-subheading text-left">Collections</p>
           <h2 className="section-heading text-left mt-2 mb-10">Shop by Category</h2>

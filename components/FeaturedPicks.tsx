@@ -86,12 +86,7 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
                     />
                   )}
 
-                  {/* SALE Badge — top-left, only if compare_price > price */}
-                  {hasDiscount && (
-                    <div className="absolute top-3 left-3 bg-white text-gray-700 text-[10px] tracking-widest uppercase px-2 py-1 font-light border border-gray-200 z-10">
-                      Sale
-                    </div>
-                  )}
+                  {/* No SALE badge — luxury feel */}
 
                   {/* Shop Now hover overlay */}
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
