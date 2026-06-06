@@ -43,7 +43,7 @@ export default async function HomePage() {
   // ── Hero Slides ───────────────────────────────────────────────────────
   const { data: heroSlides } = await sb
     .from("hero_slides")
-    .select("image_url, title")
+    .select("image_url")
     .eq("active", true)
     .eq("page", "home")
     .order("display_order", { ascending: true });
