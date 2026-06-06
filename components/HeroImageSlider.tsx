@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Slide {
   image_url: string;
-  title?: string;
 }
 
 function isVideo(url: string) {
@@ -31,13 +30,17 @@ export default function HeroImageSlider({
       : [];
 
   const [current, setCurrent] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (items.length <= 1) return;
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % items.length);
-    }, 5000);
-    return () => clearInterval(interval);
+    }, 3000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length]);
 
   if (items.length === 0) return <div className="absolute inset-0 bg-[#F9F9F9]" />;
@@ -53,8 +56,11 @@ export default function HeroImageSlider({
             muted
             loop
             playsInline
-            className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700"
-            style={{ opacity: i === current ? 1 : 0 }}
+            className="absolute inset-0 w-full h-full object-cover object-top"
+            style={{
+              opacity: i === current ? 1 : 0,
+              transition: "opacity 0.8s ease-in-out",
+            }}
           />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
@@ -62,14 +68,21 @@ export default function HeroImageSlider({
             key={i}
             src={src}
             alt="Classie"
-            className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700"
-            style={{ opacity: i === current ? 1 : 0 }}
+            className="absolute inset-0 w-full h-full object-cover object-top"
+            style={{
+              opacity: i === current ? 1 : 0,
+              transition: "opacity 0.8s ease-in-out",
+            }}
           />
         )
       )}
 
+      {/* Dot indicators */}
       {items.length > 1 && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+        <div
+          className="absolute bottom-5 left-1/2 flex gap-1.5 z-10"
+          style={{ transform: "translateX(-50%)" }}
+        >
           {items.map((_, i) => (
             <button
               key={i}
@@ -83,6 +96,7 @@ export default function HeroImageSlider({
                 border: "none",
                 cursor: "pointer",
                 transition: "all 0.3s",
+                padding: 0,
               }}
             />
           ))}
