@@ -18,11 +18,10 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
   const products = (activeTab === "latest" ? latestProducts : bestSellers).slice(0, 4);
 
   return (
-    <section className="py-20 bg-white">
+    <section className="pt-12 pb-20 bg-white border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-        {/* Eyebrow + Heading — LEFT aligned, Mango style */}
-        <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Curated for You</p>
+        {/* Heading — LEFT aligned, Mango style */}
         <h2
           className="mb-8"
           style={{
