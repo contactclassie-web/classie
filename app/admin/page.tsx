@@ -224,6 +224,7 @@ export default function AdminPage() {
   });
   const [collectionSaving, setCollectionSaving] = useState(false);
   const [collectionModalMode, setCollectionModalMode] = useState<"add"|"edit">("edit");
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
   // Manage Products modal
   const [manageProductsModal, setManageProductsModal] = useState<{
@@ -1151,7 +1152,7 @@ export default function AdminPage() {
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
                     <RefreshCw className={`w-3.5 h-3.5 ${collectionsLoading ? "animate-spin" : ""}`} /> Refresh
                   </button>
-                  <button onClick={() => { setCollectionModalMode("add"); setCollectionModal({ open: true, data: { title: "", slug: "", description: "", image_url: "", hover_image_url: "", display_order: collections.length + 1, active: true } }); }}
+                  <button onClick={() => { setCollectionModalMode("add"); setCollectionModal({ open: true, data: { title: "", slug: "", description: "", image_url: "", hover_image_url: "", display_order: collections.length + 1, active: true } }); setSlugManuallyEdited(false); }}
                     className="flex items-center gap-1.5 px-4 py-1.5 bg-[#3B5373] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
                     <Plus className="w-3.5 h-3.5" /> Add Collection
                   </button>
@@ -1912,8 +1913,8 @@ export default function AdminPage() {
                   <input type="text" value={collectionModal.data.title} onChange={(e) => {
                     const title = e.target.value;
                     setCollectionField("title", title);
-                    // Auto-generate slug from title (only in add mode, don't overwrite in edit)
-                    if (collectionModalMode === "add") {
+                    // Auto-fill slug only if user hasn't manually typed one
+                    if (collectionModalMode === "add" && !slugManuallyEdited) {
                       const autoSlug = title.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
                       setCollectionField("slug", autoSlug);
                     }
@@ -1921,7 +1922,10 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className={labelCls}>Slug</label>
-                  <input type="text" value={collectionModal.data.slug} onChange={(e) => setCollectionField("slug", e.target.value)} className={inputCls} />
+                  <input type="text" value={collectionModal.data.slug} onChange={(e) => {
+                    setSlugManuallyEdited(true);
+                    setCollectionField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""));
+                  }} className={inputCls} placeholder="e.g. summer-edit" />
                 </div>
               </div>
               <div>
