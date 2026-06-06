@@ -5,6 +5,7 @@ import HeroSlider from "@/components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
 import ProductCard from "@/components/ProductCard";
 import NewsletterSection from "@/components/NewsletterSection";
+import OccasionCarousel from "@/components/OccasionCarousel";
 import {
   Product,
   CURATED_COLLECTIONS,
@@ -84,45 +85,7 @@ export default async function HomePage() {
           <h2 className="text-center font-serif text-4xl md:text-5xl tracking-[0.2em] uppercase mb-12" style={{fontWeight: 400}}>
             Shop by Occasion
           </h2>
-          {/* Horizontal scroll — 5 visible by default, scroll for more */}
-          <div className="flex gap-6 overflow-x-auto pb-4 justify-start"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-            {occasions.map((occ) => (
-              <Link
-                key={occ.href}
-                href={occ.href}
-                className="group flex flex-col items-center gap-4 flex-shrink-0"
-                style={{ width: "calc((100vw - 3rem) / 2.4)", maxWidth: "220px", minWidth: "140px" }}
-              >
-                <div className="relative rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3B5373]/20 transition-all duration-500 w-full"
-                  style={{ aspectRatio: "1/1" }}>
-                  {occ.image ? (
-                    <Image
-                      src={occ.image}
-                      alt={occ.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 40vw, 220px"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-[#f0eef8] flex items-center justify-center">
-                      <span className="font-serif text-3xl text-[#3B5373]/40">{occ.title.charAt(0)}</span>
-                    </div>
-                  )}
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-[#3B5373]/0 group-hover:bg-[#3B5373]/15 transition-all duration-500 rounded-full" />
-                </div>
-                <div className="text-center">
-                  <span className="font-serif text-lg md:text-xl text-classie-black group-hover:text-[#3B5373] transition-colors tracking-wide block">
-                    {occ.title}
-                  </span>
-                  <span className="text-[11px] tracking-widest uppercase text-classie-gray mt-1 block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Shop Now →
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <OccasionCarousel occasions={occasions} />
         </div>
       </section>
 
