@@ -45,6 +45,7 @@ export default async function HomePage() {
     .from("hero_slides")
     .select("image_url, title")
     .eq("active", true)
+    .eq("page", "home")
     .order("display_order", { ascending: true });
 
   // ── Occasions & Categories ─────────────────────────────────────────────
