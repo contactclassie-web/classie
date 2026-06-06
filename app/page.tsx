@@ -92,7 +92,7 @@ export default async function HomePage() {
   const occasions =
     dbCollections && dbCollections.length > 0
       ? dbCollections.map(
-          (c: { title: string; slug: string; image_url?: string; tag_label?: string }) => ({
+          (c: { title: string; slug: string; image_url?: string; tag_label?: string; image_position?: string }) => ({
             title: c.title,
             href: `/shop/${c.slug}`,
             image: c.image_url ?? "",
