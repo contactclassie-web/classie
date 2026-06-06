@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #3D4F5F;
+  --primary-dark: #2e3c49;
+  --font-poppins: 'Poppins', sans-serif;
+  --font-serif:   'DM Serif Display', serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-poppins);
+  color: #1a1a1a;
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-serif); }
+
+@layer components {
+  /* ── Primary pill button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-[#3D4F5F] text-white
+           px-7 py-3 text-sm font-medium tracking-wider
+           rounded-[24px] border border-transparent
+           hover:bg-[#2e3c49] active:scale-95
+           transition-all duration-200 cursor-pointer;
+  }
+
+  /* ── Ghost/outline pill button */
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2
+           bg-transparent text-[#3D4F5F]
+           px-7 py-3 text-sm font-medium tracking-wider
+           rounded-[24px] border border-[#3D4F5F]
+           hover:bg-[#3D4F5F] hover:text-white active:scale-95
+           transition-all duration-200 cursor-pointer;
+  }
+
+  /* ── Ghost on dark (white outline) */
+  .btn-ghost-white {
+    @apply inline-flex items-center justify-center gap-2
+           bg-transparent text-white
+           px-7 py-3 text-sm font-medium tracking-wider
+           rounded-[24px] border border-white
+           hover:bg-white hover:text-[#3D4F5F] active:scale-95
+           transition-all duration-200 cursor-pointer;
+  }
+
+  .section-heading    { @apply font-serif text-3xl md:text-4xl text-classie-black text-center; }
+  .section-subheading { @apply text-[11px] text-classie-gray text-center tracking-[0.4em] uppercase mt-2; }
+}
+
+/* Hero slider */
+.hero-slide { animation: fadeSlide 0.6s ease-in-out; }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
