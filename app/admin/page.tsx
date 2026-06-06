@@ -2703,8 +2703,7 @@ export default function AdminPage() {
                           style={{
                             position: "absolute", inset: 0, width: "100%", height: "100%",
                             objectFit: "cover",
-                            objectPosition: collectionModal.data.image_position ?? "top",
-                            transition: "object-position 0.3s"
+                            objectPosition: collectionModal.data.image_position ?? "top"
                           }}
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                         />
@@ -2722,8 +2721,8 @@ export default function AdminPage() {
                             Shop Now →
                           </p>
                         </div>
-                        <div style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(0,0,0,0.5)", color: "white", fontSize: "9px", padding: "3px 8px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                          Preview
+                        <div style={{ position: "absolute", top: "10px", right: "10px", background: "#3B5373", color: "white", fontSize: "9px", padding: "3px 8px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                          {collectionModal.data.image_position ?? "top"}
                         </div>
                       </div>
                     </div>
