@@ -26,7 +26,7 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
           className="text-center mb-8"
           style={{
             fontFamily: "'DM Serif Display', serif",
-            fontSize: "clamp(2rem, 4vw, 3rem)",
+            fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
             fontWeight: 400,
             color: "#111",
             letterSpacing: "0.02em",
