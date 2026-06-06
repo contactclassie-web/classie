@@ -32,11 +32,13 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
 
-          {/* Logo — elegant letter-spaced text */}
+          {/* Logo — HD box border style */}
           <Link href="/" className="flex-shrink-0 group">
-            <span className="text-[15px] font-light tracking-[0.35em] text-[#3D4F5F] group-hover:opacity-80 transition-opacity select-none">
-              ✦ C L A S S I E
-            </span>
+            <div className="border border-[#3D4F5F] px-3 py-2 group-hover:bg-[#3D4F5F]/5 transition-colors">
+              <span className="text-[13px] font-semibold tracking-[0.25em] text-[#3D4F5F] select-none flex items-center gap-1.5">
+                ✦ C L A S S I E
+              </span>
+            </div>
           </Link>
 
           {/* Desktop links */}
@@ -45,7 +47,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-[12px] font-medium text-[#1a1a1a] hover:text-[#3D4F5F] transition-colors tracking-[0.08em] uppercase"
+                className="text-[13px] font-medium text-[#1a1a1a] hover:text-[#3D4F5F] transition-colors tracking-wider"
               >
                 {l.label}
               </Link>
@@ -86,7 +88,7 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="py-4 text-[12px] font-medium text-[#1a1a1a] border-b border-classie-border last:border-0 tracking-[0.1em] uppercase hover:text-[#3D4F5F] transition-colors"
+                className="py-4 text-sm font-medium text-[#1a1a1a] border-b border-classie-border last:border-0 tracking-wider hover:text-[#3D4F5F] transition-colors"
               >
                 {l.label}
               </Link>
