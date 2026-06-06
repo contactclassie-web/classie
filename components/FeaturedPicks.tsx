@@ -18,12 +18,12 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
   const products = (activeTab === "latest" ? latestProducts : bestSellers).slice(0, 4);
 
   return (
-    <section className="pt-12 pb-20 bg-white border-t border-gray-100">
+    <section className="pt-12 pb-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Heading — LEFT aligned, Mango style */}
         <h2
-          className="mb-8"
+          className="mb-5"
           style={{
             fontFamily: "'Playfair Display', serif",
             fontSize: "clamp(1.5rem, 2.5vw, 2.25rem)",
