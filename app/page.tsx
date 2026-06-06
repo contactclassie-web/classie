@@ -70,6 +70,20 @@ export default async function HomePage() {
       }))
     : FALLBACK_OCCASIONS;
 
+  // Philosophy section settings from site_settings
+  const { data: philosophyRows } = await sb.from("site_settings").select("key,value").in("key", [
+    "philosophy_eyebrow", "philosophy_headline", "philosophy_body",
+    "philosophy_cta_text", "philosophy_cta_url", "philosophy_image_url",
+  ]);
+  const philMap: Record<string, string> = {};
+  (philosophyRows ?? []).forEach((r: { key: string; value: string }) => { philMap[r.key] = r.value; });
+  const philEyebrow  = philMap["philosophy_eyebrow"]   || "Our Philosophy";
+  const philHeadline = philMap["philosophy_headline"]  || "One Heel. Endless Possibilities.";
+  const philBody     = philMap["philosophy_body"]      || "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way. From morning coffee to midnight celebrations, there\u2019s a Classie for every chapter of your day.";
+  const philCtaText  = philMap["philosophy_cta_text"]  || "Our Story";
+  const philCtaUrl   = philMap["philosophy_cta_url"]   || "/about";
+  const philImageUrl = philMap["philosophy_image_url"] || "";
+
   // Instagram feed images (first 4 products)
   const igImages = allProducts.slice(0, 4).map((p) => ({ image: p.image, slug: p.slug, title: p.title }));
 
@@ -122,31 +136,62 @@ export default async function HomePage() {
 
       {/* ══ OUR STORY — Editorial Banner ════════════════════════════════ */}
       <section className="bg-[#3B5373] text-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
-          {/* Left: editorial headline */}
-          <div>
-            <p className="text-[11px] tracking-[0.5em] uppercase text-white/40 mb-6">Our Philosophy</p>
-            <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-none uppercase">
-              One Heel.<br />
-              Endless<br />
-              Possibilities.
-            </h2>
+        {philImageUrl ? (
+          /* ── With image: new editorial 2-col layout ── */
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 grid md:grid-cols-2 gap-0 items-stretch">
+            {/* Left: eyebrow + heading + CTA */}
+            <div className="md:pr-12 flex flex-col justify-center">
+              <p className="text-[11px] tracking-[0.5em] uppercase text-white/40 mb-6">{philEyebrow}</p>
+              <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-none uppercase mb-8">
+                {philHeadline.split(". ").map((line, i, arr) => (
+                  <span key={i}>{line}{i < arr.length - 1 ? "." : ""}<br /></span>
+                ))}
+              </h2>
+              <Link
+                href={philCtaUrl}
+                className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3B5373] transition-all duration-300 self-start"
+              >
+                {philCtaText} <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            {/* Right: body text + image */}
+            <div className="md:border-l md:border-white/20 md:pl-12 flex flex-col gap-8">
+              <p className="text-white/70 text-base md:text-lg leading-relaxed">{philBody}</p>
+              <div className="relative overflow-hidden flex-1 min-h-[250px]">
+                <Image
+                  src={philImageUrl}
+                  alt="Classie"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            </div>
           </div>
-          {/* Right: copy + CTA */}
-          <div className="md:border-l md:border-white/20 md:pl-12">
-            <p className="text-white/70 text-base md:text-lg leading-relaxed mb-8">
-              Classie was born from a simple idea — every woman deserves to feel powerful in her heels.
-              Comfort-first design, premium quality, styled your way. From morning coffee to midnight
-              celebrations, there&apos;s a Classie for every chapter of your day.
-            </p>
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3B5373] transition-all duration-300"
-            >
-              Our Story <ChevronRight className="w-4 h-4" />
-            </Link>
+        ) : (
+          /* ── Without image: original 2-col layout ── */
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+            {/* Left: editorial headline */}
+            <div>
+              <p className="text-[11px] tracking-[0.5em] uppercase text-white/40 mb-6">{philEyebrow}</p>
+              <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-none uppercase">
+                {philHeadline.split(". ").map((line, i, arr) => (
+                  <span key={i}>{line}{i < arr.length - 1 ? "." : ""}<br /></span>
+                ))}
+              </h2>
+            </div>
+            {/* Right: copy + CTA */}
+            <div className="md:border-l md:border-white/20 md:pl-12">
+              <p className="text-white/70 text-base md:text-lg leading-relaxed mb-8">{philBody}</p>
+              <Link
+                href={philCtaUrl}
+                className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3B5373] transition-all duration-300"
+              >
+                {philCtaText} <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* ══ 5. NEWSLETTER ════════════════════════════════════════════════ */}

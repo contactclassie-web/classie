@@ -80,6 +80,12 @@ interface SiteSettings {
   announcement_speed: string;
   whatsapp_number: string;
   instagram_url: string;
+  philosophy_eyebrow: string;
+  philosophy_headline: string;
+  philosophy_body: string;
+  philosophy_cta_text: string;
+  philosophy_cta_url: string;
+  philosophy_image_url: string;
 }
 
 interface FeatureBarItem {
@@ -211,6 +217,12 @@ export default function AdminPage() {
     announcement_1: "", announcement_2: "", announcement_3: "",
     announcement_4: "", announcement_5: "", announcement_6: "",
     announcement_speed: "25",
+    philosophy_eyebrow: "Our Philosophy",
+    philosophy_headline: "One Heel. Endless Possibilities.",
+    philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
+    philosophy_cta_text: "Our Story",
+    philosophy_cta_url: "/about",
+    philosophy_image_url: "",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -330,6 +342,12 @@ export default function AdminPage() {
           announcement_1: "", announcement_2: "", announcement_3: "",
           announcement_4: "", announcement_5: "", announcement_6: "",
           announcement_speed: "25",
+          philosophy_eyebrow: "Our Philosophy",
+          philosophy_headline: "One Heel. Endless Possibilities.",
+          philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
+          philosophy_cta_text: "Our Story",
+          philosophy_cta_url: "/about",
+          philosophy_image_url: "",
         };
         data.forEach((row: { key: string; value: string }) => {
           if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
@@ -687,6 +705,22 @@ export default function AdminPage() {
       const rows: { key: string; value: string }[] = [
         { key: "whatsapp_number", value: siteSettings.whatsapp_number },
         { key: "instagram_url",   value: siteSettings.instagram_url },
+      ];
+      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+    } catch { /* ignore */ }
+    finally { setSettingsSaving(false); }
+  };
+
+  const savePhilosophy = async () => {
+    setSettingsSaving(true);
+    try {
+      const rows: { key: string; value: string }[] = [
+        { key: "philosophy_eyebrow",   value: siteSettings.philosophy_eyebrow },
+        { key: "philosophy_headline",  value: siteSettings.philosophy_headline },
+        { key: "philosophy_body",      value: siteSettings.philosophy_body },
+        { key: "philosophy_cta_text",  value: siteSettings.philosophy_cta_text },
+        { key: "philosophy_cta_url",   value: siteSettings.philosophy_cta_url },
+        { key: "philosophy_image_url", value: siteSettings.philosophy_image_url },
       ];
       await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
     } catch { /* ignore */ }
@@ -1827,6 +1861,75 @@ export default function AdminPage() {
                 >
                   <Save className="w-4 h-4" />
                   {settingsSaving ? "Saving…" : "Save Settings"}
+                </button>
+              </div>
+
+              {/* ── Philosophy Section ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <h2 className="font-semibold text-gray-700">Philosophy Section</h2>
+                <div>
+                  <label className={labelCls}>Eyebrow Text</label>
+                  <input
+                    type="text" value={siteSettings.philosophy_eyebrow} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_eyebrow: e.target.value }))}
+                    placeholder="e.g. Our Philosophy"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Headline</label>
+                  <input
+                    type="text" value={siteSettings.philosophy_headline} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_headline: e.target.value }))}
+                    placeholder="e.g. One Heel. Endless Possibilities."
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Body Text</label>
+                  <textarea
+                    value={siteSettings.philosophy_body} rows={4}
+                    className={`${inputCls} resize-none`}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_body: e.target.value }))}
+                    placeholder="Describe your brand philosophy…"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>CTA Button Text</label>
+                    <input
+                      type="text" value={siteSettings.philosophy_cta_text} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_cta_text: e.target.value }))}
+                      placeholder="e.g. Our Story"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>CTA Button URL</label>
+                    <input
+                      type="text" value={siteSettings.philosophy_cta_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_cta_url: e.target.value }))}
+                      placeholder="e.g. /about"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className={labelCls}>Image URL <span className="normal-case text-gray-400 font-normal">(leave empty to hide image)</span></label>
+                  <input
+                    type="text" value={siteSettings.philosophy_image_url} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_image_url: e.target.value }))}
+                    placeholder="https://cdn.shopify.com/…/image.jpg"
+                  />
+                  {siteSettings.philosophy_image_url && (
+                    <div className="mt-3 relative w-40 h-24 overflow-hidden border border-gray-200">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={siteSettings.philosophy_image_url} alt="Philosophy preview" className="w-full h-full object-cover object-center" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={savePhilosophy} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                >
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Philosophy"}
                 </button>
               </div>
             </div>
