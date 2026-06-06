@@ -21,7 +21,8 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
     <section className="pt-12 pb-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-        {/* Heading — LEFT aligned, Mango style */}
+        {/* Eyebrow + Heading */}
+        <p className="section-subheading mb-3">New Arrivals</p>
         <h2
           className="mb-5"
           style={{

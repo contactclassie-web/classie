@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Instagram } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
-import FeaturesBar from "@/components/FeaturesBar";
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionCarousel from "@/components/OccasionCarousel";
 import FeaturedPicks from "@/components/FeaturedPicks";
@@ -83,9 +82,8 @@ export default async function HomePage() {
       <section className="pt-16 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-          <h2 className="mb-10" style={{fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.5rem, 2.8vw, 2.25rem)", fontWeight:400, letterSpacing:"0.01em", color:"#111"}}>
-            Shop by Occasion
-          </h2>
+          <p className="section-subheading mb-3">Our Collections</p>
+          <h2 className="mb-10 section-heading">Shop by Occasion</h2>
           <OccasionCarousel occasions={occasions} />
         </div>
       </section>
@@ -151,9 +149,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ FEATURES STRIP (moved here for cleaner flow) ════════════════ */}
-      <FeaturesBar />
-
       {/* ══ 5. NEWSLETTER ════════════════════════════════════════════════ */}
       <NewsletterSection />
 
@@ -171,12 +166,11 @@ export default async function HomePage() {
       {/* ══ INSTAGRAM FEED — Premium Grid ════════════════════════════════ */}
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Instagram className="w-5 h-5 text-[#3B5373]" />
-              <h2 className="font-serif text-3xl md:text-4xl text-classie-black">Follow @_classie_in</h2>
-            </div>
-            <p className="text-classie-gray text-sm tracking-wide">Tag us to be featured ✨</p>
+          <div className="mb-10">
+            <h2 className="mb-2" style={{fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.5rem, 2.8vw, 2.25rem)", fontWeight:400, letterSpacing:"0.01em", color:"#111"}}>
+              As Seen on Instagram
+            </h2>
+            <p className="text-gray-400 text-xs tracking-wide" style={{fontFamily:"'Poppins', sans-serif", fontWeight:300}}>Tag us @_classie_in to be featured</p>
           </div>
 
           <a
