@@ -1909,7 +1909,15 @@ export default function AdminPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Title</label>
-                  <input type="text" value={collectionModal.data.title} onChange={(e) => setCollectionField("title", e.target.value)} className={inputCls} />
+                  <input type="text" value={collectionModal.data.title} onChange={(e) => {
+                    const title = e.target.value;
+                    setCollectionField("title", title);
+                    // Auto-generate slug from title (only in add mode, don't overwrite in edit)
+                    if (collectionModalMode === "add") {
+                      const autoSlug = title.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+                      setCollectionField("slug", autoSlug);
+                    }
+                  }} className={inputCls} />
                 </div>
                 <div>
                   <label className={labelCls}>Slug</label>
