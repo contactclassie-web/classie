@@ -21,37 +21,61 @@ const FALLBACK_FEATURES: FeatureItem[] = [
 
 export default function FeaturesBar() {
   const [features, setFeatures] = useState<FeatureItem[]>(FALLBACK_FEATURES);
+  const [speed, setSpeed] = useState(35);
 
   useEffect(() => {
+    // Fetch features
     supabase
       .from("features_bar")
       .select("*")
       .eq("active", true)
       .order("display_order", { ascending: true })
       .then(({ data, error }) => {
-        if (!error && data && data.length > 0) {
-          setFeatures(data as FeatureItem[]);
-        }
+        if (!error && data && data.length > 0) setFeatures(data as FeatureItem[]);
+      });
+
+    // Fetch speed from site_settings
+    supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "features_bar_speed")
+      .single()
+      .then(({ data }) => {
+        if (data?.value) setSpeed(Number(data.value));
       });
   }, []);
 
+  // Duplicate for seamless loop
+  const items = [...features, ...features, ...features];
+
   return (
-    <div className="border-y border-classie-border bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {features.map((item) => (
-            <div key={item.id ?? item.title} className="flex items-center gap-3">
-              <span className="text-2xl flex-shrink-0 leading-none">{item.icon}</span>
-              <div>
-                <p className="text-sm font-semibold text-classie-black">{item.title}</p>
-                {item.subtitle && (
-                  <p className="text-xs text-classie-gray">{item.subtitle}</p>
-                )}
-              </div>
+    <div className="border-y border-classie-border bg-white overflow-hidden py-4">
+      <div
+        className="flex gap-12 whitespace-nowrap features-marquee"
+        style={{ animation: `featuresScroll ${speed}s linear infinite` }}
+      >
+        {items.map((item, i) => (
+          <div key={i} className="flex items-center gap-3 flex-shrink-0">
+            <span className="text-2xl leading-none">{item.icon}</span>
+            <div>
+              <p className="text-sm font-semibold text-classie-black">{item.title}</p>
+              {item.subtitle && (
+                <p className="text-xs text-classie-gray">{item.subtitle}</p>
+              )}
             </div>
-          ))}
-        </div>
+            <span className="ml-8 text-gray-200 text-lg">✦</span>
+          </div>
+        ))}
       </div>
+      <style>{`
+        @keyframes featuresScroll {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+        .features-marquee:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1123,10 +1123,24 @@ export default function AdminPage() {
 
               {/* ── Sub-section B: Features Bar Manager ── */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-2">
                     <Settings className="w-4 h-4 text-[#3D4F5F]" />
                     <h2 className="font-semibold text-gray-700">Features Bar Manager</h2>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <label className="text-xs text-gray-500 font-medium">Scroll Speed:</label>
+                    <select
+                      className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3D4F5F] bg-white"
+                      defaultValue="35"
+                      onChange={async (e) => {
+                        await supabase.from("site_settings").upsert({ key: "features_bar_speed", value: e.target.value }, { onConflict: "key" });
+                      }}
+                    >
+                      <option value="50">🐢 Slow</option>
+                      <option value="35">⚡ Normal</option>
+                      <option value="20">🚀 Fast</option>
+                    </select>
                   </div>
                   <button
                     onClick={openAddFeature}
