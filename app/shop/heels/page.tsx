@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import CollectionGrid from "@/components/CollectionGrid";
 import HeroSlider from "@/components/HeroSlider";
-import { getProductsFromDB } from "@/lib/products";
+import { getProductsFromDB, getProductsByCategorySlugFromDB } from "@/lib/products";
 import { getHeroSlidesFromDB } from "@/lib/slides";
 
 export const revalidate = 60;
@@ -13,7 +13,9 @@ export const metadata: Metadata = {
 
 export default async function HeelsPage() {
   const [heels, slides] = await Promise.all([
-    getProductsFromDB({ category: "heels", active: true }),
+    getProductsByCategorySlugFromDB("heels", () =>
+      getProductsFromDB({ category: "heels", active: true })
+    ),
     getHeroSlidesFromDB("heels"),
   ]);
   return (

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import CollectionGrid from "@/components/CollectionGrid";
 import HeroSlider from "@/components/HeroSlider";
-import { getProductsFromDB } from "@/lib/products";
+import { getProductsFromDB, getProductsByCategorySlugFromDB } from "@/lib/products";
 import { getHeroSlidesFromDB } from "@/lib/slides";
 
 export const revalidate = 60;
@@ -15,7 +15,9 @@ const BOW_SLUGS = ["fauxbow", "satin-swirl", "glitzknot"];
 
 export default async function ClipsPage() {
   const [allAccessories, slides] = await Promise.all([
-    getProductsFromDB({ category: "accessories", active: true }),
+    getProductsByCategorySlugFromDB("clips", () =>
+      getProductsFromDB({ category: "accessories", active: true })
+    ),
     getHeroSlidesFromDB("clips"),
   ]);
 

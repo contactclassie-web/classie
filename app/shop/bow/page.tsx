@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import CollectionGrid from "@/components/CollectionGrid";
-import { getProductsFromDB } from "@/lib/products";
+import { getProductsFromDB, getProductsByCategorySlugFromDB } from "@/lib/products";
 
 export const revalidate = 60;
 
@@ -12,10 +12,13 @@ export const metadata: Metadata = {
 const BOW_KEYWORDS = ["fauxbow", "satin-swirl", "glitzknot", "bow"];
 
 export default async function BowPage() {
-  const accessories = await getProductsFromDB({ category: "accessories", active: true });
-  const bowProducts = accessories.filter(
-    (p) => BOW_KEYWORDS.some((kw) => p.slug.includes(kw))
-  );
+  // Try category_products for 'bow' slug first, fallback to filtered accessories
+  const bowProducts = await getProductsByCategorySlugFromDB("bow", async () => {
+    const accessories = await getProductsFromDB({ category: "accessories", active: true });
+    return accessories.filter(
+      (p) => BOW_KEYWORDS.some((kw) => p.slug.includes(kw))
+    );
+  });
 
   return (
     <>
