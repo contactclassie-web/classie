@@ -148,12 +148,13 @@ export default async function HomePage() {
   const heroImageUrl =
     cfg["hero_image_url"] ||
     "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583";
-  const heroStat1Num = cfg["hero_stat1_number"] || "500+";
-  const heroStat1Label = cfg["hero_stat1_label"] || "Styles";
-  const heroStat2Num = cfg["hero_stat2_number"] || "10k+";
-  const heroStat2Label = cfg["hero_stat2_label"] || "Happy Customers";
-  const heroStat3Num = cfg["hero_stat3_number"] || "4.9★";
-  const heroStat3Label = cfg["hero_stat3_label"] || "Avg Rating";
+  const heroStat1Num = cfg["hero_stat1_number"] || "";
+  const heroStat1Label = cfg["hero_stat1_label"] || "";
+  const heroStat2Num = cfg["hero_stat2_number"] || "";
+  const heroStat2Label = cfg["hero_stat2_label"] || "";
+  const heroStat3Num = cfg["hero_stat3_number"] || "";
+  const heroStat3Label = cfg["hero_stat3_label"] || "";
+  const showStats = !!(heroStat1Num || heroStat2Num || heroStat3Num);
   const heroChipCode = cfg["hero_chip_code"] || "";
   const heroChipText = cfg["hero_chip_text"] || "";
 
@@ -232,19 +233,21 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Stats row */}
-          <div className="flex gap-10 pt-10 border-t border-[rgba(59,83,115,0.1)]">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <div className="font-serif text-4xl font-light text-[#1a1a1a] leading-none">
-                  {stat.number}
+          {/* Stats row — only show if values exist in DB */}
+          {showStats && (
+            <div className="flex gap-10 pt-10 border-t border-[rgba(59,83,115,0.1)]">
+              {stats.filter(s => s.number).map((stat) => (
+                <div key={stat.label}>
+                  <div className="font-serif text-4xl font-light text-[#1a1a1a] leading-none">
+                    {stat.number}
+                  </div>
+                  <div className="font-sans text-[9.5px] font-light tracking-[0.2em] uppercase text-[#9ca3af] mt-1.5">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="font-sans text-[9.5px] font-light tracking-[0.2em] uppercase text-[#9ca3af] mt-1.5">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right: image */}
