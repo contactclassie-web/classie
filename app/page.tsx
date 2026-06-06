@@ -76,10 +76,10 @@ export default async function HomePage() {
       <HeroSlider slides={heroSlides} />
 
       {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
-      <section className="py-20 bg-white border-t border-gray-100">
+      <section className="pt-16 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-center text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Curated for You</p>
-          <h2 className="text-center font-serif text-3xl md:text-4xl mb-12" style={{fontWeight: 400, letterSpacing: "0.05em"}}>
+          <h2 className="text-center font-serif text-3xl md:text-4xl mb-10" style={{fontWeight: 400, letterSpacing: "0.05em"}}>
             Shop by Occasion
           </h2>
           <OccasionCarousel occasions={occasions} />
@@ -87,7 +87,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
-      <section className="py-20 bg-white border-t border-gray-100">
+      <section className="pt-10 pb-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="section-subheading text-left">Collections</p>
           <h2 className="section-heading text-left mt-2 mb-10">Shop by Category</h2>
