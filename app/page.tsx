@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Star, Truck, RefreshCw, Shield, Sparkles } from "lucide-react";
+import { ChevronRight, Star, Sparkles } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
+import FeaturesBar from "@/components/FeaturesBar";
 import ProductCard from "@/components/ProductCard";
 import NewsletterSection from "@/components/NewsletterSection";
 import {
@@ -52,27 +53,8 @@ export default async function HomePage() {
       {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
       <HeroSlider slides={heroSlides} />
 
-      {/* ══ TRUST BAR ═══════════════════════════════════════════════════ */}
-      <div className="border-b border-classie-border bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {[
-              { icon: Truck,     title: "Free Shipping",   body: "On orders above ₹999" },
-              { icon: RefreshCw, title: "Easy Returns",    body: "7-day exchange policy" },
-              { icon: Shield,    title: "Secure Checkout", body: "100% safe & trusted" },
-              { icon: Star,      title: "Premium Quality", body: "Comfort-first design" },
-            ].map(({ icon: Icon, title, body }) => (
-              <div key={title} className="flex items-center gap-3">
-                <Icon className="w-5 h-5 text-[#3D4F5F] flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-classie-black">{title}</p>
-                  <p className="text-xs text-classie-gray">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* ══ FEATURES BAR ═══════════════════════════════════════════════ */}
+      <FeaturesBar />
 
       {/* ══ 2. SHOP BY CATEGORY ══════════════════════════════════════════ */}
       <section className="py-16 bg-white">

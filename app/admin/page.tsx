@@ -73,8 +73,21 @@ interface SiteSettings {
   announcement_1: string;
   announcement_2: string;
   announcement_3: string;
+  announcement_4: string;
+  announcement_5: string;
+  announcement_6: string;
+  announcement_speed: string;
   whatsapp_number: string;
   instagram_url: string;
+}
+
+interface FeatureBarItem {
+  id?: string;
+  icon: string;
+  title: string;
+  subtitle?: string;
+  display_order: number;
+  active: boolean;
 }
 
 interface ContactMessage {
@@ -170,9 +183,25 @@ export default function AdminPage() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     announcement_text: "", whatsapp_number: "", instagram_url: "",
     announcement_1: "", announcement_2: "", announcement_3: "",
+    announcement_4: "", announcement_5: "", announcement_6: "",
+    announcement_speed: "25",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
+
+  // Announcement dynamic list (up to 6)
+  const [announcementList, setAnnouncementList] = useState<string[]>(["", "", ""]);
+  const [announcementSpeed, setAnnouncementSpeed] = useState("25");
+
+  // Features Bar
+  const [featuresBarItems, setFeaturesBarItems] = useState<FeatureBarItem[]>([]);
+  const [featuresBarLoading, setFeaturesBarLoading] = useState(false);
+  const EMPTY_FEATURE: FeatureBarItem = { icon: "⭐", title: "", subtitle: "", display_order: 0, active: true };
+  const [featuresBarModal, setFeaturesBarModal] = useState<{
+    open: boolean; mode: "add" | "edit"; data: FeatureBarItem;
+  }>({ open: false, mode: "add", data: { ...EMPTY_FEATURE } });
+  const [featuresBarSaving, setFeaturesBarSaving] = useState(false);
+  const [deleteFeatureConfirm, setDeleteFeatureConfirm] = useState<string | null>(null);
 
   // Messages
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -218,11 +247,25 @@ export default function AdminPage() {
     try {
       const { data, error } = await supabase.from("site_settings").select("*");
       if (!error && data) {
-        const merged: SiteSettings = { announcement_text: "", whatsapp_number: "", instagram_url: "", announcement_1: "", announcement_2: "", announcement_3: "" };
+        const merged: SiteSettings = {
+          announcement_text: "", whatsapp_number: "", instagram_url: "",
+          announcement_1: "", announcement_2: "", announcement_3: "",
+          announcement_4: "", announcement_5: "", announcement_6: "",
+          announcement_speed: "25",
+        };
         data.forEach((row: { key: string; value: string }) => {
           if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
         });
         setSiteSettings(merged);
+
+        // Populate dynamic announcement list
+        const list: string[] = [];
+        for (let i = 1; i <= 6; i++) {
+          const val = (merged as unknown as Record<string, string>)[`announcement_${i}`];
+          if (val) list.push(val);
+        }
+        setAnnouncementList(list.length >= 1 ? list : ["", "", ""]);
+        setAnnouncementSpeed(merged.announcement_speed || "25");
       }
     } catch { /* ignore */ }
     finally { setSettingsLoading(false); }
@@ -246,6 +289,15 @@ export default function AdminPage() {
     finally { setSubsLoading(false); }
   }, []);
 
+  const fetchFeaturesBar = useCallback(async () => {
+    setFeaturesBarLoading(true);
+    try {
+      const { data, error } = await supabase.from("features_bar").select("*").order("display_order", { ascending: true });
+      if (!error && data) setFeaturesBarItems(data as FeatureBarItem[]);
+    } catch { /* ignore */ }
+    finally { setFeaturesBarLoading(false); }
+  }, []);
+
   // Load data when authenticated
   useEffect(() => {
     if (!authed) return;
@@ -256,9 +308,9 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authed) return;
     if (tab === "slides") fetchSlides();
-    if (tab === "settings") fetchSettings();
+    if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
-  }, [authed, tab, fetchSlides, fetchSettings, fetchMessages, fetchSubscribers]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -354,14 +406,66 @@ export default function AdminPage() {
 
   // ── Settings actions ──────────────────────────────────────────────────────
 
-  const saveSettings = async () => {
+  const saveAnnouncements = async () => {
     setSettingsSaving(true);
     try {
-      const rows = Object.entries(siteSettings).map(([key, value]) => ({ key, value }));
+      const rows: { key: string; value: string }[] = [];
+      // Save announcement_1 through announcement_6
+      for (let i = 0; i < 6; i++) {
+        rows.push({ key: `announcement_${i + 1}`, value: announcementList[i] ?? "" });
+      }
+      rows.push({ key: "announcement_speed", value: announcementSpeed });
       await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
   };
+
+  const saveSettings = async () => {
+    setSettingsSaving(true);
+    try {
+      const rows: { key: string; value: string }[] = [
+        { key: "whatsapp_number", value: siteSettings.whatsapp_number },
+        { key: "instagram_url",   value: siteSettings.instagram_url },
+      ];
+      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+    } catch { /* ignore */ }
+    finally { setSettingsSaving(false); }
+  };
+
+  // ── Features Bar actions ──────────────────────────────────────────────────
+
+  const openAddFeature = () => setFeaturesBarModal({ open: true, mode: "add", data: { ...EMPTY_FEATURE } });
+  const openEditFeature = (f: FeatureBarItem) => setFeaturesBarModal({ open: true, mode: "edit", data: { ...f } });
+  const closeFeaturesBarModal = () => setFeaturesBarModal((m) => ({ ...m, open: false }));
+
+  const handleFeatureSave = async () => {
+    setFeaturesBarSaving(true);
+    try {
+      const { id, ...rest } = featuresBarModal.data;
+      if (featuresBarModal.mode === "add") {
+        await supabase.from("features_bar").insert([rest]);
+      } else {
+        await supabase.from("features_bar").update(rest).eq("id", id);
+      }
+      await fetchFeaturesBar();
+      closeFeaturesBarModal();
+    } catch { /* ignore */ }
+    finally { setFeaturesBarSaving(false); }
+  };
+
+  const deleteFeature = async (id: string) => {
+    await supabase.from("features_bar").delete().eq("id", id);
+    setFeaturesBarItems((prev) => prev.filter((f) => f.id !== id));
+    setDeleteFeatureConfirm(null);
+  };
+
+  const toggleFeatureActive = async (f: FeatureBarItem) => {
+    await supabase.from("features_bar").update({ active: !f.active }).eq("id", f.id);
+    setFeaturesBarItems((prev) => prev.map((x) => (x.id === f.id ? { ...x, active: !x.active } : x)));
+  };
+
+  const setFeatureField = (key: keyof FeatureBarItem, val: unknown) =>
+    setFeaturesBarModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
 
   // ── Computed stats ────────────────────────────────────────────────────────
 
@@ -920,54 +1024,183 @@ export default function AdminPage() {
               SETTINGS TAB
           ══════════════════════════════════════ */}
           {tab === "settings" && (
-            <div className="max-w-2xl">
+            <div className="max-w-2xl space-y-6">
+
+              {/* ── Sub-section A: Announcement Bar ── */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-                <h2 className="font-semibold text-gray-700">Site Settings</h2>
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#3D4F5F]" />
+                  <h2 className="font-semibold text-gray-700">Scrolling Announcement Bar</h2>
+                </div>
                 {settingsLoading ? (
-                  <p className="text-gray-400 text-sm">Loading settings…</p>
+                  <p className="text-gray-400 text-sm">Loading…</p>
                 ) : (
                   <>
+                    {/* Speed control */}
                     <div>
-                      <label className={labelCls}>📢 Scrolling Announcements (teen messages scroll honge)</label>
+                      <label className={labelCls}>Scroll Speed</label>
+                      <select
+                        value={announcementSpeed}
+                        onChange={(e) => setAnnouncementSpeed(e.target.value)}
+                        className={`${inputCls} max-w-[180px]`}
+                      >
+                        <option value="40">🐢 Slow (40s)</option>
+                        <option value="25">🚶 Normal (25s)</option>
+                        <option value="15">🚀 Fast (15s)</option>
+                      </select>
+                    </div>
+
+                    {/* Dynamic announcement rows */}
+                    <div>
+                      <label className={labelCls}>Announcement Messages (up to 6)</label>
                       <div className="space-y-2 mt-1">
-                        {([1,2,3] as const).map((n) => {
-                          const k = `announcement_${n}` as keyof SiteSettings;
-                          return (
-                            <div key={n} className="flex gap-2 items-center">
-                              <span className="text-xs font-medium text-gray-400 w-4 flex-shrink-0">{n}.</span>
-                              <input type="text" value={siteSettings[k] as string ?? ""} className={inputCls}
-                                placeholder={n===1?"✦ Welcome to Classie — One Heel. Endless Looks.":n===2?"Use code FIRST10 for 10% OFF!":"🚢 Free Shipping above ₹999 | 😊 Easy Returns"}
-                                onChange={(e) => setSiteSettings((s) => ({ ...s, [k]: e.target.value }))} />
-                            </div>
-                          );
-                        })}
+                        {announcementList.map((text, idx) => (
+                          <div key={idx} className="flex gap-2 items-center">
+                            <span className="text-xs font-medium text-gray-400 w-5 flex-shrink-0 text-center">{idx + 1}.</span>
+                            <input
+                              type="text"
+                              value={text}
+                              className={`${inputCls} flex-1`}
+                              placeholder={
+                                idx === 0 ? "✦ Welcome to Classie — One Heel. Endless Looks."
+                                : idx === 1 ? "Use code FIRST10 for 10% OFF!"
+                                : "🚢 Free Shipping above ₹999 | 😊 Easy Returns"
+                              }
+                              onChange={(e) => {
+                                const next = [...announcementList];
+                                next[idx] = e.target.value;
+                                setAnnouncementList(next);
+                              }}
+                            />
+                            <button
+                              onClick={() => {
+                                const next = announcementList.filter((_, i) => i !== idx);
+                                setAnnouncementList(next.length === 0 ? [""] : next);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
+
+                      {announcementList.length < 6 && (
+                        <button
+                          onClick={() => setAnnouncementList((prev) => [...prev, ""])}
+                          className="mt-2 flex items-center gap-1.5 text-xs text-[#3D4F5F] hover:underline"
+                        >
+                          <Plus className="w-3.5 h-3.5" /> Add More
+                        </button>
+                      )}
                     </div>
-                    <div>
-                      <label className={labelCls}>WhatsApp Number</label>
-                      <input
-                        type="text" value={siteSettings.whatsapp_number} className={inputCls}
-                        onChange={(e) => setSiteSettings((s) => ({ ...s, whatsapp_number: e.target.value }))}
-                        placeholder="e.g. 919876543210"
-                      />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Instagram URL</label>
-                      <input
-                        type="text" value={siteSettings.instagram_url} className={inputCls}
-                        onChange={(e) => setSiteSettings((s) => ({ ...s, instagram_url: e.target.value }))}
-                        placeholder="e.g. https://instagram.com/classie.in"
-                      />
-                    </div>
+
                     <button
-                      onClick={saveSettings} disabled={settingsSaving}
+                      onClick={saveAnnouncements} disabled={settingsSaving}
                       className="flex items-center gap-2 px-6 py-2.5 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
                     >
                       <Save className="w-4 h-4" />
-                      {settingsSaving ? "Saving…" : "Save Settings"}
+                      {settingsSaving ? "Saving…" : "Save Announcements"}
                     </button>
                   </>
                 )}
+              </div>
+
+              {/* ── Sub-section B: Features Bar Manager ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-[#3D4F5F]" />
+                    <h2 className="font-semibold text-gray-700">Features Bar Manager</h2>
+                  </div>
+                  <button
+                    onClick={openAddFeature}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#3D4F5F] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Feature
+                  </button>
+                </div>
+
+                {featuresBarLoading ? (
+                  <p className="text-gray-400 text-sm">Loading features…</p>
+                ) : featuresBarItems.length === 0 ? (
+                  <p className="text-gray-400 text-sm py-4 text-center">
+                    No features yet. Click &ldquo;Add Feature&rdquo; to create one.<br />
+                    <span className="text-xs text-gray-300">(Table must be created in Supabase first — see SQL below)</span>
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100 bg-gray-50">
+                          {["Icon", "Title", "Subtitle", "Order", "Active", "Actions"].map((h) => (
+                            <th key={h} className="text-left px-3 py-2.5 text-xs uppercase tracking-wider text-gray-400 font-semibold">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {featuresBarItems.map((f) => (
+                          <tr key={f.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                            <td className="px-3 py-3 text-xl">{f.icon}</td>
+                            <td className="px-3 py-3 font-medium text-gray-700 text-xs">{f.title}</td>
+                            <td className="px-3 py-3 text-xs text-gray-400">{f.subtitle || "—"}</td>
+                            <td className="px-3 py-3 text-xs text-gray-400">{f.display_order}</td>
+                            <td className="px-3 py-3">
+                              <button
+                                onClick={() => toggleFeatureActive(f)}
+                                className={`w-9 h-5 rounded-full transition-colors flex-shrink-0 relative ${f.active ? "bg-emerald-500" : "bg-gray-300"}`}
+                                title={f.active ? "Deactivate" : "Activate"}
+                              >
+                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${f.active ? "left-4" : "left-0.5"}`} />
+                              </button>
+                            </td>
+                            <td className="px-3 py-3">
+                              <div className="flex items-center gap-1.5">
+                                <button onClick={() => openEditFeature(f)} title="Edit"
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors">
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button onClick={() => setDeleteFeatureConfirm(f.id!)} title="Delete"
+                                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Other Settings ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <h2 className="font-semibold text-gray-700">Other Settings</h2>
+                <div>
+                  <label className={labelCls}>WhatsApp Number</label>
+                  <input
+                    type="text" value={siteSettings.whatsapp_number} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, whatsapp_number: e.target.value }))}
+                    placeholder="e.g. 919876543210"
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Instagram URL</label>
+                  <input
+                    type="text" value={siteSettings.instagram_url} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, instagram_url: e.target.value }))}
+                    placeholder="e.g. https://instagram.com/classie.in"
+                  />
+                </div>
+                <button
+                  onClick={saveSettings} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                >
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Settings"}
+                </button>
               </div>
             </div>
           )}
@@ -1372,6 +1605,78 @@ export default function AdminPage() {
                 Cancel
               </button>
               <button onClick={() => deleteSlide(deleteSlideConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          FEATURES BAR MODAL
+      ══════════════════════════════════════════════════ */}
+      {featuresBarModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">
+                {featuresBarModal.mode === "add" ? "Add Feature" : "Edit Feature"}
+              </h2>
+              <button onClick={closeFeaturesBarModal} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className={labelCls}>Icon (emoji)</label>
+                <input type="text" value={featuresBarModal.data.icon} onChange={(e) => setFeatureField("icon", e.target.value)} className={inputCls} placeholder="e.g. 🚚" />
+              </div>
+              <div>
+                <label className={labelCls}>Title *</label>
+                <input type="text" value={featuresBarModal.data.title} onChange={(e) => setFeatureField("title", e.target.value)} className={inputCls} placeholder="e.g. Free Shipping" />
+              </div>
+              <div>
+                <label className={labelCls}>Subtitle</label>
+                <input type="text" value={featuresBarModal.data.subtitle ?? ""} onChange={(e) => setFeatureField("subtitle", e.target.value)} className={inputCls} placeholder="e.g. On orders above ₹999" />
+              </div>
+              <div>
+                <label className={labelCls}>Display Order</label>
+                <input type="number" value={featuresBarModal.data.display_order} onChange={(e) => setFeatureField("display_order", Number(e.target.value))} className={inputCls} />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+                <input type="checkbox" checked={featuresBarModal.data.active} onChange={(e) => setFeatureField("active", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                Active
+              </label>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+              <button onClick={closeFeaturesBarModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3D4F5F] transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleFeatureSave} disabled={featuresBarSaving}
+                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+              >
+                <Save className="w-4 h-4" />
+                {featuresBarSaving ? "Saving…" : featuresBarModal.mode === "add" ? "Add Feature" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          DELETE CONFIRM — FEATURE
+      ══════════════════════════════════════════════════ */}
+      {deleteFeatureConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 className="font-semibold text-gray-800 mb-2">Delete Feature?</h2>
+            <p className="text-sm text-gray-400 mb-5">This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setDeleteFeatureConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3D4F5F] transition-colors">
+                Cancel
+              </button>
+              <button onClick={() => deleteFeature(deleteFeatureConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
                 Delete
               </button>
             </div>
