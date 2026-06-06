@@ -451,17 +451,22 @@ export default function AdminPage() {
   const closeCollectionModal = () => setCollectionModal((m) => ({ ...m, open: false }));
 
   const handleCollectionSave = async () => {
+    const { title, slug } = collectionModal.data;
+    if (!title.trim()) { alert("Title required!"); return; }
+    if (!slug.trim()) { alert("Slug required! Example: summer-edit"); return; }
     setCollectionSaving(true);
     try {
       const { id, ...rest } = collectionModal.data;
       if (collectionModalMode === "add") {
-        await supabase.from("collections").insert([rest]);
+        const { error } = await supabase.from("collections").insert([rest]);
+        if (error) { alert("Error: " + error.message); return; }
       } else {
-        await supabase.from("collections").update(rest).eq("id", id);
+        const { error } = await supabase.from("collections").update(rest).eq("id", id);
+        if (error) { alert("Error: " + error.message); return; }
       }
       await fetchCollections();
       closeCollectionModal();
-    } catch { /* ignore */ }
+    } catch (e: unknown) { alert("Save failed: " + (e instanceof Error ? e.message : String(e))); }
     finally { setCollectionSaving(false); }
   };
 
