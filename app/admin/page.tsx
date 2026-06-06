@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
   Lock, LogOut, RefreshCw, Package, IndianRupee, Clock,
-  CheckCircle2, Truck, AlertCircle, TrendingUp,
+  CheckCircle2, Truck, AlertCircle,
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
-  LayoutDashboard, ShoppingCart,
+  LayoutDashboard, ShoppingCart, Layers,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -90,6 +90,16 @@ interface FeatureBarItem {
   active: boolean;
 }
 
+interface Collection {
+  id?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  image_url?: string;
+  display_order: number;
+  active: boolean;
+}
+
 interface ContactMessage {
   id: string;
   name: string;
@@ -143,7 +153,7 @@ const EMPTY_SLIDE: HeroSlide = {
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3D4F5F] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "settings" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "settings" | "messages";
 
 // ── Main Component ─────────────────────────────────────────────────────────
 
@@ -203,6 +213,15 @@ export default function AdminPage() {
   }>({ open: false, mode: "add", data: { ...EMPTY_FEATURE } });
   const [featuresBarSaving, setFeaturesBarSaving] = useState(false);
   const [deleteFeatureConfirm, setDeleteFeatureConfirm] = useState<string | null>(null);
+
+  // Collections
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [collectionModal, setCollectionModal] = useState<{ open: boolean; data: Collection }>({
+    open: false,
+    data: { title: "", slug: "", description: "", image_url: "", display_order: 0, active: true },
+  });
+  const [collectionSaving, setCollectionSaving] = useState(false);
 
   // Messages
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -272,6 +291,15 @@ export default function AdminPage() {
     finally { setSettingsLoading(false); }
   }, []);
 
+  const fetchCollections = useCallback(async () => {
+    setCollectionsLoading(true);
+    try {
+      const { data, error } = await supabase.from("collections").select("*").order("display_order", { ascending: true });
+      if (!error && data) setCollections(data as Collection[]);
+    } catch { /* ignore */ }
+    finally { setCollectionsLoading(false); }
+  }, []);
+
   const fetchMessages = useCallback(async () => {
     setMessagesLoading(true);
     try {
@@ -311,7 +339,8 @@ export default function AdminPage() {
     if (tab === "slides") fetchSlides();
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers]);
+    if (tab === "collections") fetchCollections();
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -404,6 +433,30 @@ export default function AdminPage() {
 
   const setSlideField = (key: keyof HeroSlide, val: unknown) =>
     setSlideModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
+
+  // ── Collection actions ────────────────────────────────────────────────────
+
+  const openEditCollection = (c: Collection) => setCollectionModal({ open: true, data: { ...c } });
+  const closeCollectionModal = () => setCollectionModal((m) => ({ ...m, open: false }));
+
+  const handleCollectionSave = async () => {
+    setCollectionSaving(true);
+    try {
+      const { id, ...rest } = collectionModal.data;
+      await supabase.from("collections").update(rest).eq("id", id);
+      await fetchCollections();
+      closeCollectionModal();
+    } catch { /* ignore */ }
+    finally { setCollectionSaving(false); }
+  };
+
+  const toggleCollectionActive = async (c: Collection) => {
+    await supabase.from("collections").update({ active: !c.active }).eq("id", c.id);
+    setCollections((prev) => prev.map((x) => (x.id === c.id ? { ...x, active: !x.active } : x)));
+  };
+
+  const setCollectionField = (key: keyof Collection, val: unknown) =>
+    setCollectionModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
 
   // ── Settings actions ──────────────────────────────────────────────────────
 
@@ -517,12 +570,13 @@ export default function AdminPage() {
   // ── Sidebar nav items ─────────────────────────────────────────────────────
 
   const NAV_ITEMS: { id: TabId; label: string; icon: React.ElementType; badge?: number }[] = [
-    { id: "dashboard", label: "Dashboard",   icon: LayoutDashboard },
-    { id: "products",  label: "Products",    icon: ImageIcon,  badge: dbProducts.length },
-    { id: "orders",    label: "Orders",      icon: ShoppingCart, badge: orders.length },
-    { id: "slides",    label: "Hero Slides", icon: LayoutTemplate },
-    { id: "settings",  label: "Settings",    icon: Settings },
-    { id: "messages",  label: "Messages",    icon: MessageSquare, badge: messages.length },
+    { id: "dashboard",   label: "Dashboard",   icon: LayoutDashboard },
+    { id: "products",    label: "Products",    icon: ImageIcon,  badge: dbProducts.length },
+    { id: "orders",      label: "Orders",      icon: ShoppingCart, badge: orders.length },
+    { id: "slides",      label: "Hero Slides", icon: LayoutTemplate },
+    { id: "collections", label: "Collections", icon: Layers, badge: collections.length },
+    { id: "settings",    label: "Settings",    icon: Settings },
+    { id: "messages",    label: "Messages",    icon: MessageSquare, badge: messages.length },
   ];
 
   // ── Main layout ───────────────────────────────────────────────────────────
@@ -1023,6 +1077,96 @@ export default function AdminPage() {
                                   <Trash2 className="w-4 h-4" />
                                 </button>
                               </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              COLLECTIONS TAB
+          ══════════════════════════════════════ */}
+          {tab === "collections" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">{collections.length} collections</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Edit collection details and images. Collections cannot be added or deleted here.</p>
+                </div>
+                <button
+                  onClick={fetchCollections}
+                  disabled={collectionsLoading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3D4F5F] border border-gray-200 rounded-lg transition-colors"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${collectionsLoading ? "animate-spin" : ""}`} />
+                  Refresh
+                </button>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                {collectionsLoading ? (
+                  <div className="p-12 text-center text-gray-400 text-sm">Loading collections…</div>
+                ) : collections.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <Layers className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                    <p className="text-gray-400 text-sm">No collections found.</p>
+                    <p className="text-xs text-gray-300 mt-1">Run the seed script or add an image_url column to your collections table.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100 bg-gray-50">
+                          {["Image", "Title", "Slug", "Order", "Active", "Actions"].map((h) => (
+                            <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-gray-400 font-semibold">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {collections.map((c) => (
+                          <tr key={c.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                            <td className="px-5 py-4">
+                              {c.image_url ? (
+                                <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={c.image_url} alt={c.title} className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                  <Layers className="w-5 h-5 text-gray-300" />
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-5 py-4">
+                              <p className="font-medium text-gray-700 text-sm">{c.title}</p>
+                              {c.description && <p className="text-xs text-gray-400 mt-0.5 max-w-[200px] truncate">{c.description}</p>}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="font-mono text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{c.slug}</span>
+                            </td>
+                            <td className="px-5 py-4 text-xs text-gray-400">{c.display_order}</td>
+                            <td className="px-5 py-4">
+                              <button
+                                onClick={() => toggleCollectionActive(c)}
+                                className={`w-9 h-5 rounded-full transition-colors flex-shrink-0 relative ${c.active ? "bg-emerald-500" : "bg-gray-300"}`}
+                                title={c.active ? "Deactivate" : "Activate"}
+                              >
+                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${c.active ? "left-4" : "left-0.5"}`} />
+                              </button>
+                            </td>
+                            <td className="px-5 py-4">
+                              <button
+                                onClick={() => openEditCollection(c)}
+                                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors"
+                                title="Edit"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -1686,6 +1830,74 @@ export default function AdminPage() {
               >
                 <Save className="w-4 h-4" />
                 {featuresBarSaving ? "Saving…" : featuresBarModal.mode === "add" ? "Add Feature" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          COLLECTION EDIT MODAL
+      ══════════════════════════════════════════════════ */}
+      {collectionModal.open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-lg my-8 shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">Edit Collection</h2>
+              <button onClick={closeCollectionModal} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Title</label>
+                  <input type="text" value={collectionModal.data.title} onChange={(e) => setCollectionField("title", e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Slug</label>
+                  <input type="text" value={collectionModal.data.slug} onChange={(e) => setCollectionField("slug", e.target.value)} className={inputCls} />
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Description</label>
+                <textarea rows={2} value={collectionModal.data.description ?? ""} onChange={(e) => setCollectionField("description", e.target.value)} className={inputCls} placeholder="Collection description…" />
+              </div>
+              <div>
+                <label className={labelCls}>Image URL</label>
+                <input type="text" value={collectionModal.data.image_url ?? ""} onChange={(e) => setCollectionField("image_url", e.target.value)} className={inputCls} placeholder="https://cdn.shopify.com/…" />
+                {collectionModal.data.image_url && (
+                  <div className="mt-2 relative w-full h-28 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={collectionModal.data.image_url}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <p className="absolute top-1 left-2 text-[10px] text-white bg-black/50 px-1.5 py-0.5 rounded">Preview</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className={labelCls}>Display Order</label>
+                <input type="number" value={collectionModal.data.display_order} onChange={(e) => setCollectionField("display_order", Number(e.target.value))} className={`${inputCls} max-w-[120px]`} />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+                <input type="checkbox" checked={collectionModal.data.active} onChange={(e) => setCollectionField("active", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                Active
+              </label>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+              <button onClick={closeCollectionModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3D4F5F] transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleCollectionSave} disabled={collectionSaving}
+                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+              >
+                <Save className="w-4 h-4" />
+                {collectionSaving ? "Saving…" : "Save Changes"}
               </button>
             </div>
           </div>

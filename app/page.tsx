@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Star, Sparkles } from "lucide-react";
+import { ChevronRight, Star, Sparkles, Instagram } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
 import ProductCard from "@/components/ProductCard";
@@ -48,6 +48,16 @@ export default async function HomePage() {
   const everydayEdit = resolveCollection("the-everyday-edit");
   const festiveEdit = resolveCollection("the-festive-edit");
 
+  // Occasions for circular design
+  const occasions = [
+    { title: "The Date Edit",     href: "/shop/the-date-edit",     image: dateEdit[0]?.image ?? "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/70.png?v=1767129647" },
+    { title: "The Everyday Edit", href: "/shop/the-everyday-edit", image: everydayEdit[0]?.image ?? "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/40_c9833246-51b7-4ff5-8200-acf9809593c5.png?v=1767109414" },
+    { title: "The Festive Edit",  href: "/shop/the-festive-edit",  image: festiveEdit[0]?.image ?? "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583" },
+  ];
+
+  // Instagram feed images (first 4 products)
+  const igImages = allProducts.slice(0, 4).map((p) => ({ image: p.image, slug: p.slug, title: p.title }));
+
   return (
     <>
       {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
@@ -56,35 +66,43 @@ export default async function HomePage() {
       {/* ══ FEATURES BAR ═══════════════════════════════════════════════ */}
       <FeaturesBar />
 
-      {/* ══ 2. SHOP BY OCCASION ══════════════════════════════════════════ */}
-      <section className="py-16 bg-[#faf8f6]">
+      {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-subheading">Curated for you</p>
-          <h2 className="section-heading mt-2 mb-14">Shop by Occasion</h2>
-
-          <OccasionRow
-            label="The Date Edit"
-            sub="Dressed to impress, effortlessly"
-            href="/shop/the-date-edit"
-            items={dateEdit}
-          />
-          <OccasionRow
-            label="The Everyday Edit"
-            sub="Comfort for the every-day woman"
-            href="/shop/the-everyday-edit"
-            items={everydayEdit}
-          />
-          <OccasionRow
-            label="The Festive Edit"
-            sub="Celebrate in style"
-            href="/shop/the-festive-edit"
-            items={festiveEdit}
-          />
+          <h2 className="text-center font-serif text-4xl md:text-5xl tracking-widest uppercase mb-16">
+            Shop by Occasion
+          </h2>
+          <div className="flex justify-center gap-8 md:gap-14 flex-wrap">
+            {occasions.map((occ) => (
+              <Link
+                key={occ.href}
+                href={occ.href}
+                className="group flex flex-col items-center gap-4 w-40 md:w-48"
+              >
+                <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden ring-1 ring-gray-100 shadow-md group-hover:shadow-xl transition-all duration-300">
+                  {occ.image ? (
+                    <Image
+                      src={occ.image}
+                      alt={occ.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 144px, 176px"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#faf8f6]" />
+                  )}
+                </div>
+                <span className="font-serif text-base md:text-lg text-classie-black text-center group-hover:text-[#3D4F5F] transition-colors">
+                  {occ.title}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-[#faf8f6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="section-subheading">Collections</p>
           <h2 className="section-heading mt-2 mb-10">Shop by Category</h2>
@@ -140,16 +158,45 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ══ OUR STORY — Editorial Banner ════════════════════════════════ */}
+      <section className="bg-[#3D4F5F] text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+          {/* Left: editorial headline */}
+          <div>
+            <p className="text-[11px] tracking-[0.5em] uppercase text-white/40 mb-6">Our Philosophy</p>
+            <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-none uppercase">
+              One Heel.<br />
+              Endless<br />
+              Possibilities.
+            </h2>
+          </div>
+          {/* Right: copy + CTA */}
+          <div className="md:border-l md:border-white/20 md:pl-12">
+            <p className="text-white/70 text-base md:text-lg leading-relaxed mb-8">
+              Classie was born from a simple idea — every woman deserves to feel powerful in her heels.
+              Comfort-first design, premium quality, styled your way. From morning coffee to midnight
+              celebrations, there&apos;s a Classie for every chapter of your day.
+            </p>
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3D4F5F] transition-all duration-300"
+            >
+              Our Story <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ══ PROMO BANNER ══════════════════════════════════════════════════ */}
-      <section className="bg-[#3D4F5F] text-white py-16">
+      <section className="bg-white text-[#3D4F5F] py-16 border-y border-classie-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <Sparkles className="w-8 h-8 mx-auto mb-4 text-amber-300" />
-          <p className="text-[11px] tracking-[0.5em] uppercase text-white/50 mb-4">Limited Time</p>
-          <h2 className="font-serif text-5xl md:text-6xl mb-4">Up to 35% Off</h2>
-          <p className="text-white/60 text-base mb-8">
+          <Sparkles className="w-8 h-8 mx-auto mb-4 text-amber-400" />
+          <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-4">Limited Time</p>
+          <h2 className="font-serif text-5xl md:text-6xl mb-4 text-classie-black">Up to 35% Off</h2>
+          <p className="text-classie-gray text-base mb-8">
             Our hottest deals — curated styles at unbeatable prices. Cash on delivery available.
           </p>
-          <Link href="/hot-deals" className="btn-ghost-white">
+          <Link href="/hot-deals" className="btn-primary">
             Shop Hot Deals
           </Link>
         </div>
@@ -183,47 +230,61 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ INSTAGRAM CTA ════════════════════════════════════════════════ */}
-      <section className="py-14 bg-[#faf8f6] border-t border-classie-border">
-        <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-[11px] tracking-[0.4em] uppercase text-classie-gray mb-3">Follow us</p>
-          <h2 className="font-serif text-4xl text-classie-black mb-4">@_classie_in</h2>
-          <p className="text-classie-gray text-sm mb-7">Tag us in your Classie moments for a chance to be featured ✨</p>
-          <a href="https://www.instagram.com/_classie_in/" target="_blank" rel="noopener noreferrer" className="btn-primary">
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            Follow on Instagram
+      {/* ══ INSTAGRAM FEED — Premium Grid ════════════════════════════════ */}
+      <section className="py-16 bg-[#faf8f6]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Instagram className="w-5 h-5 text-[#3D4F5F]" />
+              <h2 className="font-serif text-3xl md:text-4xl text-classie-black">Follow @_classie_in</h2>
+            </div>
+            <p className="text-classie-gray text-sm tracking-wide">Tag us to be featured ✨</p>
+          </div>
+
+          <a
+            href="https://www.instagram.com/_classie_in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+              {igImages.map((item, i) => (
+                <div
+                  key={i}
+                  className="group relative overflow-hidden rounded-xl bg-classie-light"
+                  style={{ aspectRatio: "1 / 1" }}
+                >
+                  {item.image && (
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                    />
+                  )}
+                  {/* Instagram overlay on hover */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
+                    <Instagram className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </a>
+
+          <div className="text-center mt-8">
+            <a
+              href="https://www.instagram.com/_classie_in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-[#3D4F5F] border border-[#3D4F5F] px-6 py-2.5 rounded-full hover:bg-[#3D4F5F] hover:text-white transition-all duration-300"
+            >
+              <Instagram className="w-4 h-4" />
+              Follow on Instagram
+            </a>
+          </div>
         </div>
       </section>
     </>
-  );
-}
-
-function OccasionRow({
-  label,
-  sub,
-  href,
-  items,
-}: {
-  label: string;
-  sub: string;
-  href: string;
-  items: Product[];
-}) {
-  return (
-    <div className="mb-14 last:mb-0">
-      <div className="flex items-end justify-between mb-6">
-        <div>
-          <h3 className="font-serif text-2xl md:text-3xl text-classie-black">{label}</h3>
-          <p className="text-sm text-classie-gray mt-1">{sub}</p>
-        </div>
-        <Link href={href} className="flex items-center gap-1 text-sm text-[#3D4F5F] hover:underline">
-          View All <ChevronRight className="w-4 h-4" />
-        </Link>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-        {items.map((p) => <ProductCard key={p.slug} product={p} />)}
-      </div>
-    </div>
   );
 }
