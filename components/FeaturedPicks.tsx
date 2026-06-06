@@ -74,7 +74,7 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
                 {/* Image Container */}
                 <div
                   className="relative overflow-hidden bg-[#f5f5f5]"
-                  style={{ aspectRatio: "3 / 4" }}
+                  style={{ aspectRatio: "4 / 5" }}
                 >
                   {product.image && (
                     <Image

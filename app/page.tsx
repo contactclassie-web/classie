@@ -82,7 +82,7 @@ export default async function HomePage() {
       {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
       <section className="pt-16 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Curated for You</p>
+
           <h2 className="mb-10" style={{fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.5rem, 2.8vw, 2.25rem)", fontWeight:400, letterSpacing:"0.01em", color:"#111"}}>
             Shop by Occasion
           </h2>
@@ -158,7 +158,7 @@ export default async function HomePage() {
       <NewsletterSection />
 
       {/* ══ TESTIMONIALS ═════════════════════════════════════════════════ */}
-      <section className="py-24 bg-white border-t border-gray-100">
+      <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-10">What They Say</p>
           <blockquote className="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8" style={{fontFamily:"'Playfair Display', serif", fontWeight:400}}>
