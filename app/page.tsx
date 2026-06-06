@@ -48,12 +48,23 @@ export default async function HomePage() {
   const everydayEdit = resolveCollection("the-everyday-edit");
   const festiveEdit = resolveCollection("the-festive-edit");
 
-  // Occasions for circular design
-  const occasions = [
-    { title: "The Date Edit",     href: "/shop/the-date-edit",     image: dateEdit[0]?.image ?? "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/70.png?v=1767129647" },
-    { title: "The Everyday Edit", href: "/shop/the-everyday-edit", image: everydayEdit[0]?.image ?? "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/40_c9833246-51b7-4ff5-8200-acf9809593c5.png?v=1767109414" },
-    { title: "The Festive Edit",  href: "/shop/the-festive-edit",  image: festiveEdit[0]?.image ?? "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583" },
+  // Occasions — fetch from DB (admin se manage hoga)
+  const { createClient } = await import("@supabase/supabase-js");
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const { data: dbCollections } = await sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true });
+  
+  const FALLBACK_OCCASIONS = [
+    { title: "The Date Edit",     href: "/shop/the-date-edit",     image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/70.png?v=1767129647" },
+    { title: "The Everyday Edit", href: "/shop/the-everyday-edit", image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/40_c9833246-51b7-4ff5-8200-acf9809593c5.png?v=1767109414" },
+    { title: "The Festive Edit",  href: "/shop/the-festive-edit",  image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583" },
   ];
+  const occasions = dbCollections && dbCollections.length > 0
+    ? dbCollections.map((c: { title: string; slug: string; image_url?: string }) => ({
+        title: c.title,
+        href: `/shop/${c.slug}`,
+        image: c.image_url ?? "",
+      }))
+    : FALLBACK_OCCASIONS;
 
   // Instagram feed images (first 4 products)
   const igImages = allProducts.slice(0, 4).map((p) => ({ image: p.image, slug: p.slug, title: p.title }));
