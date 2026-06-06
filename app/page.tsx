@@ -84,23 +84,25 @@ export default async function HomePage() {
           <h2 className="text-center font-serif text-4xl md:text-5xl tracking-[0.2em] uppercase mb-12" style={{fontWeight: 400}}>
             Shop by Occasion
           </h2>
-          {/* Horizontal scroll — single row, no wrap */}
-          <div className="flex gap-8 md:gap-12 overflow-x-auto pb-4 scrollbar-hide"
+          {/* Horizontal scroll — 5 visible by default, scroll for more */}
+          <div className="flex gap-6 overflow-x-auto pb-4 justify-start"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             {occasions.filter(occ => occ.image).map((occ) => (
               <Link
                 key={occ.href}
                 href={occ.href}
-                className="group flex flex-col items-center gap-5 flex-shrink-0 w-44 md:w-52"
+                className="group flex flex-col items-center gap-4 flex-shrink-0"
+                style={{ width: "calc((100vw - 3rem) / 2.4)", maxWidth: "220px", minWidth: "140px" }}
               >
-                <div className="relative w-44 h-44 md:w-52 md:h-52 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3B5373]/20 transition-all duration-500">
+                <div className="relative rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3B5373]/20 transition-all duration-500 w-full"
+                  style={{ aspectRatio: "1/1" }}>
                   {occ.image ? (
                     <Image
                       src={occ.image}
                       alt={occ.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="208px"
+                      sizes="(max-width: 768px) 40vw, 220px"
                     />
                   ) : (
                     <div className="w-full h-full bg-[#faf8f6]" />
