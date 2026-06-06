@@ -189,7 +189,7 @@ export default async function HomePage() {
               { name: "Ananya K.", review: "Ordered the satin swirl clips — they completely transformed my old heels. Fast delivery, beautiful packaging, will definitely order more!", rating: 5 },
               { name: "Meera R.", review: "Quality is premium and the price is very reasonable. The Gloss Belle fits perfectly and the cushioning is great. Very happy with my purchase.", rating: 5 },
             ].map((t) => (
-              <div key={t.name} className="bg-[#faf8f6] p-8 border-t border-gray-100">
+              <div key={t.name} className="bg-white p-8 border border-gray-100">
                 <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
