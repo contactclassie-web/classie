@@ -21,36 +21,35 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-        {/* Heading — centered, DM Serif Display, ALL CAPS, ~3rem */}
+        {/* Eyebrow + Heading — LEFT aligned, Mango style */}
+        <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Curated for You</p>
         <h2
-          className="text-center mb-8"
+          className="mb-8"
           style={{
-            fontFamily: "'DM Serif Display', serif",
-            fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "clamp(1.5rem, 2.5vw, 2.25rem)",
             fontWeight: 400,
             color: "#111",
-            letterSpacing: "0.02em",
-            textTransform: "uppercase",
+            letterSpacing: "0.01em",
           }}
         >
           Featured Picks
         </h2>
 
-        {/* Tab Bar — centered */}
-        <div className="relative mb-10 flex justify-center">
-          {/* Full-width gray underline */}
+        {/* Tab Bar — LEFT aligned */}
+        <div className="relative mb-10">
           <div className="absolute bottom-0 left-0 right-0 border-b border-gray-200" />
-          <div className="relative flex gap-12">
+          <div className="relative flex gap-10">
             {(["latest", "bestsellers"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`relative pb-3 text-xs tracking-widest uppercase transition-colors duration-200 ${
                   activeTab === tab
-                    ? "text-gray-900 border-b-2 border-black"
+                    ? "text-gray-900 border-b-2 border-[#3B5373]"
                     : "text-gray-400 hover:text-gray-600"
                 }`}
-                style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400 }}
+                style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 300 }}
               >
                 {tab === "latest" ? "Latest Styles" : "Best Sellers"}
               </button>
