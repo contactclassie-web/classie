@@ -134,16 +134,14 @@ export default async function HomePage() {
   });
 
   // Hero
-  const heroEyebrow = cfg["hero_eyebrow"] || "New Collection 2025";
-  const heroLine1 = cfg["hero_heading_line1"] || "Step Into";
-  const heroItalic = cfg["hero_heading_italic"] || "Elegance";
-  const heroLine3 = cfg["hero_heading_line3"] || "Reefined";
-  const heroSubtitle =
-    cfg["hero_subtitle"] ||
-    "Premium heels crafted for the modern woman. Comfort-first design that doesn't compromise on style.";
-  const heroCta1Text = cfg["hero_cta1_text"] || "Shop Now";
+  const heroEyebrow = cfg["hero_eyebrow"] || "";
+  const heroLine1 = cfg["hero_heading_line1"] || "";
+  const heroItalic = cfg["hero_heading_italic"] || "";
+  const heroLine3 = cfg["hero_heading_line3"] || "";
+  const heroSubtitle = cfg["hero_subtitle"] || "";
+  const heroCta1Text = cfg["hero_cta1_text"] || "";
   const heroCta1Url = cfg["hero_cta1_url"] || "/shop";
-  const heroCta2Text = cfg["hero_cta2_text"] || "View Collection";
+  const heroCta2Text = cfg["hero_cta2_text"] || "";
   const heroCta2Url = cfg["hero_cta2_url"] || "/shop";
   const heroImageUrl =
     cfg["hero_image_url"] ||
@@ -225,12 +223,14 @@ export default async function HomePage() {
             >
               {heroCta1Text}
             </Link>
-            <Link
-              href={heroCta2Url}
-              className="text-[10px] font-light tracking-[0.24em] uppercase text-[#3B5373] border-b border-[rgba(59,83,115,0.4)] pb-0.5 flex items-center gap-2 hover:gap-4 transition-all duration-300"
-            >
-              {heroCta2Text} →
-            </Link>
+            {heroCta2Text && (
+              <Link
+                href={heroCta2Url}
+                className="text-[10px] font-light tracking-[0.24em] uppercase text-[#3B5373] border-b border-[rgba(59,83,115,0.4)] pb-0.5 flex items-center gap-2 hover:gap-4 transition-all duration-300"
+              >
+                {heroCta2Text} →
+              </Link>
+            )}
           </div>
 
           {/* Stats row — only show if values exist in DB */}
