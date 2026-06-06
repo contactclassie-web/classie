@@ -87,7 +87,7 @@ export default async function HomePage() {
           {/* Horizontal scroll — 5 visible by default, scroll for more */}
           <div className="flex gap-6 overflow-x-auto pb-4 justify-start"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-            {occasions.filter(occ => occ.image).map((occ) => (
+            {occasions.map((occ) => (
               <Link
                 key={occ.href}
                 href={occ.href}
@@ -105,7 +105,9 @@ export default async function HomePage() {
                       sizes="(max-width: 768px) 40vw, 220px"
                     />
                   ) : (
-                    <div className="w-full h-full bg-[#faf8f6]" />
+                    <div className="w-full h-full bg-[#f0eef8] flex items-center justify-center">
+                      <span className="font-serif text-3xl text-[#3B5373]/40">{occ.title.charAt(0)}</span>
+                    </div>
                   )}
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-[#3B5373]/0 group-hover:bg-[#3B5373]/15 transition-all duration-500 rounded-full" />
