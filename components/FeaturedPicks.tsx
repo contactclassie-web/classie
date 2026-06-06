@@ -123,7 +123,7 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
                         <span className="text-xs text-gray-400 line-through ml-2">
                           ₹{product.comparePrice.toLocaleString("en-IN")}
                         </span>
-                        <span className="text-xs font-medium text-red-500 ml-2">
+                        <span className="text-xs font-medium text-[#3B5373] ml-2">
                           -{discountPct}%
                         </span>
                       </>
