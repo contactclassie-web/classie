@@ -287,17 +287,25 @@ export default async function HomePage() {
       </div>
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
-      <section className="pt-16 pb-10 bg-white border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-8 h-px bg-[#3B5373]" />
-            <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
-              CURATED EDITS
-            </span>
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-8 sm:px-16">
+          {/* Header row: heading left, VIEW ALL EDITS right */}
+          <div className="flex items-end justify-between mb-14">
+            <div>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-7 h-px bg-[#3B5373]" />
+                <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
+                  Curated Edits
+                </span>
+              </div>
+              <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.6rem)] font-light leading-[1.08] text-[#1a1a1a]">
+                Shop by <em className="italic text-[#3B5373]">Occasion</em>
+              </h2>
+            </div>
+            <a href="/collections" className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#3B5373] border-b border-[rgba(59,83,115,0.3)] pb-0.5 hover:border-[#3B5373] transition-all whitespace-nowrap">
+              View All Edits
+            </a>
           </div>
-          <h2 className="mb-10 font-serif text-[clamp(1.6rem,3vw,2.5rem)] font-light leading-[1.15] text-[#1a1a1a]">
-            Shop by <em className="italic text-[#3B5373]">Occasion</em>
-          </h2>
           <OccasionCarousel occasions={occasions} />
         </div>
       </section>
