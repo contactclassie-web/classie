@@ -34,7 +34,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#1a1a1a] text-white">
       {/* ── Main footer body */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+      <div className="px-6 md:px-20 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
 
           {/* ── Brand col */}
@@ -160,7 +160,7 @@ export default function Footer() {
       <div className="border-t border-white/10" />
 
       {/* ── Bottom bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="px-6 md:px-20 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-xs font-light text-white/30 text-center sm:text-left tracking-wide">
           © {new Date().getFullYear()} Classie. All rights reserved.
         </p>
