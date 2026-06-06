@@ -18,8 +18,8 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
   const products = (activeTab === "latest" ? latestProducts : bestSellers).slice(0, 4);
 
   return (
-    <section className="pt-12 pb-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className="pt-12 pb-20 bg-white px-8 md:px-20">
+      <div>
 
         {/* Eyebrow + Heading */}
         <div className="flex items-center gap-4 mb-4">

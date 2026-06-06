@@ -314,8 +314,8 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 4. SHOP BY CATEGORY ════════════════════════════════════════════ */}
-      <section className="pt-10 pb-10 bg-[#1a1a1a]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="pt-16 pb-16 bg-[#1a1a1a] px-8 md:px-20">
+        <div>
           <div className="flex items-center gap-4 mb-4">
             <div className="w-8 h-px bg-[rgba(59,83,115,0.6)]" />
             <span
@@ -499,8 +499,8 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 7. TESTIMONIALS — 3 cards ═════════════════════════════════════ */}
-      <section className="py-28 px-6 md:px-20 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-28 px-8 md:px-20 bg-white">
+        <div>
           <div className="mb-14">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-8 h-px bg-[#3B5373]" />
@@ -557,8 +557,8 @@ export default async function HomePage() {
       <NewsletterSection />
 
       {/* ══ INSTAGRAM FEED ════════════════════════════════════════════════ */}
-      <section className="py-20 bg-white border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="py-20 bg-white border-t border-gray-100 px-8 md:px-20">
+        <div>
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-8 h-px bg-[#3B5373]" />
