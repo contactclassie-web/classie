@@ -79,7 +79,7 @@ export default async function HomePage() {
       <FeaturesBar />
 
       {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
-      <section className="py-14 bg-white">
+      <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-center text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-3">Curated for You</p>
           <h2 className="text-center font-serif text-4xl md:text-5xl tracking-[0.2em] uppercase mb-12" style={{fontWeight: 400}}>
@@ -90,10 +90,10 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
-      <section className="py-20 bg-[#faf8f6]">
+      <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-subheading">Collections</p>
-          <h2 className="section-heading mt-2 mb-10">Shop by Category</h2>
+          <p className="section-subheading text-left">Collections</p>
+          <h2 className="section-heading text-left mt-2 mb-10">Shop by Category</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { label: "Heels", sub: "Block heels, stilettos & slingbacks", href: "/shop/heels", image: heelsCategoryImage, count: heels.length },
@@ -176,7 +176,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ PROMO BANNER ══════════════════════════════════════════════════ */}
-      <section className="bg-white text-[#3B5373] py-16 border-y border-classie-border">
+      <section className="bg-white text-[#3B5373] py-20 border-y border-classie-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <Sparkles className="w-8 h-8 mx-auto mb-4 text-amber-400" />
           <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-4">Limited Time</p>
@@ -194,10 +194,10 @@ export default async function HomePage() {
       <NewsletterSection />
 
       {/* ══ TESTIMONIALS ═════════════════════════════════════════════════ */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-subheading">Happy Customers</p>
-          <h2 className="section-heading mt-2 mb-10">What They Say</h2>
+          <p className="section-subheading text-left">Happy Customers</p>
+          <h2 className="section-heading text-left mt-2 mb-10">What They Say</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { name: "Priya S.", review: "The Modiva heels are absolutely stunning. Wore them to my sister's wedding and got so many compliments. Super comfortable for a 4-inch heel!", rating: 5 },
@@ -219,7 +219,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ INSTAGRAM FEED — Premium Grid ════════════════════════════════ */}
-      <section className="py-20 bg-[#faf8f6]">
+      <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <div className="flex items-center justify-center gap-2 mb-2">

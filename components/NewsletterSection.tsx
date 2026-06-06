@@ -13,7 +13,7 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="py-16 bg-classie-light">
+    <section className="py-20 bg-white border-t border-gray-100">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
         <p className="text-[11px] tracking-[0.4em] uppercase text-classie-gray mb-3">Stay in the loop</p>
         <h2 className="font-serif text-3xl md:text-4xl text-classie-black mb-3">
