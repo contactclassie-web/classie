@@ -27,7 +27,7 @@ function OccasionCard({ occ, large }: { occ: Occasion; large: boolean }) {
           src={occ.image}
           alt={occ.title}
           className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-75"
-          style={{ objectPosition: occ.image_position ?? "top" }}
+          style={{ objectPosition: occ.image_position ?? "50% 50%" }}
         />
       ) : (
         <div className="absolute inset-0 bg-[#1a1a1a]" />

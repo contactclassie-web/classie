@@ -2677,51 +2677,77 @@ export default function AdminPage() {
                 {collectionModal.data.image_url && (
                   <div className="mt-3 space-y-3">
                     {/* Crop position selector */}
-                    <div>
-                      <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-gray-400 mb-2">Image Focus — site pe kaisi crop hogi</p>
-                      <div className="flex gap-2">
-                        {(["top","center","bottom"] as const).map((pos) => (
-                          <button key={pos} type="button"
-                            onClick={() => setCollectionField("image_position", pos)}
-                            className={`flex-1 py-2 text-xs font-medium capitalize rounded-lg border transition-all ${
-                              (collectionModal.data.image_position ?? "top") === pos
-                                ? "bg-[#3B5373] text-white border-[#3B5373]"
-                                : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373]"
-                            }`}>
-                            {pos === "top" ? "⬆ Top" : pos === "center" ? "⬛ Center" : "⬇ Bottom"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    {/* Card preview — matches site card exactly */}
-                    <div className="relative overflow-hidden bg-gray-900" style={{ width: "100%", paddingBottom: "115%" }}>
-                      <div className="absolute inset-0">
-                        <div style={{
-                          position: "absolute", inset: 0,
-                          backgroundImage: `url(${collectionModal.data.image_url})`,
-                          backgroundSize: "cover",
-                          backgroundRepeat: "no-repeat",
-                          backgroundPosition:
-                            (collectionModal.data.image_position ?? "top") === "top" ? "center top" :
-                            (collectionModal.data.image_position ?? "top") === "bottom" ? "center bottom" :
-                            "center center"
-                        }} />
-                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, transparent 38%, rgba(26,26,26,0.78) 100%)" }} />
-                        <div style={{ position: "absolute", bottom: 0, left: 0, padding: "22px" }}>
-                          {collectionModal.data.tag_label && (
-                            <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.65)", marginBottom: "7px" }}>
-                              {collectionModal.data.tag_label}
-                            </p>
-                          )}
-                          <p style={{ fontFamily: "Georgia,serif", fontSize: "22px", fontWeight: 300, color: "white", lineHeight: 1.2, marginBottom: "10px" }}>
-                            {collectionModal.data.title || "Collection Name"}
-                          </p>
-                          <p style={{ fontFamily: "monospace", fontSize: "9px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)" }}>
-                            Shop Now →
-                          </p>
+                    <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-gray-400">Focal Point — image pe tap karo jahan focus chahiye</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* LEFT: Full image with draggable focal dot */}
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1">👆 Yahan click karo</p>
+                        <div
+                          className="relative overflow-hidden bg-gray-100 cursor-crosshair"
+                          style={{ width: "100%", paddingBottom: "130%" }}
+                          onClick={(e) => {
+                            const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                            const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                            const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                            setCollectionField("image_position", `${x}% ${y}%`);
+                          }}
+                        >
+                          <div style={{
+                            position: "absolute", inset: 0,
+                            backgroundImage: `url(${collectionModal.data.image_url})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat"
+                          }} />
+                          {/* Focal point dot */}
+                          {(() => {
+                            const pos = collectionModal.data.image_position ?? "50% 50%";
+                            const parts = pos.replace(/%/g, "").split(" ");
+                            const fx = parseFloat(parts[0]) || 50;
+                            const fy = parseFloat(parts[1]) || 50;
+                            return (
+                              <div style={{
+                                position: "absolute",
+                                left: `${fx}%`, top: `${fy}%`,
+                                transform: "translate(-50%, -50%)",
+                                width: 22, height: 22,
+                                border: "3px solid white",
+                                borderRadius: "50%",
+                                background: "#3B5373",
+                                boxShadow: "0 0 0 2px rgba(0,0,0,0.4)",
+                                pointerEvents: "none"
+                              }} />
+                            );
+                          })()}
                         </div>
-                        <div style={{ position: "absolute", top: "10px", right: "10px", background: "#3B5373", color: "white", fontSize: "9px", padding: "3px 8px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                          {collectionModal.data.image_position ?? "top"}
+                      </div>
+                      {/* RIGHT: Card preview showing crop result */}
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1">📱 Site pe aise dikhega</p>
+                        <div className="relative overflow-hidden bg-gray-900" style={{ width: "100%", paddingBottom: "130%" }}>
+                          <div className="absolute inset-0">
+                            <div style={{
+                              position: "absolute", inset: 0,
+                              backgroundImage: `url(${collectionModal.data.image_url})`,
+                              backgroundSize: "cover",
+                              backgroundRepeat: "no-repeat",
+                              backgroundPosition: collectionModal.data.image_position ?? "50% 50%"
+                            }} />
+                            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, transparent 35%, rgba(26,26,26,0.82) 100%)" }} />
+                            <div style={{ position: "absolute", bottom: 0, left: 0, padding: "14px" }}>
+                              {collectionModal.data.tag_label && (
+                                <p style={{ fontFamily: "monospace", fontSize: "8px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.65)", marginBottom: "5px" }}>
+                                  {collectionModal.data.tag_label}
+                                </p>
+                              )}
+                              <p style={{ fontFamily: "Georgia,serif", fontSize: "15px", fontWeight: 300, color: "white", lineHeight: 1.2, marginBottom: "7px" }}>
+                                {collectionModal.data.title || "Title"}
+                              </p>
+                              <p style={{ fontFamily: "monospace", fontSize: "8px", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>
+                                Shop Now →
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
