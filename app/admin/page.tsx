@@ -5,8 +5,12 @@ import Image from "next/image";
 import {
   Lock, LogOut, RefreshCw, Package, IndianRupee, Clock,
   CheckCircle2, Truck, Home, AlertCircle, TrendingUp,
+  Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
+  Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
 } from "lucide-react";
-import { products } from "@/lib/products";
+import { supabase } from "@/lib/supabase";
+
+// ── Interfaces ─────────────────────────────────────────────────────────────
 
 interface Order {
   id: string;
@@ -23,6 +27,64 @@ interface Order {
   payment_method: string;
   created_at: string;
 }
+
+interface DbProduct {
+  id?: string;
+  title: string;
+  slug: string;
+  price: number;
+  compare_price: number;
+  category: string;
+  description: string;
+  image: string;
+  images: string[];
+  variant_type: string;
+  variants: string[];
+  heel_type?: string;
+  toe_style?: string;
+  heel_height?: string;
+  ankle_strap?: boolean;
+  shoe_fit?: string;
+  cod_available: boolean;
+  free_shipping: boolean;
+  is_featured: boolean;
+  active: boolean;
+  created_at?: string;
+}
+
+interface HeroSlide {
+  id?: string;
+  headline: string;
+  subheadline: string;
+  cta_text: string;
+  cta_url: string;
+  bg_color: string;
+  text_align: string;
+  display_order: number;
+  active: boolean;
+}
+
+interface SiteSettings {
+  announcement_text: string;
+  whatsapp_number: string;
+  instagram_url: string;
+}
+
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
+}
+
+interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  created_at: string;
+}
+
+// ── Constants ──────────────────────────────────────────────────────────────
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"];
 
@@ -42,17 +104,76 @@ const STATUS_ICONS: Record<string, React.ElementType> = {
   cancelled:  AlertCircle,
 };
 
+const EMPTY_PRODUCT: DbProduct = {
+  title: "", slug: "", price: 0, compare_price: 0,
+  category: "heels", description: "", image: "", images: [],
+  variant_type: "none", variants: [], heel_type: "", toe_style: "",
+  heel_height: "", ankle_strap: false, shoe_fit: "",
+  cod_available: true, free_shipping: false, is_featured: false, active: true,
+};
+
+const EMPTY_SLIDE: HeroSlide = {
+  headline: "", subheadline: "", cta_text: "", cta_url: "",
+  bg_color: "#3D4F5F", text_align: "left", display_order: 0, active: true,
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+const inputCls = "w-full px-3 py-2 border border-classie-border rounded-lg text-sm focus:outline-none focus:border-[#3D4F5F] transition-colors bg-white";
+const labelCls = "block text-xs font-medium text-classie-gray uppercase tracking-wider mb-1";
+
+// ── Main Component ─────────────────────────────────────────────────────────
+
 export default function AdminPage() {
+  // Auth
   const [authed, setAuthed] = useState(false);
   const [pw, setPw] = useState("");
   const [pwError, setPwError] = useState("");
+
+  // Tab
+  const [tab, setTab] = useState<"orders" | "products" | "slides" | "settings" | "messages">("orders");
+
+  // Orders
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState<"orders" | "products">("orders");
+  const [ordersLoading, setOrdersLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // Products
+  const [dbProducts, setDbProducts] = useState<DbProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productModal, setProductModal] = useState<{ open: boolean; mode: "add" | "edit"; data: DbProduct }>({
+    open: false, mode: "add", data: EMPTY_PRODUCT,
+  });
+  const [productSaving, setProductSaving] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Hero Slides
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [slidesLoading, setSlidesLoading] = useState(false);
+  const [slideModal, setSlideModal] = useState<{ open: boolean; mode: "add" | "edit"; data: HeroSlide }>({
+    open: false, mode: "add", data: EMPTY_SLIDE,
+  });
+  const [slideSaving, setSlideSaving] = useState(false);
+  const [deleteSlideConfirm, setDeleteSlideConfirm] = useState<string | null>(null);
+
+  // Site Settings
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({
+    announcement_text: "", whatsapp_number: "", instagram_url: "",
+  });
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+
+  // Messages
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
+  const [subsLoading, setSubsLoading] = useState(false);
+  const [msgSubTab, setMsgSubTab] = useState<"messages" | "newsletter">("messages");
+
+  // ── Fetch functions ──────────────────────────────────────────────────────
+
   const fetchOrders = useCallback(async () => {
-    setLoading(true);
+    setOrdersLoading(true);
     try {
       const res = await fetch("/api/orders");
       if (res.ok) {
@@ -60,22 +181,83 @@ export default function AdminPage() {
         setOrders(Array.isArray(data) ? data : []);
       }
     } catch { /* ignore */ }
-    finally { setLoading(false); }
+    finally { setOrdersLoading(false); }
   }, []);
 
+  const fetchProducts = useCallback(async () => {
+    setProductsLoading(true);
+    try {
+      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+      if (!error && data) setDbProducts(data as DbProduct[]);
+    } catch { /* ignore */ }
+    finally { setProductsLoading(false); }
+  }, []);
+
+  const fetchSlides = useCallback(async () => {
+    setSlidesLoading(true);
+    try {
+      const { data, error } = await supabase.from("hero_slides").select("*").order("display_order", { ascending: true });
+      if (!error && data) setSlides(data as HeroSlide[]);
+    } catch { /* ignore */ }
+    finally { setSlidesLoading(false); }
+  }, []);
+
+  const fetchSettings = useCallback(async () => {
+    setSettingsLoading(true);
+    try {
+      const { data, error } = await supabase.from("site_settings").select("*");
+      if (!error && data) {
+        const merged: SiteSettings = { announcement_text: "", whatsapp_number: "", instagram_url: "" };
+        data.forEach((row: { key: string; value: string }) => {
+          if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
+        });
+        setSiteSettings(merged);
+      }
+    } catch { /* ignore */ }
+    finally { setSettingsLoading(false); }
+  }, []);
+
+  const fetchMessages = useCallback(async () => {
+    setMessagesLoading(true);
+    try {
+      const { data, error } = await supabase.from("contact_messages").select("*").order("created_at", { ascending: false });
+      if (!error && data) setMessages(data as ContactMessage[]);
+    } catch { /* ignore */ }
+    finally { setMessagesLoading(false); }
+  }, []);
+
+  const fetchSubscribers = useCallback(async () => {
+    setSubsLoading(true);
+    try {
+      const { data, error } = await supabase.from("newsletter_subscribers").select("*").order("created_at", { ascending: false });
+      if (!error && data) setSubscribers(data as NewsletterSubscriber[]);
+    } catch { /* ignore */ }
+    finally { setSubsLoading(false); }
+  }, []);
+
+  // Load data when authenticated
   useEffect(() => {
-    if (authed) fetchOrders();
-  }, [authed, fetchOrders]);
+    if (!authed) return;
+    fetchOrders();
+    fetchProducts();
+  }, [authed, fetchOrders, fetchProducts]);
+
+  useEffect(() => {
+    if (!authed) return;
+    if (tab === "slides") fetchSlides();
+    if (tab === "settings") fetchSettings();
+    if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
+  }, [authed, tab, fetchSlides, fetchSettings, fetchMessages, fetchSubscribers]);
+
+  // ── Auth ─────────────────────────────────────────────────────────────────
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw === "classie@admin123") {
-      setAuthed(true);
-      setPwError("");
-    } else {
-      setPwError("Incorrect password. Please try again.");
-    }
+    if (pw === "classie@admin123") { setAuthed(true); setPwError(""); }
+    else setPwError("Incorrect password. Please try again.");
   };
+
+  // ── Order actions ─────────────────────────────────────────────────────────
 
   const updateStatus = async (id: string, status: string) => {
     setUpdatingId(id);
@@ -86,19 +268,100 @@ export default function AdminPage() {
         body: JSON.stringify({ id, status }),
       });
       setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
-    } finally {
-      setUpdatingId(null);
-    }
+    } finally { setUpdatingId(null); }
   };
 
-  // Stats
+  // ── Product actions ───────────────────────────────────────────────────────
+
+  const openAddProduct = () => setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } });
+  const openEditProduct = (p: DbProduct) => setProductModal({ open: true, mode: "edit", data: { ...p } });
+  const closeProductModal = () => setProductModal((m) => ({ ...m, open: false }));
+
+  const handleProductSave = async () => {
+    setProductSaving(true);
+    try {
+      const { id, created_at, ...rest } = productModal.data;
+      if (productModal.mode === "add") {
+        await supabase.from("products").insert([rest]);
+      } else {
+        await supabase.from("products").update(rest).eq("id", id);
+      }
+      await fetchProducts();
+      closeProductModal();
+    } catch { /* ignore */ }
+    finally { setProductSaving(false); }
+  };
+
+  const deleteProduct = async (id: string) => {
+    await supabase.from("products").delete().eq("id", id);
+    setDbProducts((prev) => prev.filter((p) => p.id !== id));
+    setDeleteConfirm(null);
+  };
+
+  const toggleProductActive = async (p: DbProduct) => {
+    await supabase.from("products").update({ active: !p.active }).eq("id", p.id);
+    setDbProducts((prev) => prev.map((x) => (x.id === p.id ? { ...x, active: !x.active } : x)));
+  };
+
+  const setProductField = (key: keyof DbProduct, val: unknown) =>
+    setProductModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
+
+  // ── Slide actions ─────────────────────────────────────────────────────────
+
+  const openAddSlide = () => setSlideModal({ open: true, mode: "add", data: { ...EMPTY_SLIDE } });
+  const openEditSlide = (s: HeroSlide) => setSlideModal({ open: true, mode: "edit", data: { ...s } });
+  const closeSlideModal = () => setSlideModal((m) => ({ ...m, open: false }));
+
+  const handleSlideSave = async () => {
+    setSlideSaving(true);
+    try {
+      const { id, ...rest } = slideModal.data;
+      if (slideModal.mode === "add") {
+        await supabase.from("hero_slides").insert([rest]);
+      } else {
+        await supabase.from("hero_slides").update(rest).eq("id", id);
+      }
+      await fetchSlides();
+      closeSlideModal();
+    } catch { /* ignore */ }
+    finally { setSlideSaving(false); }
+  };
+
+  const deleteSlide = async (id: string) => {
+    await supabase.from("hero_slides").delete().eq("id", id);
+    setSlides((prev) => prev.filter((s) => s.id !== id));
+    setDeleteSlideConfirm(null);
+  };
+
+  const toggleSlideActive = async (s: HeroSlide) => {
+    await supabase.from("hero_slides").update({ active: !s.active }).eq("id", s.id);
+    setSlides((prev) => prev.map((x) => (x.id === s.id ? { ...x, active: !x.active } : x)));
+  };
+
+  const setSlideField = (key: keyof HeroSlide, val: unknown) =>
+    setSlideModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
+
+  // ── Settings actions ──────────────────────────────────────────────────────
+
+  const saveSettings = async () => {
+    setSettingsSaving(true);
+    try {
+      const rows = Object.entries(siteSettings).map(([key, value]) => ({ key, value }));
+      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+    } catch { /* ignore */ }
+    finally { setSettingsSaving(false); }
+  };
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+
   const today = new Date().toDateString();
   const todayOrders = orders.filter((o) => new Date(o.created_at).toDateString() === today);
   const todayRevenue = todayOrders.reduce((s, o) => s + o.total_amount, 0);
   const pendingCount = orders.filter((o) => o.status === "pending").length;
   const totalRevenue = orders.reduce((s, o) => s + o.total_amount, 0);
 
-  // ── Login screen ──
+  // ── Login screen ──────────────────────────────────────────────────────────
+
   if (!authed) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -112,14 +375,10 @@ export default function AdminPage() {
           </div>
           <form onSubmit={handleLogin} className="bg-[#faf8f6] rounded-2xl p-8 space-y-4">
             <div>
-              <label className="block text-xs font-medium text-classie-gray uppercase tracking-wider mb-1.5">Password</label>
+              <label className={labelCls}>Password</label>
               <input
-                type="password"
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                placeholder="Enter admin password"
-                required
-                className="w-full px-4 py-3 border border-classie-border rounded-xl text-sm focus:outline-none focus:border-[#3D4F5F] transition-colors"
+                type="password" value={pw} onChange={(e) => setPw(e.target.value)}
+                placeholder="Enter admin password" required className={inputCls}
               />
             </div>
             {pwError && (
@@ -127,16 +386,23 @@ export default function AdminPage() {
                 <AlertCircle className="w-3.5 h-3.5" /> {pwError}
               </p>
             )}
-            <button type="submit" className="btn-primary w-full py-3.5">
-              Sign In
-            </button>
+            <button type="submit" className="btn-primary w-full py-3.5">Sign In</button>
           </form>
         </div>
       </div>
     );
   }
 
-  // ── Dashboard ──
+  // ── Dashboard ─────────────────────────────────────────────────────────────
+
+  const TABS = [
+    { id: "orders",   label: `Orders (${orders.length})`,      icon: Package },
+    { id: "products", label: `Products (${dbProducts.length})`, icon: ImageIcon },
+    { id: "slides",   label: "Hero Slides",                    icon: LayoutTemplate },
+    { id: "settings", label: "Settings",                       icon: Settings },
+    { id: "messages", label: `Messages (${messages.length})`,  icon: MessageSquare },
+  ] as const;
+
   return (
     <div className="min-h-screen bg-[#faf8f6]">
       {/* Top bar */}
@@ -151,13 +417,13 @@ export default function AdminPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Stats cards */}
+        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Orders",    value: orders.length.toString(),                  icon: Package,      color: "text-[#3D4F5F]" },
-            { label: "Total Revenue",   value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: IndianRupee,  color: "text-emerald-600" },
-            { label: "Today's Revenue", value: `₹${todayRevenue.toLocaleString("en-IN")}`, icon: TrendingUp,   color: "text-blue-600" },
-            { label: "Pending Orders",  value: pendingCount.toString(),                   icon: Clock,        color: "text-amber-600" },
+            { label: "Total Orders",    value: orders.length.toString(),                   icon: Package,     color: "text-[#3D4F5F]" },
+            { label: "Total Revenue",   value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: IndianRupee, color: "text-emerald-600" },
+            { label: "Today's Revenue", value: `₹${todayRevenue.toLocaleString("en-IN")}`, icon: TrendingUp,  color: "text-blue-600" },
+            { label: "Pending Orders",  value: pendingCount.toString(),                    icon: Clock,       color: "text-amber-600" },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-white rounded-2xl p-5 border border-classie-border">
               <div className="flex items-center justify-between mb-3">
@@ -170,52 +436,48 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          {(["orders", "products"] as const).map((t) => (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {TABS.map(({ id, label, icon: Icon }) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors capitalize ${
-                tab === t ? "bg-[#3D4F5F] text-white" : "bg-white text-classie-gray border border-classie-border hover:border-[#3D4F5F]"
+              key={id}
+              onClick={() => setTab(id)}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                tab === id ? "bg-[#3D4F5F] text-white" : "bg-white text-classie-gray border border-classie-border hover:border-[#3D4F5F]"
               }`}
             >
-              {t === "orders" ? `Orders (${orders.length})` : "Products"}
+              <Icon className="w-3.5 h-3.5" />
+              {label}
             </button>
           ))}
           {tab === "orders" && (
             <button
-              onClick={fetchOrders}
-              disabled={loading}
+              onClick={fetchOrders} disabled={ordersLoading}
               className="ml-auto flex items-center gap-2 px-4 py-2 text-sm text-classie-gray hover:text-[#3D4F5F] transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${ordersLoading ? "animate-spin" : ""}`} />
               Refresh
             </button>
           )}
         </div>
 
-        {/* Orders table */}
+        {/* ── ORDERS TAB ── */}
         {tab === "orders" && (
           <div className="bg-white rounded-2xl border border-classie-border overflow-hidden">
-            {loading ? (
+            {ordersLoading ? (
               <div className="p-12 text-center text-classie-gray text-sm">Loading orders…</div>
             ) : orders.length === 0 ? (
               <div className="p-12 text-center">
                 <Package className="w-12 h-12 text-classie-border mx-auto mb-3" />
                 <p className="text-classie-gray text-sm">No orders yet.</p>
-                <p className="text-xs text-classie-gray mt-1">Orders will appear here once customers start checking out.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-classie-border bg-[#faf8f6]">
-                      <th className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">Order</th>
-                      <th className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">Customer</th>
-                      <th className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold hidden md:table-cell">Items</th>
-                      <th className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">Amount</th>
-                      <th className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">Status</th>
-                      <th className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold hidden lg:table-cell">Date</th>
+                      {["Order","Customer","Items","Amount","Status","Date"].map((h) => (
+                        <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">{h}</th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
@@ -231,17 +493,14 @@ export default function AdminPage() {
                             <p className="text-xs text-classie-gray mt-0.5">{order.customer_phone}</p>
                             <p className="text-xs text-classie-gray">{order.city}, {order.state}</p>
                           </td>
-                          <td className="px-5 py-4 hidden md:table-cell">
+                          <td className="px-5 py-4">
                             <div className="space-y-1 max-w-[200px]">
                               {order.items.slice(0, 2).map((item, i) => (
                                 <p key={i} className="text-xs text-classie-gray truncate">
-                                  {item.quantity}× {item.title}
-                                  {item.variant ? ` (${item.variant})` : ""}
+                                  {item.quantity}× {item.title}{item.variant ? ` (${item.variant})` : ""}
                                 </p>
                               ))}
-                              {order.items.length > 2 && (
-                                <p className="text-xs text-[#3D4F5F]">+{order.items.length - 2} more</p>
-                              )}
+                              {order.items.length > 2 && <p className="text-xs text-[#3D4F5F]">+{order.items.length - 2} more</p>}
                             </div>
                           </td>
                           <td className="px-5 py-4">
@@ -251,8 +510,7 @@ export default function AdminPage() {
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-1.5 mb-2">
                               <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium ${STATUS_STYLES[order.status] ?? "bg-gray-100 text-gray-600"}`}>
-                                <StatusIcon className="w-3 h-3" />
-                                {order.status}
+                                <StatusIcon className="w-3 h-3" />{order.status}
                               </span>
                             </div>
                             <select
@@ -261,21 +519,15 @@ export default function AdminPage() {
                               disabled={updatingId === order.id}
                               className="text-xs border border-classie-border rounded-lg px-2 py-1 focus:outline-none focus:border-[#3D4F5F] bg-white disabled:opacity-50"
                             >
-                              {STATUS_OPTIONS.map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                              ))}
+                              {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                             </select>
                           </td>
-                          <td className="px-5 py-4 hidden lg:table-cell">
+                          <td className="px-5 py-4">
                             <p className="text-xs text-classie-gray">
-                              {new Date(order.created_at).toLocaleDateString("en-IN", {
-                                day: "numeric", month: "short", year: "numeric",
-                              })}
+                              {new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                             </p>
                             <p className="text-xs text-classie-gray">
-                              {new Date(order.created_at).toLocaleTimeString("en-IN", {
-                                hour: "2-digit", minute: "2-digit",
-                              })}
+                              {new Date(order.created_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                             </p>
                           </td>
                         </tr>
@@ -288,56 +540,591 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Products list */}
+        {/* ── PRODUCTS TAB ── */}
         {tab === "products" && (
-          <div className="bg-white rounded-2xl border border-classie-border overflow-hidden">
-            <div className="px-5 py-4 border-b border-classie-border bg-[#faf8f6] flex items-center justify-between">
-              <p className="text-sm font-semibold text-classie-black">{products.length} Products</p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-classie-gray">{dbProducts.length} products in database</p>
+              <button onClick={openAddProduct} className="flex items-center gap-2 px-4 py-2 bg-[#3D4F5F] text-white rounded-full text-sm font-medium hover:bg-[#2d3f4f] transition-colors">
+                <Plus className="w-4 h-4" /> Add Product
+              </button>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-classie-border">
-                    {["Product","Category","Price","Compare","Variants"].map((h) => (
-                      <th key={h} className="text-left px-5 py-3 text-xs uppercase tracking-wider text-classie-gray font-semibold">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((p) => {
-                    const disc = Math.round(((p.comparePrice - p.price) / p.comparePrice) * 100);
-                    return (
-                      <tr key={p.slug} className="border-b border-classie-border last:border-0 hover:bg-[#faf8f6] transition-colors">
-                        <td className="px-5 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-classie-light flex-shrink-0">
-                              <Image src={p.image} alt={p.title} fill className="object-cover" sizes="40px" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-classie-black text-xs leading-snug">{p.title}</p>
-                              <p className="text-[10px] text-classie-gray font-mono">{p.slug}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <span className="text-xs bg-[#faf8f6] text-classie-gray px-2 py-1 rounded-full capitalize">{p.collection}</span>
-                        </td>
-                        <td className="px-5 py-3 font-semibold text-classie-black text-xs">₹{p.price.toLocaleString("en-IN")}</td>
-                        <td className="px-5 py-3 text-xs text-classie-gray line-through">₹{p.comparePrice.toLocaleString("en-IN")}</td>
-                        <td className="px-5 py-3 text-xs text-classie-gray">
-                          {p.variants.type !== "none" ? (
-                            <span>{p.variants.type}: {p.variants.options.join(", ")}</span>
-                          ) : "—"}
-                        </td>
+            <div className="bg-white rounded-2xl border border-classie-border overflow-hidden">
+              {productsLoading ? (
+                <div className="p-12 text-center text-classie-gray text-sm">Loading products…</div>
+              ) : dbProducts.length === 0 ? (
+                <div className="p-12 text-center">
+                  <Package className="w-12 h-12 text-classie-border mx-auto mb-3" />
+                  <p className="text-classie-gray text-sm">No products yet. Add your first product.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-classie-border bg-[#faf8f6]">
+                        {["Product","Category","Price","Variants","Status","Actions"].map((h) => (
+                          <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">{h}</th>
+                        ))}
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {dbProducts.map((p) => (
+                        <tr key={p.id} className="border-b border-classie-border last:border-0 hover:bg-[#faf8f6] transition-colors">
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-3">
+                              {p.image && (
+                                <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-classie-light flex-shrink-0">
+                                  <Image src={p.image} alt={p.title} fill className="object-cover" sizes="40px" />
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-medium text-classie-black text-xs leading-snug">{p.title}</p>
+                                <p className="text-[10px] text-classie-gray font-mono">{p.slug}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className="text-xs bg-[#faf8f6] text-classie-gray px-2 py-1 rounded-full capitalize">{p.category}</span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <p className="font-semibold text-classie-black text-xs">₹{p.price.toLocaleString("en-IN")}</p>
+                            <p className="text-[10px] text-classie-gray line-through">₹{p.compare_price.toLocaleString("en-IN")}</p>
+                          </td>
+                          <td className="px-5 py-4 text-xs text-classie-gray">
+                            {p.variant_type !== "none" ? `${p.variant_type}: ${p.variants?.join(", ")}` : "—"}
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${p.active ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
+                              {p.active ? "Active" : "Inactive"}
+                            </span>
+                            {p.is_featured && <span className="ml-1 text-[10px] text-amber-600 font-medium">★ Featured</span>}
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => toggleProductActive(p)} title={p.active ? "Deactivate" : "Activate"}
+                                className="p-1.5 rounded-lg hover:bg-[#faf8f6] text-classie-gray hover:text-[#3D4F5F] transition-colors">
+                                {p.active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                              </button>
+                              <button onClick={() => openEditProduct(p)} title="Edit"
+                                className="p-1.5 rounded-lg hover:bg-[#faf8f6] text-classie-gray hover:text-[#3D4F5F] transition-colors">
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => setDeleteConfirm(p.id!)} title="Delete"
+                                className="p-1.5 rounded-lg hover:bg-red-50 text-classie-gray hover:text-red-600 transition-colors">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}
+
+        {/* ── HERO SLIDES TAB ── */}
+        {tab === "slides" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-classie-gray">{slides.length} hero slides</p>
+              <button onClick={openAddSlide} className="flex items-center gap-2 px-4 py-2 bg-[#3D4F5F] text-white rounded-full text-sm font-medium hover:bg-[#2d3f4f] transition-colors">
+                <Plus className="w-4 h-4" /> Add Slide
+              </button>
+            </div>
+            <div className="bg-white rounded-2xl border border-classie-border overflow-hidden">
+              {slidesLoading ? (
+                <div className="p-12 text-center text-classie-gray text-sm">Loading slides…</div>
+              ) : slides.length === 0 ? (
+                <div className="p-12 text-center">
+                  <LayoutTemplate className="w-12 h-12 text-classie-border mx-auto mb-3" />
+                  <p className="text-classie-gray text-sm">No hero slides yet.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-classie-border bg-[#faf8f6]">
+                        {["Order","Headline","Subheadline","CTA","Align","Status","Actions"].map((h) => (
+                          <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {slides.map((s) => (
+                        <tr key={s.id} className="border-b border-classie-border last:border-0 hover:bg-[#faf8f6] transition-colors">
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded" style={{ backgroundColor: s.bg_color }} />
+                              <span className="text-xs font-mono text-classie-gray">{s.display_order}</span>
+                            </div>
+                          </td>
+                          <td className="px-5 py-4">
+                            <p className="font-medium text-classie-black text-xs">{s.headline || "—"}</p>
+                          </td>
+                          <td className="px-5 py-4">
+                            <p className="text-xs text-classie-gray max-w-[160px] truncate">{s.subheadline || "—"}</p>
+                          </td>
+                          <td className="px-5 py-4">
+                            <p className="text-xs text-classie-black">{s.cta_text || "—"}</p>
+                            <p className="text-[10px] text-classie-gray truncate max-w-[100px]">{s.cta_url}</p>
+                          </td>
+                          <td className="px-5 py-4 text-xs text-classie-gray capitalize">{s.text_align}</td>
+                          <td className="px-5 py-4">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${s.active ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
+                              {s.active ? "Active" : "Inactive"}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => toggleSlideActive(s)} title={s.active ? "Deactivate" : "Activate"}
+                                className="p-1.5 rounded-lg hover:bg-[#faf8f6] text-classie-gray hover:text-[#3D4F5F] transition-colors">
+                                {s.active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                              </button>
+                              <button onClick={() => openEditSlide(s)} title="Edit"
+                                className="p-1.5 rounded-lg hover:bg-[#faf8f6] text-classie-gray hover:text-[#3D4F5F] transition-colors">
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => setDeleteSlideConfirm(s.id!)} title="Delete"
+                                className="p-1.5 rounded-lg hover:bg-red-50 text-classie-gray hover:text-red-600 transition-colors">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── SETTINGS TAB ── */}
+        {tab === "settings" && (
+          <div className="max-w-2xl">
+            <div className="bg-white rounded-2xl border border-classie-border p-6 space-y-5">
+              <h2 className="font-semibold text-classie-black">Site Settings</h2>
+              {settingsLoading ? (
+                <p className="text-classie-gray text-sm">Loading settings…</p>
+              ) : (
+                <>
+                  <div>
+                    <label className={labelCls}>Announcement Text</label>
+                    <input
+                      type="text" value={siteSettings.announcement_text} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, announcement_text: e.target.value }))}
+                      placeholder="e.g. Free shipping on orders above ₹999"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>WhatsApp Number</label>
+                    <input
+                      type="text" value={siteSettings.whatsapp_number} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, whatsapp_number: e.target.value }))}
+                      placeholder="e.g. 919876543210"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Instagram URL</label>
+                    <input
+                      type="text" value={siteSettings.instagram_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, instagram_url: e.target.value }))}
+                      placeholder="e.g. https://instagram.com/classie.in"
+                    />
+                  </div>
+                  <button
+                    onClick={saveSettings} disabled={settingsSaving}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-[#3D4F5F] text-white rounded-full text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                  >
+                    <Save className="w-4 h-4" />
+                    {settingsSaving ? "Saving…" : "Save Settings"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── MESSAGES TAB ── */}
+        {tab === "messages" && (
+          <div className="space-y-4">
+            {/* Sub-tabs */}
+            <div className="flex gap-2">
+              {([
+                { id: "messages", label: `Contact Messages (${messages.length})`, icon: Mail },
+                { id: "newsletter", label: `Newsletter (${subscribers.length})`, icon: Users },
+              ] as const).map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id} onClick={() => setMsgSubTab(id)}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    msgSubTab === id ? "bg-[#3D4F5F] text-white" : "bg-white text-classie-gray border border-classie-border hover:border-[#3D4F5F]"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />{label}
+                </button>
+              ))}
+              <button
+                onClick={() => { fetchMessages(); fetchSubscribers(); }}
+                className="ml-auto flex items-center gap-2 px-4 py-2 text-sm text-classie-gray hover:text-[#3D4F5F] transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${messagesLoading || subsLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </button>
+            </div>
+
+            {/* Contact Messages */}
+            {msgSubTab === "messages" && (
+              <div className="bg-white rounded-2xl border border-classie-border overflow-hidden">
+                {messagesLoading ? (
+                  <div className="p-12 text-center text-classie-gray text-sm">Loading messages…</div>
+                ) : messages.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <Mail className="w-12 h-12 text-classie-border mx-auto mb-3" />
+                    <p className="text-classie-gray text-sm">No contact messages yet.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-classie-border bg-[#faf8f6]">
+                          {["Name","Email","Message","Date"].map((h) => (
+                            <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {messages.map((m) => (
+                          <tr key={m.id} className="border-b border-classie-border last:border-0 hover:bg-[#faf8f6] transition-colors">
+                            <td className="px-5 py-4 font-medium text-classie-black">{m.name}</td>
+                            <td className="px-5 py-4 text-xs text-classie-gray">{m.email}</td>
+                            <td className="px-5 py-4 text-xs text-classie-gray max-w-[300px]">
+                              <p className="line-clamp-2">{m.message}</p>
+                            </td>
+                            <td className="px-5 py-4 text-xs text-classie-gray">
+                              {new Date(m.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Newsletter */}
+            {msgSubTab === "newsletter" && (
+              <div className="bg-white rounded-2xl border border-classie-border overflow-hidden">
+                {subsLoading ? (
+                  <div className="p-12 text-center text-classie-gray text-sm">Loading subscribers…</div>
+                ) : subscribers.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <Users className="w-12 h-12 text-classie-border mx-auto mb-3" />
+                    <p className="text-classie-gray text-sm">No subscribers yet.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-classie-border bg-[#faf8f6]">
+                          {["#","Email","Subscribed On"].map((h) => (
+                            <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-classie-gray font-semibold">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {subscribers.map((s, i) => (
+                          <tr key={s.id} className="border-b border-classie-border last:border-0 hover:bg-[#faf8f6] transition-colors">
+                            <td className="px-5 py-4 text-xs text-classie-gray">{i + 1}</td>
+                            <td className="px-5 py-4 font-medium text-classie-black">{s.email}</td>
+                            <td className="px-5 py-4 text-xs text-classie-gray">
+                              {new Date(s.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* ════════════════════════════════════════════════════════════
+          PRODUCT MODAL
+      ════════════════════════════════════════════════════════════ */}
+      {productModal.open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-2xl my-8 shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-classie-border">
+              <h2 className="font-semibold text-classie-black">
+                {productModal.mode === "add" ? "Add Product" : "Edit Product"}
+              </h2>
+              <button onClick={closeProductModal} className="p-1.5 hover:bg-[#faf8f6] rounded-lg transition-colors">
+                <X className="w-5 h-5 text-classie-gray" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* Row: Title + Slug */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Title *</label>
+                  <input type="text" value={productModal.data.title} onChange={(e) => setProductField("title", e.target.value)} className={inputCls} placeholder="e.g. Clessia Wine" />
+                </div>
+                <div>
+                  <label className={labelCls}>Slug *</label>
+                  <input type="text" value={productModal.data.slug} onChange={(e) => setProductField("slug", e.target.value)} className={inputCls} placeholder="e.g. clessia-wine" />
+                </div>
+              </div>
+
+              {/* Row: Price + Compare Price + Category */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className={labelCls}>Price (₹) *</label>
+                  <input type="number" value={productModal.data.price} onChange={(e) => setProductField("price", Number(e.target.value))} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Compare Price (₹)</label>
+                  <input type="number" value={productModal.data.compare_price} onChange={(e) => setProductField("compare_price", Number(e.target.value))} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Category</label>
+                  <select value={productModal.data.category} onChange={(e) => setProductField("category", e.target.value)} className={inputCls}>
+                    {["heels","accessories","bow","clips"].map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className={labelCls}>Description</label>
+                <textarea rows={3} value={productModal.data.description} onChange={(e) => setProductField("description", e.target.value)} className={inputCls} placeholder="Product description…" />
+              </div>
+
+              {/* Images */}
+              <div>
+                <label className={labelCls}>Main Image URL</label>
+                <input type="text" value={productModal.data.image} onChange={(e) => setProductField("image", e.target.value)} className={inputCls} placeholder="https://…" />
+              </div>
+              <div>
+                <label className={labelCls}>Additional Images (comma separated)</label>
+                <input
+                  type="text"
+                  value={productModal.data.images?.join(", ") ?? ""}
+                  onChange={(e) => setProductField("images", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
+                  className={inputCls} placeholder="https://…, https://…"
+                />
+              </div>
+
+              {/* Variants */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Variant Type</label>
+                  <select value={productModal.data.variant_type} onChange={(e) => setProductField("variant_type", e.target.value)} className={inputCls}>
+                    {["none","size","color"].map((v) => <option key={v} value={v}>{v}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Variants (comma separated)</label>
+                  <input
+                    type="text"
+                    value={productModal.data.variants?.join(", ") ?? ""}
+                    onChange={(e) => setProductField("variants", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
+                    className={inputCls} placeholder="35,36,37 or Black,Brown"
+                  />
+                </div>
+              </div>
+
+              {/* Heel-specific fields */}
+              {productModal.data.category === "heels" && (
+                <div className="border border-classie-border rounded-xl p-4 space-y-3">
+                  <p className="text-xs font-semibold text-classie-gray uppercase tracking-wider">Heel Details</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Heel Type</label>
+                      <input type="text" value={productModal.data.heel_type ?? ""} onChange={(e) => setProductField("heel_type", e.target.value)} className={inputCls} placeholder="e.g. Block, Stiletto" />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Toe Style</label>
+                      <input type="text" value={productModal.data.toe_style ?? ""} onChange={(e) => setProductField("toe_style", e.target.value)} className={inputCls} placeholder="e.g. Pointed, Round" />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Heel Height</label>
+                      <input type="text" value={productModal.data.heel_height ?? ""} onChange={(e) => setProductField("heel_height", e.target.value)} className={inputCls} placeholder="e.g. 3 inch" />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Shoe Fit</label>
+                      <input type="text" value={productModal.data.shoe_fit ?? ""} onChange={(e) => setProductField("shoe_fit", e.target.value)} className={inputCls} placeholder="e.g. True to size" />
+                    </div>
+                  </div>
+                  <label className="flex items-center gap-2 text-sm text-classie-gray cursor-pointer">
+                    <input type="checkbox" checked={productModal.data.ankle_strap ?? false} onChange={(e) => setProductField("ankle_strap", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                    Ankle Strap
+                  </label>
+                </div>
+              )}
+
+              {/* Checkboxes */}
+              <div className="grid grid-cols-2 gap-3">
+                {([
+                  ["cod_available",  "COD Available"],
+                  ["free_shipping",  "Free Shipping"],
+                  ["is_featured",    "Is Featured"],
+                  ["active",         "Active"],
+                ] as [keyof DbProduct, string][]).map(([key, label]) => (
+                  <label key={key} className="flex items-center gap-2 text-sm text-classie-gray cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(productModal.data[key])}
+                      onChange={(e) => setProductField(key, e.target.checked)}
+                      className="w-4 h-4 accent-[#3D4F5F]"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-classie-border">
+              <button onClick={closeProductModal} className="px-5 py-2 rounded-full text-sm text-classie-gray border border-classie-border hover:border-[#3D4F5F] transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleProductSave} disabled={productSaving}
+                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-full text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+              >
+                <Save className="w-4 h-4" />
+                {productSaving ? "Saving…" : productModal.mode === "add" ? "Add Product" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════
+          HERO SLIDE MODAL
+      ════════════════════════════════════════════════════════════ */}
+      {slideModal.open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-lg my-8 shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-classie-border">
+              <h2 className="font-semibold text-classie-black">
+                {slideModal.mode === "add" ? "Add Hero Slide" : "Edit Hero Slide"}
+              </h2>
+              <button onClick={closeSlideModal} className="p-1.5 hover:bg-[#faf8f6] rounded-lg transition-colors">
+                <X className="w-5 h-5 text-classie-gray" />
+              </button>
+            </div>
+
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className={labelCls}>Headline</label>
+                <input type="text" value={slideModal.data.headline} onChange={(e) => setSlideField("headline", e.target.value)} className={inputCls} placeholder="e.g. Step Into Elegance" />
+              </div>
+              <div>
+                <label className={labelCls}>Subheadline</label>
+                <input type="text" value={slideModal.data.subheadline} onChange={(e) => setSlideField("subheadline", e.target.value)} className={inputCls} placeholder="e.g. Discover our latest collection" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>CTA Text</label>
+                  <input type="text" value={slideModal.data.cta_text} onChange={(e) => setSlideField("cta_text", e.target.value)} className={inputCls} placeholder="e.g. Shop Now" />
+                </div>
+                <div>
+                  <label className={labelCls}>CTA URL</label>
+                  <input type="text" value={slideModal.data.cta_url} onChange={(e) => setSlideField("cta_url", e.target.value)} className={inputCls} placeholder="/collections/heels" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Background Color</label>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={slideModal.data.bg_color} onChange={(e) => setSlideField("bg_color", e.target.value)} className="w-10 h-9 rounded border border-classie-border cursor-pointer" />
+                    <input type="text" value={slideModal.data.bg_color} onChange={(e) => setSlideField("bg_color", e.target.value)} className={`${inputCls} flex-1`} />
+                  </div>
+                </div>
+                <div>
+                  <label className={labelCls}>Text Align</label>
+                  <select value={slideModal.data.text_align} onChange={(e) => setSlideField("text_align", e.target.value)} className={inputCls}>
+                    {["left","center","right"].map((a) => <option key={a} value={a}>{a}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Display Order</label>
+                <input type="number" value={slideModal.data.display_order} onChange={(e) => setSlideField("display_order", Number(e.target.value))} className={inputCls} />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-classie-gray cursor-pointer">
+                <input type="checkbox" checked={slideModal.data.active} onChange={(e) => setSlideField("active", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                Active
+              </label>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-classie-border">
+              <button onClick={closeSlideModal} className="px-5 py-2 rounded-full text-sm text-classie-gray border border-classie-border hover:border-[#3D4F5F] transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleSlideSave} disabled={slideSaving}
+                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-full text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+              >
+                <Save className="w-4 h-4" />
+                {slideSaving ? "Saving…" : slideModal.mode === "add" ? "Add Slide" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════
+          DELETE CONFIRM — PRODUCT
+      ════════════════════════════════════════════════════════════ */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 className="font-semibold text-classie-black mb-2">Delete Product?</h2>
+            <p className="text-sm text-classie-gray mb-5">This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setDeleteConfirm(null)} className="px-5 py-2 rounded-full text-sm border border-classie-border text-classie-gray hover:border-[#3D4F5F] transition-colors">
+                Cancel
+              </button>
+              <button onClick={() => deleteProduct(deleteConfirm)} className="px-5 py-2 rounded-full text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════
+          DELETE CONFIRM — SLIDE
+      ════════════════════════════════════════════════════════════ */}
+      {deleteSlideConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 className="font-semibold text-classie-black mb-2">Delete Slide?</h2>
+            <p className="text-sm text-classie-gray mb-5">This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setDeleteSlideConfirm(null)} className="px-5 py-2 rounded-full text-sm border border-classie-border text-classie-gray hover:border-[#3D4F5F] transition-colors">
+                Cancel
+              </button>
+              <button onClick={() => deleteSlide(deleteSlideConfirm)} className="px-5 py-2 rounded-full text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
