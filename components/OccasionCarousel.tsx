@@ -138,15 +138,20 @@ export default function OccasionCarousel({
             gap: "3px",
           }}
         >
-          {/* Big left card spans both rows */}
-          <div style={{ gridRow: "1 / 3", position: "relative" }}>
+          {/* Date Edit: col 1, rows 1-2 */}
+          <div style={{ gridColumn: "1/2", gridRow: "1/3", position: "relative" }}>
             <OccasionCard occ={displayItems[0]} large={true} />
           </div>
-          {/* Top right: 2 cards */}
-          <div className="relative"><OccasionCard occ={displayItems[1]} large={false} /></div>
-          <div className="relative"><OccasionCard occ={displayItems[2]} large={false} /></div>
-          {/* Bottom right: spans 2 cols */}
-          <div className="relative" style={{ gridColumn: "2 / 4" }}>
+          {/* Everyday Edit: col 2, row 1 */}
+          <div style={{ gridColumn: "2/3", gridRow: "1/2", position: "relative" }}>
+            <OccasionCard occ={displayItems[1]} large={false} />
+          </div>
+          {/* Festive Edit: col 3, row 1 */}
+          <div style={{ gridColumn: "3/4", gridRow: "1/2", position: "relative" }}>
+            <OccasionCard occ={displayItems[2]} large={false} />
+          </div>
+          {/* Bloom & Bow: cols 2-3, row 2 (wide) */}
+          <div style={{ gridColumn: "2/4", gridRow: "2/3", position: "relative" }}>
             <OccasionCard occ={displayItems[3]} large={false} />
           </div>
         </div>
