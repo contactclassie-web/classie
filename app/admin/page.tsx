@@ -170,6 +170,7 @@ export default function AdminPage() {
   const [productSaving, setProductSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
+  const [slidePageFilter, setSlidePageFilter] = useState<string>("all");
   // Hero Slides
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [slidesLoading, setSlidesLoading] = useState(false);
@@ -937,12 +938,25 @@ export default function AdminPage() {
           ══════════════════════════════════════ */}
           {tab === "slides" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">{slides.length} hero slides</p>
+              {/* Page filter buttons */}
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2">
+                  {["all","home","heels","clips","bow","style-ideas","hot-deals","about"].map((p) => {
+                    const labels: Record<string,string> = {all:"All",home:"🏠 Home",heels:"👠 Heels",clips:"💎 Clips",bow:"🎀 Bow","style-ideas":"✨ Style Ideas","hot-deals":"🔥 Hot Deals",about:"ℹ️ About"};
+                    const count = p === "all" ? slides.length : slides.filter(s => (s.page ?? "home") === p).length;
+                    return (
+                      <button key={p} onClick={() => setSlidePageFilter(p)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${slidePageFilter === p ? "bg-[#3D4F5F] text-white border-[#3D4F5F]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3D4F5F] hover:text-[#3D4F5F]"}`}>
+                        {labels[p]} {count > 0 && <span className={`ml-1 ${slidePageFilter===p?"text-white/70":"text-gray-400"}`}>({count})</span>}
+                      </button>
+                    );
+                  })}
+                </div>
                 <button onClick={openAddSlide} className="flex items-center gap-2 px-4 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors shadow-sm">
                   <Plus className="w-4 h-4" /> Add Slide
                 </button>
               </div>
+              <p className="text-xs text-gray-400">{slidePageFilter === "all" ? slides.length : slides.filter(s=>(s.page??"home")===slidePageFilter).length} slides {slidePageFilter !== "all" ? `for "${slidePageFilter}"` : "total"}</p>
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 {slidesLoading ? (
                   <div className="p-12 text-center text-gray-400 text-sm">Loading slides…</div>
@@ -962,7 +976,7 @@ export default function AdminPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {slides.map((s) => (
+                        {slides.filter(s => slidePageFilter === "all" || (s.page ?? "home") === slidePageFilter).map((s) => (
                           <tr key={s.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
                             <td className="px-5 py-4">
                               <span className="text-xs font-mono text-gray-400">{s.display_order}</span>
