@@ -96,6 +96,7 @@ interface Collection {
   slug: string;
   description?: string;
   image_url?: string;
+  hover_image_url?: string;
   display_order: number;
   active: boolean;
 }
@@ -1865,6 +1866,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <label className={labelCls}>Image URL</label>
+                <label className={labelCls}>Main Image URL (circle mein dikhegi)</label>
                 <input type="text" value={collectionModal.data.image_url ?? ""} onChange={(e) => setCollectionField("image_url", e.target.value)} className={inputCls} placeholder="https://cdn.shopify.com/…" />
                 {collectionModal.data.image_url && (
                   <div className="mt-2 relative w-full h-28 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
@@ -1876,6 +1878,18 @@ export default function AdminPage() {
                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     />
                     <p className="absolute top-1 left-2 text-[10px] text-white bg-black/50 px-1.5 py-0.5 rounded">Preview</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className={labelCls}>Hover Image URL (optional — hover pe swap hogi)</label>
+                <input type="text" value={collectionModal.data.hover_image_url ?? ""} onChange={(e) => setCollectionField("hover_image_url", e.target.value)} className={inputCls} placeholder="https://… (optional)" />
+                {collectionModal.data.hover_image_url && (
+                  <div className="relative h-28 rounded-xl overflow-hidden mt-2 bg-gray-100">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={collectionModal.data.hover_image_url} alt="Hover Preview" className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    <p className="absolute top-1 left-2 text-[10px] text-white bg-black/50 px-1.5 py-0.5 rounded">Hover Preview</p>
                   </div>
                 )}
               </div>

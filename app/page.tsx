@@ -67,34 +67,42 @@ export default async function HomePage() {
       <FeaturesBar />
 
       {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <h2 className="text-center font-serif text-4xl md:text-5xl tracking-widest uppercase mb-16">
+          <p className="text-center text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-3">Curated for You</p>
+          <h2 className="text-center font-serif text-5xl md:text-6xl tracking-[0.15em] uppercase mb-20">
             Shop by Occasion
           </h2>
-          <div className="flex justify-center gap-8 md:gap-14 flex-wrap">
+          <div className="flex justify-center gap-10 md:gap-20 flex-wrap">
             {occasions.map((occ) => (
               <Link
                 key={occ.href}
                 href={occ.href}
-                className="group flex flex-col items-center gap-4 w-40 md:w-48"
+                className="group flex flex-col items-center gap-5 w-52 md:w-60"
               >
-                <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden ring-1 ring-gray-100 shadow-md group-hover:shadow-xl transition-all duration-300">
+                <div className="relative w-52 h-52 md:w-60 md:h-60 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3D4F5F]/20 transition-all duration-500">
                   {occ.image ? (
                     <Image
                       src={occ.image}
                       alt={occ.title}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 144px, 176px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="(max-width: 768px) 208px, 240px"
                     />
                   ) : (
                     <div className="w-full h-full bg-[#faf8f6]" />
                   )}
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-[#3D4F5F]/0 group-hover:bg-[#3D4F5F]/15 transition-all duration-500 rounded-full" />
                 </div>
-                <span className="font-serif text-base md:text-lg text-classie-black text-center group-hover:text-[#3D4F5F] transition-colors">
-                  {occ.title}
-                </span>
+                <div className="text-center">
+                  <span className="font-serif text-lg md:text-xl text-classie-black group-hover:text-[#3D4F5F] transition-colors tracking-wide block">
+                    {occ.title}
+                  </span>
+                  <span className="text-[11px] tracking-widest uppercase text-classie-gray mt-1 block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Shop Now →
+                  </span>
+                </div>
               </Link>
             ))}
           </div>
