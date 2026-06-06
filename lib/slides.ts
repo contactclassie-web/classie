@@ -12,6 +12,7 @@ export type HeroSlide = {
   active: boolean;
   image_url?: string;
   video_url?: string;
+  page?: string;
 };
 
 // Fallback slides (in DB format) used when Supabase is unavailable
@@ -42,16 +43,23 @@ export const fallbackSlides: HeroSlide[] = [
   },
 ];
 
-export async function getHeroSlidesFromDB(): Promise<HeroSlide[]> {
+export async function getHeroSlidesFromDB(page = 'home'): Promise<HeroSlide[]> {
   try {
     const { data, error } = await supabase
       .from('hero_slides')
       .select('*')
       .eq('active', true)
+      .eq('page', page)
       .order('display_order', { ascending: true });
 
     if (error || !data || data.length === 0) {
-      return fallbackSlides;
+      // fallback: try without page filter
+      const { data: all } = await supabase
+        .from('hero_slides')
+        .select('*')
+        .eq('active', true)
+        .order('display_order', { ascending: true });
+      return (all && all.length > 0) ? all as HeroSlide[] : fallbackSlides;
     }
     return data as HeroSlide[];
   } catch {

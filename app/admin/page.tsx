@@ -65,6 +65,7 @@ interface HeroSlide {
   active: boolean;
   image_url?: string;
   video_url?: string;
+  page?: string;
 }
 
 interface SiteSettings {
@@ -118,7 +119,7 @@ const EMPTY_PRODUCT: DbProduct = {
 const EMPTY_SLIDE: HeroSlide = {
   headline: "", subheadline: "", cta_text: "", cta_url: "",
   bg_color: "#3D4F5F", text_align: "left", display_order: 0, active: true,
-  image_url: "", video_url: "",
+  image_url: "", video_url: "", page: "home",
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -859,6 +860,7 @@ export default function AdminPage() {
                               <span className="text-xs font-mono text-gray-400">{s.display_order}</span>
                             </td>
                             <td className="px-5 py-4">
+                              <span className="inline-block px-2 py-0.5 bg-[#3D4F5F]/10 text-[#3D4F5F] text-[10px] rounded-full font-medium mb-1">{s.page ?? "home"}</span>
                               {s.image_url ? (
                                 <div className="relative w-12 h-8 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1288,6 +1290,18 @@ export default function AdminPage() {
               <div>
                 <label className={labelCls}>Display Order</label>
                 <input type="number" value={slideModal.data.display_order} onChange={(e) => setSlideField("display_order", Number(e.target.value))} className={inputCls} />
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Page (kahan dikhega yeh slide?)</label>
+                  <select value={slideModal.data.page ?? "home"} onChange={(e) => setSlideField("page", e.target.value)} className={inputCls}>
+                    <option value="home">🏠 Home Page</option>
+                    <option value="style-ideas">✨ Style Ideas</option>
+                    <option value="hot-deals">🔥 Hot Deals</option>
+                    <option value="heels">👠 Heels Shop</option>
+                    <option value="clips">💎 Clips Shop</option>
+                    <option value="bow">🎀 Bow Shop</option>
+                  </select>
+                </div>
               </div>
               <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
                 <input type="checkbox" checked={slideModal.data.active} onChange={(e) => setSlideField("active", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
