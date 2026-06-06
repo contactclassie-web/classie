@@ -39,13 +39,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
 
-          {/* ── Logo — editorial box border */}
-          <Link href="/" className="flex-shrink-0 group">
-            <div className="border border-[#3B5373] px-3 py-1 group-hover:bg-[#3B5373]/5 transition-colors">
-              <span className="text-xl tracking-[0.4em] font-light text-[#3B5373] select-none flex items-center gap-1.5">
-                ✦ C L A S S I E
-              </span>
-            </div>
+          {/* ── Logo — no border */}
+          <Link href="/" className="flex-shrink-0">
+            <span className="font-serif text-xl tracking-[0.48em] font-normal text-[#1a1a1a] select-none flex items-center gap-2">
+              <span className="text-[#3B5373]">✦</span>CLASSIE
+            </span>
           </Link>
 
           {/* ── Desktop links */}
