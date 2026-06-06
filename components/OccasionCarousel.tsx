@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+// Using plain img to avoid next/image caching delays
 
 interface Occasion {
   title: string;
@@ -21,12 +21,11 @@ function OccasionCard({ occ, large }: { occ: Occasion; large: boolean }) {
     >
       {/* Background image */}
       {occ.image ? (
-        <Image
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={occ.image}
           alt={occ.title}
-          fill
-          className="object-cover transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-75"
-          sizes={large ? "(max-width: 768px) 100vw, 60vw" : "(max-width: 768px) 100vw, 20vw"}
+          className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-75"
         />
       ) : (
         <div className="absolute inset-0 bg-[#1a1a1a]" />
