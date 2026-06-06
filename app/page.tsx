@@ -3,9 +3,9 @@ import Image from "next/image";
 import { ChevronRight, Star, Instagram } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
-import ProductCard from "@/components/ProductCard";
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionCarousel from "@/components/OccasionCarousel";
+import FeaturedPicks from "@/components/FeaturedPicks";
 import {
   Product,
   CURATED_COLLECTIONS,
@@ -27,8 +27,9 @@ export default async function HomePage() {
   const heels = allProducts.filter((p) => p.category === "heels");
   const accessories = allProducts.filter((p) => p.category === "accessories");
 
-  // "Most Loved" section: use featured if available, else first 8
-  const bestsellers =
+  // Featured Picks: latest (first 8 by order) and best sellers (featured or fallback)
+  const latestProducts = allProducts.slice(0, 8);
+  const bestSellers =
     featuredProducts.length > 0
       ? featuredProducts.slice(0, 8)
       : allProducts.slice(0, 8);
@@ -112,26 +113,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ 4. BESTSELLERS ═══════════════════════════════════════════════ */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="text-[11px] tracking-[0.4em] uppercase text-gray-400">New & Trending</p>
-              <h2 className="font-serif text-4xl md:text-5xl text-black mt-1" style={{fontWeight:400}}>Most Loved</h2>
-            </div>
-            <Link href="/shop/heels" className="hidden md:flex items-center gap-1 text-sm text-[#3B5373] hover:underline">
-              View All <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
-            {bestsellers.map((p) => <ProductCard key={p.slug} product={p} />)}
-          </div>
-          <div className="text-center mt-10 md:hidden">
-            <Link href="/shop/heels" className="btn-outline">View All</Link>
-          </div>
-        </div>
-      </section>
+      {/* ══ 4. FEATURED PICKS ════════════════════════════════════════════ */}
+      <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} />
 
       {/* ══ OUR STORY — Editorial Banner ════════════════════════════════ */}
       <section className="bg-[#3B5373] text-white overflow-hidden">
