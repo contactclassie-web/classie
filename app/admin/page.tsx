@@ -848,7 +848,7 @@ export default function AdminPage() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-gray-100 bg-gray-50">
-                          {["#","Preview","Headline","CTA","Align","Status","Actions"].map((h) => (
+                          {["#","Preview","Headline","Page","CTA","Align","Status","Actions"].map((h) => (
                             <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-gray-400 font-semibold">{h}</th>
                           ))}
                         </tr>
@@ -860,7 +860,6 @@ export default function AdminPage() {
                               <span className="text-xs font-mono text-gray-400">{s.display_order}</span>
                             </td>
                             <td className="px-5 py-4">
-                              <span className="inline-block px-2 py-0.5 bg-[#3D4F5F]/10 text-[#3D4F5F] text-[10px] rounded-full font-medium mb-1">{s.page ?? "home"}</span>
                               {s.image_url ? (
                                 <div className="relative w-12 h-8 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -873,6 +872,9 @@ export default function AdminPage() {
                             <td className="px-5 py-4">
                               <p className="font-medium text-gray-700 text-xs whitespace-pre-line">{s.headline || "—"}</p>
                               <p className="text-[10px] text-gray-400 mt-0.5 truncate max-w-[140px]">{s.subheadline}</p>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="inline-block px-2 py-1 bg-[#3D4F5F]/10 text-[#3D4F5F] text-[11px] rounded-full font-medium capitalize">{s.page ?? "home"}</span>
                             </td>
                             <td className="px-5 py-4">
                               <p className="text-xs text-gray-700">{s.cta_text || "—"}</p>
