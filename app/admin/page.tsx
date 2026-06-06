@@ -70,6 +70,7 @@ interface HeroSlide {
 }
 
 interface SiteSettings {
+  logo_image_url: string;
   announcement_text: string;
   announcement_1: string;
   announcement_2: string;
@@ -234,7 +235,7 @@ export default function AdminPage() {
 
   // Site Settings
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
-    announcement_text: "", whatsapp_number: "", instagram_url: "",
+    logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
     announcement_1: "", announcement_2: "", announcement_3: "",
     announcement_4: "", announcement_5: "", announcement_6: "",
     announcement_speed: "25",
@@ -378,7 +379,7 @@ export default function AdminPage() {
       const { data, error } = await supabase.from("site_settings").select("*");
       if (!error && data) {
         const merged: SiteSettings = {
-          announcement_text: "", whatsapp_number: "", instagram_url: "",
+          logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
           announcement_1: "", announcement_2: "", announcement_3: "",
           announcement_4: "", announcement_5: "", announcement_6: "",
           announcement_speed: "25",
@@ -762,6 +763,7 @@ export default function AdminPage() {
     setSettingsSaving(true);
     try {
       const rows: { key: string; value: string }[] = [
+        { key: "logo_image_url",  value: siteSettings.logo_image_url },
         { key: "whatsapp_number", value: siteSettings.whatsapp_number },
         { key: "instagram_url",   value: siteSettings.instagram_url },
       ];
@@ -1922,6 +1924,34 @@ export default function AdminPage() {
                     </table>
                   </div>
                 )}
+              </div>
+
+              {/* ── Logo Settings ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-[#3B5373]" />
+                  <h2 className="font-semibold text-gray-700">Logo</h2>
+                </div>
+                <div>
+                  <label className={labelCls}>Logo Image URL</label>
+                  <input
+                    type="text" value={siteSettings.logo_image_url} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, logo_image_url: e.target.value }))}
+                    placeholder="https://... (leave empty to use text logo)"
+                  />
+                  {siteSettings.logo_image_url && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100 inline-block">
+                      <img src={siteSettings.logo_image_url} alt="Logo preview" className="h-10 object-contain" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={saveSettings} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                >
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Logo"}
+                </button>
               </div>
 
               {/* ── Other Settings ── */}

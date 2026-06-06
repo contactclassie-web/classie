@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "./CartContext";
 import AnnouncementBar from "./AnnouncementBar";
+import { createClient } from "@supabase/supabase-js";
+
+const sb = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const navLinks = [
   { label: "Heels",       href: "/shop/heels" },
@@ -19,11 +26,17 @@ export default function Navbar() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    sb.from("site_settings").select("value").eq("key", "logo_image_url").single()
+      .then(({ data }) => { if (data?.value) setLogoUrl(data.value); });
   }, []);
 
   return (
@@ -39,11 +52,17 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
 
-          {/* ── Logo — no border */}
+          {/* ── Logo */}
           <Link href="/" className="flex-shrink-0">
-            <span className="font-serif text-xl tracking-[0.48em] font-normal text-[#1a1a1a] select-none flex items-center gap-2">
-              <span className="text-[#3B5373]">✦</span>CLASSIE
-            </span>
+            {logoUrl ? (
+              <div className="relative h-10 w-32">
+                <Image src={logoUrl} alt="Classie" fill className="object-contain object-left" sizes="128px" />
+              </div>
+            ) : (
+              <span className="font-serif text-xl tracking-[0.48em] font-normal text-[#1a1a1a] select-none flex items-center gap-2">
+                <span className="text-[#3B5373]">✦</span>CLASSIE
+              </span>
+            )}
           </Link>
 
           {/* ── Desktop links */}
