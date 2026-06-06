@@ -1318,6 +1318,103 @@ export default function AdminPage() {
           )}
 
           {/* ══════════════════════════════════════
+              CATEGORIES TAB
+          ══════════════════════════════════════ */}
+          {tab === "categories" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Shop by Category</h2>
+                  <p className="text-sm text-gray-400 mt-0.5">{siteCategories.length} categories</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={fetchCategories} disabled={categoriesLoading}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
+                    <RefreshCw className={`w-3.5 h-3.5 ${categoriesLoading ? "animate-spin" : ""}`} /> Refresh
+                  </button>
+                  <button onClick={openAddCategory}
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-[#3B5373] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
+                    <Plus className="w-3.5 h-3.5" /> Add Category
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                {categoriesLoading ? (
+                  <div className="p-12 text-center text-gray-400 text-sm">Loading categories…</div>
+                ) : siteCategories.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <Grid3x3 className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                    <p className="text-gray-400 text-sm">No categories found.</p>
+                    <p className="text-xs text-gray-300 mt-1">Create the <code className="bg-gray-100 px-1 rounded">site_categories</code> table in Supabase first, then add categories here.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100 bg-gray-50">
+                          {["Image", "Name", "Slug", "Description", "Order", "Active", "Actions"].map((h) => (
+                            <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-gray-400 font-semibold">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {siteCategories.map((c) => (
+                          <tr key={c.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                            <td className="px-5 py-4">
+                              {c.image_url ? (
+                                <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={c.image_url} alt={c.name} className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                  <Grid3x3 className="w-5 h-5 text-gray-300" />
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-5 py-4">
+                              <p className="font-medium text-gray-700 text-sm">{c.name}</p>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="font-mono text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{c.slug}</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <p className="text-xs text-gray-400 max-w-[180px] truncate">{c.description || "—"}</p>
+                            </td>
+                            <td className="px-5 py-4 text-xs text-gray-400">{c.display_order}</td>
+                            <td className="px-5 py-4">
+                              <button
+                                onClick={() => toggleCategoryActive(c)}
+                                className={`w-9 h-5 rounded-full transition-colors flex-shrink-0 relative ${c.active ? "bg-emerald-500" : "bg-gray-300"}`}
+                                title={c.active ? "Deactivate" : "Activate"}
+                              >
+                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${c.active ? "left-4" : "left-0.5"}`} />
+                              </button>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => openEditCategory(c)}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors" title="Edit">
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => setDeleteCategoryConfirm(c.id!)}
+                                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors" title="Delete">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
               SETTINGS TAB
           ══════════════════════════════════════ */}
           {tab === "settings" && (
@@ -2080,6 +2177,104 @@ export default function AdminPage() {
                 Cancel
               </button>
               <button onClick={() => deleteFeature(deleteFeatureConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          SITE CATEGORY MODAL
+      ══════════════════════════════════════════════════ */}
+      {categoryModal.open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-lg my-8 shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">{categoryModal.mode === "add" ? "Add Category" : "Edit Category"}</h2>
+              <button onClick={closeCategoryModal} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Name *</label>
+                  <input type="text" value={categoryModal.data.name} onChange={(e) => {
+                    const name = e.target.value;
+                    setCategoryField("name", name);
+                    if (categoryModal.mode === "add" && !categorySlugManuallyEdited) {
+                      const autoSlug = name.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+                      setCategoryField("slug", autoSlug);
+                    }
+                  }} className={inputCls} placeholder="e.g. Heels" />
+                </div>
+                <div>
+                  <label className={labelCls}>Slug *</label>
+                  <input type="text" value={categoryModal.data.slug} onChange={(e) => {
+                    setCategorySlugManuallyEdited(true);
+                    setCategoryField("slug", e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""));
+                  }} className={inputCls} placeholder="e.g. heels" />
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Description</label>
+                <textarea rows={2} value={categoryModal.data.description} onChange={(e) => setCategoryField("description", e.target.value)} className={inputCls} placeholder="Short description…" />
+              </div>
+              <div>
+                <label className={labelCls}>Image URL</label>
+                <input type="text" value={categoryModal.data.image_url} onChange={(e) => setCategoryField("image_url", e.target.value)} className={inputCls} placeholder="https://cdn.shopify.com/…" />
+                {categoryModal.data.image_url && (
+                  <div className="mt-2 relative w-full h-28 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={categoryModal.data.image_url}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <p className="absolute top-1 left-2 text-[10px] text-white bg-black/50 px-1.5 py-0.5 rounded">Preview</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className={labelCls}>Display Order</label>
+                <input type="number" value={categoryModal.data.display_order} onChange={(e) => setCategoryField("display_order", Number(e.target.value))} className={`${inputCls} max-w-[120px]`} />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
+                <input type="checkbox" checked={categoryModal.data.active} onChange={(e) => setCategoryField("active", e.target.checked)} className="w-4 h-4 accent-[#3B5373]" />
+                Active
+              </label>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+              <button onClick={closeCategoryModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3B5373] transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={handleCategorySave} disabled={categorySaving}
+                className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+              >
+                <Save className="w-4 h-4" />
+                {categorySaving ? "Saving…" : categoryModal.mode === "add" ? "Add Category" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          DELETE CONFIRM — CATEGORY
+      ══════════════════════════════════════════════════ */}
+      {deleteCategoryConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h2 className="font-semibold text-gray-800 mb-2">Delete Category?</h2>
+            <p className="text-sm text-gray-400 mb-5">This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setDeleteCategoryConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3B5373] transition-colors">
+                Cancel
+              </button>
+              <button onClick={() => deleteCategory(deleteCategoryConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
                 Delete
               </button>
             </div>
