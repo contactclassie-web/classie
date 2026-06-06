@@ -18,10 +18,19 @@ export default async function BowPage() {
   );
 
   return (
-    <CollectionGrid
-      title="Bloom Bow Collection"
-      subtitle="Soft & Romantic"
-      products={bowProducts}
-    />
+    <>
+      {/* ── Editorial page header */}
+      <div className="bg-[#faf8f6] py-16 text-center border-b border-gray-100">
+        <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Collections</p>
+        <h1 className="font-serif text-5xl md:text-6xl tracking-tight text-[#1a1a1a]">Bloom Bow</h1>
+        <p className="text-sm text-gray-400 mt-3 tracking-wide">Satin swirls &amp; romantic bows</p>
+      </div>
+
+      <CollectionGrid
+        title="Bloom Bow Collection"
+        subtitle="Soft & Romantic"
+        products={bowProducts}
+      />
+    </>
   );
 }

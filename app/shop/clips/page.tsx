@@ -29,16 +29,24 @@ export default async function ClipsPage() {
   return (
     <>
       {slides.length > 0 && <HeroSlider slides={slides} />}
-    <CollectionGrid
-      title="Clip-ons & Accessories"
-      subtitle="Bloom Bow & Crystal"
-      products={allAccessories}
-      tabs={[
-        { key: "all",   label: "All Clip-ons",  products: allAccessories },
-        { key: "clips", label: "Crystal Clips",  products: crystalClips },
-        { key: "bow",   label: "Bloom Bow",      products: bowProducts },
-      ]}
-    />
+
+      {/* ── Editorial page header */}
+      <div className="bg-[#faf8f6] py-16 text-center border-b border-gray-100">
+        <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Collections</p>
+        <h1 className="font-serif text-5xl md:text-6xl tracking-tight text-[#1a1a1a]">Clip-ons</h1>
+        <p className="text-sm text-gray-400 mt-3 tracking-wide">Crystal clips &amp; statement pieces</p>
+      </div>
+
+      <CollectionGrid
+        title="Clip-ons & Accessories"
+        subtitle="Bloom Bow & Crystal"
+        products={allAccessories}
+        tabs={[
+          { key: "all",   label: "All Clip-ons",  products: allAccessories },
+          { key: "clips", label: "Crystal Clips",  products: crystalClips },
+          { key: "bow",   label: "Bloom Bow",      products: bowProducts },
+        ]}
+      />
     </>
   );
 }

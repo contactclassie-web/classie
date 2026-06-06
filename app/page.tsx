@@ -63,6 +63,23 @@ export default async function HomePage() {
       {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
       <HeroSlider slides={heroSlides} />
 
+      {/* ══ MARQUEE STRIP ══════════════════════════════════════════════ */}
+      <div className="bg-[#3D4F5F] py-2.5 overflow-hidden">
+        <div
+          className="flex gap-16 whitespace-nowrap"
+          style={{ animation: "marqueeText 20s linear infinite" }}
+        >
+          {[...Array(6)].map((_, i) => (
+            <span
+              key={i}
+              className="font-serif italic text-white/90 text-sm tracking-wide flex-shrink-0"
+            >
+              ✦ One Heel. Endless Looks. &nbsp;&nbsp;&nbsp; ✦ Premium Quality &nbsp;&nbsp;&nbsp; ✦ Free Shipping ₹999+ &nbsp;&nbsp;&nbsp; ✦ Cash on Delivery
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* ══ FEATURES BAR ═══════════════════════════════════════════════ */}
       <FeaturesBar />
 
