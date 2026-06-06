@@ -49,7 +49,7 @@ export default function Navbar() {
       <AnnouncementBar />
 
       {/* ── Main nav row ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="px-6 md:px-20">
         <div className="flex items-center justify-between h-16">
 
           {/* ── Logo */}

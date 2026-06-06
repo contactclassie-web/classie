@@ -18,7 +18,7 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
   const products = (activeTab === "latest" ? latestProducts : bestSellers).slice(0, 4);
 
   return (
-    <section className="pt-12 pb-20 bg-white px-8 md:px-20">
+    <section className="pt-12 pb-20 bg-white px-6 md:px-20">
       <div>
 
         {/* Eyebrow + Heading */}

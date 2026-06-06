@@ -198,7 +198,7 @@ export default async function HomePage() {
       {/* ══ 1. HERO — Split editorial layout ═══════════════════════════════ */}
       <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[calc(100vh-72px)]">
         {/* Left: text content */}
-        <div className="flex flex-col justify-center px-10 md:px-20 py-16 md:py-24 bg-white relative">
+        <div className="flex flex-col justify-center px-6 md:px-20 py-16 md:py-24 bg-white relative">
           {/* Vertical line divider */}
           <div className="absolute right-0 top-[12%] bottom-[12%] w-px bg-gradient-to-b from-transparent via-[rgba(59,83,115,0.2)] to-transparent hidden md:block" />
 
@@ -292,7 +292,7 @@ export default async function HomePage() {
       </div>
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
-      <section className="py-20 bg-white px-8 md:px-20">
+      <section className="py-20 bg-white px-6 md:px-20">
           {/* Header */}
           <div className="flex items-end justify-between mb-14">
             <div>
@@ -311,7 +311,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 4. SHOP BY CATEGORY ════════════════════════════════════════════ */}
-      <section className="pt-16 pb-16 bg-[#1a1a1a] px-8 md:px-20">
+      <section className="pt-16 pb-16 bg-[#1a1a1a] px-6 md:px-20">
         <div>
           <div className="flex items-center gap-4 mb-4">
             <div className="w-8 h-px bg-[rgba(59,83,115,0.6)]" />
@@ -429,7 +429,7 @@ export default async function HomePage() {
         </div>
 
         {/* Right: dark content */}
-        <div className="bg-[#1a1a1a] flex flex-col justify-center px-12 md:px-16 py-20">
+        <div className="bg-[#1a1a1a] flex flex-col justify-center px-6 md:px-20 py-20">
           {/* Eyebrow */}
           <div className="flex items-center gap-4 mb-7">
             <div className="w-8 h-px bg-[rgba(59,83,115,0.6)]" />
@@ -496,7 +496,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 7. TESTIMONIALS — 3 cards ═════════════════════════════════════ */}
-      <section className="py-28 px-8 md:px-20 bg-white">
+      <section className="py-28 px-6 md:px-20 bg-white">
         <div>
           <div className="mb-14">
             <div className="flex items-center gap-4 mb-4">
@@ -554,7 +554,7 @@ export default async function HomePage() {
       <NewsletterSection />
 
       {/* ══ INSTAGRAM FEED ════════════════════════════════════════════════ */}
-      <section className="py-20 bg-white border-t border-gray-100 px-8 md:px-20">
+      <section className="py-20 bg-white border-t border-gray-100 px-6 md:px-20">
         <div>
           <div className="mb-10">
             <div className="flex items-center gap-4 mb-4">
