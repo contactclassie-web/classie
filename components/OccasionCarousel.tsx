@@ -87,14 +87,15 @@ export default function OccasionCarousel({
 }: {
   occasions: Occasion[];
 }) {
-  const withImages = occasions.filter((o) => o.image);
-  const items = withImages.length >= 5 ? withImages : occasions;
-  const displayItems = items.slice(0, 5);
+  // Show all occasions that have an image, up to 5
+  const displayItems = occasions.filter((o) => o.image).slice(0, 5);
 
-  if (displayItems.length >= 5) {
+  if (displayItems.length === 0) return null;
+
+  // 5 items → full magazine: 1 big left (spans 2 rows) + 2x2 right
+  if (displayItems.length === 5) {
     return (
       <>
-        {/* Desktop: magazine editorial grid */}
         <div
           className="hidden md:grid"
           style={{
@@ -104,19 +105,15 @@ export default function OccasionCarousel({
             gap: "3px",
           }}
         >
-          {/* Large left card — spans 2 rows */}
           <div style={{ gridRow: "1 / 3", position: "relative" }}>
             <OccasionCard occ={displayItems[0]} large={true} />
           </div>
-          {/* 4 smaller cards on right */}
           {displayItems.slice(1, 5).map((occ) => (
             <div key={occ.href} className="relative">
               <OccasionCard occ={occ} large={false} />
             </div>
           ))}
         </div>
-
-        {/* Mobile: vertical stack */}
         <div className="flex flex-col gap-[3px] md:hidden">
           {displayItems.map((occ) => (
             <div key={occ.href} className="relative" style={{ height: "220px" }}>
@@ -128,20 +125,50 @@ export default function OccasionCarousel({
     );
   }
 
-  // Fewer than 5: simple editorial grid (still sharp/editorial)
-  const cols = Math.min(displayItems.length, 3);
+  // 3–4 items → 1 big left + rest stacked right
+  if (displayItems.length >= 3) {
+    const rightItems = displayItems.slice(1);
+    return (
+      <>
+        <div
+          className="hidden md:grid"
+          style={{
+            gridTemplateColumns: "1.65fr 1fr",
+            gridTemplateRows: `repeat(${rightItems.length}, 1fr)`,
+            height: "580px",
+            gap: "3px",
+          }}
+        >
+          <div style={{ gridRow: `1 / ${rightItems.length + 1}`, position: "relative" }}>
+            <OccasionCard occ={displayItems[0]} large={true} />
+          </div>
+          {rightItems.map((occ) => (
+            <div key={occ.href} className="relative">
+              <OccasionCard occ={occ} large={false} />
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-[3px] md:hidden">
+          {displayItems.map((occ) => (
+            <div key={occ.href} className="relative" style={{ height: "220px" }}>
+              <OccasionCard occ={occ} large={false} />
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  // 1–2 items → simple full-width editorial cards
   return (
     <>
       <div
         className="hidden md:grid gap-[3px]"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          height: "400px",
-        }}
+        style={{ gridTemplateColumns: `repeat(${displayItems.length}, 1fr)`, height: "480px" }}
       >
         {displayItems.map((occ) => (
           <div key={occ.href} className="relative">
-            <OccasionCard occ={occ} large={false} />
+            <OccasionCard occ={occ} large={true} />
           </div>
         ))}
       </div>
