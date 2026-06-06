@@ -1295,11 +1295,12 @@ export default function AdminPage() {
                   <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Page (kahan dikhega yeh slide?)</label>
                   <select value={slideModal.data.page ?? "home"} onChange={(e) => setSlideField("page", e.target.value)} className={inputCls}>
                     <option value="home">🏠 Home Page</option>
-                    <option value="style-ideas">✨ Style Ideas</option>
-                    <option value="hot-deals">🔥 Hot Deals</option>
                     <option value="heels">👠 Heels Shop</option>
                     <option value="clips">💎 Clips Shop</option>
                     <option value="bow">🎀 Bow Shop</option>
+                    <option value="style-ideas">✨ Style Ideas</option>
+                    <option value="hot-deals">🔥 Hot Deals</option>
+                    <option value="about">ℹ️ About Us</option>
                   </select>
                 </div>
               </div>

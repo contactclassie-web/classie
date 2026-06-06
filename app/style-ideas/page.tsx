@@ -1,7 +1,11 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import HeroSlider from "@/components/HeroSlider";
 import { products } from "@/lib/products";
+import { getHeroSlidesFromDB } from "@/lib/slides";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Style Ideas",
@@ -43,9 +47,11 @@ const looks = [
   },
 ];
 
-export default function StyleIdeasPage() {
+export default async function StyleIdeasPage() {
+  const slides = await getHeroSlidesFromDB("style-ideas");
   return (
     <>
+      {slides.length > 0 && <HeroSlider slides={slides} />}
       <div className="bg-[#faf8f6] py-12 text-center border-b border-classie-border">
         <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-2">Lookbook</p>
         <h1 className="font-serif text-5xl md:text-6xl text-classie-black">Style Ideas</h1>

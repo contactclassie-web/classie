@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import CollectionGrid from "@/components/CollectionGrid";
+import HeroSlider from "@/components/HeroSlider";
 import { getProductsFromDB } from "@/lib/products";
+import { getHeroSlidesFromDB } from "@/lib/slides";
 
 export const revalidate = 60;
 
@@ -12,7 +14,10 @@ export const metadata: Metadata = {
 const BOW_SLUGS = ["fauxbow", "satin-swirl", "glitzknot"];
 
 export default async function ClipsPage() {
-  const allAccessories = await getProductsFromDB({ category: "accessories", active: true });
+  const [allAccessories, slides] = await Promise.all([
+    getProductsFromDB({ category: "accessories", active: true }),
+    getHeroSlidesFromDB("clips"),
+  ]);
 
   const crystalClips = allAccessories.filter(
     (p) => !BOW_SLUGS.some((s) => p.slug.includes(s))
@@ -22,6 +27,8 @@ export default async function ClipsPage() {
   );
 
   return (
+    <>
+      {slides.length > 0 && <HeroSlider slides={slides} />}
     <CollectionGrid
       title="Clip-ons & Accessories"
       subtitle="Bloom Bow & Crystal"
@@ -32,5 +39,6 @@ export default async function ClipsPage() {
         { key: "bow",   label: "Bloom Bow",      products: bowProducts },
       ]}
     />
+    </>
   );
 }

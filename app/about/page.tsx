@@ -1,16 +1,22 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import HeroSlider from "@/components/HeroSlider";
 import { products } from "@/lib/products";
+import { getHeroSlidesFromDB } from "@/lib/slides";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "About Us",
   description: "The Classie story — where comfort meets luxury, designed for the modern Indian woman.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const slides = await getHeroSlidesFromDB("about");
   return (
     <>
+      {slides.length > 0 && <HeroSlider slides={slides} />}
       {/* ── Page header ── */}
       <div className="bg-[#faf8f6] py-12 text-center border-b border-classie-border">
         <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-2">Our Story</p>
