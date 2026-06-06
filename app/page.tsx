@@ -63,23 +63,6 @@ export default async function HomePage() {
       {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
       <HeroSlider slides={heroSlides} />
 
-      {/* ══ MARQUEE STRIP ══════════════════════════════════════════════ */}
-      <div className="bg-[#3D4F5F] py-2.5 overflow-hidden">
-        <div
-          className="flex gap-16 whitespace-nowrap"
-          style={{ animation: "marqueeText 20s linear infinite" }}
-        >
-          {[...Array(6)].map((_, i) => (
-            <span
-              key={i}
-              className="font-serif italic text-white/90 text-sm tracking-wide flex-shrink-0"
-            >
-              ✦ One Heel. Endless Looks. &nbsp;&nbsp;&nbsp; ✦ Premium Quality &nbsp;&nbsp;&nbsp; ✦ Free Shipping ₹999+ &nbsp;&nbsp;&nbsp; ✦ Cash on Delivery
-            </span>
-          ))}
-        </div>
-      </div>
-
       {/* ══ FEATURES BAR ═══════════════════════════════════════════════ */}
       <FeaturesBar />
 
@@ -87,7 +70,7 @@ export default async function HomePage() {
       <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-center text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-3">Curated for You</p>
-          <h2 className="text-center font-serif text-5xl md:text-6xl tracking-[0.15em] uppercase mb-12">
+          <h2 className="text-center font-serif text-4xl md:text-5xl tracking-[0.2em] uppercase mb-12" style={{fontWeight: 400}}>
             Shop by Occasion
           </h2>
           <div className="flex justify-center gap-10 md:gap-20 flex-wrap">

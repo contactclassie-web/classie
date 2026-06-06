@@ -204,24 +204,45 @@ export async function getFeaturedProductsFromDB(): Promise<Product[]> {
   }
 }
 
-export async function getCollectionProductsFromDB(collectionSlug: string): Promise<Product[]> {
+export async function getCollectionProductsFromDB(slug: string): Promise<Product[]> {
   try {
-    const { data, error } = await supabase
+    // Get collection id first
+    const { data: col } = await supabase
+      .from('collections')
+      .select('id')
+      .eq('slug', slug)
+      .single();
+
+    if (!col) return getCollection(slug);
+
+    // Get linked product slugs ordered by display_order
+    const { data: links } = await supabase
       .from('collection_products')
-      .select('products(*)')
-      .eq('collection_slug', collectionSlug)
-      .order('sort_order', { ascending: true });
-    if (error || !data || data.length === 0) {
-      return getCollection(collectionSlug);
-    }
-    const mapped = (data as any[])
-      .map((row: any) => row.products)
-      .filter(Boolean)
-      .filter((p: any) => p.active !== false)
-      .map((p: any) => mapDbProduct(p as DbProduct));
-    if (mapped.length === 0) return getCollection(collectionSlug);
-    return mapped;
+      .select('product_slug, display_order')
+      .eq('collection_id', col.id)
+      .order('display_order', { ascending: true });
+
+    if (!links || links.length === 0) return getCollection(slug);
+
+    const slugs = links.map((l: any) => l.product_slug);
+
+    // Fetch products by slug
+    const { data: productRows } = await supabase
+      .from('products')
+      .select('*')
+      .in('slug', slugs)
+      .eq('active', true);
+
+    if (!productRows || productRows.length === 0) return getCollection(slug);
+
+    // Return in display_order order
+    const mapped = slugs
+      .map((s: string) => (productRows as DbProduct[]).find((p) => p.slug === s))
+      .filter((p): p is DbProduct => Boolean(p))
+      .map((p) => mapDbProduct(p));
+
+    return mapped.length > 0 ? mapped : getCollection(slug);
   } catch {
-    return getCollection(collectionSlug);
+    return getCollection(slug);
   }
 }

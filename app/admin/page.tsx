@@ -225,6 +225,14 @@ export default function AdminPage() {
   const [collectionSaving, setCollectionSaving] = useState(false);
   const [collectionModalMode, setCollectionModalMode] = useState<"add"|"edit">("edit");
 
+  // Manage Products modal
+  const [manageProductsModal, setManageProductsModal] = useState<{
+    open: boolean;
+    collection: Collection | null;
+    selectedSlugs: string[];
+    saving: boolean;
+  }>({ open: false, collection: null, selectedSlugs: [], saving: false });
+
   // Messages
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
@@ -469,6 +477,37 @@ export default function AdminPage() {
 
   const setCollectionField = (key: keyof Collection, val: unknown) =>
     setCollectionModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
+
+  const openManageProducts = async (c: Collection) => {
+    const { data: col } = await supabase.from('collections').select('id').eq('slug', c.slug).single();
+    let selectedSlugs: string[] = [];
+    if (col) {
+      const { data: links } = await supabase
+        .from('collection_products')
+        .select('product_slug')
+        .eq('collection_id', col.id);
+      selectedSlugs = (links ?? []).map((l: any) => l.product_slug);
+    }
+    setManageProductsModal({ open: true, collection: c, selectedSlugs, saving: false });
+  };
+
+  const saveManageProducts = async () => {
+    if (!manageProductsModal.collection) return;
+    setManageProductsModal(m => ({ ...m, saving: true }));
+    const { data: col } = await supabase.from('collections').select('id').eq('slug', manageProductsModal.collection.slug).single();
+    if (!col) { setManageProductsModal(m => ({ ...m, saving: false })); return; }
+    await supabase.from('collection_products').delete().eq('collection_id', col.id);
+    if (manageProductsModal.selectedSlugs.length > 0) {
+      await supabase.from('collection_products').insert(
+        manageProductsModal.selectedSlugs.map((slug, i) => ({
+          collection_id: col.id,
+          product_slug: slug,
+          display_order: i + 1,
+        }))
+      );
+    }
+    setManageProductsModal(m => ({ ...m, open: false, saving: false }));
+  };
 
   // ── Settings actions ──────────────────────────────────────────────────────
 
@@ -1172,6 +1211,10 @@ export default function AdminPage() {
                             </td>
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-1">
+                                <button onClick={() => openManageProducts(c)}
+                                  className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-300 hover:text-blue-500 transition-colors" title="Manage Products">
+                                  <Package className="w-4 h-4" />
+                                </button>
                                 <button onClick={() => { setCollectionModalMode("edit"); openEditCollection(c); }}
                                   className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors" title="Edit">
                                   <Pencil className="w-4 h-4" />
@@ -1945,6 +1988,68 @@ export default function AdminPage() {
               </button>
               <button onClick={() => deleteFeature(deleteFeatureConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          MANAGE PRODUCTS MODAL
+      ══════════════════════════════════════════════════ */}
+      {manageProductsModal.open && manageProductsModal.collection && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <div>
+                <h2 className="font-semibold text-gray-800">Manage Products</h2>
+                <p className="text-xs text-gray-400 mt-0.5">{manageProductsModal.collection.title} — {manageProductsModal.selectedSlugs.length} selected</p>
+              </div>
+              <button onClick={() => setManageProductsModal(m => ({ ...m, open: false }))} className="p-2 rounded-lg hover:bg-gray-100">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            {/* Select all / clear */}
+            <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-3">
+              <button onClick={() => setManageProductsModal(m => ({ ...m, selectedSlugs: dbProducts.map(p => p.slug) }))}
+                className="text-xs text-[#3D4F5F] hover:underline">Select All</button>
+              <span className="text-gray-300">|</span>
+              <button onClick={() => setManageProductsModal(m => ({ ...m, selectedSlugs: [] }))}
+                className="text-xs text-gray-400 hover:underline">Clear All</button>
+            </div>
+            {/* Product list */}
+            <div className="overflow-y-auto flex-1 p-5 space-y-2">
+              {dbProducts.map(p => (
+                <label key={p.slug} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer group">
+                  <input type="checkbox"
+                    checked={manageProductsModal.selectedSlugs.includes(p.slug)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setManageProductsModal(m => ({ ...m, selectedSlugs: [...m.selectedSlugs, p.slug] }));
+                      } else {
+                        setManageProductsModal(m => ({ ...m, selectedSlugs: m.selectedSlugs.filter(s => s !== p.slug) }));
+                      }
+                    }}
+                    className="w-4 h-4 accent-[#3D4F5F] cursor-pointer"
+                  />
+                  {p.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.image} alt={p.title} className="w-10 h-10 object-cover rounded-lg flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{p.title}</p>
+                    <p className="text-xs text-gray-400">₹{p.price.toLocaleString('en-IN')} · {p.category}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+            {/* Footer */}
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setManageProductsModal(m => ({ ...m, open: false }))} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+              <button onClick={saveManageProducts} disabled={manageProductsModal.saving}
+                className="px-6 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
+                {manageProductsModal.saving ? "Saving…" : `Save (${manageProductsModal.selectedSlugs.length} products)`}
               </button>
             </div>
           </div>
