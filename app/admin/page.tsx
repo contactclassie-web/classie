@@ -2698,6 +2698,7 @@ export default function AdminPage() {
                       <div className="absolute inset-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
+                          key={`preview-${collectionModal.data.image_position ?? "top"}`}
                           src={collectionModal.data.image_url}
                           alt="Card Preview"
                           style={{
