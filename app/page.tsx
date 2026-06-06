@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Star, Sparkles, Instagram } from "lucide-react";
+import { ChevronRight, Star, Instagram } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
 import ProductCard from "@/components/ProductCard";
@@ -75,14 +75,11 @@ export default async function HomePage() {
       {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
       <HeroSlider slides={heroSlides} />
 
-      {/* ══ FEATURES BAR ═══════════════════════════════════════════════ */}
-      <FeaturesBar />
-
       {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-3">Curated for You</p>
-          <h2 className="text-center font-serif text-4xl md:text-5xl tracking-[0.2em] uppercase mb-12" style={{fontWeight: 400}}>
+          <p className="text-center text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Curated for You</p>
+          <h2 className="text-center font-serif text-3xl md:text-4xl mb-12" style={{fontWeight: 400, letterSpacing: "0.05em"}}>
             Shop by Occasion
           </h2>
           <OccasionCarousel occasions={occasions} />
@@ -130,8 +127,8 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <p className="text-[11px] tracking-[0.4em] uppercase text-classie-gray">Bestsellers</p>
-              <h2 className="font-serif text-3xl md:text-4xl text-classie-black mt-2">Most Loved</h2>
+              <p className="text-[11px] tracking-[0.4em] uppercase text-gray-400">New & Trending</p>
+              <h2 className="font-serif text-4xl md:text-5xl text-black mt-1" style={{fontWeight:400}}>Most Loved</h2>
             </div>
             <Link href="/shop/heels" className="hidden md:flex items-center gap-1 text-sm text-[#3B5373] hover:underline">
               View All <ChevronRight className="w-4 h-4" />
@@ -175,20 +172,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ PROMO BANNER ══════════════════════════════════════════════════ */}
-      <section className="bg-white text-[#3B5373] py-20 border-y border-classie-border">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <Sparkles className="w-8 h-8 mx-auto mb-4 text-amber-400" />
-          <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-4">Limited Time</p>
-          <h2 className="font-serif text-5xl md:text-6xl mb-4 text-classie-black">Up to 35% Off</h2>
-          <p className="text-classie-gray text-base mb-8">
-            Our hottest deals — curated styles at unbeatable prices. Cash on delivery available.
-          </p>
-          <Link href="/hot-deals" className="btn-primary">
-            Shop Hot Deals
-          </Link>
-        </div>
-      </section>
+      {/* ══ FEATURES STRIP (moved here for cleaner flow) ════════════════ */}
+      <FeaturesBar />
 
       {/* ══ 5. NEWSLETTER ════════════════════════════════════════════════ */}
       <NewsletterSection />
