@@ -105,9 +105,7 @@ export default async function HomePage() {
                   <h3 className="font-serif text-3xl mb-1">{cat.name}</h3>
                   <p className="text-sm text-white/75">{cat.description}</p>
                 </div>
-                <div className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                  <ChevronRight className="w-4 h-4 text-[#3B5373]" />
-                </div>
+                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-500" />
               </Link>
             ))}
           </div>
