@@ -223,6 +223,7 @@ export default function AdminPage() {
     data: { title: "", slug: "", description: "", image_url: "", display_order: 0, active: true },
   });
   const [collectionSaving, setCollectionSaving] = useState(false);
+  const [collectionModalMode, setCollectionModalMode] = useState<"add"|"edit">("edit");
 
   // Messages
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -444,11 +445,21 @@ export default function AdminPage() {
     setCollectionSaving(true);
     try {
       const { id, ...rest } = collectionModal.data;
-      await supabase.from("collections").update(rest).eq("id", id);
+      if (collectionModalMode === "add") {
+        await supabase.from("collections").insert([rest]);
+      } else {
+        await supabase.from("collections").update(rest).eq("id", id);
+      }
       await fetchCollections();
       closeCollectionModal();
     } catch { /* ignore */ }
     finally { setCollectionSaving(false); }
+  };
+
+  const deleteCollection = async (id: string) => {
+    if (!confirm("Delete this collection? This cannot be undone.")) return;
+    await supabase.from("collections").delete().eq("id", id);
+    setCollections((prev) => prev.filter((c) => c.id !== id));
   };
 
   const toggleCollectionActive = async (c: Collection) => {
@@ -1094,19 +1105,18 @@ export default function AdminPage() {
           ══════════════════════════════════════ */}
           {tab === "collections" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">{collections.length} collections</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Edit collection details and images. Collections cannot be added or deleted here.</p>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <p className="text-sm text-gray-500">{collections.length} collections</p>
+                <div className="flex items-center gap-2">
+                  <button onClick={fetchCollections} disabled={collectionsLoading}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3D4F5F] border border-gray-200 rounded-lg transition-colors">
+                    <RefreshCw className={`w-3.5 h-3.5 ${collectionsLoading ? "animate-spin" : ""}`} /> Refresh
+                  </button>
+                  <button onClick={() => { setCollectionModalMode("add"); setCollectionModal({ open: true, data: { title: "", slug: "", description: "", image_url: "", hover_image_url: "", display_order: collections.length + 1, active: true } }); }}
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-[#3D4F5F] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
+                    <Plus className="w-3.5 h-3.5" /> Add Collection
+                  </button>
                 </div>
-                <button
-                  onClick={fetchCollections}
-                  disabled={collectionsLoading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3D4F5F] border border-gray-200 rounded-lg transition-colors"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${collectionsLoading ? "animate-spin" : ""}`} />
-                  Refresh
-                </button>
               </div>
 
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -1161,13 +1171,16 @@ export default function AdminPage() {
                               </button>
                             </td>
                             <td className="px-5 py-4">
-                              <button
-                                onClick={() => openEditCollection(c)}
-                                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors"
-                                title="Edit"
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => { setCollectionModalMode("edit"); openEditCollection(c); }}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors" title="Edit">
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => deleteCollection(c.id!)}
+                                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors" title="Delete">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -1844,7 +1857,7 @@ export default function AdminPage() {
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-lg my-8 shadow-2xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-800">Edit Collection</h2>
+              <h2 className="font-semibold text-gray-800">{collectionModalMode === "add" ? "Add Collection" : "Edit Collection"}</h2>
               <button onClick={closeCollectionModal} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
                 <X className="w-5 h-5 text-gray-400" />
               </button>

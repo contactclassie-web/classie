@@ -12,7 +12,12 @@
 }
 
 * { box-sizing: border-box; }
+
+/* ── Smooth scroll */
 html { scroll-behavior: smooth; }
+
+/* ── Selection color */
+::selection { background: #3D4F5F; color: white; }
 
 body {
   font-family: var(--font-poppins);
@@ -22,6 +27,17 @@ body {
 }
 
 h1, h2, h3, h4 { font-family: var(--font-serif); }
+
+/* ── Thin scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #f9fafb; }
+::-webkit-scrollbar-thumb { background: #3D4F5F; border-radius: 2px; }
+
+/* ── Marquee animation */
+@keyframes marqueeText {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-16.666%); }
+}
 
 @layer components {
   /* ── Primary pill button */
@@ -54,8 +70,43 @@ h1, h2, h3, h4 { font-family: var(--font-serif); }
            transition-all duration-200 cursor-pointer;
   }
 
-  .section-heading    { @apply font-serif text-3xl md:text-4xl text-classie-black text-center; }
-  .section-subheading { @apply text-[11px] text-classie-gray text-center tracking-[0.4em] uppercase mt-2; }
+  /* ── Section headings — luxury refinement */
+  .section-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: -0.01em;
+    color: #1a1a1a;
+    line-height: 1.1;
+    @apply text-center;
+  }
+
+  .section-subheading {
+    font-size: 11px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    @apply text-center;
+  }
+
+  /* ── Premium nav link hover underline */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #3D4F5F;
+    transition: width 0.3s ease;
+  }
+  .nav-link:hover::after {
+    width: 100%;
+  }
 }
 
 /* Hero slider */

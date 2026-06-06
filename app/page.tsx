@@ -67,10 +67,10 @@ export default async function HomePage() {
       <FeaturesBar />
 
       {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
-      <section className="py-24 bg-white">
+      <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="text-center text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-3">Curated for You</p>
-          <h2 className="text-center font-serif text-5xl md:text-6xl tracking-[0.15em] uppercase mb-20">
+          <h2 className="text-center font-serif text-5xl md:text-6xl tracking-[0.15em] uppercase mb-12">
             Shop by Occasion
           </h2>
           <div className="flex justify-center gap-10 md:gap-20 flex-wrap">
