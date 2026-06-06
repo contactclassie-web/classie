@@ -4,6 +4,7 @@ import { Instagram } from "lucide-react";
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionCarousel from "@/components/OccasionCarousel";
 import FeaturedPicks from "@/components/FeaturedPicks";
+import HeroImageSlider from "@/components/HeroImageSlider";
 import {
   Product,
   CURATED_COLLECTIONS,
@@ -38,6 +39,13 @@ export default async function HomePage() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+
+  // ── Hero Slides ───────────────────────────────────────────────────────
+  const { data: heroSlides } = await sb
+    .from("hero_slides")
+    .select("image_url, title")
+    .eq("active", true)
+    .order("display_order", { ascending: true });
 
   // ── Occasions & Categories ─────────────────────────────────────────────
   const { data: dbCollections } = await sb
@@ -250,16 +258,9 @@ export default async function HomePage() {
           )}
         </div>
 
-        {/* Right: image */}
+        {/* Right: auto-changing image slider */}
         <div className="relative overflow-hidden bg-[#F9F9F9] min-h-[400px]">
-          <Image
-            src={heroImageUrl}
-            alt="Classie"
-            fill
-            className="object-cover object-top"
-            sizes="46vw"
-            priority
-          />
+          <HeroImageSlider slides={heroSlides ?? []} fallbackUrl={heroImageUrl} />
           {/* Promo chip */}
           {heroChipCode && (
             <div className="absolute bottom-12 left-0 bg-white px-7 py-5 border-l-[3px] border-[#3B5373] shadow-xl">
