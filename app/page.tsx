@@ -4,15 +4,47 @@ import { ChevronRight, Star, Truck, RefreshCw, Shield, Sparkles } from "lucide-r
 import HeroSlider from "@/components/HeroSlider";
 import ProductCard from "@/components/ProductCard";
 import NewsletterSection from "@/components/NewsletterSection";
-import { products, getCollection, getByCollection } from "@/lib/products";
+import {
+  Product,
+  CURATED_COLLECTIONS,
+  getProductsFromDB,
+  getFeaturedProductsFromDB,
+} from "@/lib/products";
 
-const heels       = getByCollection("heels");
-const dateEdit    = getCollection("the-date-edit").slice(0, 5);
-const everydayEdit = getCollection("the-everyday-edit").slice(0, 5);
-const festiveEdit = getCollection("the-festive-edit").slice(0, 5);
-const bestsellers = products.slice(0, 8);
+export const revalidate = 60;
 
-export default function HomePage() {
+export default async function HomePage() {
+  // ── Fetch live data from Supabase (falls back to hardcoded if DB unavailable) ──
+  const [allProducts, featuredProducts] = await Promise.all([
+    getProductsFromDB({ active: true }),
+    getFeaturedProductsFromDB(),
+  ]);
+
+  const heels = allProducts.filter((p) => p.category === "heels");
+  const accessories = allProducts.filter((p) => p.category === "accessories");
+
+  // Safe image access for category banners
+  const heelsCategoryImage = heels[6]?.image ?? heels[0]?.image ?? "";
+  const clipsImage =
+    accessories.find((p) => p.collection === "clips")?.image ?? "";
+
+  // "Most Loved" section: use featured if available, else first 8
+  const bestsellers =
+    featuredProducts.length > 0
+      ? featuredProducts.slice(0, 8)
+      : allProducts.slice(0, 8);
+
+  // Occasion rows — resolve slugs from live products
+  const resolveCollection = (key: keyof typeof CURATED_COLLECTIONS, limit = 5): Product[] =>
+    CURATED_COLLECTIONS[key].slugs
+      .map((s) => allProducts.find((p) => p.slug === s))
+      .filter((p): p is Product => p !== undefined)
+      .slice(0, limit);
+
+  const dateEdit = resolveCollection("the-date-edit");
+  const everydayEdit = resolveCollection("the-everyday-edit");
+  const festiveEdit = resolveCollection("the-festive-edit");
+
   return (
     <>
       {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
@@ -51,15 +83,15 @@ export default function HomePage() {
                 label: "Heels",
                 sub: "Block heels, stilettos & slingbacks",
                 href: "/shop/heels",
-                image: heels[6].image,
+                image: heelsCategoryImage,
                 count: heels.length,
               },
               {
                 label: "Clip-ons",
                 sub: "Crystal clips, bow clips & satin swirls",
                 href: "/shop/clips",
-                image: products.find((p) => p.collection === "clips")!.image,
-                count: products.filter((p) => p.category === "accessories").length,
+                image: clipsImage,
+                count: accessories.length,
               },
             ].map((cat) => (
               <Link
@@ -68,13 +100,15 @@ export default function HomePage() {
                 className="group relative overflow-hidden rounded-2xl bg-classie-light"
                 style={{ aspectRatio: "16 / 8" }}
               >
-                <Image
-                  src={cat.image}
-                  alt={cat.label}
-                  fill
-                  className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+                {cat.image && (
+                  <Image
+                    src={cat.image}
+                    alt={cat.label}
+                    fill
+                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
                 <div className="absolute bottom-6 left-6 text-white">
                   <p className="text-xs uppercase tracking-widest text-white/60 mb-1">
@@ -199,9 +233,16 @@ export default function HomePage() {
   );
 }
 
-function OccasionRow({ label, sub, href, items }: {
-  label: string; sub: string; href: string;
-  items: ReturnType<typeof getCollection>;
+function OccasionRow({
+  label,
+  sub,
+  href,
+  items,
+}: {
+  label: string;
+  sub: string;
+  href: string;
+  items: Product[];
 }) {
   return (
     <div className="mb-14 last:mb-0">

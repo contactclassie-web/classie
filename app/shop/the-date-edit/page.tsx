@@ -1,18 +1,21 @@
 import { Metadata } from "next";
 import CollectionGrid from "@/components/CollectionGrid";
-import { getCollection } from "@/lib/products";
+import { getCollectionProductsFromDB } from "@/lib/products";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "The Date Edit",
   description: "Dressed to impress, effortlessly. Shop Classie's Date Edit collection.",
 };
 
-export default function DateEditPage() {
+export default async function DateEditPage() {
+  const collectionProducts = await getCollectionProductsFromDB("the-date-edit");
   return (
     <CollectionGrid
       title="The Date Edit"
       subtitle="Dressed to impress, effortlessly"
-      products={getCollection("the-date-edit")}
+      products={collectionProducts}
     />
   );
 }

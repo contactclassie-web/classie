@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 export interface Product {
   slug: string;
   title: string;
@@ -88,4 +90,138 @@ export function getHotDeals(): Product[] {
   return products.filter((p) => p.comparePrice > p.price).sort(
     (a, b) => (b.comparePrice - b.price) / b.comparePrice - (a.comparePrice - a.price) / a.comparePrice
   );
+}
+
+// ── SUPABASE DB TYPES ─────────────────────────────────────────────────────
+// DB schema: variants = string[] (options only), variant_type = 'size'|'color'|'none'
+// No 'collection' field in DB — we derive it from slug/category
+interface DbProduct {
+  id?: string;
+  slug: string;
+  title: string;
+  price: number;
+  compare_price: number;
+  category: string;
+  variant_type: string | null;
+  variants: string[] | null;  // plain array of option values
+  image: string;
+  description: string;
+  tags?: string[];
+  active?: boolean;
+  is_featured?: boolean;
+}
+
+function deriveCollection(slug: string, category: string): Product['collection'] {
+  if (category === 'heels') return 'heels';
+  // Bow products: fauxbow-*, satin-swirl-*, glitzknot
+  if (
+    slug.includes('fauxbow') ||
+    slug.includes('satin-swirl') ||
+    slug.includes('glitzknot')
+  ) {
+    return 'bow';
+  }
+  return 'clips';
+}
+
+function mapDbProduct(row: DbProduct): Product {
+  return {
+    slug: row.slug,
+    title: row.title,
+    price: Number(row.price),
+    comparePrice: Number(row.compare_price),
+    category: row.category as Product['category'],
+    collection: deriveCollection(row.slug, row.category),
+    variants: {
+      type: ((row.variant_type ?? 'none') as 'size' | 'color' | 'none'),
+      options: Array.isArray(row.variants) ? row.variants : [],
+    },
+    image: row.image,
+    description: row.description,
+  };
+}
+
+// ── ASYNC SUPABASE FUNCTIONS (with hardcoded fallback) ────────────────────
+
+export async function getProductsFromDB(filters?: { category?: string; active?: boolean }): Promise<Product[]> {
+  try {
+    let query = supabase.from('products').select('*').eq('active', true);
+    if (filters?.category) {
+      query = query.eq('category', filters.category);
+    }
+    const { data, error } = await query;
+    if (error || !data || data.length === 0) {
+      // Fallback to hardcoded
+      let fallback = products;
+      if (filters?.category) fallback = products.filter((p) => p.category === filters.category);
+      return fallback;
+    }
+    return (data as DbProduct[]).map(mapDbProduct);
+  } catch {
+    let fallback = products;
+    if (filters?.category) fallback = products.filter((p) => p.category === filters!.category);
+    return fallback;
+  }
+}
+
+export async function getProductBySlugFromDB(slug: string): Promise<Product | null> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle();
+    if (error) {
+      // DB error → fall back to hardcoded
+      return getProductBySlug(slug) ?? null;
+    }
+    if (data === null) {
+      // Not in DB → fall back to hardcoded
+      return getProductBySlug(slug) ?? null;
+    }
+    // Inactive product → don't show
+    if ((data as DbProduct).active === false) return null;
+    return mapDbProduct(data as DbProduct);
+  } catch {
+    return getProductBySlug(slug) ?? null;
+  }
+}
+
+export async function getFeaturedProductsFromDB(): Promise<Product[]> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('is_featured', true)
+      .eq('active', true)
+      .limit(8);
+    if (error || !data || data.length === 0) {
+      return products.slice(0, 8);
+    }
+    return (data as DbProduct[]).map(mapDbProduct);
+  } catch {
+    return products.slice(0, 8);
+  }
+}
+
+export async function getCollectionProductsFromDB(collectionSlug: string): Promise<Product[]> {
+  try {
+    const { data, error } = await supabase
+      .from('collection_products')
+      .select('products(*)')
+      .eq('collection_slug', collectionSlug)
+      .order('sort_order', { ascending: true });
+    if (error || !data || data.length === 0) {
+      return getCollection(collectionSlug);
+    }
+    const mapped = (data as any[])
+      .map((row: any) => row.products)
+      .filter(Boolean)
+      .filter((p: any) => p.active !== false)
+      .map((p: any) => mapDbProduct(p as DbProduct));
+    if (mapped.length === 0) return getCollection(collectionSlug);
+    return mapped;
+  } catch {
+    return getCollection(collectionSlug);
+  }
 }
