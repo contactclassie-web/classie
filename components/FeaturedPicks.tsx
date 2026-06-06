@@ -89,12 +89,8 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
 
                   {/* No SALE badge — luxury feel */}
 
-                  {/* Shop Now hover overlay */}
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="bg-white text-gray-800 text-xs tracking-[0.2em] uppercase px-4 py-2 font-light">
-                      Shop Now
-                    </span>
-                  </div>
+                  {/* Subtle dark overlay on hover — no text */}
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
 
                 {/* Product Info */}
