@@ -28,8 +28,8 @@ export default async function HomePage() {
 
   // Safe image access for category banners
   const heelsCategoryImage = heels[6]?.image ?? heels[0]?.image ?? "";
-  const clipsImage =
-    accessories.find((p) => p.collection === "clips")?.image ?? "";
+  const clipsImage = accessories.find((p) => !["fauxbow","satin-swirl","glitzknot"].some(s => p.slug.includes(s)))?.image ?? accessories[0]?.image ?? "";
+  const bowImage = accessories.find((p) => ["fauxbow","satin-swirl","glitzknot"].some(s => p.slug.includes(s)))?.image ?? "";
 
   // "Most Loved" section: use featured if available, else first 8
   const bestsellers =
@@ -56,61 +56,7 @@ export default async function HomePage() {
       {/* ══ FEATURES BAR ═══════════════════════════════════════════════ */}
       <FeaturesBar />
 
-      {/* ══ 2. SHOP BY CATEGORY ══════════════════════════════════════════ */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-subheading">Collections</p>
-          <h2 className="section-heading mt-2 mb-10">Shop by Category</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              {
-                label: "Heels",
-                sub: "Block heels, stilettos & slingbacks",
-                href: "/shop/heels",
-                image: heelsCategoryImage,
-                count: heels.length,
-              },
-              {
-                label: "Clip-ons",
-                sub: "Crystal clips, bow clips & satin swirls",
-                href: "/shop/clips",
-                image: clipsImage,
-                count: accessories.length,
-              },
-            ].map((cat) => (
-              <Link
-                key={cat.href}
-                href={cat.href}
-                className="group relative overflow-hidden rounded-2xl bg-classie-light"
-                style={{ aspectRatio: "16 / 8" }}
-              >
-                {cat.image && (
-                  <Image
-                    src={cat.image}
-                    alt={cat.label}
-                    fill
-                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
-                <div className="absolute bottom-6 left-6 text-white">
-                  <p className="text-xs uppercase tracking-widest text-white/60 mb-1">
-                    {cat.count} products
-                  </p>
-                  <h3 className="font-serif text-4xl mb-1">{cat.label}</h3>
-                  <p className="text-sm text-white/75">{cat.sub}</p>
-                </div>
-                <div className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                  <ChevronRight className="w-4 h-4 text-[#3D4F5F]" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ 3. SHOP BY OCCASION ══════════════════════════════════════════ */}
+      {/* ══ 2. SHOP BY OCCASION ══════════════════════════════════════════ */}
       <section className="py-16 bg-[#faf8f6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="section-subheading">Curated for you</p>
@@ -134,6 +80,42 @@ export default async function HomePage() {
             href="/shop/the-festive-edit"
             items={festiveEdit}
           />
+        </div>
+      </section>
+
+      {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <p className="section-subheading">Collections</p>
+          <h2 className="section-heading mt-2 mb-10">Shop by Category</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { label: "Heels", sub: "Block heels, stilettos & slingbacks", href: "/shop/heels", image: heelsCategoryImage, count: heels.length },
+              { label: "Clip-ons", sub: "Crystal clips & statement pieces", href: "/shop/clips", image: clipsImage, count: accessories.filter(p => !["fauxbow","satin-swirl","glitzknot"].some(s=>p.slug.includes(s))).length },
+              { label: "Bow Collection", sub: "Satin swirls & bloom bows", href: "/shop/bow", image: bowImage, count: accessories.filter(p => ["fauxbow","satin-swirl","glitzknot"].some(s=>p.slug.includes(s))).length },
+            ].map((cat) => (
+              <Link key={cat.href} href={cat.href}
+                className="group relative overflow-hidden rounded-2xl bg-classie-light"
+                style={{ aspectRatio: "4 / 3" }}
+              >
+                {cat.image && (
+                  <Image src={cat.image} alt={cat.label} fill
+                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                <div className="absolute bottom-6 left-6 text-white">
+                  <p className="text-xs uppercase tracking-widest text-white/60 mb-1">{cat.count} products</p>
+                  <h3 className="font-serif text-3xl mb-1">{cat.label}</h3>
+                  <p className="text-sm text-white/75">{cat.sub}</p>
+                </div>
+                <div className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                  <ChevronRight className="w-4 h-4 text-[#3D4F5F]" />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
