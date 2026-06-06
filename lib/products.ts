@@ -10,6 +10,7 @@ export interface Product {
   variants: { type: "size" | "color" | "none"; options: string[] };
   image: string;
   description: string;
+  featured_tab?: string | null;
 }
 
 export const products: Product[] = [
@@ -109,6 +110,7 @@ interface DbProduct {
   tags?: string[];
   active?: boolean;
   is_featured?: boolean;
+  featured_tab?: string | null;
 }
 
 function deriveCollection(slug: string, category: string): Product['collection'] {
@@ -138,6 +140,7 @@ function mapDbProduct(row: DbProduct): Product {
     },
     image: row.image,
     description: row.description,
+    featured_tab: row.featured_tab ?? null,
   };
 }
 
@@ -201,6 +204,21 @@ export async function getFeaturedProductsFromDB(): Promise<Product[]> {
     return (data as DbProduct[]).map(mapDbProduct);
   } catch {
     return products.slice(0, 8);
+  }
+}
+
+export async function getTabProductsFromDB(tab: 'latest' | 'bestseller'): Promise<Product[]> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('featured_tab', tab)
+      .eq('active', true)
+      .limit(4);
+    if (error || !data || data.length === 0) return [];
+    return (data as DbProduct[]).map(mapDbProduct);
+  } catch {
+    return [];
   }
 }
 

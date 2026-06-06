@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Product } from "@/lib/products";
 
@@ -14,43 +15,42 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
   const [activeTab, setActiveTab] = useState<"latest" | "bestsellers">("latest");
   const router = useRouter();
 
-  const products = activeTab === "latest" ? latestProducts : bestSellers;
+  const products = (activeTab === "latest" ? latestProducts : bestSellers).slice(0, 4);
 
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Header */}
-        <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-2">
-          New &amp; Trending
-        </p>
+
+        {/* Heading — centered, DM Serif Display, ALL CAPS, ~3rem */}
         <h2
+          className="text-center mb-8"
           style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: "clamp(1.75rem, 3vw, 2.25rem)",
+            fontFamily: "'DM Serif Display', serif",
+            fontSize: "clamp(2rem, 4vw, 3rem)",
             fontWeight: 400,
             color: "#111",
-            letterSpacing: "0.01em",
-            marginBottom: "1.5rem",
+            letterSpacing: "0.02em",
+            textTransform: "uppercase",
           }}
         >
           Featured Picks
         </h2>
 
-        {/* Tab Bar */}
-        <div className="relative mb-8">
+        {/* Tab Bar — centered */}
+        <div className="relative mb-10 flex justify-center">
           {/* Full-width gray underline */}
           <div className="absolute bottom-0 left-0 right-0 border-b border-gray-200" />
-          <div className="flex gap-8">
+          <div className="relative flex gap-12">
             {(["latest", "bestsellers"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`relative pb-3 text-xs tracking-[0.3em] uppercase font-light transition-colors duration-200 ${
+                className={`relative pb-3 text-xs tracking-widest uppercase transition-colors duration-200 ${
                   activeTab === tab
-                    ? "text-[#111] border-b-2 border-[#3B5373]"
+                    ? "text-gray-900 border-b-2 border-black"
                     : "text-gray-400 hover:text-gray-600"
                 }`}
-                style={{ fontFamily: "'Poppins', sans-serif" }}
+                style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400 }}
               >
                 {tab === "latest" ? "Latest Styles" : "Best Sellers"}
               </button>
@@ -58,15 +58,13 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
           </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {/* Product Grid — exactly 4 */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
           {products.map((product) => {
             const hasDiscount =
               product.comparePrice && product.comparePrice > product.price;
             const discountPct = hasDiscount
-              ? Math.round(
-                  ((product.comparePrice - product.price) / product.comparePrice) * 100
-                )
+              ? Math.round((1 - product.price / product.comparePrice) * 100)
               : 0;
 
             return (
@@ -85,52 +83,50 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
                       src={product.image}
                       alt={product.title}
                       fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   )}
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                    <span className="text-white text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Shop Now →
+
+                  {/* SALE Badge — top-left, only if compare_price > price */}
+                  {hasDiscount && (
+                    <div className="absolute top-3 left-3 bg-white text-gray-700 text-[10px] tracking-widest uppercase px-2 py-1 font-light border border-gray-200 z-10">
+                      Sale
+                    </div>
+                  )}
+
+                  {/* Shop Now hover overlay */}
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="bg-white text-gray-800 text-xs tracking-[0.2em] uppercase px-4 py-2 font-light">
+                      Shop Now
                     </span>
                   </div>
                 </div>
 
                 {/* Product Info */}
-                <div className="pt-3 pb-1">
+                <div className="mt-3">
                   <p
-                    className="text-sm text-[#111] mb-1 truncate"
-                    style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 400 }}
+                    className="text-sm font-normal text-gray-800 truncate"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
                   >
                     {product.title}
                   </p>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {hasDiscount ? (
+                  <div className="flex items-center flex-wrap mt-1">
+                    <span
+                      className="text-sm text-gray-800"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                      ₹{product.price.toLocaleString("en-IN")}
+                    </span>
+                    {hasDiscount && (
                       <>
-                        <span className="text-gray-400 text-xs line-through">
+                        <span className="text-xs text-gray-400 line-through ml-2">
                           ₹{product.comparePrice.toLocaleString("en-IN")}
                         </span>
-                        <span
-                          className="text-sm font-medium text-[#111]"
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
-                          ₹{product.price.toLocaleString("en-IN")}
-                        </span>
-                        <span
-                          className="text-xs font-medium text-[#3B5373]"
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                        >
+                        <span className="text-xs font-medium text-red-500 ml-2">
                           -{discountPct}%
                         </span>
                       </>
-                    ) : (
-                      <span
-                        className="text-sm text-[#111]"
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                      >
-                        ₹{product.price.toLocaleString("en-IN")}
-                      </span>
                     )}
                   </div>
                 </div>
@@ -139,11 +135,14 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
           })}
         </div>
 
-        {/* View All */}
+        {/* EXPLORE ALL button — gray style, links to /shop/heels */}
         <div className="text-center mt-10">
-          <a href="/shop" className="btn-outline">
-            View All
-          </a>
+          <Link
+            href="/shop/heels"
+            className="inline-block border border-gray-300 bg-gray-50 text-gray-600 px-12 py-3 text-xs tracking-[0.3em] uppercase font-light hover:bg-gray-100 transition-all"
+          >
+            Explore All
+          </Link>
         </div>
       </div>
     </section>

@@ -11,6 +11,7 @@ import {
   CURATED_COLLECTIONS,
   getProductsFromDB,
   getFeaturedProductsFromDB,
+  getTabProductsFromDB,
 } from "@/lib/products";
 import { getHeroSlidesFromDB } from "@/lib/slides";
 
@@ -18,21 +19,26 @@ export const revalidate = 60;
 
 export default async function HomePage() {
   // ── Fetch live data from Supabase (falls back to hardcoded if DB unavailable) ──
-  const [allProducts, featuredProducts, heroSlides] = await Promise.all([
+  const [allProducts, featuredProducts, heroSlides, latestTabProducts, bestsellerTabProducts] = await Promise.all([
     getProductsFromDB({ active: true }),
     getFeaturedProductsFromDB(),
     getHeroSlidesFromDB(),
+    getTabProductsFromDB('latest'),
+    getTabProductsFromDB('bestseller'),
   ]);
 
   const heels = allProducts.filter((p) => p.category === "heels");
   const accessories = allProducts.filter((p) => p.category === "accessories");
 
-  // Featured Picks: latest (first 8 by order) and best sellers (featured or fallback)
-  const latestProducts = allProducts.slice(0, 8);
+  // Featured Picks: admin-controlled via featured_tab column, fallback to defaults
+  const latestProducts =
+    latestTabProducts.length > 0 ? latestTabProducts : allProducts.slice(0, 4);
   const bestSellers =
-    featuredProducts.length > 0
-      ? featuredProducts.slice(0, 8)
-      : allProducts.slice(0, 8);
+    bestsellerTabProducts.length > 0
+      ? bestsellerTabProducts
+      : featuredProducts.length > 0
+      ? featuredProducts.slice(0, 4)
+      : allProducts.slice(0, 4);
 
   // Occasion rows — resolve slugs from live products
   const resolveCollection = (key: keyof typeof CURATED_COLLECTIONS, limit = 5): Product[] =>

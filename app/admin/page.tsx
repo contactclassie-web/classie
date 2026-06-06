@@ -49,6 +49,7 @@ interface DbProduct {
   cod_available: boolean;
   free_shipping: boolean;
   is_featured: boolean;
+  featured_tab?: string | null;
   active: boolean;
   created_at?: string;
 }
@@ -151,7 +152,7 @@ const EMPTY_PRODUCT: DbProduct = {
   category: "heels", description: "", image: "", images: [],
   variant_type: "none", variants: [], heel_type: "", toe_style: "",
   heel_height: "", ankle_strap: false, shoe_fit: "",
-  cod_available: true, free_shipping: false, is_featured: false, active: true,
+  cod_available: true, free_shipping: false, is_featured: false, featured_tab: null, active: true,
 };
 
 const EMPTY_SLIDE: HeroSlide = {
@@ -1839,6 +1840,20 @@ export default function AdminPage() {
                     {label}
                   </label>
                 ))}
+              </div>
+
+              {/* Featured Picks Tab */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Featured Picks Tab</label>
+                <select
+                  value={productModal.data.featured_tab ?? ""}
+                  onChange={(e) => setProductField("featured_tab", e.target.value || null)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-[#3B5373] transition-colors"
+                >
+                  <option value="">None — don&apos;t show in Featured Picks</option>
+                  <option value="latest">Latest Styles tab</option>
+                  <option value="bestseller">Best Sellers tab</option>
+                </select>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
