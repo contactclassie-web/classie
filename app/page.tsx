@@ -84,21 +84,23 @@ export default async function HomePage() {
           <h2 className="text-center font-serif text-4xl md:text-5xl tracking-[0.2em] uppercase mb-12" style={{fontWeight: 400}}>
             Shop by Occasion
           </h2>
-          <div className="flex justify-center gap-10 md:gap-20 flex-wrap">
-            {occasions.map((occ) => (
+          {/* Horizontal scroll — single row, no wrap */}
+          <div className="flex gap-8 md:gap-12 overflow-x-auto pb-4 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+            {occasions.filter(occ => occ.image).map((occ) => (
               <Link
                 key={occ.href}
                 href={occ.href}
-                className="group flex flex-col items-center gap-5 w-52 md:w-60"
+                className="group flex flex-col items-center gap-5 flex-shrink-0 w-44 md:w-52"
               >
-                <div className="relative w-52 h-52 md:w-60 md:h-60 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3B5373]/20 transition-all duration-500">
+                <div className="relative w-44 h-44 md:w-52 md:h-52 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3B5373]/20 transition-all duration-500">
                   {occ.image ? (
                     <Image
                       src={occ.image}
                       alt={occ.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 208px, 240px"
+                      sizes="208px"
                     />
                   ) : (
                     <div className="w-full h-full bg-[#faf8f6]" />
