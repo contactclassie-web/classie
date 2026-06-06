@@ -72,7 +72,7 @@ export default async function DynamicCollectionPage({ params }: Props) {
       <CollectionGrid
         title={col.title}
         products={products}
-        emptyMessage={`No products found in ${col.title}`}
+
       />
     </>
   );
