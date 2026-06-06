@@ -36,7 +36,7 @@ export default async function AboutPage() {
                 <br />
                 <em>Elegance</em>
               </h2>
-              <div className="w-12 h-1 bg-[#3D4F5F] rounded-full mt-8" />
+              <div className="w-12 h-1 bg-[#3B5373] rounded-full mt-8" />
             </div>
 
             {/* Right */}
@@ -127,7 +127,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-14 bg-[#3D4F5F] text-white text-center">
+      <section className="py-14 bg-[#3B5373] text-white text-center">
         <div className="max-w-xl mx-auto px-4">
           <h2 className="font-serif text-4xl mb-4">Ready to Step In?</h2>
           <p className="text-white/70 text-sm mb-8">

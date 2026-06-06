@@ -53,7 +53,7 @@ export default function TrackOrderPage() {
             onChange={(e) => setOrderId(e.target.value)}
             placeholder="Enter your Order ID"
             required
-            className="flex-1 px-4 py-3 border border-classie-border rounded-xl text-sm focus:outline-none focus:border-[#3D4F5F] transition-colors"
+            className="flex-1 px-4 py-3 border border-classie-border rounded-xl text-sm focus:outline-none focus:border-[#3B5373] transition-colors"
           />
           <button type="submit" disabled={loading} className="btn-primary gap-2 disabled:opacity-60">
             <Search className="w-4 h-4" /> {loading ? "…" : "Track"}
@@ -93,7 +93,7 @@ export default function TrackOrderPage() {
                     <div key={step} className="flex items-start flex-1 min-w-0">
                       <div className="flex flex-col items-center flex-1">
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          active ? "bg-[#3D4F5F] text-white shadow-lg" :
+                          active ? "bg-[#3B5373] text-white shadow-lg" :
                           done  ? "bg-emerald-500 text-white" :
                                   "bg-[#faf8f6] text-classie-gray border border-classie-border"
                         }`}>
@@ -133,11 +133,11 @@ export default function TrackOrderPage() {
 
         <p className="text-center text-xs text-classie-gray mt-8">
           Need help?{" "}
-          <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-[#3D4F5F] underline">
+          <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-[#3B5373] underline">
             WhatsApp us
           </a>{" "}
           or{" "}
-          <a href="mailto:hello@classie.co.in" className="text-[#3D4F5F] underline">
+          <a href="mailto:hello@classie.co.in" className="text-[#3B5373] underline">
             email us
           </a>
         </p>

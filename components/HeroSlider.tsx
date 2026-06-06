@@ -44,7 +44,7 @@ export default function HeroSlider({ slides }: HeroSliderProps) {
   const isCenter = slide.text_align === "center";
   const hasMedia = !!(slide.video_url || slide.image_url);
   // When no media + center + light bg_color → dark text; otherwise white text
-  const useDarkText = isCenter && !hasMedia && isLightColor(slide.bg_color ?? "#3D4F5F");
+  const useDarkText = isCenter && !hasMedia && isLightColor(slide.bg_color ?? "#3B5373");
 
   const overlay = isCenter
     ? "bg-gradient-to-t from-white/30 via-white/10 to-transparent"
@@ -53,7 +53,7 @@ export default function HeroSlider({ slides }: HeroSliderProps) {
   return (
     <section
       className="relative w-full min-h-[85vh] md:min-h-[90vh] overflow-hidden"
-      style={{ background: slide.bg_color ?? "#3D4F5F" }}
+      style={{ background: slide.bg_color ?? "#3B5373" }}
     >
       {/* ── Background: Video → Image → solid color ── */}
       <div key={slide.id} className="absolute inset-0 hero-slide">
@@ -107,7 +107,7 @@ export default function HeroSlider({ slides }: HeroSliderProps) {
           <p
             className="text-base md:text-lg mb-10 max-w-md leading-relaxed"
             style={{
-              color: useDarkText ? "#3D4F5F" : "rgba(255,255,255,0.85)",
+              color: useDarkText ? "#3B5373" : "rgba(255,255,255,0.85)",
             }}
           >
             {slide.subheadline}

@@ -118,7 +118,7 @@ export default function CartPage() {
               Checkout
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/shop/heels" className="block text-center text-sm text-classie-gray hover:text-[#3D4F5F] mt-4 transition-colors">
+            <Link href="/shop/heels" className="block text-center text-sm text-classie-gray hover:text-[#3B5373] mt-4 transition-colors">
               ← Continue Shopping
             </Link>
           </div>

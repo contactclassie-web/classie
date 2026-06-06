@@ -40,7 +40,7 @@ export default function ReturnsPage() {
         </Section>
         <Section title="How to Initiate a Return">
           <ol className="list-decimal pl-5 space-y-2">
-            <li>WhatsApp us at <a href="https://wa.me/919999999999" className="text-[#3D4F5F] underline">+91 99999 99999</a> with your Order ID and reason</li>
+            <li>WhatsApp us at <a href="https://wa.me/919999999999" className="text-[#3B5373] underline">+91 99999 99999</a> with your Order ID and reason</li>
             <li>We'll confirm eligibility and schedule a free pickup</li>
             <li>Pack the product securely in original packaging</li>
             <li>Hand over to the courier when they arrive</li>
@@ -54,8 +54,8 @@ export default function ReturnsPage() {
         </Section>
         <Section title="Contact Us">
           <p>
-            Email: <a href="mailto:hello@classie.co.in" className="text-[#3D4F5F] underline">hello@classie.co.in</a><br />
-            WhatsApp: <a href="https://wa.me/919999999999" className="text-[#3D4F5F] underline">+91 99999 99999</a>
+            Email: <a href="mailto:hello@classie.co.in" className="text-[#3B5373] underline">hello@classie.co.in</a><br />
+            WhatsApp: <a href="https://wa.me/919999999999" className="text-[#3B5373] underline">+91 99999 99999</a>
           </p>
         </Section>
       </div>

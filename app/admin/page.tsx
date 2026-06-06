@@ -145,13 +145,13 @@ const EMPTY_PRODUCT: DbProduct = {
 
 const EMPTY_SLIDE: HeroSlide = {
   headline: "", subheadline: "", cta_text: "", cta_url: "",
-  bg_color: "#3D4F5F", text_align: "left", display_order: 0, active: true,
+  bg_color: "#3B5373", text_align: "left", display_order: 0, active: true,
   image_url: "", video_url: "", page: "home",
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3D4F5F] transition-colors bg-white";
+const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
 type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "settings" | "messages";
@@ -585,7 +585,7 @@ export default function AdminPage() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#3D4F5F] to-[#2a3a47] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#3B5373] to-[#2a3a47] flex items-center justify-center px-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-5 border border-white/20">
@@ -609,7 +609,7 @@ export default function AdminPage() {
                 <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" /> {pwError}
               </p>
             )}
-            <button type="submit" className="w-full py-3 bg-[#3D4F5F] text-white rounded-xl text-sm font-semibold hover:bg-[#2d3f4f] transition-colors">
+            <button type="submit" className="w-full py-3 bg-[#3B5373] text-white rounded-xl text-sm font-semibold hover:bg-[#2d3f4f] transition-colors">
               Sign In
             </button>
           </form>
@@ -639,7 +639,7 @@ export default function AdminPage() {
       ══════════════════════════════════════════════════ */}
       <aside
         className="w-56 flex-shrink-0 flex flex-col"
-        style={{ background: "#3D4F5F" }}
+        style={{ background: "#3B5373" }}
       >
         {/* Logo */}
         <div className="px-5 py-6 border-b border-white/10">
@@ -664,7 +664,7 @@ export default function AdminPage() {
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="flex-1">{label}</span>
                 {badge !== undefined && badge > 0 && (
-                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${active ? "bg-white text-[#3D4F5F]" : "bg-white/20 text-white/80"}`}>
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${active ? "bg-white text-[#3B5373]" : "bg-white/20 text-white/80"}`}>
                     {badge}
                   </span>
                 )}
@@ -701,7 +701,7 @@ export default function AdminPage() {
             {tab === "orders" && (
               <button
                 onClick={fetchOrders} disabled={ordersLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3D4F5F] border border-gray-200 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${ordersLoading ? "animate-spin" : ""}`} />
                 Refresh
@@ -770,7 +770,7 @@ export default function AdminPage() {
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                   <h2 className="font-semibold text-gray-700">Recent Orders</h2>
-                  <button onClick={() => setTab("orders")} className="text-xs text-[#3D4F5F] hover:underline">
+                  <button onClick={() => setTab("orders")} className="text-xs text-[#3B5373] hover:underline">
                     View all →
                   </button>
                 </div>
@@ -824,7 +824,7 @@ export default function AdminPage() {
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                   <h2 className="font-semibold text-gray-700">Featured Products</h2>
-                  <button onClick={() => setTab("products")} className="text-xs text-[#3D4F5F] hover:underline">
+                  <button onClick={() => setTab("products")} className="text-xs text-[#3B5373] hover:underline">
                     Manage →
                   </button>
                 </div>
@@ -911,7 +911,7 @@ export default function AdminPage() {
                                     {item.quantity}× {item.title}{item.variant ? ` (${item.variant})` : ""}
                                   </p>
                                 ))}
-                                {order.items.length > 2 && <p className="text-xs text-[#3D4F5F]">+{order.items.length - 2} more</p>}
+                                {order.items.length > 2 && <p className="text-xs text-[#3B5373]">+{order.items.length - 2} more</p>}
                               </div>
                             </td>
                             <td className="px-5 py-4">
@@ -928,7 +928,7 @@ export default function AdminPage() {
                                 value={order.status}
                                 onChange={(e) => updateStatus(order.id, e.target.value)}
                                 disabled={updatingId === order.id}
-                                className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#3D4F5F] bg-white disabled:opacity-50"
+                                className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#3B5373] bg-white disabled:opacity-50"
                               >
                                 {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                               </select>
@@ -958,7 +958,7 @@ export default function AdminPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-500">{dbProducts.length} products in database</p>
-                <button onClick={openAddProduct} className="flex items-center gap-2 px-4 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors shadow-sm">
+                <button onClick={openAddProduct} className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors shadow-sm">
                   <Plus className="w-4 h-4" /> Add Product
                 </button>
               </div>
@@ -1015,11 +1015,11 @@ export default function AdminPage() {
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-1.5">
                                 <button onClick={() => toggleProductActive(p)} title={p.active ? "Deactivate" : "Activate"}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors">
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
                                   {p.active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                                 </button>
                                 <button onClick={() => openEditProduct(p)} title="Edit"
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors">
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
                                   <Pencil className="w-4 h-4" />
                                 </button>
                                 <button onClick={() => setDeleteConfirm(p.id!)} title="Delete"
@@ -1051,13 +1051,13 @@ export default function AdminPage() {
                     const count = p === "all" ? slides.length : slides.filter(s => (s.page ?? "home") === p).length;
                     return (
                       <button key={p} onClick={() => setSlidePageFilter(p)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${slidePageFilter === p ? "bg-[#3D4F5F] text-white border-[#3D4F5F]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3D4F5F] hover:text-[#3D4F5F]"}`}>
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${slidePageFilter === p ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373] hover:text-[#3B5373]"}`}>
                         {labels[p]} {count > 0 && <span className={`ml-1 ${slidePageFilter===p?"text-white/70":"text-gray-400"}`}>({count})</span>}
                       </button>
                     );
                   })}
                 </div>
-                <button onClick={openAddSlide} className="flex items-center gap-2 px-4 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors shadow-sm">
+                <button onClick={openAddSlide} className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors shadow-sm">
                   <Plus className="w-4 h-4" /> Add Slide
                 </button>
               </div>
@@ -1101,7 +1101,7 @@ export default function AdminPage() {
                               <p className="text-[10px] text-gray-400 mt-0.5 truncate max-w-[140px]">{s.subheadline}</p>
                             </td>
                             <td className="px-5 py-4">
-                              <span className="inline-block px-2 py-1 bg-[#3D4F5F]/10 text-[#3D4F5F] text-[11px] rounded-full font-medium capitalize">{s.page ?? "home"}</span>
+                              <span className="inline-block px-2 py-1 bg-[#3B5373]/10 text-[#3B5373] text-[11px] rounded-full font-medium capitalize">{s.page ?? "home"}</span>
                             </td>
                             <td className="px-5 py-4">
                               <p className="text-xs text-gray-700">{s.cta_text || "—"}</p>
@@ -1116,11 +1116,11 @@ export default function AdminPage() {
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-1.5">
                                 <button onClick={() => toggleSlideActive(s)} title={s.active ? "Deactivate" : "Activate"}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors">
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
                                   {s.active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                                 </button>
                                 <button onClick={() => openEditSlide(s)} title="Edit"
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors">
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
                                   <Pencil className="w-4 h-4" />
                                 </button>
                                 <button onClick={() => setDeleteSlideConfirm(s.id!)} title="Delete"
@@ -1148,11 +1148,11 @@ export default function AdminPage() {
                 <p className="text-sm text-gray-500">{collections.length} collections</p>
                 <div className="flex items-center gap-2">
                   <button onClick={fetchCollections} disabled={collectionsLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3D4F5F] border border-gray-200 rounded-lg transition-colors">
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
                     <RefreshCw className={`w-3.5 h-3.5 ${collectionsLoading ? "animate-spin" : ""}`} /> Refresh
                   </button>
                   <button onClick={() => { setCollectionModalMode("add"); setCollectionModal({ open: true, data: { title: "", slug: "", description: "", image_url: "", hover_image_url: "", display_order: collections.length + 1, active: true } }); }}
-                    className="flex items-center gap-1.5 px-4 py-1.5 bg-[#3D4F5F] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-[#3B5373] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
                     <Plus className="w-3.5 h-3.5" /> Add Collection
                   </button>
                 </div>
@@ -1216,7 +1216,7 @@ export default function AdminPage() {
                                   <Package className="w-4 h-4" />
                                 </button>
                                 <button onClick={() => { setCollectionModalMode("edit"); openEditCollection(c); }}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors" title="Edit">
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors" title="Edit">
                                   <Pencil className="w-4 h-4" />
                                 </button>
                                 <button onClick={() => deleteCollection(c.id!)}
@@ -1244,7 +1244,7 @@ export default function AdminPage() {
               {/* ── Sub-section A: Announcement Bar ── */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#3D4F5F]" />
+                  <MessageSquare className="w-4 h-4 text-[#3B5373]" />
                   <h2 className="font-semibold text-gray-700">Scrolling Announcement Bar</h2>
                 </div>
                 {settingsLoading ? (
@@ -1304,7 +1304,7 @@ export default function AdminPage() {
                       {announcementList.length < 6 && (
                         <button
                           onClick={() => setAnnouncementList((prev) => [...prev, ""])}
-                          className="mt-2 flex items-center gap-1.5 text-xs text-[#3D4F5F] hover:underline"
+                          className="mt-2 flex items-center gap-1.5 text-xs text-[#3B5373] hover:underline"
                         >
                           <Plus className="w-3.5 h-3.5" /> Add More
                         </button>
@@ -1313,7 +1313,7 @@ export default function AdminPage() {
 
                     <button
                       onClick={saveAnnouncements} disabled={settingsSaving}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                      className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
                     >
                       <Save className="w-4 h-4" />
                       {settingsSaving ? "Saving…" : "Save Announcements"}
@@ -1326,13 +1326,13 @@ export default function AdminPage() {
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-[#3D4F5F]" />
+                    <Settings className="w-4 h-4 text-[#3B5373]" />
                     <h2 className="font-semibold text-gray-700">Features Bar Manager</h2>
                   </div>
                   <div className="flex items-center gap-3">
                     <label className="text-xs text-gray-500 font-medium">Scroll Speed:</label>
                     <select
-                      className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3D4F5F] bg-white"
+                      className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373] bg-white"
                       defaultValue="35"
                       onChange={async (e) => {
                         await supabase.from("site_settings").upsert({ key: "features_bar_speed", value: e.target.value }, { onConflict: "key" });
@@ -1345,7 +1345,7 @@ export default function AdminPage() {
                   </div>
                   <button
                     onClick={openAddFeature}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#3D4F5F] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add Feature
                   </button>
@@ -1387,7 +1387,7 @@ export default function AdminPage() {
                             <td className="px-3 py-3">
                               <div className="flex items-center gap-1.5">
                                 <button onClick={() => openEditFeature(f)} title="Edit"
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3D4F5F] transition-colors">
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
                                   <Pencil className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => setDeleteFeatureConfirm(f.id!)} title="Delete"
@@ -1425,7 +1425,7 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={saveSettings} disabled={settingsSaving}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
                 >
                   <Save className="w-4 h-4" />
                   {settingsSaving ? "Saving…" : "Save Settings"}
@@ -1447,7 +1447,7 @@ export default function AdminPage() {
                   <button
                     key={id} onClick={() => setMsgSubTab(id)}
                     className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                      msgSubTab === id ? "bg-[#3D4F5F] text-white" : "bg-white text-gray-500 border border-gray-200 hover:border-[#3D4F5F]"
+                      msgSubTab === id ? "bg-[#3B5373] text-white" : "bg-white text-gray-500 border border-gray-200 hover:border-[#3B5373]"
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />{label}
@@ -1455,7 +1455,7 @@ export default function AdminPage() {
                 ))}
                 <button
                   onClick={() => { fetchMessages(); fetchSubscribers(); }}
-                  className="ml-auto flex items-center gap-2 px-3 py-2 text-xs text-gray-400 hover:text-[#3D4F5F] border border-gray-200 rounded-xl transition-colors"
+                  className="ml-auto flex items-center gap-2 px-3 py-2 text-xs text-gray-400 hover:text-[#3B5373] border border-gray-200 rounded-xl transition-colors"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${messagesLoading || subsLoading ? "animate-spin" : ""}`} />
                   Refresh
@@ -1638,7 +1638,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                    <input type="checkbox" checked={productModal.data.ankle_strap ?? false} onChange={(e) => setProductField("ankle_strap", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                    <input type="checkbox" checked={productModal.data.ankle_strap ?? false} onChange={(e) => setProductField("ankle_strap", e.target.checked)} className="w-4 h-4 accent-[#3B5373]" />
                     Ankle Strap
                   </label>
                 </div>
@@ -1655,7 +1655,7 @@ export default function AdminPage() {
                       type="checkbox"
                       checked={Boolean(productModal.data[key])}
                       onChange={(e) => setProductField(key, e.target.checked)}
-                      className="w-4 h-4 accent-[#3D4F5F]"
+                      className="w-4 h-4 accent-[#3B5373]"
                     />
                     {label}
                   </label>
@@ -1663,12 +1663,12 @@ export default function AdminPage() {
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
-              <button onClick={closeProductModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3D4F5F] transition-colors">
+              <button onClick={closeProductModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3B5373] transition-colors">
                 Cancel
               </button>
               <button
                 onClick={handleProductSave} disabled={productSaving}
-                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
               >
                 <Save className="w-4 h-4" />
                 {productSaving ? "Saving…" : productModal.mode === "add" ? "Add Product" : "Save Changes"}
@@ -1781,17 +1781,17 @@ export default function AdminPage() {
                 </div>
               </div>
               <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                <input type="checkbox" checked={slideModal.data.active} onChange={(e) => setSlideField("active", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                <input type="checkbox" checked={slideModal.data.active} onChange={(e) => setSlideField("active", e.target.checked)} className="w-4 h-4 accent-[#3B5373]" />
                 Active
               </label>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
-              <button onClick={closeSlideModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3D4F5F] transition-colors">
+              <button onClick={closeSlideModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3B5373] transition-colors">
                 Cancel
               </button>
               <button
                 onClick={handleSlideSave} disabled={slideSaving}
-                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
               >
                 <Save className="w-4 h-4" />
                 {slideSaving ? "Saving…" : slideModal.mode === "add" ? "Add Slide" : "Save Changes"}
@@ -1810,7 +1810,7 @@ export default function AdminPage() {
             <h2 className="font-semibold text-gray-800 mb-2">Delete Product?</h2>
             <p className="text-sm text-gray-400 mb-5">This action cannot be undone.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setDeleteConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3D4F5F] transition-colors">
+              <button onClick={() => setDeleteConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3B5373] transition-colors">
                 Cancel
               </button>
               <button onClick={() => deleteProduct(deleteConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
@@ -1830,7 +1830,7 @@ export default function AdminPage() {
             <h2 className="font-semibold text-gray-800 mb-2">Delete Slide?</h2>
             <p className="text-sm text-gray-400 mb-5">This action cannot be undone.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setDeleteSlideConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3D4F5F] transition-colors">
+              <button onClick={() => setDeleteSlideConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3B5373] transition-colors">
                 Cancel
               </button>
               <button onClick={() => deleteSlide(deleteSlideConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
@@ -1873,17 +1873,17 @@ export default function AdminPage() {
                 <input type="number" value={featuresBarModal.data.display_order} onChange={(e) => setFeatureField("display_order", Number(e.target.value))} className={inputCls} />
               </div>
               <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                <input type="checkbox" checked={featuresBarModal.data.active} onChange={(e) => setFeatureField("active", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                <input type="checkbox" checked={featuresBarModal.data.active} onChange={(e) => setFeatureField("active", e.target.checked)} className="w-4 h-4 accent-[#3B5373]" />
                 Active
               </label>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
-              <button onClick={closeFeaturesBarModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3D4F5F] transition-colors">
+              <button onClick={closeFeaturesBarModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3B5373] transition-colors">
                 Cancel
               </button>
               <button
                 onClick={handleFeatureSave} disabled={featuresBarSaving}
-                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
               >
                 <Save className="w-4 h-4" />
                 {featuresBarSaving ? "Saving…" : featuresBarModal.mode === "add" ? "Add Feature" : "Save Changes"}
@@ -1954,17 +1954,17 @@ export default function AdminPage() {
                 <input type="number" value={collectionModal.data.display_order} onChange={(e) => setCollectionField("display_order", Number(e.target.value))} className={`${inputCls} max-w-[120px]`} />
               </div>
               <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                <input type="checkbox" checked={collectionModal.data.active} onChange={(e) => setCollectionField("active", e.target.checked)} className="w-4 h-4 accent-[#3D4F5F]" />
+                <input type="checkbox" checked={collectionModal.data.active} onChange={(e) => setCollectionField("active", e.target.checked)} className="w-4 h-4 accent-[#3B5373]" />
                 Active
               </label>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
-              <button onClick={closeCollectionModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3D4F5F] transition-colors">
+              <button onClick={closeCollectionModal} className="px-5 py-2 rounded-xl text-sm text-gray-500 border border-gray-200 hover:border-[#3B5373] transition-colors">
                 Cancel
               </button>
               <button
                 onClick={handleCollectionSave} disabled={collectionSaving}
-                className="flex items-center gap-2 px-5 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
               >
                 <Save className="w-4 h-4" />
                 {collectionSaving ? "Saving…" : "Save Changes"}
@@ -1983,7 +1983,7 @@ export default function AdminPage() {
             <h2 className="font-semibold text-gray-800 mb-2">Delete Feature?</h2>
             <p className="text-sm text-gray-400 mb-5">This action cannot be undone.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setDeleteFeatureConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3D4F5F] transition-colors">
+              <button onClick={() => setDeleteFeatureConfirm(null)} className="px-5 py-2 rounded-xl text-sm border border-gray-200 text-gray-500 hover:border-[#3B5373] transition-colors">
                 Cancel
               </button>
               <button onClick={() => deleteFeature(deleteFeatureConfirm)} className="px-5 py-2 rounded-xl text-sm bg-red-600 text-white hover:bg-red-700 transition-colors">
@@ -2013,7 +2013,7 @@ export default function AdminPage() {
             {/* Select all / clear */}
             <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-3">
               <button onClick={() => setManageProductsModal(m => ({ ...m, selectedSlugs: dbProducts.map(p => p.slug) }))}
-                className="text-xs text-[#3D4F5F] hover:underline">Select All</button>
+                className="text-xs text-[#3B5373] hover:underline">Select All</button>
               <span className="text-gray-300">|</span>
               <button onClick={() => setManageProductsModal(m => ({ ...m, selectedSlugs: [] }))}
                 className="text-xs text-gray-400 hover:underline">Clear All</button>
@@ -2031,7 +2031,7 @@ export default function AdminPage() {
                         setManageProductsModal(m => ({ ...m, selectedSlugs: m.selectedSlugs.filter(s => s !== p.slug) }));
                       }
                     }}
-                    className="w-4 h-4 accent-[#3D4F5F] cursor-pointer"
+                    className="w-4 h-4 accent-[#3B5373] cursor-pointer"
                   />
                   {p.image && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -2048,7 +2048,7 @@ export default function AdminPage() {
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
               <button onClick={() => setManageProductsModal(m => ({ ...m, open: false }))} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
               <button onClick={saveManageProducts} disabled={manageProductsModal.saving}
-                className="px-6 py-2 bg-[#3D4F5F] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
+                className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
                 {manageProductsModal.saving ? "Saving…" : `Save (${manageProductsModal.selectedSlugs.length} products)`}
               </button>
             </div>

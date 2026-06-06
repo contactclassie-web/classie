@@ -45,9 +45,9 @@ export default function ProductDetailClient({ product, related }: { product: Pro
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-0">
         <nav className="flex items-center gap-2 text-xs text-classie-gray flex-wrap">
-          <Link href="/" className="hover:text-[#3D4F5F] transition-colors">Home</Link>
+          <Link href="/" className="hover:text-[#3B5373] transition-colors">Home</Link>
           <ChevronRight className="w-3 h-3 flex-shrink-0" />
-          <Link href={`/shop/${product.collection}`} className="hover:text-[#3D4F5F] transition-colors capitalize">
+          <Link href={`/shop/${product.collection}`} className="hover:text-[#3B5373] transition-colors capitalize">
             {product.collection === "heels" ? "Heels" : product.collection === "clips" ? "Clips" : "Bow"}
           </Link>
           <ChevronRight className="w-3 h-3 flex-shrink-0" />
@@ -71,7 +71,7 @@ export default function ProductDetailClient({ product, related }: { product: Pro
                 priority
               />
               {discount > 0 && (
-                <span className="absolute top-4 left-4 bg-[#3D4F5F] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <span className="absolute top-4 left-4 bg-[#3B5373] text-white text-xs font-semibold px-3 py-1 rounded-full">
                   -{discount}% OFF
                 </span>
               )}
@@ -126,7 +126,7 @@ export default function ProductDetailClient({ product, related }: { product: Pro
                   <p className="text-sm font-semibold text-classie-black uppercase tracking-wider">
                     Size — <span className="font-normal text-classie-gray">EU {selected}</span>
                   </p>
-                  <Link href="/faq#size-guide" className="text-xs text-[#3D4F5F] underline">
+                  <Link href="/faq#size-guide" className="text-xs text-[#3B5373] underline">
                     Size guide
                   </Link>
                 </div>
@@ -137,8 +137,8 @@ export default function ProductDetailClient({ product, related }: { product: Pro
                       onClick={() => setSelected(sz)}
                       className={`w-12 h-12 rounded-full text-sm font-medium border-2 transition-all ${
                         selected === sz
-                          ? "bg-[#3D4F5F] border-[#3D4F5F] text-white"
-                          : "border-classie-border text-classie-black hover:border-[#3D4F5F]"
+                          ? "bg-[#3B5373] border-[#3B5373] text-white"
+                          : "border-classie-border text-classie-black hover:border-[#3B5373]"
                       }`}
                     >
                       {sz}
@@ -162,8 +162,8 @@ export default function ProductDetailClient({ product, related }: { product: Pro
                       title={col}
                       className={`relative w-[60px] h-[60px] rounded-full border-2 flex items-center justify-center text-[10px] font-medium overflow-hidden transition-all ${
                         selected === col
-                          ? "border-[#3D4F5F] scale-110 shadow-md"
-                          : "border-classie-border hover:border-[#3D4F5F]"
+                          ? "border-[#3B5373] scale-110 shadow-md"
+                          : "border-classie-border hover:border-[#3B5373]"
                       }`}
                     >
                       <Image
@@ -174,7 +174,7 @@ export default function ProductDetailClient({ product, related }: { product: Pro
                         sizes="60px"
                       />
                       {selected === col && (
-                        <span className="absolute inset-0 bg-[#3D4F5F]/20 rounded-full flex items-center justify-center">
+                        <span className="absolute inset-0 bg-[#3B5373]/20 rounded-full flex items-center justify-center">
                           <Check className="w-3 h-3 text-white drop-shadow" />
                         </span>
                       )}
@@ -190,7 +190,7 @@ export default function ProductDetailClient({ product, related }: { product: Pro
               className={`w-full py-4 text-sm font-semibold tracking-widest uppercase flex items-center justify-center gap-3 rounded-[24px] transition-all duration-300 ${
                 added
                   ? "bg-emerald-600 text-white"
-                  : "bg-[#3D4F5F] text-white hover:bg-[#2e3c49] active:scale-[0.98]"
+                  : "bg-[#3B5373] text-white hover:bg-[#2e3c49] active:scale-[0.98]"
               }`}
             >
               {added ? <><Check className="w-5 h-5" /> Added!</> : <><ShoppingBag className="w-5 h-5" /> Add to Cart</>}
@@ -204,7 +204,7 @@ export default function ProductDetailClient({ product, related }: { product: Pro
                 { icon: Shield,    text: "COD available" },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex-1 flex flex-col items-center gap-1.5 text-center bg-[#faf8f6] rounded-xl py-3 px-1">
-                  <Icon className="w-4 h-4 text-[#3D4F5F]" />
+                  <Icon className="w-4 h-4 text-[#3B5373]" />
                   <span className="text-[10px] text-classie-gray leading-tight">{text}</span>
                 </div>
               ))}

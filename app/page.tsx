@@ -80,7 +80,7 @@ export default async function HomePage() {
                 href={occ.href}
                 className="group flex flex-col items-center gap-5 w-52 md:w-60"
               >
-                <div className="relative w-52 h-52 md:w-60 md:h-60 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3D4F5F]/20 transition-all duration-500">
+                <div className="relative w-52 h-52 md:w-60 md:h-60 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-lg group-hover:shadow-2xl group-hover:ring-[#3B5373]/20 transition-all duration-500">
                   {occ.image ? (
                     <Image
                       src={occ.image}
@@ -93,10 +93,10 @@ export default async function HomePage() {
                     <div className="w-full h-full bg-[#faf8f6]" />
                   )}
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-[#3D4F5F]/0 group-hover:bg-[#3D4F5F]/15 transition-all duration-500 rounded-full" />
+                  <div className="absolute inset-0 bg-[#3B5373]/0 group-hover:bg-[#3B5373]/15 transition-all duration-500 rounded-full" />
                 </div>
                 <div className="text-center">
-                  <span className="font-serif text-lg md:text-xl text-classie-black group-hover:text-[#3D4F5F] transition-colors tracking-wide block">
+                  <span className="font-serif text-lg md:text-xl text-classie-black group-hover:text-[#3B5373] transition-colors tracking-wide block">
                     {occ.title}
                   </span>
                   <span className="text-[11px] tracking-widest uppercase text-classie-gray mt-1 block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -137,7 +137,7 @@ export default async function HomePage() {
                   <p className="text-sm text-white/75">{cat.sub}</p>
                 </div>
                 <div className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                  <ChevronRight className="w-4 h-4 text-[#3D4F5F]" />
+                  <ChevronRight className="w-4 h-4 text-[#3B5373]" />
                 </div>
               </Link>
             ))}
@@ -153,7 +153,7 @@ export default async function HomePage() {
               <p className="text-[11px] tracking-[0.4em] uppercase text-classie-gray">Bestsellers</p>
               <h2 className="font-serif text-3xl md:text-4xl text-classie-black mt-2">Most Loved</h2>
             </div>
-            <Link href="/shop/heels" className="hidden md:flex items-center gap-1 text-sm text-[#3D4F5F] hover:underline">
+            <Link href="/shop/heels" className="hidden md:flex items-center gap-1 text-sm text-[#3B5373] hover:underline">
               View All <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -167,7 +167,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ OUR STORY — Editorial Banner ════════════════════════════════ */}
-      <section className="bg-[#3D4F5F] text-white overflow-hidden">
+      <section className="bg-[#3B5373] text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
           {/* Left: editorial headline */}
           <div>
@@ -187,7 +187,7 @@ export default async function HomePage() {
             </p>
             <Link
               href="/about"
-              className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3D4F5F] transition-all duration-300"
+              className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3B5373] transition-all duration-300"
             >
               Our Story <ChevronRight className="w-4 h-4" />
             </Link>
@@ -196,7 +196,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ PROMO BANNER ══════════════════════════════════════════════════ */}
-      <section className="bg-white text-[#3D4F5F] py-16 border-y border-classie-border">
+      <section className="bg-white text-[#3B5373] py-16 border-y border-classie-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <Sparkles className="w-8 h-8 mx-auto mb-4 text-amber-400" />
           <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-4">Limited Time</p>
@@ -243,7 +243,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Instagram className="w-5 h-5 text-[#3D4F5F]" />
+              <Instagram className="w-5 h-5 text-[#3B5373]" />
               <h2 className="font-serif text-3xl md:text-4xl text-classie-black">Follow @_classie_in</h2>
             </div>
             <p className="text-classie-gray text-sm tracking-wide">Tag us to be featured ✨</p>
@@ -285,7 +285,7 @@ export default async function HomePage() {
               href="https://www.instagram.com/_classie_in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-[#3D4F5F] border border-[#3D4F5F] px-6 py-2.5 rounded-full hover:bg-[#3D4F5F] hover:text-white transition-all duration-300"
+              className="inline-flex items-center gap-2 text-sm text-[#3B5373] border border-[#3B5373] px-6 py-2.5 rounded-full hover:bg-[#3B5373] hover:text-white transition-all duration-300"
             >
               <Instagram className="w-4 h-4" />
               Follow on Instagram

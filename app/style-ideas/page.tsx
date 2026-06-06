@@ -19,7 +19,7 @@ const looks = [
     desc: "Pair our Modiva heels with a satin midi dress. Add crystal clip-ons to your heels and a Gloss Bow to your clutch — instant runway.",
     image: products[7].image,
     products: ["modiva", "radiance-heart-crystal-clip-pair", "fauxbow-black"],
-    color: "#3D4F5F",
+    color: "#3B5373",
   },
   {
     title: "Office to After-Hours",
@@ -94,7 +94,7 @@ export default async function StyleIdeasPage() {
                           <Image src={p.image} alt={p.title} fill className="object-cover" sizes="48px" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-classie-black group-hover:text-[#3D4F5F] transition-colors truncate">{p.title}</p>
+                          <p className="text-sm font-medium text-classie-black group-hover:text-[#3B5373] transition-colors truncate">{p.title}</p>
                           <p className="text-xs text-classie-gray">₹{p.price.toLocaleString("en-IN")}</p>
                         </div>
                       </Link>
@@ -115,7 +115,7 @@ export default async function StyleIdeasPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 bg-[#3D4F5F] text-white text-center">
+      <section className="py-14 bg-[#3B5373] text-white text-center">
         <div className="max-w-xl mx-auto px-4">
           <h2 className="font-serif text-3xl md:text-4xl mb-3">Create Your Look</h2>
           <p className="text-white/70 text-sm mb-7">Tag us @_classie_in for a chance to be featured in our next lookbook.</p>

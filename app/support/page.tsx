@@ -17,16 +17,16 @@ export default function SupportPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-14">
           {[
             { icon: MessageCircle, label: "WhatsApp", sub: "Fastest response", href: "https://wa.me/919999999999", cta: "Chat Now", color: "#25D366" },
-            { icon: Mail, label: "Email", sub: "hello@classie.co.in", href: "mailto:hello@classie.co.in", cta: "Send Email", color: "#3D4F5F" },
+            { icon: Mail, label: "Email", sub: "hello@classie.co.in", href: "mailto:hello@classie.co.in", cta: "Send Email", color: "#3B5373" },
             { icon: Instagram, label: "Instagram", sub: "@_classie_in", href: "https://www.instagram.com/_classie_in/", cta: "DM Us", color: "#E1306C" },
           ].map(({ icon: Icon, label, sub, href, cta, color }) => (
-            <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center text-center bg-[#faf8f6] rounded-2xl p-7 border border-classie-border hover:border-[#3D4F5F] transition-all hover:shadow-md">
+            <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center text-center bg-[#faf8f6] rounded-2xl p-7 border border-classie-border hover:border-[#3B5373] transition-all hover:shadow-md">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 text-white" style={{ background: color }}>
                 <Icon className="w-5 h-5" />
               </div>
               <p className="font-semibold text-classie-black mb-1">{label}</p>
               <p className="text-xs text-classie-gray mb-4">{sub}</p>
-              <span className="text-xs font-medium text-[#3D4F5F] group-hover:underline">{cta} →</span>
+              <span className="text-xs font-medium text-[#3B5373] group-hover:underline">{cta} →</span>
             </a>
           ))}
         </div>
@@ -39,8 +39,8 @@ export default function SupportPage() {
             { icon: RefreshCw, label: "Returns & Exchanges", href: "/returns" },
             { icon: HelpCircle, label: "FAQ", href: "/faq" },
           ].map(({ icon: Icon, label, href }) => (
-            <Link key={href} href={href} className="flex items-center gap-3 p-4 border border-classie-border rounded-xl hover:border-[#3D4F5F] hover:bg-[#faf8f6] transition-all">
-              <Icon className="w-5 h-5 text-[#3D4F5F]" />
+            <Link key={href} href={href} className="flex items-center gap-3 p-4 border border-classie-border rounded-xl hover:border-[#3B5373] hover:bg-[#faf8f6] transition-all">
+              <Icon className="w-5 h-5 text-[#3B5373]" />
               <span className="text-sm font-medium text-classie-black">{label}</span>
             </Link>
           ))}

@@ -45,14 +45,14 @@ export default function ProductCard({ product }: { product: Product }) {
           className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 cursor-pointer"
           onClick={handleQuickAdd}
         >
-          <span className="text-xs tracking-[0.3em] uppercase text-[#3D4F5F] font-medium">
+          <span className="text-xs tracking-[0.3em] uppercase text-[#3B5373] font-medium">
             Add to Cart
           </span>
         </div>
 
         {/* ── Sale badge — thin, elegant */}
         {discount > 0 && (
-          <div className="absolute top-3 left-3 bg-[#3D4F5F] text-white text-[10px] tracking-widest uppercase px-2.5 py-1">
+          <div className="absolute top-3 left-3 bg-[#3B5373] text-white text-[10px] tracking-widest uppercase px-2.5 py-1">
             -{discount}%
           </div>
         )}
@@ -60,11 +60,11 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* ── Product info */}
       <div className="pt-3 pb-1">
-        <p className="font-serif text-sm tracking-wide text-[#1a1a1a] leading-snug line-clamp-2 group-hover:text-[#3D4F5F] transition-colors duration-200">
+        <p className="font-serif text-sm tracking-wide text-[#1a1a1a] leading-snug line-clamp-2 group-hover:text-[#3B5373] transition-colors duration-200">
           {product.title}
         </p>
         <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-sm font-medium text-[#3D4F5F]">
+          <span className="text-sm font-medium text-[#3B5373]">
             ₹{product.price.toLocaleString("en-IN")}
           </span>
           {discount > 0 && (

@@ -91,7 +91,7 @@ export default function ContactPage() {
                           required
                           rows={5}
                           placeholder="How can we help you?"
-                          className="w-full pl-11 pr-4 py-3 border border-classie-border rounded-xl text-sm focus:outline-none focus:border-[#3D4F5F] transition-colors resize-none bg-white"
+                          className="w-full pl-11 pr-4 py-3 border border-classie-border rounded-xl text-sm focus:outline-none focus:border-[#3B5373] transition-colors resize-none bg-white"
                         />
                       </div>
                     </div>
@@ -131,7 +131,7 @@ function IconField({ icon: Icon, label, name, type, value, onChange, placeholder
           onChange={onChange}
           placeholder={placeholder}
           required={required}
-          className="w-full pl-11 pr-4 py-3 border border-classie-border rounded-xl text-sm focus:outline-none focus:border-[#3D4F5F] transition-colors bg-white"
+          className="w-full pl-11 pr-4 py-3 border border-classie-border rounded-xl text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white"
         />
       </div>
     </div>
@@ -144,8 +144,8 @@ function ContactInfo({ icon: Icon, label, value, href }: {
   const cls = "flex items-center gap-4 group";
   const inner = (
     <>
-      <div className="w-10 h-10 rounded-full bg-[#3D4F5F]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#3D4F5F] transition-colors">
-        <Icon className="w-4 h-4 text-[#3D4F5F] group-hover:text-white transition-colors" />
+      <div className="w-10 h-10 rounded-full bg-[#3B5373]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#3B5373] transition-colors">
+        <Icon className="w-4 h-4 text-[#3B5373] group-hover:text-white transition-colors" />
       </div>
       <div>
         <p className="text-[11px] uppercase tracking-widest text-classie-gray">{label}</p>

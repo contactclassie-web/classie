@@ -41,8 +41,8 @@ export default function Navbar() {
 
           {/* ── Logo — editorial box border */}
           <Link href="/" className="flex-shrink-0 group">
-            <div className="border border-[#3D4F5F] px-3 py-1 group-hover:bg-[#3D4F5F]/5 transition-colors">
-              <span className="text-xl tracking-[0.4em] font-light text-[#3D4F5F] select-none flex items-center gap-1.5">
+            <div className="border border-[#3B5373] px-3 py-1 group-hover:bg-[#3B5373]/5 transition-colors">
+              <span className="text-xl tracking-[0.4em] font-light text-[#3B5373] select-none flex items-center gap-1.5">
                 ✦ C L A S S I E
               </span>
             </div>
@@ -54,7 +54,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="nav-link text-[12px] font-light text-[#1a1a1a] hover:text-[#3D4F5F] transition-colors tracking-[0.12em] uppercase"
+                className="nav-link text-[12px] font-light text-[#1a1a1a] hover:text-[#3B5373] transition-colors tracking-[0.12em] uppercase"
               >
                 {l.label}
               </Link>
@@ -66,11 +66,11 @@ export default function Navbar() {
             <Link
               href="/cart"
               aria-label="Cart"
-              className="relative p-1 text-[#1a1a1a] hover:text-[#3D4F5F] transition-colors"
+              className="relative p-1 text-[#1a1a1a] hover:text-[#3B5373] transition-colors"
             >
               <ShoppingBag className="w-5 h-5" />
               {count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#3D4F5F] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 bg-[#3B5373] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-medium">
                   {count > 9 ? "9+" : count}
                 </span>
               )}
@@ -93,7 +93,7 @@ export default function Navbar() {
         }`}
       >
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-          <span className="text-sm tracking-[0.3em] uppercase font-light text-[#3D4F5F]">Menu</span>
+          <span className="text-sm tracking-[0.3em] uppercase font-light text-[#3B5373]">Menu</span>
           <button onClick={() => setOpen(false)} className="text-[#1a1a1a]" aria-label="Close menu">
             <X className="w-5 h-5" />
           </button>
@@ -104,7 +104,7 @@ export default function Navbar() {
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="py-4 text-sm font-light text-[#1a1a1a] border-b border-gray-50 last:border-0 tracking-[0.15em] uppercase hover:text-[#3D4F5F] transition-colors"
+              className="py-4 text-sm font-light text-[#1a1a1a] border-b border-gray-50 last:border-0 tracking-[0.15em] uppercase hover:text-[#3B5373] transition-colors"
             >
               {l.label}
             </Link>
@@ -114,7 +114,7 @@ export default function Navbar() {
           <Link
             href="/cart"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-3 text-sm font-light text-[#3D4F5F] tracking-wider uppercase"
+            className="flex items-center gap-3 text-sm font-light text-[#3B5373] tracking-wider uppercase"
           >
             <ShoppingBag className="w-4 h-4" />
             Cart {count > 0 && `(${count})`}

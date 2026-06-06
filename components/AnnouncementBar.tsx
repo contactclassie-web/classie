@@ -47,7 +47,7 @@ export default function AnnouncementBar() {
   const duration = `${speed}s`;
 
   return (
-    <div className="bg-[#3D4F5F] text-white text-[11px] py-2 overflow-hidden">
+    <div className="bg-[#3B5373] text-white text-[11px] py-2 overflow-hidden">
       <div
         className="marquee-track flex gap-16 whitespace-nowrap"
         style={{ animation: `marquee ${duration} linear infinite` }}
