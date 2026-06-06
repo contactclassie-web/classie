@@ -9,21 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans:  ["Poppins", "sans-serif"],
-        serif: ['"DM Serif Display"', "serif"],
+        sans:     ["Poppins", "sans-serif"],
+        serif:    ['"DM Serif Display"', "serif"],
+        display:  ['"Playfair Display"', "serif"],
       },
       colors: {
         primary: {
-          DEFAULT: "#3D4F5F",
-          dark:    "#2e3c49",
-          light:   "#4f6476",
+          DEFAULT: "#3B5373",   // exact original button color
+          dark:    "#2a3d55",
+          light:   "#4f6a8a",
         },
         classie: {
-          black:  "#1a1a1a",
+          black:  "#000000",    // exact original foreground
           gray:   "#6b6b6b",
           light:  "#f7f7f7",
           border: "#e8e8e8",
-          navy:   "#3D4F5F",
+          navy:   "#3B5373",   // exact original navy
         },
       },
       borderRadius: {
