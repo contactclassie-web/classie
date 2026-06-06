@@ -17,7 +17,7 @@ function OccasionCard({ occ, large }: { occ: Occasion; large: boolean }) {
   return (
     <Link
       href={occ.href}
-      className="group relative overflow-hidden block w-full h-full"
+      className="group absolute inset-0 overflow-hidden"
     >
       {/* Background image */}
       {occ.image ? (
@@ -99,20 +99,30 @@ export default function OccasionCarousel({
         <div
           className="hidden md:grid"
           style={{
-            gridTemplateColumns: "1.65fr 1fr",
+            gridTemplateColumns: "1.65fr 1fr 1fr",
             gridTemplateRows: "1fr 1fr",
             height: "580px",
             gap: "3px",
           }}
         >
-          <div style={{ gridRow: "1 / 3", position: "relative" }}>
+          {/* Big left: col 1, rows 1-2 */}
+          <div style={{ gridColumn: "1/2", gridRow: "1/3", position: "relative" }}>
             <OccasionCard occ={displayItems[0]} large={true} />
           </div>
-          {displayItems.slice(1, 5).map((occ) => (
-            <div key={occ.href} className="relative">
-              <OccasionCard occ={occ} large={false} />
-            </div>
-          ))}
+          {/* Top right: col 2 row 1, col 3 row 1 */}
+          <div style={{ gridColumn: "2/3", gridRow: "1/2", position: "relative" }}>
+            <OccasionCard occ={displayItems[1]} large={false} />
+          </div>
+          <div style={{ gridColumn: "3/4", gridRow: "1/2", position: "relative" }}>
+            <OccasionCard occ={displayItems[2]} large={false} />
+          </div>
+          {/* Bottom right: col 2 row 2, col 3 row 2 */}
+          <div style={{ gridColumn: "2/3", gridRow: "2/3", position: "relative" }}>
+            <OccasionCard occ={displayItems[3]} large={false} />
+          </div>
+          <div style={{ gridColumn: "3/4", gridRow: "2/3", position: "relative" }}>
+            <OccasionCard occ={displayItems[4]} large={false} />
+          </div>
         </div>
         <div className="flex flex-col gap-[3px] md:hidden">
           {displayItems.map((occ) => (
