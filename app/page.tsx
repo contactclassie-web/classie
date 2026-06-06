@@ -82,7 +82,7 @@ export default async function HomePage() {
       <section className="pt-16 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-          <p className="section-subheading mb-3">Our Collections</p>
+          <p className="section-subheading mb-3">Style Edits</p>
           <h2 className="mb-10 section-heading">Shop by Occasion</h2>
           <OccasionCarousel occasions={occasions} />
         </div>
