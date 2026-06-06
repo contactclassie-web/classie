@@ -305,9 +305,7 @@ export default async function HomePage() {
                 Shop by <em className="italic text-[#3B5373]">Occasion</em>
               </h2>
             </div>
-            <a href="/collections" className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#3B5373] border-b border-[rgba(59,83,115,0.3)] pb-0.5 hover:border-[#3B5373] transition-all whitespace-nowrap">
-              View All Edits
-            </a>
+
           </div>
           <OccasionCarousel occasions={occasions} />
         </div>
