@@ -198,7 +198,7 @@ export default async function HomePage() {
       {/* ══ 1. HERO — Split editorial layout ═══════════════════════════════ */}
       <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[calc(100vh-72px)]">
         {/* Left: text content */}
-        <div className="flex flex-col justify-center px-8 md:px-16 py-16 md:py-24 bg-white relative">
+        <div className="flex flex-col justify-center px-10 md:px-20 py-16 md:py-24 bg-white relative">
           {/* Vertical line divider */}
           <div className="absolute right-0 top-[12%] bottom-[12%] w-px bg-gradient-to-b from-transparent via-[rgba(59,83,115,0.2)] to-transparent hidden md:block" />
 
