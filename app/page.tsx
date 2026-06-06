@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Star, Instagram } from "lucide-react";
+import { ChevronRight, Instagram } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import FeaturesBar from "@/components/FeaturesBar";
 import NewsletterSection from "@/components/NewsletterSection";
@@ -158,27 +158,13 @@ export default async function HomePage() {
       <NewsletterSection />
 
       {/* ══ TESTIMONIALS ═════════════════════════════════════════════════ */}
-      <section className="py-20 bg-white border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-subheading text-left">Happy Customers</p>
-          <h2 className="section-heading text-left mt-2 mb-10">What They Say</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { name: "Priya S.", review: "The Modiva heels are absolutely stunning. Wore them to my sister's wedding and got so many compliments. Super comfortable for a 4-inch heel!", rating: 5 },
-              { name: "Ananya K.", review: "Ordered the satin swirl clips — they completely transformed my old heels. Fast delivery, beautiful packaging, will definitely order more!", rating: 5 },
-              { name: "Meera R.", review: "Quality is premium and the price is very reasonable. The Gloss Belle fits perfectly and the cushioning is great. Very happy with my purchase.", rating: 5 },
-            ].map((t) => (
-              <div key={t.name} className="bg-white p-8 border border-gray-100">
-                <div className="flex gap-0.5 mb-3">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-classie-black text-sm leading-relaxed mb-4">&ldquo;{t.review}&rdquo;</p>
-                <p className="text-xs font-semibold text-classie-gray uppercase tracking-wider">— {t.name}</p>
-              </div>
-            ))}
-          </div>
+      <section className="py-24 bg-white border-t border-gray-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-10">What They Say</p>
+          <blockquote className="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8" style={{fontFamily:"'Playfair Display', serif", fontWeight:400}}>
+            &ldquo;The most elegant heels I&apos;ve owned. Wore them all evening at a wedding — zero discomfort, endless compliments.&rdquo;
+          </blockquote>
+          <p className="text-xs tracking-[0.3em] uppercase text-gray-400">— Priya S., Delhi</p>
         </div>
       </section>
 

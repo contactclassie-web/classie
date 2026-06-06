@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 const DEFAULT_ANNOUNCEMENTS = [
-  "✦ Welcome to Classie — One Heel. Endless Looks.",
-  "Use code FIRST10 for 10% OFF your first order!",
-  "🚢 Free Shipping above ₹999 | 😊 Easy Returns & Exchange",
+  "Welcome to Classie — One Heel. Endless Looks.",
+  "Use code FIRST10 for 10% OFF your first order.",
+  "Free Shipping above ₹999  |  Easy Returns & Exchange",
 ];
 
 const ALL_ANNOUNCEMENT_KEYS = [
@@ -47,7 +47,7 @@ export default function AnnouncementBar() {
   const duration = `${speed}s`;
 
   return (
-    <div className="bg-[#3B5373] text-white text-[11px] py-2 overflow-hidden">
+    <div className="bg-[#f5f5f5] text-[#3B5373] text-xs py-2 overflow-hidden" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 300 }}>
       <div
         className="marquee-track flex gap-16 whitespace-nowrap"
         style={{ animation: `marquee ${duration} linear infinite` }}
