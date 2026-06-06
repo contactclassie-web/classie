@@ -90,7 +90,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
-      <section className="py-16 bg-[#faf8f6]">
+      <section className="py-20 bg-[#faf8f6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="section-subheading">Collections</p>
           <h2 className="section-heading mt-2 mb-10">Shop by Category</h2>
@@ -126,7 +126,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 4. BESTSELLERS ═══════════════════════════════════════════════ */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -194,7 +194,7 @@ export default async function HomePage() {
       <NewsletterSection />
 
       {/* ══ TESTIMONIALS ═════════════════════════════════════════════════ */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <p className="section-subheading">Happy Customers</p>
           <h2 className="section-heading mt-2 mb-10">What They Say</h2>
@@ -204,7 +204,7 @@ export default async function HomePage() {
               { name: "Ananya K.", review: "Ordered the satin swirl clips — they completely transformed my old heels. Fast delivery, beautiful packaging, will definitely order more!", rating: 5 },
               { name: "Meera R.", review: "Quality is premium and the price is very reasonable. The Gloss Belle fits perfectly and the cushioning is great. Very happy with my purchase.", rating: 5 },
             ].map((t) => (
-              <div key={t.name} className="bg-[#faf8f6] p-6 rounded-2xl">
+              <div key={t.name} className="bg-[#faf8f6] p-8 border-t border-gray-100">
                 <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -219,7 +219,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ INSTAGRAM FEED — Premium Grid ════════════════════════════════ */}
-      <section className="py-16 bg-[#faf8f6]">
+      <section className="py-20 bg-[#faf8f6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -239,7 +239,7 @@ export default async function HomePage() {
               {igImages.map((item, i) => (
                 <div
                   key={i}
-                  className="group relative overflow-hidden rounded-xl bg-classie-light"
+                  className="group relative overflow-hidden bg-classie-light"
                   style={{ aspectRatio: "1 / 1" }}
                 >
                   {item.image && (
@@ -265,7 +265,7 @@ export default async function HomePage() {
               href="https://www.instagram.com/_classie_in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-[#3B5373] border border-[#3B5373] px-6 py-2.5 rounded-full hover:bg-[#3B5373] hover:text-white transition-all duration-300"
+              className="inline-flex items-center gap-2 text-sm text-[#3B5373] border border-[#3B5373] px-8 py-3 tracking-[0.2em] uppercase hover:bg-[#3B5373] hover:text-white transition-all duration-300"
             >
               <Instagram className="w-4 h-4" />
               Follow on Instagram
