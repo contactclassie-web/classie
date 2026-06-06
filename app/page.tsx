@@ -10,14 +10,16 @@ import {
   getProductsFromDB,
   getFeaturedProductsFromDB,
 } from "@/lib/products";
+import { getHeroSlidesFromDB } from "@/lib/slides";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
   // ── Fetch live data from Supabase (falls back to hardcoded if DB unavailable) ──
-  const [allProducts, featuredProducts] = await Promise.all([
+  const [allProducts, featuredProducts, heroSlides] = await Promise.all([
     getProductsFromDB({ active: true }),
     getFeaturedProductsFromDB(),
+    getHeroSlidesFromDB(),
   ]);
 
   const heels = allProducts.filter((p) => p.category === "heels");
@@ -48,7 +50,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
-      <HeroSlider />
+      <HeroSlider slides={heroSlides} />
 
       {/* ══ TRUST BAR ═══════════════════════════════════════════════════ */}
       <div className="border-b border-classie-border bg-white">
