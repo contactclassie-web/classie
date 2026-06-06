@@ -75,8 +75,8 @@ export default async function HomePage() {
       {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
       <section className="pt-16 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="text-center text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Curated for You</p>
-          <h2 className="text-center mb-10" style={{fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.5rem, 2.8vw, 2.25rem)", fontWeight:400, letterSpacing:"0.01em", color:"#111"}}>
+          <p className="text-[11px] tracking-[0.5em] uppercase text-gray-400 mb-3">Curated for You</p>
+          <h2 className="mb-10" style={{fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.5rem, 2.8vw, 2.25rem)", fontWeight:400, letterSpacing:"0.01em", color:"#111"}}>
             Shop by Occasion
           </h2>
           <OccasionCarousel occasions={occasions} />

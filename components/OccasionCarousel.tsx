@@ -102,7 +102,7 @@ export default function OccasionCarousel({ occasions }: { occasions: Occasion[] 
               <div className="absolute inset-0 bg-[#3B5373]/0 group-hover:bg-[#3B5373]/15 transition-all duration-500 rounded-full" />
             </div>
             <div className="text-center px-1">
-              <span className="font-serif text-base md:text-lg text-black group-hover:text-[#3B5373] transition-colors tracking-wide block leading-tight">
+              <span className="text-sm text-gray-700 group-hover:text-[#3B5373] transition-colors tracking-wide block leading-tight" style={{fontFamily:"'Poppins', sans-serif", fontWeight:300}}>
                 {toTitleCase(occ.title)}
               </span>
               <span className="text-[10px] tracking-widest uppercase text-gray-400 mt-1 block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
