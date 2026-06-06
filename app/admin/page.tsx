@@ -187,6 +187,8 @@ export default function AdminPage() {
   // Products
   const [dbProducts, setDbProducts] = useState<DbProduct[]>([]);
   const [productsLoading, setProductsLoading] = useState(false);
+  const [productCategoryFilter, setProductCategoryFilter] = useState<string>("all");
+  const [productSearch, setProductSearch] = useState("");
   const [productModal, setProductModal] = useState<{ open: boolean; mode: "add" | "edit"; data: DbProduct }>({
     open: false, mode: "add", data: EMPTY_PRODUCT,
   });
@@ -248,6 +250,16 @@ export default function AdminPage() {
   const [categorySaving, setCategorySaving] = useState(false);
   const [deleteCategoryConfirm, setDeleteCategoryConfirm] = useState<string | null>(null);
   const [categorySlugManuallyEdited, setCategorySlugManuallyEdited] = useState(false);
+
+  // Manage Category Products modal
+  const [manageCategoryProductsModal, setManageCategoryProductsModal] = useState<{
+    open: boolean;
+    category: SiteCategory | null;
+    saving: boolean;
+    search: string;
+  }>({ open: false, category: null, saving: false, search: "" });
+  const [categoryProductIds, setCategoryProductIds] = useState<string[]>([]);
+  const [allProductsForCategoryModal, setAllProductsForCategoryModal] = useState<DbProduct[]>([]);
 
   // Manage Products modal
   const [manageProductsModal, setManageProductsModal] = useState<{
@@ -583,6 +595,44 @@ export default function AdminPage() {
 
   const setCategoryField = (key: keyof SiteCategory, val: unknown) =>
     setCategoryModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
+
+  // ── Category Products actions ─────────────────────────────────────────────
+
+  const openManageCategoryProducts = async (c: SiteCategory) => {
+    // Load all active products
+    const { data: allProds } = await supabase.from('products').select('*').eq('active', true).order('title');
+    setAllProductsForCategoryModal((allProds as DbProduct[]) ?? []);
+    // Load existing links
+    let linkedIds: string[] = [];
+    if (c.id) {
+      const { data: links } = await supabase
+        .from('category_products')
+        .select('product_id')
+        .eq('category_id', c.id);
+      linkedIds = (links ?? []).map((l: { product_id: string }) => l.product_id);
+    }
+    setCategoryProductIds(linkedIds);
+    setManageCategoryProductsModal({ open: true, category: c, saving: false, search: "" });
+  };
+
+  const saveManageCategoryProducts = async () => {
+    if (!manageCategoryProductsModal.category?.id) return;
+    setManageCategoryProductsModal(m => ({ ...m, saving: true }));
+    const catId = manageCategoryProductsModal.category!.id!;
+    // Delete all existing links for this category
+    await supabase.from('category_products').delete().eq('category_id', catId);
+    // Insert checked products
+    if (categoryProductIds.length > 0) {
+      await supabase.from('category_products').insert(
+        categoryProductIds.map((pid, i) => ({
+          category_id: catId,
+          product_id: pid,
+          display_order: i + 1,
+        }))
+      );
+    }
+    setManageCategoryProductsModal(m => ({ ...m, open: false, saving: false }));
+  };
 
   const openManageProducts = async (c: Collection) => {
     const { data: col } = await supabase.from('collections').select('id').eq('slug', c.slug).single();
@@ -1064,9 +1114,19 @@ export default function AdminPage() {
           ══════════════════════════════════════ */}
           {tab === "products" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">{dbProducts.length} products in database</p>
-                <button onClick={openAddProduct} className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <p className="text-sm text-gray-500">{dbProducts.filter(p => (productCategoryFilter === "all" || p.category === productCategoryFilter) && (productSearch === "" || p.title.toLowerCase().includes(productSearch.toLowerCase()))).length} products</p>
+                  <select value={productCategoryFilter} onChange={e => setProductCategoryFilter(e.target.value)} className="border border-gray-200 text-xs px-3 py-1.5 text-gray-600 focus:outline-none focus:border-[#3B5373]">
+                    <option value="all">All Categories</option>
+                    <option value="heels">Heels</option>
+                    <option value="accessories">Accessories</option>
+                    <option value="clips">Clips</option>
+                    <option value="bow">Bow</option>
+                  </select>
+                  <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="Search products..." className="border border-gray-200 text-xs px-3 py-1.5 text-gray-600 focus:outline-none focus:border-[#3B5373] w-44" />
+                </div>
+                <button onClick={openAddProduct} className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white text-sm font-medium hover:bg-[#2d3f4f] transition-colors shadow-sm">
                   <Plus className="w-4 h-4" /> Add Product
                 </button>
               </div>
@@ -1089,7 +1149,7 @@ export default function AdminPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {dbProducts.map((p) => (
+                        {dbProducts.filter(p => (productCategoryFilter === "all" || p.category === productCategoryFilter) && (productSearch === "" || p.title.toLowerCase().includes(productSearch.toLowerCase()))).map((p) => (
                           <tr key={p.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-3">
@@ -1420,6 +1480,10 @@ export default function AdminPage() {
                             </td>
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-1">
+                                <button onClick={() => openManageCategoryProducts(c)}
+                                  className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-300 hover:text-blue-500 transition-colors" title="Manage Products">
+                                  <Package className="w-4 h-4" />
+                                </button>
                                 <button onClick={() => openEditCategory(c)}
                                   className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors" title="Edit">
                                   <Pencil className="w-4 h-4" />
@@ -2527,6 +2591,78 @@ export default function AdminPage() {
                 className="px-6 py-2 bg-[#3B5373] text-white rounded-lg text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50"
               >
                 {featuredPicksModal.saving ? 'Saving…' : `Save (${featuredPicksModal.selectedIds.length} selected)`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          MANAGE CATEGORY PRODUCTS MODAL
+      ══════════════════════════════════════════════════ */}
+      {manageCategoryProductsModal.open && manageCategoryProductsModal.category && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <div>
+                <h2 className="font-semibold text-gray-800">Manage Products</h2>
+                <p className="text-xs text-gray-400 mt-0.5">{manageCategoryProductsModal.category.name} — {categoryProductIds.length} selected</p>
+              </div>
+              <button onClick={() => setManageCategoryProductsModal(m => ({ ...m, open: false }))} className="p-2 rounded-lg hover:bg-gray-100">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            {/* Search + select controls */}
+            <div className="px-5 py-3 border-b border-gray-50 flex items-center gap-3">
+              <input
+                type="text"
+                placeholder="Search products…"
+                value={manageCategoryProductsModal.search}
+                onChange={e => setManageCategoryProductsModal(m => ({ ...m, search: e.target.value }))}
+                className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373]"
+              />
+              <button onClick={() => setCategoryProductIds(allProductsForCategoryModal.map(p => p.id!))}
+                className="text-xs text-[#3B5373] hover:underline">Select All</button>
+              <span className="text-gray-300">|</span>
+              <button onClick={() => setCategoryProductIds([])}
+                className="text-xs text-gray-400 hover:underline">Clear</button>
+            </div>
+            {/* Product list */}
+            <div className="overflow-y-auto flex-1 p-5 space-y-2">
+              {allProductsForCategoryModal
+                .filter(p => !manageCategoryProductsModal.search || p.title.toLowerCase().includes(manageCategoryProductsModal.search.toLowerCase()))
+                .map(p => (
+                <label key={p.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer group">
+                  <input type="checkbox"
+                    checked={categoryProductIds.includes(p.id!)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setCategoryProductIds(prev => [...prev, p.id!]);
+                      } else {
+                        setCategoryProductIds(prev => prev.filter(id => id !== p.id));
+                      }
+                    }}
+                    className="w-4 h-4 accent-[#3B5373] cursor-pointer"
+                  />
+                  {p.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.image} alt={p.title} className="w-10 h-10 object-cover rounded-lg flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{p.title}</p>
+                    <p className="text-xs text-gray-400">₹{p.price.toLocaleString('en-IN')} · {p.category}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+            {/* Footer */}
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setManageCategoryProductsModal(m => ({ ...m, open: false }))}
+                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+              <button onClick={saveManageCategoryProducts} disabled={manageCategoryProductsModal.saving}
+                className="px-6 py-2 bg-[#3B5373] text-white rounded-lg text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
+                {manageCategoryProductsModal.saving ? "Saving…" : `Save (${categoryProductIds.length} products)`}
               </button>
             </div>
           </div>

@@ -222,6 +222,51 @@ export async function getTabProductsFromDB(tab: 'latest' | 'bestseller'): Promis
   }
 }
 
+/**
+ * Fetch products for a site_category by slug.
+ * If category_products entries exist for that category → return those (ordered by display_order).
+ * Otherwise → call fallbackFn() so existing behaviour is preserved.
+ */
+export async function getProductsByCategorySlugFromDB(
+  slug: string,
+  fallbackFn: () => Promise<Product[]>
+): Promise<Product[]> {
+  try {
+    const { data: catData } = await supabase
+      .from('site_categories')
+      .select('id')
+      .eq('slug', slug)
+      .single();
+
+    if (catData) {
+      const { data: cpData } = await supabase
+        .from('category_products')
+        .select('product_id')
+        .eq('category_id', catData.id)
+        .order('display_order', { ascending: true });
+
+      if (cpData && cpData.length > 0) {
+        const ids = (cpData as { product_id: string }[]).map((r) => r.product_id);
+        const { data: prods } = await supabase
+          .from('products')
+          .select('*')
+          .in('id', ids)
+          .eq('active', true);
+
+        if (prods && prods.length > 0) {
+          // Preserve display_order from category_products
+          const ordered = ids
+            .map((id) => (prods as DbProduct[]).find((p) => p.id === id))
+            .filter((p): p is DbProduct => Boolean(p))
+            .map(mapDbProduct);
+          if (ordered.length > 0) return ordered;
+        }
+      }
+    }
+  } catch { /* fall through to fallback */ }
+  return fallbackFn();
+}
+
 export async function getCollectionProductsFromDB(slug: string): Promise<Product[]> {
   try {
     // Get collection id first
