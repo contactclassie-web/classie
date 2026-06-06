@@ -1671,7 +1671,7 @@ export default function AdminPage() {
               SETTINGS TAB
           ══════════════════════════════════════ */}
           {tab === "settings" && (
-            <div className="max-w-2xl space-y-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
               {/* ── Sub-section A: Announcement Bar ── */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
