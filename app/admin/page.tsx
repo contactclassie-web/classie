@@ -7,7 +7,7 @@ import {
   CheckCircle2, Truck, AlertCircle,
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
-  LayoutDashboard, ShoppingCart, Layers,
+  LayoutDashboard, ShoppingCart, Layers, Grid3x3,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -101,6 +101,17 @@ interface Collection {
   active: boolean;
 }
 
+interface SiteCategory {
+  id?: string;
+  name: string;
+  slug: string;
+  description: string;
+  image_url: string;
+  display_order: number;
+  active: boolean;
+  created_at?: string;
+}
+
 interface ContactMessage {
   id: string;
   name: string;
@@ -154,7 +165,7 @@ const EMPTY_SLIDE: HeroSlide = {
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "settings" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "settings" | "messages";
 
 // ── Main Component ─────────────────────────────────────────────────────────
 
@@ -225,6 +236,17 @@ export default function AdminPage() {
   const [collectionSaving, setCollectionSaving] = useState(false);
   const [collectionModalMode, setCollectionModalMode] = useState<"add"|"edit">("edit");
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+  // Site Categories
+  const EMPTY_CATEGORY: SiteCategory = { name: "", slug: "", description: "", image_url: "", display_order: 0, active: true };
+  const [siteCategories, setSiteCategories] = useState<SiteCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoryModal, setCategoryModal] = useState<{ open: boolean; mode: "add" | "edit"; data: SiteCategory }>({
+    open: false, mode: "add", data: { ...EMPTY_CATEGORY },
+  });
+  const [categorySaving, setCategorySaving] = useState(false);
+  const [deleteCategoryConfirm, setDeleteCategoryConfirm] = useState<string | null>(null);
+  const [categorySlugManuallyEdited, setCategorySlugManuallyEdited] = useState(false);
 
   // Manage Products modal
   const [manageProductsModal, setManageProductsModal] = useState<{
@@ -338,6 +360,15 @@ export default function AdminPage() {
     finally { setFeaturesBarLoading(false); }
   }, []);
 
+  const fetchCategories = useCallback(async () => {
+    setCategoriesLoading(true);
+    try {
+      const { data, error } = await supabase.from("site_categories").select("*").order("display_order", { ascending: true });
+      if (!error && data) setSiteCategories(data as SiteCategory[]);
+    } catch { /* ignore */ }
+    finally { setCategoriesLoading(false); }
+  }, []);
+
   // Load data when authenticated
   useEffect(() => {
     if (!authed) return;
@@ -351,7 +382,8 @@ export default function AdminPage() {
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections]);
+    if (tab === "categories") fetchCategories();
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -483,6 +515,49 @@ export default function AdminPage() {
 
   const setCollectionField = (key: keyof Collection, val: unknown) =>
     setCollectionModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
+
+  // ── Site Category actions ─────────────────────────────────────────────────
+
+  const openAddCategory = () => {
+    setCategorySlugManuallyEdited(false);
+    setCategoryModal({ open: true, mode: "add", data: { name: "", slug: "", description: "", image_url: "", display_order: siteCategories.length + 1, active: true } });
+  };
+  const openEditCategory = (c: SiteCategory) => setCategoryModal({ open: true, mode: "edit", data: { ...c } });
+  const closeCategoryModal = () => setCategoryModal((m) => ({ ...m, open: false }));
+
+  const handleCategorySave = async () => {
+    const { name, slug } = categoryModal.data;
+    if (!name.trim()) { alert("Name required!"); return; }
+    if (!slug.trim()) { alert("Slug required! Example: heels"); return; }
+    setCategorySaving(true);
+    try {
+      const { id, created_at, ...rest } = categoryModal.data;
+      if (categoryModal.mode === "add") {
+        const { error } = await supabase.from("site_categories").insert([rest]);
+        if (error) { alert("Error: " + error.message); return; }
+      } else {
+        const { error } = await supabase.from("site_categories").update(rest).eq("id", id);
+        if (error) { alert("Error: " + error.message); return; }
+      }
+      await fetchCategories();
+      closeCategoryModal();
+    } catch (e: unknown) { alert("Save failed: " + (e instanceof Error ? e.message : String(e))); }
+    finally { setCategorySaving(false); }
+  };
+
+  const deleteCategory = async (id: string) => {
+    await supabase.from("site_categories").delete().eq("id", id);
+    setSiteCategories((prev) => prev.filter((c) => c.id !== id));
+    setDeleteCategoryConfirm(null);
+  };
+
+  const toggleCategoryActive = async (c: SiteCategory) => {
+    await supabase.from("site_categories").update({ active: !c.active }).eq("id", c.id);
+    setSiteCategories((prev) => prev.map((x) => (x.id === c.id ? { ...x, active: !x.active } : x)));
+  };
+
+  const setCategoryField = (key: keyof SiteCategory, val: unknown) =>
+    setCategoryModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
 
   const openManageProducts = async (c: Collection) => {
     const { data: col } = await supabase.from('collections').select('id').eq('slug', c.slug).single();
@@ -632,6 +707,7 @@ export default function AdminPage() {
     { id: "orders",      label: "Orders",      icon: ShoppingCart, badge: orders.length },
     { id: "slides",      label: "Hero Slides", icon: LayoutTemplate },
     { id: "collections", label: "Collections", icon: Layers, badge: collections.length },
+    { id: "categories",  label: "Categories",  icon: Grid3x3, badge: siteCategories.length },
     { id: "settings",    label: "Settings",    icon: Settings },
     { id: "messages",    label: "Messages",    icon: MessageSquare, badge: messages.length },
   ];

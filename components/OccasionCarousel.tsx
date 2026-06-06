@@ -11,6 +11,9 @@ interface Occasion {
   image: string;
 }
 
+const toTitleCase = (str: string) =>
+  str.replace(/\b\w/g, (c) => c.toUpperCase());
+
 export default function OccasionCarousel({ occasions }: { occasions: Occasion[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -100,7 +103,7 @@ export default function OccasionCarousel({ occasions }: { occasions: Occasion[] 
             </div>
             <div className="text-center px-1">
               <span className="font-serif text-base md:text-lg text-black group-hover:text-[#3B5373] transition-colors tracking-wide block leading-tight">
-                {occ.title}
+                {toTitleCase(occ.title)}
               </span>
               <span className="text-[10px] tracking-widest uppercase text-gray-400 mt-1 block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 Shop Now →
