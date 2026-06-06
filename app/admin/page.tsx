@@ -2696,18 +2696,16 @@ export default function AdminPage() {
                     {/* Card preview — matches site card exactly */}
                     <div className="relative overflow-hidden bg-gray-900" style={{ width: "100%", paddingBottom: "115%" }}>
                       <div className="absolute inset-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          key={`preview-${collectionModal.data.image_position ?? "top"}`}
-                          src={collectionModal.data.image_url}
-                          alt="Card Preview"
-                          style={{
-                            position: "absolute", inset: 0, width: "100%", height: "100%",
-                            objectFit: "cover",
-                            objectPosition: collectionModal.data.image_position ?? "top"
-                          }}
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                        />
+                        <div style={{
+                          position: "absolute", inset: 0,
+                          backgroundImage: `url(${collectionModal.data.image_url})`,
+                          backgroundSize: "cover",
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition:
+                            (collectionModal.data.image_position ?? "top") === "top" ? "center top" :
+                            (collectionModal.data.image_position ?? "top") === "bottom" ? "center bottom" :
+                            "center center"
+                        }} />
                         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, transparent 38%, rgba(26,26,26,0.78) 100%)" }} />
                         <div style={{ position: "absolute", bottom: 0, left: 0, padding: "22px" }}>
                           {collectionModal.data.tag_label && (
