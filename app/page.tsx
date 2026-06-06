@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Instagram } from "lucide-react";
-import HeroSlider from "@/components/HeroSlider";
+import { Instagram } from "lucide-react";
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionCarousel from "@/components/OccasionCarousel";
 import FeaturedPicks from "@/components/FeaturedPicks";
@@ -12,24 +11,18 @@ import {
   getFeaturedProductsFromDB,
   getTabProductsFromDB,
 } from "@/lib/products";
-import { getHeroSlidesFromDB } from "@/lib/slides";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  // ── Fetch live data from Supabase (falls back to hardcoded if DB unavailable) ──
-  const [allProducts, featuredProducts, heroSlides, latestTabProducts, bestsellerTabProducts] = await Promise.all([
+  // ── Fetch live data from Supabase ──────────────────────────────────────
+  const [allProducts, featuredProducts, latestTabProducts, bestsellerTabProducts] = await Promise.all([
     getProductsFromDB({ active: true }),
     getFeaturedProductsFromDB(),
-    getHeroSlidesFromDB(),
-    getTabProductsFromDB('latest'),
-    getTabProductsFromDB('bestseller'),
+    getTabProductsFromDB("latest"),
+    getTabProductsFromDB("bestseller"),
   ]);
 
-  const heels = allProducts.filter((p) => p.category === "heels");
-  const accessories = allProducts.filter((p) => p.category === "accessories");
-
-  // Featured Picks: admin-controlled via featured_tab column, fallback to defaults
   const latestProducts =
     latestTabProducts.length > 0 ? latestTabProducts : allProducts.slice(0, 4);
   const bestSellers =
@@ -39,74 +32,292 @@ export default async function HomePage() {
       ? featuredProducts.slice(0, 4)
       : allProducts.slice(0, 4);
 
-  // Occasion rows — resolve slugs from live products
-  const resolveCollection = (key: keyof typeof CURATED_COLLECTIONS, limit = 5): Product[] =>
-    CURATED_COLLECTIONS[key].slugs
-      .map((s) => allProducts.find((p) => p.slug === s))
-      .filter((p): p is Product => p !== undefined)
-      .slice(0, limit);
-
-  const dateEdit = resolveCollection("the-date-edit");
-  const everydayEdit = resolveCollection("the-everyday-edit");
-  const festiveEdit = resolveCollection("the-festive-edit");
-
-  // Occasions & Categories — fetch from DB (admin se manage hoga)
+  // ── Supabase client ────────────────────────────────────────────────────
   const { createClient } = await import("@supabase/supabase-js");
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const { data: dbCollections } = await sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true });
-  const { data: dbSiteCategories } = await sb.from("site_categories").select("*").eq("active", true).order("display_order", { ascending: true });
-  const siteCategories: Array<{ name: string; slug: string; description: string; image_url: string }> = dbSiteCategories ?? [];
-  
+  const sb = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // ── Occasions & Categories ─────────────────────────────────────────────
+  const { data: dbCollections } = await sb
+    .from("collections")
+    .select("*")
+    .eq("active", true)
+    .order("display_order", { ascending: true });
+  const { data: dbSiteCategories } = await sb
+    .from("site_categories")
+    .select("*")
+    .eq("active", true)
+    .order("display_order", { ascending: true });
+  const siteCategories: Array<{
+    name: string;
+    slug: string;
+    description: string;
+    image_url: string;
+  }> = dbSiteCategories ?? [];
+
   const FALLBACK_OCCASIONS = [
-    { title: "The Date Edit",     href: "/shop/the-date-edit",     image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/70.png?v=1767129647" },
-    { title: "The Everyday Edit", href: "/shop/the-everyday-edit", image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/40_c9833246-51b7-4ff5-8200-acf9809593c5.png?v=1767109414" },
-    { title: "The Festive Edit",  href: "/shop/the-festive-edit",  image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583" },
+    {
+      title: "The Date Edit",
+      href: "/shop/the-date-edit",
+      image:
+        "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/70.png?v=1767129647",
+      tag_label: "FESTIVE",
+    },
+    {
+      title: "The Everyday Edit",
+      href: "/shop/the-everyday-edit",
+      image:
+        "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/40_c9833246-51b7-4ff5-8200-acf9809593c5.png?v=1767109414",
+      tag_label: "EVERYDAY",
+    },
+    {
+      title: "The Festive Edit",
+      href: "/shop/the-festive-edit",
+      image:
+        "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583",
+      tag_label: "NEW IN",
+    },
   ];
-  const occasions = dbCollections && dbCollections.length > 0
-    ? dbCollections.map((c: { title: string; slug: string; image_url?: string }) => ({
-        title: c.title,
-        href: `/shop/${c.slug}`,
-        image: c.image_url ?? "",
-      }))
-    : FALLBACK_OCCASIONS;
+  const occasions =
+    dbCollections && dbCollections.length > 0
+      ? dbCollections.map(
+          (c: { title: string; slug: string; image_url?: string; tag_label?: string }) => ({
+            title: c.title,
+            href: `/shop/${c.slug}`,
+            image: c.image_url ?? "",
+            tag_label: c.tag_label ?? "",
+          })
+        )
+      : FALLBACK_OCCASIONS;
 
-  // Philosophy section settings from site_settings
-  const { data: philosophyRows } = await sb.from("site_settings").select("key,value").in("key", [
-    "philosophy_eyebrow", "philosophy_headline", "philosophy_body",
-    "philosophy_cta_text", "philosophy_cta_url", "philosophy_image_url",
-  ]);
-  const philMap: Record<string, string> = {};
-  (philosophyRows ?? []).forEach((r: { key: string; value: string }) => { philMap[r.key] = r.value; });
-  const philEyebrow  = philMap["philosophy_eyebrow"]   || "Our Philosophy";
-  const philHeadline = philMap["philosophy_headline"]  || "One Heel. Endless Possibilities.";
-  const philBody     = philMap["philosophy_body"]      || "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way. From morning coffee to midnight celebrations, there\u2019s a Classie for every chapter of your day.";
-  const philCtaText  = philMap["philosophy_cta_text"]  || "Our Story";
-  const philCtaUrl   = philMap["philosophy_cta_url"]   || "/about";
-  const philImageUrl = philMap["philosophy_image_url"] || "";
+  // ── Site Settings ──────────────────────────────────────────────────────
+  const HERO_KEYS = [
+    "hero_eyebrow",
+    "hero_heading_line1",
+    "hero_heading_italic",
+    "hero_heading_line3",
+    "hero_subtitle",
+    "hero_cta1_text",
+    "hero_cta1_url",
+    "hero_cta2_text",
+    "hero_cta2_url",
+    "hero_image_url",
+    "hero_stat1_number",
+    "hero_stat1_label",
+    "hero_stat2_number",
+    "hero_stat2_label",
+    "hero_stat3_number",
+    "hero_stat3_label",
+    "hero_chip_code",
+    "hero_chip_text",
+    "band_text",
+  ];
+  const PHIL_KEYS = [
+    "philosophy_eyebrow",
+    "philosophy_headline",
+    "philosophy_body",
+    "philosophy_cta_text",
+    "philosophy_cta_url",
+    "philosophy_image_url",
+  ];
 
-  // Instagram feed images (first 4 products)
-  const igImages = allProducts.slice(0, 4).map((p) => ({ image: p.image, slug: p.slug, title: p.title }));
+  const { data: settingsRows } = await sb
+    .from("site_settings")
+    .select("key,value")
+    .in("key", [...HERO_KEYS, ...PHIL_KEYS]);
+
+  const cfg: Record<string, string> = {};
+  (settingsRows ?? []).forEach((r: { key: string; value: string }) => {
+    cfg[r.key] = r.value;
+  });
+
+  // Hero
+  const heroEyebrow = cfg["hero_eyebrow"] || "New Collection 2025";
+  const heroLine1 = cfg["hero_heading_line1"] || "Step Into";
+  const heroItalic = cfg["hero_heading_italic"] || "Elegance";
+  const heroLine3 = cfg["hero_heading_line3"] || "Reefined";
+  const heroSubtitle =
+    cfg["hero_subtitle"] ||
+    "Premium heels crafted for the modern woman. Comfort-first design that doesn't compromise on style.";
+  const heroCta1Text = cfg["hero_cta1_text"] || "Shop Now";
+  const heroCta1Url = cfg["hero_cta1_url"] || "/shop";
+  const heroCta2Text = cfg["hero_cta2_text"] || "View Collection";
+  const heroCta2Url = cfg["hero_cta2_url"] || "/shop";
+  const heroImageUrl =
+    cfg["hero_image_url"] ||
+    "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583";
+  const heroStat1Num = cfg["hero_stat1_number"] || "500+";
+  const heroStat1Label = cfg["hero_stat1_label"] || "Styles";
+  const heroStat2Num = cfg["hero_stat2_number"] || "10k+";
+  const heroStat2Label = cfg["hero_stat2_label"] || "Happy Customers";
+  const heroStat3Num = cfg["hero_stat3_number"] || "4.9★";
+  const heroStat3Label = cfg["hero_stat3_label"] || "Avg Rating";
+  const heroChipCode = cfg["hero_chip_code"] || "";
+  const heroChipText = cfg["hero_chip_text"] || "";
+
+  // Trust Band
+  const bandRaw =
+    cfg["band_text"] ||
+    "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design · Handcrafted Luxury";
+  const bandItems = bandRaw.split(" · ").map((s) => s.trim()).filter(Boolean);
+
+  // Philosophy
+  const philEyebrow = cfg["philosophy_eyebrow"] || "Our Philosophy";
+  const philHeadline =
+    cfg["philosophy_headline"] || "One Heel. Endless Possibilities.";
+  const philBody =
+    cfg["philosophy_body"] ||
+    "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way. From morning coffee to midnight celebrations, there's a Classie for every chapter of your day.";
+  const philCtaText = cfg["philosophy_cta_text"] || "Our Story";
+  const philCtaUrl = cfg["philosophy_cta_url"] || "/about";
+  const philImageUrl = cfg["philosophy_image_url"] || "";
+
+  // Instagram feed
+  const igImages = allProducts
+    .slice(0, 4)
+    .map((p) => ({ image: p.image, slug: p.slug, title: p.title }));
+
+  const stats = [
+    { number: heroStat1Num, label: heroStat1Label },
+    { number: heroStat2Num, label: heroStat2Label },
+    { number: heroStat3Num, label: heroStat3Label },
+  ];
 
   return (
     <>
-      {/* ══ 1. HERO SLIDER ══════════════════════════════════════════════ */}
-      <HeroSlider slides={heroSlides} />
+      {/* ══ 1. HERO — Split editorial layout ═══════════════════════════════ */}
+      <section className="grid grid-cols-1 md:grid-cols-[54%_46%] min-h-[calc(100vh-72px)]">
+        {/* Left: text content */}
+        <div className="flex flex-col justify-center px-8 md:px-16 py-16 md:py-24 bg-white relative">
+          {/* Vertical line divider */}
+          <div className="absolute right-0 top-[12%] bottom-[12%] w-px bg-gradient-to-b from-transparent via-[rgba(59,83,115,0.2)] to-transparent hidden md:block" />
 
-      {/* ══ 2. SHOP BY OCCASION — Circular Premium Design ══════════════ */}
+          {/* Eyebrow */}
+          <div className="flex items-center gap-4 mb-7">
+            <div className="w-8 h-px bg-[#3B5373]" />
+            <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
+              {heroEyebrow}
+            </span>
+          </div>
+
+          {/* Heading */}
+          <h1 className="font-serif text-[clamp(52px,6.2vw,94px)] font-light leading-[1.02] text-[#1a1a1a] mb-8">
+            {heroLine1}
+            <br />
+            <em className="italic text-[#3B5373]">{heroItalic}</em>
+            <br />
+            {heroLine3}
+          </h1>
+
+          {/* Subtitle */}
+          <p className="font-sans text-sm font-light leading-[1.85] text-[#6b7280] max-w-[360px] mb-12 tracking-[0.04em]">
+            {heroSubtitle}
+          </p>
+
+          {/* Buttons */}
+          <div className="flex flex-wrap items-center gap-6 mb-16">
+            <Link
+              href={heroCta1Url}
+              className="bg-[#3B5373] text-white px-10 py-4 text-[10px] font-light tracking-[0.28em] uppercase border border-[#3B5373] hover:bg-[#1a1a1a] hover:border-[#1a1a1a] transition-all duration-300"
+            >
+              {heroCta1Text}
+            </Link>
+            <Link
+              href={heroCta2Url}
+              className="text-[10px] font-light tracking-[0.24em] uppercase text-[#3B5373] border-b border-[rgba(59,83,115,0.4)] pb-0.5 flex items-center gap-2 hover:gap-4 transition-all duration-300"
+            >
+              {heroCta2Text} →
+            </Link>
+          </div>
+
+          {/* Stats row */}
+          <div className="flex gap-10 pt-10 border-t border-[rgba(59,83,115,0.1)]">
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <div className="font-serif text-4xl font-light text-[#1a1a1a] leading-none">
+                  {stat.number}
+                </div>
+                <div className="font-sans text-[9.5px] font-light tracking-[0.2em] uppercase text-[#9ca3af] mt-1.5">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: image */}
+        <div className="relative overflow-hidden bg-[#F9F9F9] min-h-[400px]">
+          <Image
+            src={heroImageUrl}
+            alt="Classie"
+            fill
+            className="object-cover object-top"
+            sizes="46vw"
+            priority
+          />
+          {/* Promo chip */}
+          {heroChipCode && (
+            <div className="absolute bottom-12 left-0 bg-white px-7 py-5 border-l-[3px] border-[#3B5373] shadow-xl">
+              <div className="font-serif text-xl font-normal text-[#3B5373] tracking-[0.08em]">
+                {heroChipCode}
+              </div>
+              <div className="font-sans text-[9.5px] font-light tracking-[0.22em] uppercase text-[#6b7280] mt-1">
+                {heroChipText}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ══ 2. TRUST BAND — Navy scrolling ticker ══════════════════════════ */}
+      <div className="bg-[#3B5373] py-4 overflow-hidden">
+        <div className="flex animate-ticker w-max">
+          {[...bandItems, ...bandItems].map((item, i) => (
+            <span
+              key={i}
+              className="font-serif text-[15px] font-light italic text-white/80 px-14 whitespace-nowrap flex items-center gap-14"
+            >
+              {item}
+              <span className="not-italic text-[7px] text-white/40">◆</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
       <section className="pt-16 pb-10 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-
-          <p className="section-subheading text-left mb-3">Style Edits</p>
-          <h2 className="mb-10 section-heading text-left">Shop by Occasion</h2>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-8 h-px bg-[#3B5373]" />
+            <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
+              CURATED EDITS
+            </span>
+          </div>
+          <h2 className="mb-10 font-serif text-[clamp(1.6rem,3vw,2.5rem)] font-light leading-[1.15] text-[#1a1a1a]">
+            Shop by <em className="italic text-[#3B5373]">Occasion</em>
+          </h2>
           <OccasionCarousel occasions={occasions} />
         </div>
       </section>
 
-      {/* ══ 3. SHOP BY CATEGORY ══════════════════════════════════════════ */}
+      {/* ══ 4. SHOP BY CATEGORY ════════════════════════════════════════════ */}
       <section className="pt-10 pb-10 bg-[#1a1a1a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <p className="section-subheading text-left" style={{ color: "rgba(59,83,115,0.6)" }}>Collections</p>
-          <h2 className="section-heading text-left mt-2 mb-10 text-white">Shop by Category</h2>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-8 h-px bg-[rgba(59,83,115,0.6)]" />
+            <span
+              className="font-sans text-[10px] font-light tracking-[0.36em] uppercase"
+              style={{ color: "rgba(59,83,115,0.6)" }}
+            >
+              COLLECTIONS
+            </span>
+          </div>
+          <h2 className="font-serif text-[clamp(1.6rem,3vw,2.5rem)] font-light leading-[1.15] text-white mt-2 mb-10">
+            What Are You{" "}
+            <em className="italic text-[rgba(59,83,115,0.55)]">Looking For?</em>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: "1px" }}>
             {siteCategories.map((cat, catIdx) => (
               <Link
@@ -119,7 +330,6 @@ export default async function HomePage() {
                   minHeight: "300px",
                 }}
               >
-                {/* Background image when available */}
                 {cat.image_url && (
                   <>
                     <Image
@@ -132,8 +342,6 @@ export default async function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                   </>
                 )}
-
-                {/* Number watermark */}
                 <span
                   className="absolute top-3 right-5 select-none pointer-events-none leading-none"
                   style={{
@@ -146,8 +354,6 @@ export default async function HomePage() {
                 >
                   {String(catIdx + 1).padStart(2, "0")}
                 </span>
-
-                {/* Card content */}
                 <div className="relative h-full flex flex-col justify-end" style={{ minHeight: "180px" }}>
                   <h3
                     className="mb-3"
@@ -187,92 +393,178 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══ 4. FEATURED PICKS ════════════════════════════════════════════ */}
+      {/* ══ 5. FEATURED PICKS ═════════════════════════════════════════════ */}
       <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} />
 
-      {/* ══ OUR STORY — Editorial Banner ════════════════════════════════ */}
-      <section className="bg-[#3B5373] text-white overflow-hidden">
-        {philImageUrl ? (
-          /* ── With image: new editorial 2-col layout ── */
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 grid md:grid-cols-2 gap-0 items-stretch">
-            {/* Left: eyebrow + heading + CTA */}
-            <div className="md:pr-12 flex flex-col justify-center">
-              <p className="text-[11px] tracking-[0.5em] uppercase text-white/40 mb-6">{philEyebrow}</p>
-              <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-none uppercase mb-8">
-                {philHeadline.split(". ").map((line, i, arr) => (
-                  <span key={i}>{line}{i < arr.length - 1 ? "." : ""}<br /></span>
-                ))}
-              </h2>
-              <Link
-                href={philCtaUrl}
-                className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3B5373] transition-all duration-300 self-start"
+      {/* ══ 6. PHILOSOPHY — Image + Dark text layout ══════════════════════ */}
+      <section className="grid grid-cols-1 md:grid-cols-2" style={{ minHeight: "82vh" }}>
+        {/* Left: image */}
+        <div className="relative overflow-hidden" style={{ minHeight: "400px" }}>
+          {philImageUrl ? (
+            <Image
+              src={philImageUrl}
+              alt="Classie Philosophy"
+              fill
+              className="object-cover object-center"
+              sizes="50vw"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[#F9F9F9] flex items-center justify-center">
+              <div
+                className="text-center"
+                style={{ fontFamily: "var(--font-cormorant)", color: "rgba(59,83,115,0.12)", fontSize: "120px", fontWeight: 300 }}
               >
-                {philCtaText} <ChevronRight className="w-4 h-4" />
-              </Link>
+                C
+              </div>
             </div>
-            {/* Right: body text + image */}
-            <div className="md:border-l md:border-white/20 md:pl-12 flex flex-col gap-8">
-              <p className="text-white/70 text-base md:text-lg leading-relaxed">{philBody}</p>
-              <div className="relative overflow-hidden flex-1 min-h-[250px]">
-                <Image
-                  src={philImageUrl}
-                  alt="Classie"
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+          )}
+        </div>
+
+        {/* Right: dark content */}
+        <div className="bg-[#1a1a1a] flex flex-col justify-center px-12 md:px-16 py-20">
+          {/* Eyebrow */}
+          <div className="flex items-center gap-4 mb-7">
+            <div className="w-8 h-px bg-[rgba(59,83,115,0.6)]" />
+            <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[rgba(59,83,115,0.8)]">
+              {philEyebrow}
+            </span>
+          </div>
+
+          {/* Heading */}
+          <h2 className="font-serif text-[clamp(36px,4vw,64px)] font-light leading-[1.05] text-white mb-8">
+            {philHeadline}
+          </h2>
+
+          {/* Body */}
+          <p className="font-sans text-sm font-light leading-[1.85] text-white/50 mb-12 max-w-[420px] tracking-[0.03em]">
+            {philBody}
+          </p>
+
+          {/* Feature rows */}
+          <div className="space-y-8 mb-12">
+            <div className="flex items-start gap-5">
+              <span className="text-[#3B5373] text-lg mt-0.5 flex-shrink-0">✦</span>
+              <div>
+                <div className="font-sans text-[11px] font-light tracking-[0.24em] uppercase text-white/80 mb-1.5">
+                  Comfort-First Design
+                </div>
+                <div className="font-sans text-xs font-light text-white/40 leading-[1.7]">
+                  Engineered for all-day wear without sacrificing elegance.
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-5">
+              <span className="text-[#3B5373] text-lg mt-0.5 flex-shrink-0">⬡</span>
+              <div>
+                <div className="font-sans text-[11px] font-light tracking-[0.24em] uppercase text-white/80 mb-1.5">
+                  Premium Quality
+                </div>
+                <div className="font-sans text-xs font-light text-white/40 leading-[1.7]">
+                  Curated materials, careful craftsmanship in every pair.
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-5">
+              <span className="text-[#3B5373] text-lg mt-0.5 flex-shrink-0">↩</span>
+              <div>
+                <div className="font-sans text-[11px] font-light tracking-[0.24em] uppercase text-white/80 mb-1.5">
+                  Free Exchange
+                </div>
+                <div className="font-sans text-xs font-light text-white/40 leading-[1.7]">
+                  Not the right fit? Exchange hassle-free, always.
+                </div>
               </div>
             </div>
           </div>
-        ) : (
-          /* ── Without image: original 2-col layout ── */
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
-            {/* Left: editorial headline */}
-            <div>
-              <p className="text-[11px] tracking-[0.5em] uppercase text-white/40 mb-6">{philEyebrow}</p>
-              <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-none uppercase">
-                {philHeadline.split(". ").map((line, i, arr) => (
-                  <span key={i}>{line}{i < arr.length - 1 ? "." : ""}<br /></span>
-                ))}
-              </h2>
-            </div>
-            {/* Right: copy + CTA */}
-            <div className="md:border-l md:border-white/20 md:pl-12">
-              <p className="text-white/70 text-base md:text-lg leading-relaxed mb-8">{philBody}</p>
-              <Link
-                href={philCtaUrl}
-                className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-widest uppercase hover:bg-white hover:text-[#3B5373] transition-all duration-300"
-              >
-                {philCtaText} <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        )}
-      </section>
 
-      {/* ══ 5. NEWSLETTER ════════════════════════════════════════════════ */}
-      <NewsletterSection />
-
-      {/* ══ TESTIMONIALS ═════════════════════════════════════════════════ */}
-      <section className="py-20 bg-white border-t border-gray-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <p className="section-subheading mb-10">What They Say</p>
-          <blockquote className="font-serif text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8" style={{fontFamily:"var(--font-cormorant)", fontWeight:300}}>
-            &ldquo;The most elegant heels I&apos;ve owned. Wore them all evening at a wedding — zero discomfort, endless compliments.&rdquo;
-          </blockquote>
-          <p className="text-xs tracking-[0.3em] uppercase text-gray-400">— Priya S., Delhi</p>
+          {/* CTA */}
+          <Link
+            href={philCtaUrl}
+            className="inline-flex items-center gap-3 border border-[rgba(59,83,115,0.5)] text-white px-10 py-4 text-[10px] font-light tracking-[0.28em] uppercase hover:bg-[#3B5373] hover:border-[#3B5373] transition-all duration-300 self-start"
+          >
+            {philCtaText} →
+          </Link>
         </div>
       </section>
 
-      {/* ══ INSTAGRAM FEED — Premium Grid ════════════════════════════════ */}
+      {/* ══ 7. TESTIMONIALS — 3 cards ═════════════════════════════════════ */}
+      <section className="py-28 px-6 md:px-20 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-14">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-8 h-px bg-[#3B5373]" />
+              <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
+                TESTIMONIALS
+              </span>
+            </div>
+            <h2 className="font-serif text-[clamp(36px,3.8vw,58px)] font-light leading-[1.05] text-[#1a1a1a]">
+              What She <em className="italic text-[#3B5373]">Said</em>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[3px]">
+            {/* Card 1 */}
+            <div className="bg-[#F9F9F9] p-12 hover:-translate-y-1.5 hover:bg-white hover:shadow-lg transition-all duration-300">
+              <div className="text-[#3B5373] text-[11px] tracking-[5px] mb-7">★★★★★</div>
+              <p className="font-serif text-lg font-light italic leading-[1.65] text-[#1a1a1a] mb-8">
+                <span className="text-[#3B5373] text-[34px] leading-none align-[-12px] mr-1">"</span>
+                The most elegant heels I&apos;ve owned. The clip-on changed my entire wardrobe game.
+              </p>
+              <div className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#9ca3af] flex items-center gap-3">
+                <span className="w-5 h-px bg-[rgba(59,83,115,0.4)]" />
+                Ananya M. — Verified Buyer
+              </div>
+            </div>
+            {/* Card 2 */}
+            <div className="bg-[#F9F9F9] p-12 hover:-translate-y-1.5 hover:bg-white hover:shadow-lg transition-all duration-300">
+              <div className="text-[#3B5373] text-[11px] tracking-[5px] mb-7">★★★★★</div>
+              <p className="font-serif text-lg font-light italic leading-[1.65] text-[#1a1a1a] mb-8">
+                <span className="text-[#3B5373] text-[34px] leading-none align-[-12px] mr-1">"</span>
+                I wore these to a wedding and got compliments all night. Comfortable from ceremony to dance floor.
+              </p>
+              <div className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#9ca3af] flex items-center gap-3">
+                <span className="w-5 h-px bg-[rgba(59,83,115,0.4)]" />
+                Priya S. — Verified Buyer
+              </div>
+            </div>
+            {/* Card 3 */}
+            <div className="bg-[#F9F9F9] p-12 hover:-translate-y-1.5 hover:bg-white hover:shadow-lg transition-all duration-300">
+              <div className="text-[#3B5373] text-[11px] tracking-[5px] mb-7">★★★★★</div>
+              <p className="font-serif text-lg font-light italic leading-[1.65] text-[#1a1a1a] mb-8">
+                <span className="text-[#3B5373] text-[34px] leading-none align-[-12px] mr-1">"</span>
+                Finally heels that are comfortable AND gorgeous. Classie understands what modern women need.
+              </p>
+              <div className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#9ca3af] flex items-center gap-3">
+                <span className="w-5 h-px bg-[rgba(59,83,115,0.4)]" />
+                Meera K. — Verified Buyer
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
+      <NewsletterSection />
+
+      {/* ══ INSTAGRAM FEED ════════════════════════════════════════════════ */}
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="mb-10">
-            <p className="section-subheading mb-3">Instagram</p>
-            <h2 className="section-heading mb-2">As Seen on Instagram</h2>
-            <p className="text-gray-400 text-xs tracking-wide" style={{fontFamily:"'Poppins', sans-serif", fontWeight:300}}>Tag us @_classie_in to be featured</p>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-8 h-px bg-[#3B5373]" />
+              <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
+                INSTAGRAM
+              </span>
+            </div>
+            <h2 className="font-serif text-[clamp(1.6rem,3vw,2.5rem)] font-light leading-[1.15] text-[#1a1a1a] mb-2">
+              As Seen on <em className="italic text-[#3B5373]">Instagram</em>
+            </h2>
+            <p
+              className="text-[#9ca3af] text-xs tracking-wide"
+              style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 300 }}
+            >
+              Tag us @_classie_in to be featured
+            </p>
           </div>
-
           <a
             href="https://www.instagram.com/_classie_in/"
             target="_blank"
@@ -283,7 +575,7 @@ export default async function HomePage() {
               {igImages.map((item, i) => (
                 <div
                   key={i}
-                  className="group relative overflow-hidden bg-classie-light"
+                  className="group relative overflow-hidden bg-[#F9F9F9]"
                   style={{ aspectRatio: "1 / 1" }}
                 >
                   {item.image && (
@@ -295,7 +587,6 @@ export default async function HomePage() {
                       sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   )}
-                  {/* Instagram overlay on hover */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
                     <Instagram className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
@@ -303,7 +594,6 @@ export default async function HomePage() {
               ))}
             </div>
           </a>
-
           <div className="text-center mt-8">
             <a
               href="https://www.instagram.com/_classie_in/"

@@ -86,6 +86,26 @@ interface SiteSettings {
   philosophy_cta_text: string;
   philosophy_cta_url: string;
   philosophy_image_url: string;
+  // Hero section
+  hero_eyebrow: string;
+  hero_heading_line1: string;
+  hero_heading_italic: string;
+  hero_heading_line3: string;
+  hero_subtitle: string;
+  hero_cta1_text: string;
+  hero_cta1_url: string;
+  hero_cta2_text: string;
+  hero_cta2_url: string;
+  hero_image_url: string;
+  hero_stat1_number: string;
+  hero_stat1_label: string;
+  hero_stat2_number: string;
+  hero_stat2_label: string;
+  hero_stat3_number: string;
+  hero_stat3_label: string;
+  hero_chip_code: string;
+  hero_chip_text: string;
+  band_text: string;
 }
 
 interface FeatureBarItem {
@@ -104,6 +124,7 @@ interface Collection {
   description?: string;
   image_url?: string;
   hover_image_url?: string;
+  tag_label?: string;
   display_order: number;
   active: boolean;
 }
@@ -223,6 +244,25 @@ export default function AdminPage() {
     philosophy_cta_text: "Our Story",
     philosophy_cta_url: "/about",
     philosophy_image_url: "",
+    hero_eyebrow: "New Collection 2025",
+    hero_heading_line1: "Step Into",
+    hero_heading_italic: "Elegance",
+    hero_heading_line3: "Redefined",
+    hero_subtitle: "Premium heels crafted for the modern woman.",
+    hero_cta1_text: "Shop Now",
+    hero_cta1_url: "/shop",
+    hero_cta2_text: "View Collection",
+    hero_cta2_url: "/shop",
+    hero_image_url: "",
+    hero_stat1_number: "500+",
+    hero_stat1_label: "Styles",
+    hero_stat2_number: "10k+",
+    hero_stat2_label: "Happy Customers",
+    hero_stat3_number: "4.9★",
+    hero_stat3_label: "Avg Rating",
+    hero_chip_code: "",
+    hero_chip_text: "",
+    band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -246,7 +286,7 @@ export default function AdminPage() {
   const [collectionsLoading, setCollectionsLoading] = useState(false);
   const [collectionModal, setCollectionModal] = useState<{ open: boolean; data: Collection }>({
     open: false,
-    data: { title: "", slug: "", description: "", image_url: "", display_order: 0, active: true },
+    data: { title: "", slug: "", description: "", image_url: "", tag_label: "", display_order: 0, active: true },
   });
   const [collectionSaving, setCollectionSaving] = useState(false);
   const [collectionModalMode, setCollectionModalMode] = useState<"add"|"edit">("edit");
@@ -348,6 +388,25 @@ export default function AdminPage() {
           philosophy_cta_text: "Our Story",
           philosophy_cta_url: "/about",
           philosophy_image_url: "",
+          hero_eyebrow: "New Collection 2025",
+          hero_heading_line1: "Step Into",
+          hero_heading_italic: "Elegance",
+          hero_heading_line3: "Redefined",
+          hero_subtitle: "Premium heels crafted for the modern woman.",
+          hero_cta1_text: "Shop Now",
+          hero_cta1_url: "/shop",
+          hero_cta2_text: "View Collection",
+          hero_cta2_url: "/shop",
+          hero_image_url: "",
+          hero_stat1_number: "500+",
+          hero_stat1_label: "Styles",
+          hero_stat2_number: "10k+",
+          hero_stat2_label: "Happy Customers",
+          hero_stat3_number: "4.9★",
+          hero_stat3_label: "Avg Rating",
+          hero_chip_code: "",
+          hero_chip_text: "",
+          band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
         };
         data.forEach((row: { key: string; value: string }) => {
           if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
@@ -721,6 +780,35 @@ export default function AdminPage() {
         { key: "philosophy_cta_text",  value: siteSettings.philosophy_cta_text },
         { key: "philosophy_cta_url",   value: siteSettings.philosophy_cta_url },
         { key: "philosophy_image_url", value: siteSettings.philosophy_image_url },
+      ];
+      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+    } catch { /* ignore */ }
+    finally { setSettingsSaving(false); }
+  };
+
+  const saveHero = async () => {
+    setSettingsSaving(true);
+    try {
+      const rows: { key: string; value: string }[] = [
+        { key: "hero_eyebrow",        value: siteSettings.hero_eyebrow },
+        { key: "hero_heading_line1",  value: siteSettings.hero_heading_line1 },
+        { key: "hero_heading_italic", value: siteSettings.hero_heading_italic },
+        { key: "hero_heading_line3",  value: siteSettings.hero_heading_line3 },
+        { key: "hero_subtitle",       value: siteSettings.hero_subtitle },
+        { key: "hero_cta1_text",      value: siteSettings.hero_cta1_text },
+        { key: "hero_cta1_url",       value: siteSettings.hero_cta1_url },
+        { key: "hero_cta2_text",      value: siteSettings.hero_cta2_text },
+        { key: "hero_cta2_url",       value: siteSettings.hero_cta2_url },
+        { key: "hero_image_url",      value: siteSettings.hero_image_url },
+        { key: "hero_stat1_number",   value: siteSettings.hero_stat1_number },
+        { key: "hero_stat1_label",    value: siteSettings.hero_stat1_label },
+        { key: "hero_stat2_number",   value: siteSettings.hero_stat2_number },
+        { key: "hero_stat2_label",    value: siteSettings.hero_stat2_label },
+        { key: "hero_stat3_number",   value: siteSettings.hero_stat3_number },
+        { key: "hero_stat3_label",    value: siteSettings.hero_stat3_label },
+        { key: "hero_chip_code",      value: siteSettings.hero_chip_code },
+        { key: "hero_chip_text",      value: siteSettings.hero_chip_text },
+        { key: "band_text",           value: siteSettings.band_text },
       ];
       await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
     } catch { /* ignore */ }
@@ -1932,6 +2020,141 @@ export default function AdminPage() {
                   {settingsSaving ? "Saving…" : "Save Philosophy"}
                 </button>
               </div>
+
+              {/* ── Hero Section ── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <h2 className="font-semibold text-gray-700">Hero Section</h2>
+
+                {/* Eyebrow */}
+                <div>
+                  <label className={labelCls}>Eyebrow Text</label>
+                  <input type="text" value={siteSettings.hero_eyebrow} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, hero_eyebrow: e.target.value }))}
+                    placeholder="e.g. New Collection 2025" />
+                </div>
+
+                {/* Heading lines */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className={labelCls}>Heading Line 1</label>
+                    <input type="text" value={siteSettings.hero_heading_line1} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_line1: e.target.value }))}
+                      placeholder="Step Into" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Italic Line (navy)</label>
+                    <input type="text" value={siteSettings.hero_heading_italic} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_italic: e.target.value }))}
+                      placeholder="Elegance" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Heading Line 3</label>
+                    <input type="text" value={siteSettings.hero_heading_line3} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_heading_line3: e.target.value }))}
+                      placeholder="Redefined" />
+                  </div>
+                </div>
+
+                {/* Subtitle */}
+                <div>
+                  <label className={labelCls}>Subtitle</label>
+                  <textarea rows={2} value={siteSettings.hero_subtitle} className={`${inputCls} resize-none`}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, hero_subtitle: e.target.value }))}
+                    placeholder="Premium heels crafted for the modern woman…" />
+                </div>
+
+                {/* CTAs */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>CTA 1 Text</label>
+                    <input type="text" value={siteSettings.hero_cta1_text} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta1_text: e.target.value }))}
+                      placeholder="Shop Now" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>CTA 1 URL</label>
+                    <input type="text" value={siteSettings.hero_cta1_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta1_url: e.target.value }))}
+                      placeholder="/shop" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>CTA 2 Text</label>
+                    <input type="text" value={siteSettings.hero_cta2_text} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta2_text: e.target.value }))}
+                      placeholder="View Collection" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>CTA 2 URL</label>
+                    <input type="text" value={siteSettings.hero_cta2_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_cta2_url: e.target.value }))}
+                      placeholder="/shop" />
+                  </div>
+                </div>
+
+                {/* Hero image */}
+                <div>
+                  <label className={labelCls}>Hero Image URL</label>
+                  <input type="text" value={siteSettings.hero_image_url} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, hero_image_url: e.target.value }))}
+                    placeholder="https://cdn.shopify.com/…/image.jpg" />
+                  {siteSettings.hero_image_url && (
+                    <div className="mt-3 relative w-40 h-24 overflow-hidden border border-gray-200">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={siteSettings.hero_image_url} alt="Hero preview" className="w-full h-full object-cover object-top" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-3">
+                  {([1, 2, 3] as const).map((n) => (
+                    <div key={n} className="space-y-2">
+                      <label className={labelCls}>Stat {n} Number</label>
+                      <input type="text"
+                        value={(siteSettings as unknown as Record<string, string>)[`hero_stat${n}_number`]}
+                        className={inputCls} placeholder="500+"
+                        onChange={(e) => setSiteSettings((s) => ({ ...s, [`hero_stat${n}_number`]: e.target.value }))} />
+                      <label className={labelCls}>Stat {n} Label</label>
+                      <input type="text"
+                        value={(siteSettings as unknown as Record<string, string>)[`hero_stat${n}_label`]}
+                        className={inputCls} placeholder="Styles"
+                        onChange={(e) => setSiteSettings((s) => ({ ...s, [`hero_stat${n}_label`]: e.target.value }))} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Promo chip */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Chip Code <span className="normal-case text-gray-400 font-normal">(e.g. SAVE10 — leave empty to hide)</span></label>
+                    <input type="text" value={siteSettings.hero_chip_code} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_chip_code: e.target.value }))}
+                      placeholder="SAVE10" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Chip Text</label>
+                    <input type="text" value={siteSettings.hero_chip_text} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, hero_chip_text: e.target.value }))}
+                      placeholder="Use code for 10% off" />
+                  </div>
+                </div>
+
+                {/* Trust band */}
+                <div>
+                  <label className={labelCls}>Trust Band Text <span className="normal-case text-gray-400 font-normal">(separate items with ` · `)</span></label>
+                  <textarea rows={2} value={siteSettings.band_text} className={`${inputCls} resize-none`}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, band_text: e.target.value }))}
+                    placeholder="Free Shipping · Easy Returns · Premium Quality" />
+                </div>
+
+                <button
+                  onClick={saveHero} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
+                >
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Hero Section"}
+                </button>
+              </div>
             </div>
           )}
 
@@ -2461,6 +2684,10 @@ export default function AdminPage() {
                     <p className="absolute top-1 left-2 text-[10px] text-white bg-black/50 px-1.5 py-0.5 rounded">Hover Preview</p>
                   </div>
                 )}
+              </div>
+              <div>
+                <label className={labelCls}>Tag Label <span className="normal-case text-gray-400 font-normal">(shown as eyebrow on card — e.g. NEW IN / FESTIVE / EXCLUSIVE)</span></label>
+                <input type="text" value={collectionModal.data.tag_label ?? ""} onChange={(e) => setCollectionField("tag_label", e.target.value)} className={inputCls} placeholder="NEW IN / FESTIVE / EXCLUSIVE" />
               </div>
               <div>
                 <label className={labelCls}>Display Order</label>

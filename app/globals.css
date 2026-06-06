@@ -43,6 +43,15 @@ h4, h5, h6 { font-family: var(--font-cormorant); font-weight: 400; }
   100% { transform: translateX(-16.666%); }
 }
 
+/* Trust band ticker */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-ticker {
+  animation: ticker 22s linear infinite;
+}
+
 @layer components {
 
   /* ── Primary button — Zara style (sharp, thin border, tracked uppercase) */

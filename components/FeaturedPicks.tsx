@@ -22,18 +22,16 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Eyebrow + Heading */}
-        <p className="section-subheading mb-3">New Arrivals</p>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-8 h-px bg-[#3B5373]" />
+          <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
+            NEW ARRIVALS
+          </span>
+        </div>
         <h2
-          className="mb-5"
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: "clamp(1.5rem, 2.5vw, 2.25rem)",
-            fontWeight: 400,
-            color: "#111",
-            letterSpacing: "0.01em",
-          }}
+          className="mb-5 font-serif text-[clamp(1.6rem,3vw,2.5rem)] font-light leading-[1.15] text-[#1a1a1a]"
         >
-          Featured Picks
+          Featured <em className="italic text-[#3B5373]">Picks</em>
         </h2>
 
         {/* Tab Bar — LEFT aligned */}

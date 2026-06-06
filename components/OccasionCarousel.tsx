@@ -7,6 +7,7 @@ interface Occasion {
   title: string;
   href: string;
   image: string;
+  tag_label?: string;
 }
 
 const toTitleCase = (str: string) =>
@@ -43,7 +44,7 @@ function OccasionCard({ occ, large }: { occ: Occasion; large: boolean }) {
       {/* Bottom-left text */}
       <div className="absolute bottom-0 left-0 p-6 pb-7">
         <p
-          className="mb-2"
+          className="mb-2 occ-tag"
           style={{
             fontFamily: "var(--font-poppins)",
             fontSize: "9px",
@@ -52,7 +53,7 @@ function OccasionCard({ occ, large }: { occ: Occasion; large: boolean }) {
             color: "rgba(255,255,255,0.6)",
           }}
         >
-          Collection
+          {occ.tag_label || "Collection"}
         </p>
         <h3
           className="mb-3 leading-none"
