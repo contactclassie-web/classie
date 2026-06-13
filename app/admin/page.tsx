@@ -107,6 +107,12 @@ interface SiteSettings {
   hero_stat3_label: string;
   hero_chip_code: string;
   hero_chip_text: string;
+  hero_badge_text: string;
+  hero_badge_sub: string;
+  hero_badge_active: string;
+  hero_pill_text: string;
+  hero_pill_sub: string;
+  hero_pill_active: string;
   band_text: string;
 }
 
@@ -340,6 +346,12 @@ export default function AdminPage() {
     hero_stat3_label: "Avg Rating",
     hero_chip_code: "",
     hero_chip_text: "",
+    hero_badge_text: "SS25",
+    hero_badge_sub: "New In",
+    hero_badge_active: "true",
+    hero_pill_text: "247 sold today",
+    hero_pill_sub: "Limited stock",
+    hero_pill_active: "true",
     band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
@@ -511,6 +523,12 @@ export default function AdminPage() {
           hero_stat3_label: "Avg Rating",
           hero_chip_code: "",
           hero_chip_text: "",
+          hero_badge_text: "SS25",
+          hero_badge_sub: "New In",
+          hero_badge_active: "true",
+          hero_pill_text: "247 sold today",
+          hero_pill_sub: "Limited stock",
+          hero_pill_active: "true",
           band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
         };
         data.forEach((row: { key: string; value: string }) => {
@@ -951,6 +969,12 @@ export default function AdminPage() {
         { key: "hero_stat3_label",    value: siteSettings.hero_stat3_label },
         { key: "hero_chip_code",      value: siteSettings.hero_chip_code },
         { key: "hero_chip_text",      value: siteSettings.hero_chip_text },
+        { key: "hero_badge_text",     value: siteSettings.hero_badge_text },
+        { key: "hero_badge_sub",      value: siteSettings.hero_badge_sub },
+        { key: "hero_badge_active",   value: siteSettings.hero_badge_active },
+        { key: "hero_pill_text",      value: siteSettings.hero_pill_text },
+        { key: "hero_pill_sub",       value: siteSettings.hero_pill_sub },
+        { key: "hero_pill_active",    value: siteSettings.hero_pill_active },
         { key: "band_text",           value: siteSettings.band_text },
       ];
       await upsertSettings(rows);
@@ -1586,6 +1610,51 @@ export default function AdminPage() {
                           placeholder="10% off · First order" />
                       </div>
                     </div>
+                    {/* Badge + Pill */}
+                    <div className="border border-gray-100 rounded-xl p-4 space-y-3">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Image Overlays</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className={labelCls}>Badge Text <span className="normal-case text-gray-400 font-normal">(bottom-left, e.g. SS25)</span></label>
+                          <input type="text" value={siteSettings.hero_badge_text} className={inputCls}
+                            onChange={(e) => setSiteSettings((s) => ({ ...s, hero_badge_text: e.target.value }))}
+                            placeholder="SS25" />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Badge Sub <span className="normal-case text-gray-400 font-normal">(e.g. New In)</span></label>
+                          <input type="text" value={siteSettings.hero_badge_sub} className={inputCls}
+                            onChange={(e) => setSiteSettings((s) => ({ ...s, hero_badge_sub: e.target.value }))}
+                            placeholder="New In" />
+                        </div>
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" checked={siteSettings.hero_badge_active === "true"}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_badge_active: e.target.checked ? "true" : "false" }))}
+                          className="w-4 h-4 accent-[#3B5373]" />
+                        <span className="text-xs text-gray-600">Show Badge</span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className={labelCls}>Pill Text <span className="normal-case text-gray-400 font-normal">(top-right, e.g. 247 sold today)</span></label>
+                          <input type="text" value={siteSettings.hero_pill_text} className={inputCls}
+                            onChange={(e) => setSiteSettings((s) => ({ ...s, hero_pill_text: e.target.value }))}
+                            placeholder="247 sold today" />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Pill Sub</label>
+                          <input type="text" value={siteSettings.hero_pill_sub} className={inputCls}
+                            onChange={(e) => setSiteSettings((s) => ({ ...s, hero_pill_sub: e.target.value }))}
+                            placeholder="Limited stock" />
+                        </div>
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" checked={siteSettings.hero_pill_active === "true"}
+                          onChange={(e) => setSiteSettings((s) => ({ ...s, hero_pill_active: e.target.checked ? "true" : "false" }))}
+                          className="w-4 h-4 accent-[#3B5373]" />
+                        <span className="text-xs text-gray-600">Show Pill</span>
+                      </label>
+                    </div>
+
                     <div>
                       <label className={labelCls}>Trust Band <span className="normal-case text-gray-400 font-normal">(items separated by · )</span></label>
                       <textarea rows={2} value={siteSettings.band_text} className={`${inputCls} resize-none`}

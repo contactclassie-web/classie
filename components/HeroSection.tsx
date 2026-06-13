@@ -28,6 +28,12 @@ const DEFAULTS = {
   hero_stat3_label:     "",
   hero_chip_code:       "",
   hero_chip_text:       "",
+  hero_badge_text:      "SS25",
+  hero_badge_sub:       "New In",
+  hero_badge_active:    "true",
+  hero_pill_text:       "247 sold today",
+  hero_pill_sub:        "Limited stock",
+  hero_pill_active:     "true",
 };
 
 const HERO_KEYS = Object.keys(DEFAULTS);
@@ -71,8 +77,14 @@ export default function HeroSection({ heroSlides, heroImageUrl }: Props) {
   const stat2Lab  = cfg.hero_stat2_label;
   const stat3Num  = cfg.hero_stat3_number;
   const stat3Lab  = cfg.hero_stat3_label;
-  const chipCode  = cfg.hero_chip_code;
-  const chipText  = cfg.hero_chip_text;
+  const chipCode    = cfg.hero_chip_code;
+  const chipText    = cfg.hero_chip_text;
+  const badgeText   = cfg.hero_badge_text;
+  const badgeSub    = cfg.hero_badge_sub;
+  const badgeActive = cfg.hero_badge_active !== "false";
+  const pillText    = cfg.hero_pill_text;
+  const pillSub     = cfg.hero_pill_sub;
+  const pillActive  = cfg.hero_pill_active !== "false";
   const showStats = !!(stat1Num || stat2Num || stat3Num);
   const stats     = [
     { number: stat1Num, label: stat1Lab },
@@ -141,17 +153,21 @@ export default function HeroSection({ heroSlides, heroImageUrl }: Props) {
             <div className="font-sans text-[9.5px] font-light tracking-[0.22em] uppercase text-[#6b7280] mt-1">{chipText}</div>
           </div>
         )}
-        <div className="absolute bottom-0 left-0 bg-[#3B5373] text-white px-5 py-4">
-          <div className="font-sans text-[18px] font-semibold tracking-[0.08em] uppercase">SS25</div>
-          <div className="font-sans text-[9px] tracking-[0.18em] uppercase text-white/70 mt-0.5">New In</div>
-        </div>
-        <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm shadow-md px-4 py-2.5 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
-          <div>
-            <p className="font-sans text-[11px] font-medium text-[#1a1a1a]">247 sold today</p>
-            <p className="font-sans text-[10px] text-[#9ca3af]">Limited stock</p>
+        {badgeActive && badgeText && (
+          <div className="absolute bottom-0 left-0 bg-[#3B5373] text-white px-5 py-4">
+            <div className="font-sans text-[18px] font-semibold tracking-[0.08em] uppercase">{badgeText}</div>
+            {badgeSub && <div className="font-sans text-[9px] tracking-[0.18em] uppercase text-white/70 mt-0.5">{badgeSub}</div>}
           </div>
-        </div>
+        )}
+        {pillActive && pillText && (
+          <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm shadow-md px-4 py-2.5 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
+            <div>
+              <p className="font-sans text-[11px] font-medium text-[#1a1a1a]">{pillText}</p>
+              {pillSub && <p className="font-sans text-[10px] text-[#9ca3af]">{pillSub}</p>}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
