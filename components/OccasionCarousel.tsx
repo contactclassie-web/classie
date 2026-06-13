@@ -88,27 +88,15 @@ export default function OccasionCarousel({ occasions }: { occasions: Occasion[] 
         </>
       )}
 
-      {/* Mobile: horizontal scroll with arrows */}
-      <div className="md:hidden relative">
-        {hasMore && (
-          <button onClick={() => scroll("left", mobileRef)}
-            className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-        )}
+      {/* Mobile: swipe scroll (no arrows — touch devices swipe naturally) */}
+      <div className="md:hidden">
         <div ref={mobileRef} className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" style={{ scrollbarWidth: "none" }}>
           {allItems.map((occ) => (
-            <div key={occ.href} className="snap-start flex-shrink-0" style={{ width: show3.length === 1 ? "100%" : "82vw" }}>
+            <div key={occ.href} className="snap-start flex-shrink-0" style={{ width: allItems.length === 1 ? "100%" : "82vw" }}>
               <OccasionCard occ={occ} />
             </div>
           ))}
         </div>
-        {hasMore && (
-          <button onClick={() => scroll("right", mobileRef)}
-            className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
-        )}
       </div>
     </div>
   );
