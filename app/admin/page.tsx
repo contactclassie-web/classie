@@ -623,7 +623,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!authed) return;
-    if (tab === "slides") fetchSlides();
+    if (tab === "slides") { fetchSlides(); fetchSettings(); }
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
