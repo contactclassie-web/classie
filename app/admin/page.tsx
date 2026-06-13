@@ -2224,87 +2224,6 @@ export default function AdminPage() {
           {tab === "settings" && (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
 
-              {/* ── Sub-section A: Announcement Bar ── */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#3B5373]" />
-                  <h2 className="font-semibold text-gray-700">Scrolling Announcement Bar</h2>
-                </div>
-                {settingsLoading ? (
-                  <p className="text-gray-400 text-sm">Loading…</p>
-                ) : (
-                  <>
-                    {/* Speed control */}
-                    <div>
-                      <label className={labelCls}>Scroll Speed</label>
-                      <select
-                        value={announcementSpeed}
-                        onChange={(e) => setAnnouncementSpeed(e.target.value)}
-                        className={`${inputCls} max-w-[180px]`}
-                      >
-                        <option value="40">🐢 Slow (40s)</option>
-                        <option value="25">🚶 Normal (25s)</option>
-                        <option value="15">🚀 Fast (15s)</option>
-                      </select>
-                    </div>
-
-                    {/* Dynamic announcement rows */}
-                    <div>
-                      <label className={labelCls}>Announcement Messages (up to 6)</label>
-                      <div className="space-y-2 mt-1">
-                        {announcementList.map((text, idx) => (
-                          <div key={idx} className="flex gap-2 items-center">
-                            <span className="text-xs font-medium text-gray-400 w-5 flex-shrink-0 text-center">{idx + 1}.</span>
-                            <input
-                              type="text"
-                              value={text}
-                              className={`${inputCls} flex-1`}
-                              placeholder={
-                                idx === 0 ? "✦ Welcome to Classie — One Heel. Endless Looks."
-                                : idx === 1 ? "Use code FIRST10 for 10% OFF!"
-                                : "🚢 Free Shipping above ₹999 | 😊 Easy Returns"
-                              }
-                              onChange={(e) => {
-                                const next = [...announcementList];
-                                next[idx] = e.target.value;
-                                setAnnouncementList(next);
-                              }}
-                            />
-                            <button
-                              onClick={() => {
-                                const next = announcementList.filter((_, i) => i !== idx);
-                                setAnnouncementList(next.length === 0 ? [""] : next);
-                              }}
-                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
-                              title="Delete"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-
-                      {announcementList.length < 6 && (
-                        <button
-                          onClick={() => setAnnouncementList((prev) => [...prev, ""])}
-                          className="mt-2 flex items-center gap-1.5 text-xs text-[#3B5373] hover:underline"
-                        >
-                          <Plus className="w-3.5 h-3.5" /> Add More
-                        </button>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={saveAnnouncements} disabled={settingsSaving}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
-                    >
-                      <Save className="w-4 h-4" />
-                      {settingsSaving ? "Saving…" : "Save Announcements"}
-                    </button>
-                  </>
-                )}
-              </div>
-
               {/* ── Sub-section B: Features Bar Manager ── */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-3">
@@ -2385,34 +2304,6 @@ export default function AdminPage() {
                     </table>
                   </div>
                 )}
-              </div>
-
-              {/* ── Logo Settings ── */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-                <div className="flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4 text-[#3B5373]" />
-                  <h2 className="font-semibold text-gray-700">Logo</h2>
-                </div>
-                <div>
-                  <label className={labelCls}>Logo Image URL</label>
-                  <input
-                    type="text" value={siteSettings.logo_image_url} className={inputCls}
-                    onChange={(e) => setSiteSettings((s) => ({ ...s, logo_image_url: e.target.value }))}
-                    placeholder="https://... (leave empty to use text logo)"
-                  />
-                  {siteSettings.logo_image_url && (
-                    <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100 inline-block">
-                      <img src={siteSettings.logo_image_url} alt="Logo preview" className="h-10 object-contain" />
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={saveSettings} disabled={settingsSaving}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
-                >
-                  <Save className="w-4 h-4" />
-                  {settingsSaving ? "Saving…" : "Save Logo"}
-                </button>
               </div>
 
               {/* ── Other Settings ── */}
