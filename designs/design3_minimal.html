@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classie — Design 3: Ultra Minimal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        navy: '#3B5373',
+        'navy-dark': '#2a3d55',
+        'navy-light': '#4f6a8a',
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+        display: ['"DM Serif Display"', 'serif'],
+        cormorant: ['"Cormorant Garamond"', 'serif'],
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="font-sans bg-white text-black">
+
+<!-- NAV — Ultra Clean -->
+<nav class="fixed top-0 w-full z-50 bg-white">
+  <div class="max-w-screen-xl mx-auto px-8 h-16 flex items-center justify-between">
+    <div class="flex gap-10 text-xs tracking-widest uppercase text-gray-400">
+      <a href="#" class="hover:text-black transition">Women</a>
+      <a href="#" class="hover:text-black transition">Men</a>
+      <a href="#" class="hover:text-black transition">Accessories</a>
+    </div>
+    <div class="font-display text-2xl tracking-[0.3em] text-black">CLASSIE</div>
+    <div class="flex gap-8 text-xs tracking-widest uppercase text-gray-400">
+      <a href="#" class="hover:text-black transition">Search</a>
+      <a href="#" class="hover:text-black transition">Account</a>
+      <a href="#" class="hover:text-black transition">Bag</a>
+    </div>
+  </div>
+  <div class="h-px bg-gray-100"></div>
+</nav>
+
+<!-- HERO — Full Screen Minimal -->
+<section class="h-screen flex items-end pb-24 px-8" style="background: linear-gradient(135deg, #f7f7f7 0%, #e8e8e8 100%);">
+  <div class="max-w-screen-xl mx-auto w-full flex items-end justify-between">
+    <div>
+      <p class="font-cormorant italic text-gray-400 text-xl mb-4 tracking-wide">SS 2025 Collection</p>
+      <h1 class="font-display text-[96px] leading-none text-black">
+        The Art of<br/>
+        <span class="italic text-navy">Dressing Well</span>
+      </h1>
+    </div>
+    <div class="text-right pb-4">
+      <p class="font-cormorant text-gray-500 text-xl mb-6 max-w-xs leading-relaxed">
+        Curated essentials for the modern wardrobe.
+      </p>
+      <a href="#" class="inline-block bg-black text-white text-xs tracking-widest uppercase px-10 py-4 hover:bg-navy transition">Explore Collection</a>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBER STATS -->
+<section class="bg-navy text-white py-12">
+  <div class="max-w-screen-xl mx-auto px-8 grid grid-cols-4 divide-x divide-navy-light">
+    <div class="text-center px-8">
+      <div class="font-display text-5xl italic mb-1">500+</div>
+      <p class="text-xs tracking-widest uppercase text-gray-300">Styles</p>
+    </div>
+    <div class="text-center px-8">
+      <div class="font-display text-5xl italic mb-1">12</div>
+      <p class="text-xs tracking-widest uppercase text-gray-300">Collections</p>
+    </div>
+    <div class="text-center px-8">
+      <div class="font-display text-5xl italic mb-1">50K+</div>
+      <p class="text-xs tracking-widest uppercase text-gray-300">Happy Customers</p>
+    </div>
+    <div class="text-center px-8">
+      <div class="font-display text-5xl italic mb-1">100%</div>
+      <p class="text-xs tracking-widest uppercase text-gray-300">Premium Fabrics</p>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES — Horizontal Scroll Style -->
+<section class="py-24 max-w-screen-xl mx-auto px-8">
+  <div class="flex items-center justify-between mb-16">
+    <h2 class="font-display text-5xl">Collections</h2>
+    <div class="h-px bg-gray-200 flex-1 mx-8"></div>
+    <a href="#" class="text-xs tracking-widest uppercase text-gray-400 hover:text-black transition">All Collections →</a>
+  </div>
+  <div class="grid grid-cols-3 gap-2">
+    <div class="group relative cursor-pointer overflow-hidden" style="height: 600px;">
+      <div class="absolute inset-0 bg-[#c8bfb5] group-hover:scale-[1.03] transition-transform duration-700"></div>
+      <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition"></div>
+      <div class="absolute bottom-10 left-10">
+        <p class="font-cormorant italic text-white/80 text-base mb-2">Explore</p>
+        <h3 class="font-display text-5xl text-white">Women</h3>
+        <div class="mt-4 w-8 h-px bg-white group-hover:w-16 transition-all duration-300"></div>
+      </div>
+    </div>
+    <div class="group relative cursor-pointer overflow-hidden" style="height: 600px; margin-top: 60px;">
+      <div class="absolute inset-0 bg-[#3B5373] group-hover:scale-[1.03] transition-transform duration-700"></div>
+      <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition"></div>
+      <div class="absolute bottom-10 left-10">
+        <p class="font-cormorant italic text-white/80 text-base mb-2">Explore</p>
+        <h3 class="font-display text-5xl text-white">Men</h3>
+        <div class="mt-4 w-8 h-px bg-white group-hover:w-16 transition-all duration-300"></div>
+      </div>
+    </div>
+    <div class="group relative cursor-pointer overflow-hidden" style="height: 600px;">
+      <div class="absolute inset-0 bg-[#7a6e62] group-hover:scale-[1.03] transition-transform duration-700"></div>
+      <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition"></div>
+      <div class="absolute bottom-10 left-10">
+        <p class="font-cormorant italic text-white/80 text-base mb-2">Explore</p>
+        <h3 class="font-display text-5xl text-white">Accessories</h3>
+        <div class="mt-4 w-8 h-px bg-white group-hover:w-16 transition-all duration-300"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEW ARRIVALS — Clean Grid -->
+<section class="bg-[#f7f7f7] py-24">
+  <div class="max-w-screen-xl mx-auto px-8">
+    <div class="flex items-center justify-between mb-16">
+      <div>
+        <p class="font-cormorant italic text-navy text-lg mb-1">Fresh this week</p>
+        <h2 class="font-display text-5xl">New Arrivals</h2>
+      </div>
+      <a href="#" class="text-xs tracking-widest uppercase text-gray-400 hover:text-black border-b border-gray-300 pb-1 transition">View All</a>
+    </div>
+    <div class="grid grid-cols-4 gap-px bg-gray-200">
+      <div class="group bg-white cursor-pointer">
+        <div class="overflow-hidden bg-[#e8e8e8]" style="height: 400px;">
+          <div class="w-full h-full group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+            <span class="font-display text-6xl text-gray-200">1</span>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="text-xs text-gray-400 tracking-widest uppercase mb-1">Linen</p>
+              <h4 class="font-sans text-sm font-medium">Oversized Blazer</h4>
+            </div>
+            <span class="text-xs bg-navy text-white px-2 py-1 tracking-wide">NEW</span>
+          </div>
+          <p class="font-cormorant text-navy text-xl mt-3">₹7,999</p>
+        </div>
+      </div>
+      <div class="group bg-white cursor-pointer">
+        <div class="overflow-hidden bg-[#ddd8d3]" style="height: 400px;">
+          <div class="w-full h-full group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+            <span class="font-display text-6xl text-gray-200">2</span>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="text-xs text-gray-400 tracking-widest uppercase mb-1">Silk</p>
+              <h4 class="font-sans text-sm font-medium">Wrap Midi Dress</h4>
+            </div>
+            <span class="text-xs bg-navy text-white px-2 py-1 tracking-wide">NEW</span>
+          </div>
+          <p class="font-cormorant text-navy text-xl mt-3">₹5,499</p>
+        </div>
+      </div>
+      <div class="group bg-white cursor-pointer">
+        <div class="overflow-hidden bg-[#3B5373]" style="height: 400px;">
+          <div class="w-full h-full group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+            <span class="font-display text-6xl text-white/20">3</span>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="text-xs text-gray-400 tracking-widest uppercase mb-1">Cotton</p>
+              <h4 class="font-sans text-sm font-medium">Structured Trousers</h4>
+            </div>
+            <span class="text-xs bg-navy text-white px-2 py-1 tracking-wide">NEW</span>
+          </div>
+          <p class="font-cormorant text-navy text-xl mt-3">₹4,299</p>
+        </div>
+      </div>
+      <div class="group bg-white cursor-pointer">
+        <div class="overflow-hidden bg-[#e8e0d5]" style="height: 400px;">
+          <div class="w-full h-full group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+            <span class="font-display text-6xl text-gray-200">4</span>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="text-xs text-gray-400 tracking-widest uppercase mb-1">Leather</p>
+              <h4 class="font-sans text-sm font-medium">Mini Shoulder Bag</h4>
+            </div>
+            <span class="text-xs bg-navy text-white px-2 py-1 tracking-wide">NEW</span>
+          </div>
+          <p class="font-cormorant text-navy text-xl mt-3">₹6,799</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT — Centered Minimal -->
+<section class="py-32 text-center max-w-3xl mx-auto px-8">
+  <p class="font-cormorant italic text-navy text-xl mb-6">Est. 2020</p>
+  <h2 class="font-display text-6xl text-black mb-8 leading-tight">
+    Fashion that<br/>Respects Your <span class="italic text-navy">Intelligence</span>
+  </h2>
+  <p class="font-cormorant text-gray-500 text-2xl leading-relaxed mb-10">
+    We create clothes for people who know what they want — quality over quantity, timelessness over trend.
+  </p>
+  <a href="#" class="inline-block text-xs tracking-widest uppercase text-navy border-b-2 border-navy pb-1 hover:text-navy-dark transition">Discover Our Philosophy →</a>
+</section>
+
+<!-- FULL WIDTH BANNER -->
+<section class="bg-navy-dark py-32 px-8 text-center">
+  <p class="font-cormorant italic text-gray-400 text-xl mb-4">Limited Time</p>
+  <h2 class="font-display text-7xl text-white mb-6">End of Season<br/><span class="italic">Sale — Up to 40% Off</span></h2>
+  <a href="#" class="inline-block bg-white text-navy text-xs tracking-widest uppercase px-12 py-5 hover:bg-gray-100 transition mt-4">Shop Sale</a>
+</section>
+
+<!-- NEWSLETTER — Minimal -->
+<section class="py-24 px-8 max-w-screen-xl mx-auto">
+  <div class="border border-gray-200 p-16 text-center">
+    <h2 class="font-display text-4xl mb-4">Join the Inner Circle</h2>
+    <p class="font-cormorant text-gray-500 text-xl mb-10">Early access to new drops and exclusive offers.</p>
+    <div class="flex max-w-md mx-auto">
+      <input type="email" placeholder="Enter your email" class="flex-1 border border-gray-300 border-r-0 px-6 py-4 text-sm focus:outline-none focus:border-navy">
+      <button class="bg-navy text-white text-xs tracking-widest uppercase px-8 hover:bg-navy-dark transition">Join</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-gray-100 py-12">
+  <div class="max-w-screen-xl mx-auto px-8 flex items-center justify-between">
+    <div class="font-display text-2xl tracking-[0.3em]">CLASSIE</div>
+    <div class="flex gap-12 text-xs tracking-widest uppercase text-gray-400">
+      <a href="#" class="hover:text-black transition">Women</a>
+      <a href="#" class="hover:text-black transition">Men</a>
+      <a href="#" class="hover:text-black transition">Accessories</a>
+      <a href="#" class="hover:text-black transition">About</a>
+      <a href="#" class="hover:text-black transition">Contact</a>
+    </div>
+    <p class="text-xs text-gray-300 tracking-widest">© 2025 CLASSIE</p>
+  </div>
+</footer>
+
+</body>
+</html>

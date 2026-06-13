@@ -8,6 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
+  Star, Camera, Palette,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -156,6 +157,46 @@ interface NewsletterSubscriber {
   created_at: string;
 }
 
+interface Testimonial {
+  id?: string;
+  customer_name: string;
+  location: string;
+  review_text: string;
+  rating: number;
+  active: boolean;
+  display_order: number;
+}
+
+interface InstagramImage {
+  id?: string;
+  image_url: string;
+  link_url: string;
+  display_order: number;
+  active: boolean;
+}
+
+interface StyleInspo {
+  id?: string;
+  title: string;
+  image_url: string;
+  link_url: string;
+  tag: string;
+  display_order: number;
+  active: boolean;
+}
+
+const EMPTY_TESTIMONIAL: Testimonial = {
+  customer_name: "", location: "", review_text: "", rating: 5, active: true, display_order: 0,
+};
+
+const EMPTY_INSTAGRAM: InstagramImage = {
+  image_url: "", link_url: "https://www.instagram.com/_classie_in/", display_order: 0, active: true,
+};
+
+const EMPTY_STYLE_INSPO: StyleInspo = {
+  title: "", image_url: "", link_url: "", tag: "", display_order: 0, active: true,
+};
+
 // ── Constants ──────────────────────────────────────────────────────────────
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"];
@@ -195,7 +236,7 @@ const EMPTY_SLIDE: HeroSlide = {
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages" | "testimonials" | "instagram" | "style-inspo";
 
 // ── Main Component ─────────────────────────────────────────────────────────
 
@@ -342,6 +383,33 @@ export default function AdminPage() {
   const [subsLoading, setSubsLoading] = useState(false);
   const [msgSubTab, setMsgSubTab] = useState<"messages" | "newsletter">("messages");
 
+  // Testimonials
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [testimonialsLoading, setTestimonialsLoading] = useState(false);
+  const [testimonialModal, setTestimonialModal] = useState<{ open: boolean; mode: "add" | "edit"; data: Testimonial }>({
+    open: false, mode: "add", data: { ...EMPTY_TESTIMONIAL },
+  });
+  const [testimonialSaving, setTestimonialSaving] = useState(false);
+  const [deleteTestimonialConfirm, setDeleteTestimonialConfirm] = useState<string | null>(null);
+
+  // Instagram Images
+  const [instagramImages, setInstagramImages] = useState<InstagramImage[]>([]);
+  const [instagramLoading, setInstagramLoading] = useState(false);
+  const [instagramModal, setInstagramModal] = useState<{ open: boolean; mode: "add" | "edit"; data: InstagramImage }>({
+    open: false, mode: "add", data: { ...EMPTY_INSTAGRAM },
+  });
+  const [instagramSaving, setInstagramSaving] = useState(false);
+  const [deleteInstagramConfirm, setDeleteInstagramConfirm] = useState<string | null>(null);
+
+  // Style Inspo
+  const [styleInspos, setStyleInspos] = useState<StyleInspo[]>([]);
+  const [styleInspoLoading, setStyleInspoLoading] = useState(false);
+  const [styleInspoModal, setStyleInspoModal] = useState<{ open: boolean; mode: "add" | "edit"; data: StyleInspo }>({
+    open: false, mode: "add", data: { ...EMPTY_STYLE_INSPO },
+  });
+  const [styleInspoSaving, setStyleInspoSaving] = useState(false);
+  const [deleteStyleInspoConfirm, setDeleteStyleInspoConfirm] = useState<string | null>(null);
+
   // ── Fetch functions ──────────────────────────────────────────────────────
 
   const fetchOrders = useCallback(async () => {
@@ -484,6 +552,33 @@ export default function AdminPage() {
     finally { setCategoriesLoading(false); }
   }, []);
 
+  const fetchTestimonials = useCallback(async () => {
+    setTestimonialsLoading(true);
+    try {
+      const { data, error } = await supabase.from("testimonials").select("*").order("display_order", { ascending: true });
+      if (!error && data) setTestimonials(data as Testimonial[]);
+    } catch { /* ignore */ }
+    finally { setTestimonialsLoading(false); }
+  }, []);
+
+  const fetchInstagramImages = useCallback(async () => {
+    setInstagramLoading(true);
+    try {
+      const { data, error } = await supabase.from("instagram_images").select("*").order("display_order", { ascending: true });
+      if (!error && data) setInstagramImages(data as InstagramImage[]);
+    } catch { /* ignore */ }
+    finally { setInstagramLoading(false); }
+  }, []);
+
+  const fetchStyleInspos = useCallback(async () => {
+    setStyleInspoLoading(true);
+    try {
+      const { data, error } = await supabase.from("style_inspo").select("*").order("display_order", { ascending: true });
+      if (!error && data) setStyleInspos(data as StyleInspo[]);
+    } catch { /* ignore */ }
+    finally { setStyleInspoLoading(false); }
+  }, []);
+
   // Load data when authenticated
   useEffect(() => {
     if (!authed) return;
@@ -499,7 +594,10 @@ export default function AdminPage() {
     if (tab === "collections") fetchCollections();
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") fetchFeaturedPicks();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks]);
+    if (tab === "testimonials") fetchTestimonials();
+    if (tab === "instagram") fetchInstagramImages();
+    if (tab === "style-inspo") fetchStyleInspos();
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -911,6 +1009,9 @@ export default function AdminPage() {
     { id: "featured-picks", label: "Featured Picks", icon: Sparkles },
     { id: "settings",    label: "Settings",    icon: Settings },
     { id: "messages",    label: "Messages",    icon: MessageSquare, badge: messages.length },
+    { id: "testimonials", label: "Reviews",    icon: Star, badge: testimonials.length },
+    { id: "instagram",   label: "Instagram",   icon: Camera, badge: instagramImages.length },
+    { id: "style-inspo", label: "Style Inspo", icon: Palette, badge: styleInspos.length },
   ];
 
   // ── Main layout ───────────────────────────────────────────────────────────
@@ -2277,6 +2378,226 @@ export default function AdminPage() {
               )}
             </div>
           )}
+
+          {/* ══ TESTIMONIALS TAB ══════════════════════════════════════════ */}
+          {tab === "testimonials" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Customer Reviews</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">{testimonials.length} reviews</p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={fetchTestimonials} disabled={testimonialsLoading}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-[#3B5373] border border-gray-200 rounded-xl transition-colors">
+                    <RefreshCw className={`w-3.5 h-3.5 ${testimonialsLoading ? "animate-spin" : ""}`} />Refresh
+                  </button>
+                  <button onClick={() => setTestimonialModal({ open: true, mode: "add", data: { ...EMPTY_TESTIMONIAL } })}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
+                    <Plus className="w-3.5 h-3.5" />Add Review
+                  </button>
+                </div>
+              </div>
+              {testimonialsLoading ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400 text-sm">Loading…</div>
+              ) : testimonials.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                  <Star className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm">No reviews yet. Add your first review!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {testimonials.map(t => (
+                    <div key={t.id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="font-medium text-gray-800 text-sm">{t.customer_name}</p>
+                          {t.location && <p className="text-xs text-gray-400">{t.location}</p>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${t.active ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}>
+                            {t.active ? "Active" : "Hidden"}
+                          </span>
+                          <button onClick={() => setTestimonialModal({ open: true, mode: "edit", data: { ...t } })}
+                            className="p-1.5 text-gray-400 hover:text-[#3B5373] hover:bg-gray-50 rounded-lg transition-colors">
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => setDeleteTestimonialConfirm(t.id!)}
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-[#3B5373] text-xs mb-2">{"★".repeat(t.rating)}{"☆".repeat(5 - t.rating)}</div>
+                      <p className="text-sm text-gray-600 italic leading-relaxed">&quot;{t.review_text}&quot;</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {deleteTestimonialConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                  <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
+                    <p className="font-semibold text-gray-800 mb-2">Delete Review?</p>
+                    <p className="text-sm text-gray-500 mb-6">This cannot be undone.</p>
+                    <div className="flex gap-3 justify-center">
+                      <button onClick={() => setDeleteTestimonialConfirm(null)} className="px-5 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
+                      <button onClick={async () => {
+                        await supabase.from("testimonials").delete().eq("id", deleteTestimonialConfirm);
+                        setDeleteTestimonialConfirm(null);
+                        await fetchTestimonials();
+                      }} className="px-5 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══ INSTAGRAM TAB ══════════════════════════════════════════════ */}
+          {tab === "instagram" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Instagram Feed Images</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">{instagramImages.length} images (4 shown on homepage)</p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={fetchInstagramImages} disabled={instagramLoading}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-[#3B5373] border border-gray-200 rounded-xl transition-colors">
+                    <RefreshCw className={`w-3.5 h-3.5 ${instagramLoading ? "animate-spin" : ""}`} />Refresh
+                  </button>
+                  <button onClick={() => setInstagramModal({ open: true, mode: "add", data: { ...EMPTY_INSTAGRAM } })}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
+                    <Plus className="w-3.5 h-3.5" />Add Image
+                  </button>
+                </div>
+              </div>
+              {instagramLoading ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400 text-sm">Loading…</div>
+              ) : instagramImages.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                  <Camera className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm">No images yet. Add Instagram images to show on homepage!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {instagramImages.map((img, idx) => (
+                    <div key={img.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                      <div className="relative aspect-square bg-gray-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        {img.image_url ? <img src={img.image_url} alt="Instagram" className="w-full h-full object-cover" /> :
+                          <div className="w-full h-full flex items-center justify-center text-gray-300"><Camera className="w-8 h-8" /></div>}
+                        <span className="absolute top-2 left-2 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded">#{idx + 1}</span>
+                        <span className={`absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded ${img.active ? "bg-green-500/80 text-white" : "bg-gray-400/80 text-white"}`}>
+                          {img.active ? "ON" : "OFF"}
+                        </span>
+                      </div>
+                      <div className="p-3 flex justify-end gap-2">
+                        <button onClick={() => setInstagramModal({ open: true, mode: "edit", data: { ...img } })}
+                          className="p-1.5 text-gray-400 hover:text-[#3B5373] hover:bg-gray-50 rounded-lg transition-colors">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => setDeleteInstagramConfirm(img.id!)}
+                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {deleteInstagramConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                  <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
+                    <p className="font-semibold text-gray-800 mb-2">Delete Image?</p>
+                    <div className="flex gap-3 justify-center">
+                      <button onClick={() => setDeleteInstagramConfirm(null)} className="px-5 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
+                      <button onClick={async () => {
+                        await supabase.from("instagram_images").delete().eq("id", deleteInstagramConfirm);
+                        setDeleteInstagramConfirm(null);
+                        await fetchInstagramImages();
+                      }} className="px-5 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══ STYLE INSPO TAB ════════════════════════════════════════════ */}
+          {tab === "style-inspo" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Style Inspiration</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">{styleInspos.length} items</p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={fetchStyleInspos} disabled={styleInspoLoading}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-[#3B5373] border border-gray-200 rounded-xl transition-colors">
+                    <RefreshCw className={`w-3.5 h-3.5 ${styleInspoLoading ? "animate-spin" : ""}`} />Refresh
+                  </button>
+                  <button onClick={() => setStyleInspoModal({ open: true, mode: "add", data: { ...EMPTY_STYLE_INSPO } })}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
+                    <Plus className="w-3.5 h-3.5" />Add Inspo
+                  </button>
+                </div>
+              </div>
+              {styleInspoLoading ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400 text-sm">Loading…</div>
+              ) : styleInspos.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                  <Palette className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm">No style inspo yet. Add your first look!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {styleInspos.map(inspo => (
+                    <div key={inspo.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                      <div className="relative aspect-square bg-gray-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        {inspo.image_url ? <img src={inspo.image_url} alt={inspo.title || "Style"} className="w-full h-full object-cover" /> :
+                          <div className="w-full h-full flex items-center justify-center text-gray-300"><Palette className="w-8 h-8" /></div>}
+                        {inspo.tag && <span className="absolute top-2 left-2 bg-[#3B5373] text-white text-xs px-2 py-0.5 rounded">{inspo.tag}</span>}
+                        <span className={`absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded ${inspo.active ? "bg-green-500/80 text-white" : "bg-gray-400/80 text-white"}`}>
+                          {inspo.active ? "ON" : "OFF"}
+                        </span>
+                      </div>
+                      <div className="p-3">
+                        {inspo.title && <p className="text-xs font-medium text-gray-700 truncate mb-2">{inspo.title}</p>}
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => setStyleInspoModal({ open: true, mode: "edit", data: { ...inspo } })}
+                            className="p-1.5 text-gray-400 hover:text-[#3B5373] hover:bg-gray-50 rounded-lg transition-colors">
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => setDeleteStyleInspoConfirm(inspo.id!)}
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {deleteStyleInspoConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                  <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
+                    <p className="font-semibold text-gray-800 mb-2">Delete Style Inspo?</p>
+                    <div className="flex gap-3 justify-center">
+                      <button onClick={() => setDeleteStyleInspoConfirm(null)} className="px-5 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
+                      <button onClick={async () => {
+                        await supabase.from("style_inspo").delete().eq("id", deleteStyleInspoConfirm);
+                        setDeleteStyleInspoConfirm(null);
+                        await fetchStyleInspos();
+                      }} className="px-5 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </main>
 
@@ -3136,6 +3457,202 @@ export default function AdminPage() {
               <button onClick={saveManageProducts} disabled={manageProductsModal.saving}
                 className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
                 {manageProductsModal.saving ? "Saving…" : `Save (${manageProductsModal.selectedSlugs.length} products)`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          TESTIMONIAL MODAL
+      ══════════════════════════════════════════════════ */}
+      {testimonialModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">{testimonialModal.mode === "add" ? "Add Review" : "Edit Review"}</h2>
+              <button onClick={() => setTestimonialModal(m => ({ ...m, open: false }))} className="p-2 rounded-lg hover:bg-gray-100">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className={labelCls}>Customer Name *</label>
+                <input className={inputCls} value={testimonialModal.data.customer_name}
+                  onChange={e => setTestimonialModal(m => ({ ...m, data: { ...m.data, customer_name: e.target.value } }))} placeholder="e.g. Priya S." />
+              </div>
+              <div>
+                <label className={labelCls}>Location</label>
+                <input className={inputCls} value={testimonialModal.data.location}
+                  onChange={e => setTestimonialModal(m => ({ ...m, data: { ...m.data, location: e.target.value } }))} placeholder="e.g. Mumbai" />
+              </div>
+              <div>
+                <label className={labelCls}>Review Text *</label>
+                <textarea className={inputCls} rows={3} value={testimonialModal.data.review_text}
+                  onChange={e => setTestimonialModal(m => ({ ...m, data: { ...m.data, review_text: e.target.value } }))} placeholder="Customer review..." />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>Rating (1-5)</label>
+                  <input type="number" min={1} max={5} className={inputCls} value={testimonialModal.data.rating}
+                    onChange={e => setTestimonialModal(m => ({ ...m, data: { ...m.data, rating: parseInt(e.target.value) || 5 } }))} />
+                </div>
+                <div>
+                  <label className={labelCls}>Display Order</label>
+                  <input type="number" className={inputCls} value={testimonialModal.data.display_order}
+                    onChange={e => setTestimonialModal(m => ({ ...m, data: { ...m.data, display_order: parseInt(e.target.value) || 0 } }))} />
+                </div>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={testimonialModal.data.active}
+                  onChange={e => setTestimonialModal(m => ({ ...m, data: { ...m.data, active: e.target.checked } }))}
+                  className="w-4 h-4 accent-[#3B5373]" />
+                <span className="text-sm text-gray-600">Active (show on website)</span>
+              </label>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setTestimonialModal(m => ({ ...m, open: false }))} className="px-4 py-2 text-sm text-gray-500">Cancel</button>
+              <button disabled={testimonialSaving} onClick={async () => {
+                setTestimonialSaving(true);
+                try {
+                  const d = testimonialModal.data;
+                  if (testimonialModal.mode === "add") {
+                    await supabase.from("testimonials").insert([{ ...d }]);
+                  } else {
+                    await supabase.from("testimonials").update({ ...d }).eq("id", d.id!);
+                  }
+                  await fetchTestimonials();
+                  setTestimonialModal(m => ({ ...m, open: false }));
+                } catch { /* ignore */ }
+                finally { setTestimonialSaving(false); }
+              }} className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
+                {testimonialSaving ? "Saving…" : "Save Review"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          INSTAGRAM IMAGE MODAL
+      ══════════════════════════════════════════════════ */}
+      {instagramModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">{instagramModal.mode === "add" ? "Add Instagram Image" : "Edit Instagram Image"}</h2>
+              <button onClick={() => setInstagramModal(m => ({ ...m, open: false }))} className="p-2 rounded-lg hover:bg-gray-100">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className={labelCls}>Image URL *</label>
+                <input className={inputCls} value={instagramModal.data.image_url}
+                  onChange={e => setInstagramModal(m => ({ ...m, data: { ...m.data, image_url: e.target.value } }))} placeholder="https://..." />
+              </div>
+              <div>
+                <label className={labelCls}>Link URL</label>
+                <input className={inputCls} value={instagramModal.data.link_url}
+                  onChange={e => setInstagramModal(m => ({ ...m, data: { ...m.data, link_url: e.target.value } }))} placeholder="https://instagram.com/..." />
+              </div>
+              <div>
+                <label className={labelCls}>Display Order</label>
+                <input type="number" className={inputCls} value={instagramModal.data.display_order}
+                  onChange={e => setInstagramModal(m => ({ ...m, data: { ...m.data, display_order: parseInt(e.target.value) || 0 } }))} />
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={instagramModal.data.active}
+                  onChange={e => setInstagramModal(m => ({ ...m, data: { ...m.data, active: e.target.checked } }))}
+                  className="w-4 h-4 accent-[#3B5373]" />
+                <span className="text-sm text-gray-600">Active</span>
+              </label>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setInstagramModal(m => ({ ...m, open: false }))} className="px-4 py-2 text-sm text-gray-500">Cancel</button>
+              <button disabled={instagramSaving} onClick={async () => {
+                setInstagramSaving(true);
+                try {
+                  const d = instagramModal.data;
+                  if (instagramModal.mode === "add") {
+                    await supabase.from("instagram_images").insert([{ ...d }]);
+                  } else {
+                    await supabase.from("instagram_images").update({ ...d }).eq("id", d.id!);
+                  }
+                  await fetchInstagramImages();
+                  setInstagramModal(m => ({ ...m, open: false }));
+                } catch { /* ignore */ }
+                finally { setInstagramSaving(false); }
+              }} className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
+                {instagramSaving ? "Saving…" : "Save Image"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          STYLE INSPO MODAL
+      ══════════════════════════════════════════════════ */}
+      {styleInspoModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">{styleInspoModal.mode === "add" ? "Add Style Inspo" : "Edit Style Inspo"}</h2>
+              <button onClick={() => setStyleInspoModal(m => ({ ...m, open: false }))} className="p-2 rounded-lg hover:bg-gray-100">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className={labelCls}>Title</label>
+                <input className={inputCls} value={styleInspoModal.data.title}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, title: e.target.value } }))} placeholder="e.g. Date Night Look" />
+              </div>
+              <div>
+                <label className={labelCls}>Image URL *</label>
+                <input className={inputCls} value={styleInspoModal.data.image_url}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, image_url: e.target.value } }))} placeholder="https://..." />
+              </div>
+              <div>
+                <label className={labelCls}>Link URL</label>
+                <input className={inputCls} value={styleInspoModal.data.link_url}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, link_url: e.target.value } }))} placeholder="/shop/..." />
+              </div>
+              <div>
+                <label className={labelCls}>Tag Label</label>
+                <input className={inputCls} value={styleInspoModal.data.tag}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, tag: e.target.value } }))} placeholder="e.g. NEW, TRENDING" />
+              </div>
+              <div>
+                <label className={labelCls}>Display Order</label>
+                <input type="number" className={inputCls} value={styleInspoModal.data.display_order}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, display_order: parseInt(e.target.value) || 0 } }))} />
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={styleInspoModal.data.active}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, active: e.target.checked } }))}
+                  className="w-4 h-4 accent-[#3B5373]" />
+                <span className="text-sm text-gray-600">Active</span>
+              </label>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setStyleInspoModal(m => ({ ...m, open: false }))} className="px-4 py-2 text-sm text-gray-500">Cancel</button>
+              <button disabled={styleInspoSaving} onClick={async () => {
+                setStyleInspoSaving(true);
+                try {
+                  const d = styleInspoModal.data;
+                  if (styleInspoModal.mode === "add") {
+                    await supabase.from("style_inspo").insert([{ ...d }]);
+                  } else {
+                    await supabase.from("style_inspo").update({ ...d }).eq("id", d.id!);
+                  }
+                  await fetchStyleInspos();
+                  setStyleInspoModal(m => ({ ...m, open: false }));
+                } catch { /* ignore */ }
+                finally { setStyleInspoSaving(false); }
+              }} className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
+                {styleInspoSaving ? "Saving…" : "Save"}
               </button>
             </div>
           </div>

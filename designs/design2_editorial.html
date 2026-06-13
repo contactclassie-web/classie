@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classie — Design 2: Editorial</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        navy: '#3B5373',
+        'navy-dark': '#2a3d55',
+        'navy-light': '#4f6a8a',
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+        display: ['"DM Serif Display"', 'serif'],
+        cormorant: ['"Cormorant Garamond"', 'serif'],
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="font-sans bg-white text-black">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="font-display text-2xl tracking-widest text-navy">CLASSIE</div>
+    <div class="hidden md:flex gap-10 text-xs tracking-widest uppercase text-gray-500">
+      <a href="#" class="hover:text-navy transition">Women</a>
+      <a href="#" class="hover:text-navy transition">Men</a>
+      <a href="#" class="hover:text-navy transition">Accessories</a>
+      <a href="#" class="hover:text-navy transition">New In</a>
+    </div>
+    <div class="flex gap-4 text-xs tracking-widest uppercase text-gray-500">
+      <a href="#" class="hover:text-navy transition">Search</a>
+      <a href="#" class="hover:text-navy transition">Bag (0)</a>
+    </div>
+  </div>
+</nav>
+
+<!-- EDITORIAL HERO — Full Bleed Split -->
+<section class="pt-16 min-h-screen grid grid-cols-2">
+  <!-- Left: Text -->
+  <div class="bg-[#f7f7f7] flex flex-col justify-center px-16 py-20">
+    <p class="font-cormorant italic text-navy-light text-lg tracking-widest mb-4">Summer Collection 2025</p>
+    <h1 class="font-display text-7xl leading-tight text-black mb-6">
+      Dressed<br/>for the<br/><span class="italic text-navy">Moment</span>
+    </h1>
+    <p class="font-cormorant text-gray-500 text-xl leading-relaxed mb-10 max-w-sm">
+      Where timeless elegance meets modern sensibility. Each piece tells a story.
+    </p>
+    <div class="flex gap-4">
+      <a href="#" class="bg-navy text-white text-xs tracking-widest uppercase px-8 py-4 hover:bg-navy-dark transition">Shop Women</a>
+      <a href="#" class="border border-navy text-navy text-xs tracking-widest uppercase px-8 py-4 hover:bg-navy hover:text-white transition">Shop Men</a>
+    </div>
+  </div>
+  <!-- Right: Image Placeholder -->
+  <div class="bg-navy-dark relative overflow-hidden">
+    <div class="absolute inset-0 flex items-center justify-center">
+      <div class="text-center text-white opacity-20">
+        <div class="text-8xl font-display">C</div>
+        <div class="text-xl tracking-widest mt-2">Hero Image</div>
+      </div>
+    </div>
+    <!-- Editorial tag -->
+    <div class="absolute bottom-8 left-8 text-white">
+      <p class="font-cormorant italic text-sm text-gray-300">Featured Look</p>
+      <p class="font-sans text-xs tracking-widest uppercase mt-1">Linen Blazer — ₹8,499</p>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE STRIP -->
+<div class="bg-navy text-white py-3 overflow-hidden">
+  <div class="flex gap-16 animate-none whitespace-nowrap text-xs tracking-widest uppercase">
+    <span>Free Shipping Above ₹2,999</span>
+    <span>•</span>
+    <span>New Arrivals Every Friday</span>
+    <span>•</span>
+    <span>Sustainable Fabrics</span>
+    <span>•</span>
+    <span>Easy 30-Day Returns</span>
+    <span>•</span>
+    <span>Free Shipping Above ₹2,999</span>
+    <span>•</span>
+    <span>New Arrivals Every Friday</span>
+    <span>•</span>
+    <span>Sustainable Fabrics</span>
+    <span>•</span>
+    <span>Easy 30-Day Returns</span>
+  </div>
+</div>
+
+<!-- CATEGORIES — Editorial Grid -->
+<section class="max-w-7xl mx-auto px-6 py-24">
+  <div class="flex items-end justify-between mb-12">
+    <h2 class="font-display text-5xl text-black">Shop by<br/><span class="italic text-navy">Category</span></h2>
+    <a href="#" class="text-xs tracking-widest uppercase text-gray-400 hover:text-navy border-b border-gray-300 pb-1 transition">View All</a>
+  </div>
+  <div class="grid grid-cols-3 gap-4">
+    <!-- Women -->
+    <div class="group relative overflow-hidden cursor-pointer" style="height: 520px;">
+      <div class="absolute inset-0 bg-[#d4c9bd] group-hover:scale-105 transition-transform duration-700"></div>
+      <div class="absolute inset-0 flex items-center justify-center opacity-10">
+        <span class="font-display text-9xl text-white">W</span>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/40 to-transparent">
+        <p class="font-cormorant italic text-white text-sm mb-1">Explore</p>
+        <h3 class="font-display text-4xl text-white">Women</h3>
+        <p class="text-xs tracking-widest uppercase text-gray-200 mt-2">248 Pieces</p>
+      </div>
+    </div>
+    <!-- Men -->
+    <div class="group relative overflow-hidden cursor-pointer" style="height: 520px;">
+      <div class="absolute inset-0 bg-[#3B5373] group-hover:scale-105 transition-transform duration-700"></div>
+      <div class="absolute inset-0 flex items-center justify-center opacity-10">
+        <span class="font-display text-9xl text-white">M</span>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/40 to-transparent">
+        <p class="font-cormorant italic text-white text-sm mb-1">Explore</p>
+        <h3 class="font-display text-4xl text-white">Men</h3>
+        <p class="text-xs tracking-widest uppercase text-gray-200 mt-2">184 Pieces</p>
+      </div>
+    </div>
+    <!-- Accessories -->
+    <div class="group relative overflow-hidden cursor-pointer" style="height: 520px;">
+      <div class="absolute inset-0 bg-[#8a7e72] group-hover:scale-105 transition-transform duration-700"></div>
+      <div class="absolute inset-0 flex items-center justify-center opacity-10">
+        <span class="font-display text-9xl text-white">A</span>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/40 to-transparent">
+        <p class="font-cormorant italic text-white text-sm mb-1">Explore</p>
+        <h3 class="font-display text-4xl text-white">Accessories</h3>
+        <p class="text-xs tracking-widest uppercase text-gray-200 mt-2">96 Pieces</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEW ARRIVALS -->
+<section class="bg-[#f7f7f7] py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <p class="font-cormorant italic text-navy text-lg mb-2">Just Landed</p>
+      <h2 class="font-display text-5xl">New Arrivals</h2>
+    </div>
+    <div class="grid grid-cols-4 gap-6">
+      <!-- Product Cards -->
+      <div class="group cursor-pointer" v-for="i in [1,2,3,4]">
+        <div class="relative overflow-hidden bg-white mb-4" style="height: 380px;">
+          <div class="absolute inset-0 bg-[#e8e8e8] group-hover:scale-105 transition-transform duration-500"></div>
+          <div class="absolute inset-0 flex items-center justify-center opacity-20">
+            <span class="font-display text-5xl text-gray-400">C</span>
+          </div>
+          <div class="absolute top-4 left-4 bg-navy text-white text-xs tracking-widest px-3 py-1">NEW</div>
+          <button class="absolute bottom-4 left-4 right-4 bg-white text-navy text-xs tracking-widest uppercase py-3 opacity-0 group-hover:opacity-100 transition border border-navy hover:bg-navy hover:text-white">
+            Quick Add
+          </button>
+        </div>
+        <p class="text-xs text-gray-400 tracking-widest uppercase mb-1">Women / Tops</p>
+        <h4 class="font-sans text-sm font-medium text-black mb-1">Silk Crepe Blouse</h4>
+        <p class="font-cormorant text-navy text-lg">₹4,299</p>
+      </div>
+    </div>
+    <div class="text-center mt-12">
+      <a href="#" class="inline-block border border-navy text-navy text-xs tracking-widest uppercase px-12 py-4 hover:bg-navy hover:text-white transition">View All New Arrivals</a>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND STORY -->
+<section class="max-w-7xl mx-auto px-6 py-24">
+  <div class="grid grid-cols-2 gap-20 items-center">
+    <div class="relative" style="height: 600px;">
+      <div class="absolute inset-0 bg-navy-dark rounded-none"></div>
+      <div class="absolute inset-0 flex items-center justify-center opacity-10">
+        <span class="font-display text-9xl text-white">Story</span>
+      </div>
+      <div class="absolute -bottom-6 -right-6 w-40 h-40 border-2 border-navy"></div>
+    </div>
+    <div>
+      <p class="font-cormorant italic text-navy text-xl mb-4">Our Story</p>
+      <h2 class="font-display text-5xl text-black mb-6 leading-tight">
+        Crafted with<br/>Purpose &<br/><span class="italic text-navy">Passion</span>
+      </h2>
+      <p class="font-cormorant text-gray-500 text-xl leading-relaxed mb-6">
+        Born in the heart of India, Classie is a celebration of refined taste. We believe that fashion is not just what you wear — it is how you present yourself to the world.
+      </p>
+      <p class="font-cormorant text-gray-500 text-xl leading-relaxed mb-10">
+        Every stitch, every fabric choice, every silhouette is deliberate. We partner with artisans across the country to bring you pieces that are both modern and timeless.
+      </p>
+      <a href="#" class="text-xs tracking-widest uppercase text-navy border-b border-navy pb-1 hover:text-navy-dark transition">Read Our Story →</a>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL STRIP -->
+<section class="bg-navy py-16">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    <p class="font-cormorant italic text-gray-300 text-lg mb-2">Follow Along</p>
+    <h2 class="font-display text-4xl text-white mb-2">@classie.official</h2>
+    <p class="text-gray-400 text-sm tracking-wider mb-10">Tag us in your looks</p>
+    <div class="grid grid-cols-6 gap-2">
+      <div class="bg-navy-dark" style="height: 180px;"></div>
+      <div class="bg-[#4f6a8a]" style="height: 180px;"></div>
+      <div class="bg-navy-dark" style="height: 180px;"></div>
+      <div class="bg-[#4f6a8a]" style="height: 180px;"></div>
+      <div class="bg-navy-dark" style="height: 180px;"></div>
+      <div class="bg-[#4f6a8a]" style="height: 180px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="py-24 bg-[#f7f7f7]">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <p class="font-cormorant italic text-navy text-lg mb-2">Stay in the Loop</p>
+    <h2 class="font-display text-5xl text-black mb-4">The Classie Edit</h2>
+    <p class="font-cormorant text-gray-500 text-xl mb-10">Curated drops, style notes, and early access — delivered to your inbox.</p>
+    <div class="flex gap-0 max-w-lg mx-auto">
+      <input type="email" placeholder="Your email address" class="flex-1 border border-gray-300 px-6 py-4 text-sm focus:outline-none focus:border-navy bg-white">
+      <button class="bg-navy text-white text-xs tracking-widest uppercase px-8 py-4 hover:bg-navy-dark transition">Subscribe</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-black text-white py-16">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-4 gap-12 mb-12">
+      <div>
+        <div class="font-display text-3xl tracking-widest text-white mb-4">CLASSIE</div>
+        <p class="font-cormorant text-gray-400 text-lg leading-relaxed">Luxury fashion for the discerning individual.</p>
+      </div>
+      <div>
+        <h4 class="text-xs tracking-widest uppercase text-gray-500 mb-6">Shop</h4>
+        <ul class="space-y-3 text-sm text-gray-400 font-cormorant text-lg">
+          <li><a href="#" class="hover:text-white transition">Women</a></li>
+          <li><a href="#" class="hover:text-white transition">Men</a></li>
+          <li><a href="#" class="hover:text-white transition">Accessories</a></li>
+          <li><a href="#" class="hover:text-white transition">New Arrivals</a></li>
+          <li><a href="#" class="hover:text-white transition">Sale</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs tracking-widest uppercase text-gray-500 mb-6">Help</h4>
+        <ul class="space-y-3 font-cormorant text-lg text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Shipping & Returns</a></li>
+          <li><a href="#" class="hover:text-white transition">Size Guide</a></li>
+          <li><a href="#" class="hover:text-white transition">FAQs</a></li>
+          <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-xs tracking-widest uppercase text-gray-500 mb-6">Follow</h4>
+        <ul class="space-y-3 font-cormorant text-lg text-gray-400">
+          <li><a href="#" class="hover:text-white transition">Instagram</a></li>
+          <li><a href="#" class="hover:text-white transition">Pinterest</a></li>
+          <li><a href="#" class="hover:text-white transition">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 pt-8 flex justify-between items-center">
+      <p class="text-xs text-gray-600 tracking-widest">© 2025 CLASSIE. ALL RIGHTS RESERVED.</p>
+      <p class="text-xs text-gray-600 tracking-widest">MADE IN INDIA</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
