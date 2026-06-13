@@ -65,8 +65,8 @@ export default function AnnouncementBar() {
         fontFamily: "'Poppins', sans-serif",
         fontSize: "11px",
         letterSpacing: "0.16em",
-        textTransform: "uppercase",
-        color: "#fff",
+        textTransform: "uppercase" as const,
+        color: "rgba(255,255,255,0.9)",
       }}
     >
       <p>
