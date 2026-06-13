@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Instagram } from "lucide-react";
 import NewsletterSection from "@/components/NewsletterSection";
-import OccasionCarousel from "@/components/OccasionCarousel";
+import OccasionSection from "@/components/OccasionSection";
 import FeaturedPicks from "@/components/FeaturedPicks";
 import HeroImageSlider from "@/components/HeroImageSlider";
 import HeroSection from "@/components/HeroSection";
@@ -232,7 +232,7 @@ export default async function HomePage() {
                 Shop by <em className="italic text-[#3B5373]">Occasion</em>
               </h2>
           </div>
-          <OccasionCarousel occasions={occasions} />
+          <OccasionSection />
           {/* Numbered Quick Links Row */}
           {siteCategories.length > 0 && (
             <div className="grid border border-[#e8e8e8] mt-5" style={{ gridTemplateColumns: `repeat(${Math.min(siteCategories.length, 4)}, 1fr)` }}>
