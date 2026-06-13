@@ -80,6 +80,7 @@ interface SiteSettings {
   announcement_5: string;
   announcement_6: string;
   announcement_speed: string;
+  announcement_mode: string;
   whatsapp_number: string;
   instagram_url: string;
   philosophy_eyebrow: string;
@@ -242,7 +243,7 @@ const EMPTY_SLIDE: HeroSlide = {
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages" | "testimonials" | "instagram" | "style-inspo";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement";
 type MainSection = "dashboard" | "homepage" | "catalog" | "orders" | "settings" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -252,6 +253,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "testimonials":   "homepage",
   "instagram":      "homepage",
   "style-inspo":    "homepage",
+  "announcement":   "homepage",
   "products":       "catalog",
   "collections":    "catalog",
   "categories":     "catalog",
@@ -264,6 +266,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   dashboard: [],
   homepage: [
     { id: "slides",         label: "Hero" },
+    { id: "announcement",   label: "Announcement" },
     { id: "featured-picks", label: "Featured Picks" },
     { id: "testimonials",   label: "Reviews" },
     { id: "instagram",      label: "Instagram" },
@@ -321,7 +324,8 @@ export default function AdminPage() {
     logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
     announcement_1: "", announcement_2: "", announcement_3: "",
     announcement_4: "", announcement_5: "", announcement_6: "",
-    announcement_speed: "25",
+    announcement_speed: "15",
+    announcement_mode: "rotate",
     philosophy_eyebrow: "Our Philosophy",
     philosophy_headline: "One Heel. Endless Possibilities.",
     philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
@@ -498,7 +502,8 @@ export default function AdminPage() {
           logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
           announcement_1: "", announcement_2: "", announcement_3: "",
           announcement_4: "", announcement_5: "", announcement_6: "",
-          announcement_speed: "25",
+          announcement_speed: "15",
+    announcement_mode: "rotate",
           philosophy_eyebrow: "Our Philosophy",
           philosophy_headline: "One Heel. Endless Possibilities.",
           philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
@@ -642,6 +647,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authed) return;
     if (tab === "slides") { fetchSlides(); fetchSettings(); }
+    if (tab === "announcement") { fetchSettings(); }
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
@@ -913,6 +919,7 @@ export default function AdminPage() {
         rows.push({ key: `announcement_${i + 1}`, value: announcementList[i] ?? "" });
       }
       rows.push({ key: "announcement_speed", value: announcementSpeed });
+      rows.push({ key: "announcement_mode",  value: siteSettings.announcement_mode });
       await upsertSettings(rows);
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
@@ -2108,6 +2115,76 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              ANNOUNCEMENT TAB
+          ══════════════════════════════════════ */}
+          {tab === "announcement" && (
+            <div className="max-w-2xl space-y-6">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#3B5373]" />
+                  <h2 className="font-semibold text-gray-700">Announcement Bar</h2>
+                </div>
+                {settingsLoading ? <p className="text-gray-400 text-sm">Loading…</p> : (
+                  <>
+                    {/* Mode */}
+                    <div>
+                      <label className={labelCls}>Display Mode</label>
+                      <div className="flex gap-3 mt-1">
+                        {(["rotate","scroll"] as const).map(m => (
+                          <button key={m} onClick={() => setSiteSettings(s => ({ ...s, announcement_mode: m }))}
+                            className={`px-5 py-2.5 rounded-xl text-sm font-medium border transition-all ${siteSettings.announcement_mode === m ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-600 border-gray-200 hover:border-[#3B5373]"}`}>
+                            {m === "rotate" ? "🔄 Rotate / Blink" : "📜 Scroll (Ticker)"}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1.5">
+                        {siteSettings.announcement_mode === "scroll" ? "All messages scroll left continuously like a ticker" : "One message at a time — fades in/out every few seconds"}
+                      </p>
+                    </div>
+                    {/* Speed */}
+                    <div>
+                      <label className={labelCls}>{siteSettings.announcement_mode === "scroll" ? "Scroll Speed" : "Rotation Speed"}</label>
+                      <select value={announcementSpeed} onChange={(e) => setAnnouncementSpeed(e.target.value)} className={`${inputCls} max-w-[200px]`}>
+                        <option value="40">🐢 Slow (40s)</option>
+                        <option value="25">🚶 Normal (25s)</option>
+                        <option value="15">🚀 Fast (15s)</option>
+                      </select>
+                    </div>
+                    {/* Messages */}
+                    <div>
+                      <label className={labelCls}>Messages (up to 6)</label>
+                      <div className="space-y-2 mt-1">
+                        {announcementList.map((text, i) => (
+                          <div key={i} className="flex gap-2 items-center">
+                            <span className="text-xs font-medium text-gray-400 w-5 flex-shrink-0 text-center">{i + 1}.</span>
+                            <input type="text" value={text} className={`${inputCls} flex-1`}
+                              placeholder={i === 0 ? "✦ Welcome to Classie — One Heel. Endless Looks." : i === 1 ? "Use code FIRST10 for 10% OFF!" : "🚢 Free Shipping above ₹999"}
+                              onChange={(e) => { const n = [...announcementList]; n[i] = e.target.value; setAnnouncementList(n); }} />
+                            <button onClick={() => { const n = announcementList.filter((_,j) => j !== i); setAnnouncementList(n.length === 0 ? [""] : n); }}
+                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      {announcementList.length < 6 && (
+                        <button onClick={() => setAnnouncementList(p => [...p, ""])} className="mt-2 flex items-center gap-1.5 text-xs text-[#3B5373] hover:underline">
+                          <Plus className="w-3.5 h-3.5" /> Add More
+                        </button>
+                      )}
+                    </div>
+                    <button onClick={saveAnnouncements} disabled={settingsSaving}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                      <Save className="w-4 h-4" />
+                      {settingsSaving ? "Saving…" : "Save Announcements"}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}
