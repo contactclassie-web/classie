@@ -183,10 +183,23 @@ export default async function HomePage() {
   const philCtaUrl = cfg["philosophy_cta_url"] || "/about";
   const philImageUrl = cfg["philosophy_image_url"] || "";
 
-  // Instagram feed
-  const igImages = allProducts
-    .slice(0, 4)
-    .map((p) => ({ image: p.image, slug: p.slug, title: p.title }));
+  // Instagram / Style Inspo feed — from DB first, fallback to products
+  const { data: dbInstagramImages } = await sb
+    .from("instagram_images")
+    .select("image_url, link_url")
+    .eq("active", true)
+    .order("display_order", { ascending: true })
+    .limit(6);
+
+  const igImages = dbInstagramImages && dbInstagramImages.length > 0
+    ? dbInstagramImages.map((img: { image_url: string; link_url: string }) => ({
+        image: img.image_url,
+        link: img.link_url || "https://www.instagram.com/_classie_in/",
+      }))
+    : allProducts.slice(0, 6).map((p) => ({
+        image: p.image,
+        link: "https://www.instagram.com/_classie_in/",
+      }));
 
   const stats = [
     { number: heroStat1Num, label: heroStat1Label },
@@ -274,6 +287,19 @@ export default async function HomePage() {
               </div>
             </div>
           )}
+          {/* SS Badge */}
+          <div className="absolute top-6 right-6 bg-[#3B5373] text-white text-center px-3 py-2">
+            <div className="font-sans text-[10px] font-semibold tracking-[0.2em] uppercase">SS25</div>
+            <div className="font-sans text-[9px] tracking-[0.14em] uppercase text-white/70 mt-0.5">New In</div>
+          </div>
+          {/* Live sold pill */}
+          <div className="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm shadow-md px-3 py-2 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
+            <div>
+              <p className="font-sans text-[11px] font-medium text-[#1a1a1a]">Trending today</p>
+              <p className="font-sans text-[10px] text-[#9ca3af]">Limited stock</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -309,6 +335,30 @@ export default async function HomePage() {
             </div>
           </div>
           <OccasionCarousel occasions={occasions} />
+          {/* Numbered Quick Links Row */}
+          {siteCategories.length > 0 && (
+            <div className="grid border border-[#e8e8e8] mt-5" style={{ gridTemplateColumns: `repeat(${Math.min(siteCategories.length, 4)}, 1fr)` }}>
+              {siteCategories.slice(0, 4).map((cat, idx) => (
+                <Link
+                  key={cat.slug}
+                  href={`/shop/${cat.slug}`}
+                  className="group flex items-center justify-between px-6 py-5 bg-white hover:bg-[#f7f7f7] transition-colors border-r border-[#e8e8e8] last:border-r-0"
+                >
+                  <div>
+                    <p className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#9ca3af] mb-1">
+                      0{idx + 1}
+                    </p>
+                    <p className="font-serif text-[1.05rem] text-[#1a1a1a] group-hover:text-[#3B5373] transition-colors">
+                      {cat.name}
+                    </p>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B5373" strokeWidth="1.8" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </Link>
+              ))}
+            </div>
+          )}
       </section>
 
       {/* ══ 4. SHOP BY CATEGORY ════════════════════════════════════════════ */}
@@ -554,64 +604,57 @@ export default async function HomePage() {
       {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
       <NewsletterSection />
 
-      {/* ══ INSTAGRAM FEED ════════════════════════════════════════════════ */}
+      {/* ══ STYLE INSPO / INSTAGRAM ═══════════════════════════════════════ */}
       <section className="py-20 bg-white border-t border-gray-100 px-6 md:px-20">
         <div>
-          <div className="mb-10">
-            <div className="flex items-center gap-4 mb-4">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-4 mb-4">
               <div className="w-8 h-px bg-[#3B5373]" />
               <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
-                INSTAGRAM
+                @classie_in
               </span>
+              <div className="w-8 h-px bg-[#3B5373]" />
             </div>
             <h2 className="font-serif text-[clamp(1.6rem,3vw,2.5rem)] font-light leading-[1.15] text-[#1a1a1a] mb-2">
-              As Seen on <em className="italic text-[#3B5373]">Instagram</em>
+              Style <em className="italic text-[#3B5373]">Inspo</em>
             </h2>
-            <p
-              className="text-[#9ca3af] text-xs tracking-wide"
-              style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 300 }}
-            >
-              Tag us @_classie_in to be featured
+            <p className="text-[#9ca3af] text-xs tracking-wide font-light">
+              Tag us to be featured
             </p>
           </div>
-          <a
-            href="https://www.instagram.com/_classie_in/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-              {igImages.map((item, i) => (
-                <div
-                  key={i}
-                  className="group relative overflow-hidden bg-[#F9F9F9]"
-                  style={{ aspectRatio: "1 / 1" }}
-                >
-                  {item.image && (
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                    <Instagram className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-1 md:gap-1">
+            {igImages.map((item, i) => (
+              <a
+                key={i}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative overflow-hidden bg-[#c8d6e5]"
+                style={{ aspectRatio: "1 / 1" }}
+              >
+                {item.image && (
+                  <Image
+                    src={item.image}
+                    alt="Style Inspo"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 33vw, 16vw"
+                  />
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
+                  <Instagram className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-              ))}
-            </div>
-          </a>
+              </a>
+            ))}
+          </div>
           <div className="text-center mt-8">
             <a
               href="https://www.instagram.com/_classie_in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-[#3B5373] border border-[#3B5373] px-8 py-3 tracking-[0.2em] uppercase hover:bg-[#3B5373] hover:text-white transition-all duration-300"
+              className="font-sans text-[11px] tracking-[0.2em] uppercase text-[#3B5373] border-b border-[#3B5373] pb-0.5 hover:text-[#2a3d55] transition-colors"
             >
-              <Instagram className="w-4 h-4" />
-              Follow on Instagram
+              Follow @classie_in →
             </a>
           </div>
         </div>
