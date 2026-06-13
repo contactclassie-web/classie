@@ -42,43 +42,30 @@ export default function CategoryLinks() {
   if (cats.length === 0) return null;
 
   return (
-    <div className="grid border border-[#e8e8e8] mt-5 overflow-hidden rounded-sm"
-      style={{ gridTemplateColumns: `repeat(${Math.min(cats.length, 4)}, 1fr)` }}>
+    <div className="mt-5 border border-[#e5e5e5] rounded-sm overflow-hidden"
+      style={{ gridTemplateColumns: `repeat(${Math.min(cats.length, 4)}, 1fr)`, display: "grid" }}>
       {cats.slice(0, 4).map((cat, idx) => (
         <Link key={cat.slug} href={`/shop/${cat.slug}`}
-          className="group flex items-center justify-between px-6 py-5 bg-white transition-all duration-300 border-r border-[#e8e8e8] last:border-r-0"
+          className="group flex flex-col justify-center px-7 py-5 bg-white border-r border-[#e5e5e5] last:border-r-0 transition-all duration-300"
           onMouseEnter={e => {
-            const el = e.currentTarget;
+            const el = e.currentTarget as HTMLAnchorElement;
             el.style.backgroundColor = style.hoverBg;
-            el.querySelectorAll<HTMLElement>("[data-cat-name],[data-cat-arrow]").forEach(c => {
-              c.style.color = style.hoverText;
-              c.style.opacity = "1";
-            });
-            el.querySelector<HTMLElement>("[data-cat-num]")!.style.color = style.hoverText + "99";
+            el.querySelectorAll<HTMLElement>("[data-cat-name]").forEach(c => { c.style.color = style.hoverText; });
+            el.querySelectorAll<HTMLElement>("[data-cat-num]").forEach(c => { c.style.color = style.hoverText + "80"; });
           }}
           onMouseLeave={e => {
-            const el = e.currentTarget;
+            const el = e.currentTarget as HTMLAnchorElement;
             el.style.backgroundColor = "";
-            el.querySelectorAll<HTMLElement>("[data-cat-name],[data-cat-arrow]").forEach(c => {
-              c.style.color = "";
-              c.style.opacity = "";
-            });
-            el.querySelector<HTMLElement>("[data-cat-num]")!.style.color = "";
+            el.querySelectorAll<HTMLElement>("[data-cat-name],[data-cat-num]").forEach(c => { c.style.color = ""; });
           }}>
-          <div>
-            <p data-cat-num className="font-sans text-[9px] tracking-[0.2em] uppercase mb-1 transition-colors"
-              style={{ color: style.numColor }}>
-              0{idx + 1}
-            </p>
-            <p data-cat-name className="font-serif text-[#1a1a1a] transition-colors tracking-wide"
-              style={{ fontSize: `${style.textSize}rem`, fontWeight: style.bold ? 600 : 400 }}>
-              {cat.name}
-            </p>
-          </div>
-          <svg data-cat-arrow width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-            className="opacity-0 translate-x-0 group-hover:translate-x-1 transition-all duration-300">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
+          <p data-cat-num className="font-sans text-[10px] tracking-[0.15em] mb-1.5 transition-colors"
+            style={{ color: style.numColor }}>
+            0{idx + 1}
+          </p>
+          <p data-cat-name className="font-serif text-[#1a1a1a] transition-colors"
+            style={{ fontSize: `${style.textSize}rem`, fontWeight: style.bold ? 600 : 400, letterSpacing: "0.01em" }}>
+            {cat.name}
+          </p>
         </Link>
       ))}
     </div>
