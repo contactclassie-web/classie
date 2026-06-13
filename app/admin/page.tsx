@@ -1066,7 +1066,11 @@ export default function AdminPage() {
         <nav className="flex-1 py-4 px-3 space-y-0.5">
           {MAIN_SECTIONS.map(({ id, label, icon: Icon, badge }) => {
             const active = mainSection === id;
-            const firstTab = id === "dashboard" ? "dashboard" as TabId : (SECTION_SUBTABS[id][0]?.id ?? "dashboard" as TabId);
+            const firstTab: TabId = id === "dashboard" ? "dashboard" :
+              id === "orders" ? "orders" :
+              id === "settings" ? "settings" :
+              id === "messages" ? "messages" :
+              (SECTION_SUBTABS[id][0]?.id ?? "dashboard");
             return (
               <button
                 key={id}
