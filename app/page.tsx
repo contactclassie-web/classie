@@ -235,22 +235,23 @@ export default async function HomePage() {
           <OccasionSection />
           {/* Numbered Quick Links Row */}
           {siteCategories.length > 0 && (
-            <div className="grid border border-[#e8e8e8] mt-5" style={{ gridTemplateColumns: `repeat(${Math.min(siteCategories.length, 4)}, 1fr)` }}>
+            <div className="grid border border-[#e8e8e8] mt-5 overflow-hidden rounded-sm" style={{ gridTemplateColumns: `repeat(${Math.min(siteCategories.length, 4)}, 1fr)` }}>
               {siteCategories.slice(0, 4).map((cat, idx) => (
                 <Link
                   key={cat.slug}
                   href={`/shop/${cat.slug}`}
-                  className="group flex items-center justify-between px-6 py-5 bg-white hover:bg-[#f7f7f7] transition-colors border-r border-[#e8e8e8] last:border-r-0"
+                  className="group flex items-center justify-between px-6 py-5 bg-white hover:bg-[#3B5373] transition-all duration-300 border-r border-[#e8e8e8] last:border-r-0"
                 >
                   <div>
-                    <p className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#9ca3af] mb-1">
+                    <p className="font-sans text-[9px] tracking-[0.2em] uppercase text-[#9ca3af] mb-1 group-hover:text-white/60 transition-colors">
                       0{idx + 1}
                     </p>
-                    <p className="font-serif text-[1.05rem] text-[#1a1a1a] group-hover:text-[#3B5373] transition-colors">
+                    <p className="font-serif text-[1.1rem] font-semibold text-[#1a1a1a] group-hover:text-white transition-colors tracking-wide">
                       {cat.name}
                     </p>
                   </div>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B5373" strokeWidth="1.8" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                    className="text-[#3B5373] group-hover:text-white opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                   </svg>
                 </Link>
