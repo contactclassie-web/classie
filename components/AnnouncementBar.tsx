@@ -56,15 +56,23 @@ export default function AnnouncementBar() {
 
   // SCROLL mode — single marquee ticker
   if (mode === "scroll") {
-    const ticker = msgs.join("          ✦          ");
     const dur = `${Math.max(10, parseInt(speed))}s`;
+    const sep = "\u00A0\u00A0\u00A0\u00A0\u00A0✦\u00A0\u00A0\u00A0\u00A0\u00A0";
+    const items = [...msgs, ...msgs]; // duplicate for seamless loop
     return (
-      <div style={BAR_STYLE}>
+      <div style={{ ...BAR_STYLE, position: "relative" }}>
         <style>{`
-          @keyframes marquee { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
-          .ann-ticker { display: inline-block; white-space: nowrap; animation: marquee ${dur} linear infinite; }
+          @keyframes marquee2 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+          .ann-ticker2 { display: inline-flex; white-space: nowrap; animation: marquee2 ${dur} linear infinite; }
         `}</style>
-        <span className="ann-ticker">{highlightText(ticker)}</span>
+        <span className="ann-ticker2">
+          {items.map((msg, i) => (
+            <span key={i} style={{ display: "inline-block" }}>
+              {highlightText(msg)}
+              {i < items.length - 1 && <span style={{ opacity: 0.5 }}>{sep}</span>}
+            </span>
+          ))}
+        </span>
       </div>
     );
   }
