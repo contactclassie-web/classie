@@ -3,18 +3,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-const FALLBACK = "Free Shipping ₹999+ · Easy Returns · Premium Quality · Made in India · Comfort-First Design";
-
 export default function TrustBand() {
-  const [items, setItems] = useState<string[]>(FALLBACK.split(" · "));
+  const [items, setItems] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.from("site_settings").select("value").eq("key", "band_text").single()
       .then(({ data }) => {
-        if (data?.value) setItems(data.value.split(" · ").map((s: string) => s.trim()).filter(Boolean));
+        if (data?.value) setItems(data.value.split("·").map((s: string) => s.trim()).filter(Boolean));
       });
   }, []);
 
+  if (items.length === 0) return null;
   const doubled = [...items, ...items];
 
   return (
