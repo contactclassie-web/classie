@@ -91,8 +91,9 @@ export default function OccasionCarousel({
 }: {
   occasions: Occasion[];
 }) {
-  // Always show exactly 3 cards — match HTML design
-  const displayItems = occasions.filter((o) => o.image).slice(0, 3);
+  const allItems = occasions.filter((o) => o.image);
+  const displayItems = allItems.slice(0, 3);
+  const hasMore = allItems.length > 3;
 
   if (displayItems.length === 0) return null;
 
@@ -108,16 +109,26 @@ export default function OccasionCarousel({
         ))}
       </div>
 
-      {/* Mobile: stacked */}
-      <div className="flex flex-col gap-[3px] md:hidden">
+      {/* Mobile: horizontal scroll */}
+      <div className="flex gap-[3px] md:hidden overflow-x-auto snap-x snap-mandatory pb-2" style={{ scrollbarWidth: "none" }}>
         {displayItems.map((occ) => (
-          <div key={occ.href} className="relative" style={{ height: "260px" }}>
-            <div className="absolute inset-0">
-              <OccasionCard occ={occ} />
-            </div>
+          <div key={occ.href} className="flex-shrink-0 snap-start" style={{ width: "75vw" }}>
+            <OccasionCard occ={occ} />
           </div>
         ))}
       </div>
+
+      {/* View All button — only if more than 3 occasions in DB */}
+      {hasMore && (
+        <div className="text-center mt-5">
+          <a
+            href="/occasions"
+            className="font-sans text-[11px] tracking-[0.2em] uppercase text-[#3B5373] border-b border-[#3B5373] pb-0.5 hover:text-[#2a3d55] transition-colors"
+          >
+            View All Occasions →
+          </a>
+        </div>
+      )}
     </>
   );
 }
