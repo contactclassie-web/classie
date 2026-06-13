@@ -109,10 +109,10 @@ export default function OccasionCarousel({
         ))}
       </div>
 
-      {/* Mobile: horizontal scroll */}
-      <div className="flex gap-[3px] md:hidden overflow-x-auto snap-x snap-mandatory pb-2" style={{ scrollbarWidth: "none" }}>
+      {/* Mobile: horizontal scroll, full-bleed */}
+      <div className="flex gap-2 md:hidden overflow-x-auto snap-x snap-mandatory pb-2 -mx-6 px-6" style={{ scrollbarWidth: "none" }}>
         {displayItems.map((occ) => (
-          <div key={occ.href} className="flex-shrink-0 snap-start" style={{ width: "75vw" }}>
+          <div key={occ.href} className="flex-shrink-0 snap-start" style={{ width: displayItems.length === 1 ? "100%" : "82vw" }}>
             <OccasionCard occ={occ} />
           </div>
         ))}

@@ -221,8 +221,8 @@ export default async function HomePage() {
       <TrustBand />
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
-      <section className="py-12 bg-white px-6 md:px-20">
-        <div className="max-w-[1280px] mx-auto">
+      <section className="py-12 bg-white">
+        <div className="max-w-[1280px] mx-auto px-6 md:px-20">
           {/* Header — centered like HTML design */}
           <div className="text-center mb-10">
               <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
