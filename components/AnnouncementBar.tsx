@@ -56,7 +56,7 @@ export default function AnnouncementBar() {
 
   // SCROLL mode — single marquee ticker
   if (mode === "scroll") {
-    const ticker = msgs.join("  ·  ");
+    const ticker = msgs.join("          ✦          ");
     const dur = `${Math.max(10, parseInt(speed))}s`;
     return (
       <div style={BAR_STYLE}>
