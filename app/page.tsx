@@ -5,6 +5,7 @@ import NewsletterSection from "@/components/NewsletterSection";
 import OccasionCarousel from "@/components/OccasionCarousel";
 import FeaturedPicks from "@/components/FeaturedPicks";
 import HeroImageSlider from "@/components/HeroImageSlider";
+import HeroSection from "@/components/HeroSection";
 import {
   Product,
   CURATED_COLLECTIONS,
@@ -212,92 +213,8 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* ══ 1. HERO — Split editorial layout ═══════════════════════════════ */}
-      <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[calc(100vh-72px)]">
-        {/* Left: text content */}
-        <div className="flex flex-col justify-center px-6 md:px-20 py-16 md:py-24 bg-[#f7f7f7] relative">
-
-          {/* Eyebrow */}
-          <div className="flex items-center gap-4 mb-7">
-            <div className="w-8 h-px bg-[#3B5373]" />
-            <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
-              {heroEyebrow}
-            </span>
-          </div>
-
-          {/* Heading */}
-          <h1 className="font-serif text-[clamp(52px,6.2vw,94px)] font-light leading-[1.02] text-[#1a1a1a] mb-8">
-            {heroLine1}
-            <br />
-            <em className="italic text-[#3B5373]">{heroItalic}</em>
-            <br />
-            {heroLine3}
-          </h1>
-
-          {/* Subtitle */}
-          <p className="font-sans text-sm font-light leading-[1.85] text-[#6b7280] max-w-[360px] mb-12 tracking-[0.04em]">
-            {heroSubtitle}
-          </p>
-
-          {/* Buttons */}
-          <div className="flex flex-wrap items-center gap-6 mb-16">
-            <Link
-              href={heroCta1Url}
-              className="bg-[#3B5373] text-white px-10 py-4 text-[10px] font-light tracking-[0.28em] uppercase border border-[#3B5373] hover:bg-[#1a1a1a] hover:border-[#1a1a1a] transition-all duration-300"
-            >
-              {heroCta1Text}
-            </Link>
-            {heroCta2Text && (
-              <Link
-                href={heroCta2Url}
-                className="border border-[#3B5373] text-[#3B5373] px-10 py-4 text-[10px] font-light tracking-[0.28em] uppercase hover:bg-[#3B5373] hover:text-white transition-all duration-300"
-              >
-                {heroCta2Text}
-              </Link>
-            )}
-          </div>
-
-          {/* Stats row */}
-          <div className="flex gap-8 pt-8 border-t border-[rgba(59,83,115,0.15)]">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <div className="font-serif text-[1.4rem] font-normal text-[#3B5373] leading-none">
-                  {stat.number}
-                </div>
-                <div className="font-sans text-[10px] font-light tracking-[0.14em] uppercase text-[#9ca3af] mt-1">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: auto-changing image slider */}
-        {/* Right: image */}
-        <div className="relative overflow-hidden bg-[#F9F9F9] min-h-[400px]">
-          <HeroImageSlider slides={heroSlides ?? []} fallbackUrl={heroImageUrl} />
-          {/* Promo chip */}
-          {heroChipCode && (
-            <div className="absolute bottom-12 left-0 bg-white px-7 py-5 border-l-[3px] border-[#3B5373] shadow-xl">
-              <div className="font-serif text-xl font-normal text-[#3B5373] tracking-[0.08em]">{heroChipCode}</div>
-              <div className="font-sans text-[9.5px] font-light tracking-[0.22em] uppercase text-[#6b7280] mt-1">{heroChipText}</div>
-            </div>
-          )}
-          {/* SS Badge — bottom left */}
-          <div className="absolute bottom-0 left-0 bg-[#3B5373] text-white px-5 py-4">
-            <div className="font-sans text-[18px] font-semibold tracking-[0.08em] uppercase">SS25</div>
-            <div className="font-sans text-[9px] tracking-[0.18em] uppercase text-white/70 mt-0.5">New In</div>
-          </div>
-          {/* Live sold pill — top right */}
-          <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm shadow-md px-4 py-2.5 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
-            <div>
-              <p className="font-sans text-[11px] font-medium text-[#1a1a1a]">247 sold today</p>
-              <p className="font-sans text-[10px] text-[#9ca3af]">Limited stock</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ══ 1. HERO ═══════════════════════════════════════════════════════ */}
+      <HeroSection heroSlides={heroSlides ?? []} heroImageUrl={heroImageUrl} />
 
       {/* ══ 2. TRUST BAND — Navy scrolling ticker ══════════════════════════ */}
       <div className="bg-[#3B5373] py-3 overflow-hidden">
