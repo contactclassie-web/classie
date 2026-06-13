@@ -59,7 +59,7 @@ export default function AnnouncementBar() {
   return (
     <div
       style={{
-        background: "#000",
+        background: "#3B5373",
         padding: "9px 16px",
         textAlign: "center",
         fontFamily: "'Poppins', sans-serif",
