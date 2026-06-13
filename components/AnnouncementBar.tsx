@@ -57,7 +57,7 @@ export default function AnnouncementBar() {
   return (
     <div
       className="overflow-hidden py-2"
-      style={{ background: "#000", fontFamily: "'Poppins', sans-serif" }}
+      style={{ background: "#3B5373", fontFamily: "'Poppins', sans-serif" }}
     >
       <div
         className="announcement-track flex whitespace-nowrap"
