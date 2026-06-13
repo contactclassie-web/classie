@@ -17,7 +17,7 @@ function highlightText(text: string) {
 
 const BAR_STYLE: React.CSSProperties = {
   background: "#3B5373",
-  padding: "9px 16px",
+  padding: "5px 16px",
   textAlign: "center",
   fontFamily: "'Poppins', sans-serif",
   fontSize: "11px",
