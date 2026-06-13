@@ -879,6 +879,13 @@ export default function AdminPage() {
 
   // ── Settings actions ──────────────────────────────────────────────────────
 
+  // Helper: delete-then-insert so it works even without UNIQUE constraint on key
+  const upsertSettings = async (rows: { key: string; value: string }[]) => {
+    const keys = rows.map((r) => r.key);
+    await supabase.from("site_settings").delete().in("key", keys);
+    await supabase.from("site_settings").insert(rows);
+  };
+
   const saveAnnouncements = async () => {
     setSettingsSaving(true);
     try {
@@ -888,7 +895,7 @@ export default function AdminPage() {
         rows.push({ key: `announcement_${i + 1}`, value: announcementList[i] ?? "" });
       }
       rows.push({ key: "announcement_speed", value: announcementSpeed });
-      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+      await upsertSettings(rows);
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
   };
@@ -901,7 +908,7 @@ export default function AdminPage() {
         { key: "whatsapp_number", value: siteSettings.whatsapp_number },
         { key: "instagram_url",   value: siteSettings.instagram_url },
       ];
-      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+      await upsertSettings(rows);
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
   };
@@ -917,7 +924,7 @@ export default function AdminPage() {
         { key: "philosophy_cta_url",   value: siteSettings.philosophy_cta_url },
         { key: "philosophy_image_url", value: siteSettings.philosophy_image_url },
       ];
-      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+      await upsertSettings(rows);
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
   };
@@ -946,7 +953,7 @@ export default function AdminPage() {
         { key: "hero_chip_text",      value: siteSettings.hero_chip_text },
         { key: "band_text",           value: siteSettings.band_text },
       ];
-      await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
+      await upsertSettings(rows);
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
   };
@@ -2136,7 +2143,7 @@ export default function AdminPage() {
                       className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373] bg-white"
                       defaultValue="35"
                       onChange={async (e) => {
-                        await supabase.from("site_settings").upsert({ key: "features_bar_speed", value: e.target.value }, { onConflict: "key" });
+                        await upsertSettings([{ key: "features_bar_speed", value: e.target.value }]);
                       }}
                     >
                       <option value="50">🐢 Slow</option>
