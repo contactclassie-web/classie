@@ -237,10 +237,10 @@ const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm foc
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
 type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages" | "testimonials" | "instagram" | "style-inspo";
-type MainSection = "homepage" | "catalog" | "orders" | "settings" | "messages";
+type MainSection = "dashboard" | "homepage" | "catalog" | "orders" | "settings" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
-  "dashboard":      "homepage",
+  "dashboard":      "dashboard",
   "slides":         "homepage",
   "featured-picks": "homepage",
   "testimonials":   "homepage",
@@ -255,8 +255,8 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
 };
 
 const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
+  dashboard: [],
   homepage: [
-    { id: "dashboard",      label: "Overview" },
     { id: "slides",         label: "Hero" },
     { id: "featured-picks", label: "Featured Picks" },
     { id: "testimonials",   label: "Reviews" },
@@ -1037,11 +1037,12 @@ export default function AdminPage() {
   const mainSection: MainSection = TAB_TO_SECTION[tab];
 
   const MAIN_SECTIONS: { id: MainSection; label: string; icon: React.ElementType; badge?: number }[] = [
-    { id: "homepage",  label: "Homepage",  icon: Home },
-    { id: "catalog",   label: "Catalog",   icon: ImageIcon, badge: dbProducts.length },
-    { id: "orders",    label: "Orders",    icon: ShoppingCart, badge: orders.length },
-    { id: "settings",  label: "Settings",  icon: Settings },
-    { id: "messages",  label: "Messages",  icon: MessageSquare, badge: messages.length },
+    { id: "dashboard", label: "Dashboard",  icon: LayoutDashboard },
+    { id: "homepage",  label: "Homepage",   icon: Home },
+    { id: "catalog",   label: "Catalog",    icon: ImageIcon, badge: dbProducts.length },
+    { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
+    { id: "settings",  label: "Settings",   icon: Settings },
+    { id: "messages",  label: "Messages",   icon: MessageSquare, badge: messages.length },
   ];
 
   // ── Main layout ───────────────────────────────────────────────────────────
@@ -1065,7 +1066,7 @@ export default function AdminPage() {
         <nav className="flex-1 py-4 px-3 space-y-0.5">
           {MAIN_SECTIONS.map(({ id, label, icon: Icon, badge }) => {
             const active = mainSection === id;
-            const firstTab = SECTION_SUBTABS[id][0]?.id ?? (id as unknown as TabId);
+            const firstTab = id === "dashboard" ? "dashboard" as TabId : (SECTION_SUBTABS[id][0]?.id ?? "dashboard" as TabId);
             return (
               <button
                 key={id}
@@ -1108,7 +1109,8 @@ export default function AdminPage() {
         <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
           <div>
             <h1 className="font-semibold text-gray-800 capitalize">
-              {mainSection === "homepage" ? "Homepage" :
+              {mainSection === "dashboard" ? "Dashboard" :
+               mainSection === "homepage" ? "Homepage" :
                mainSection === "catalog" ? "Catalog" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" : "Messages"}
