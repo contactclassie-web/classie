@@ -213,11 +213,9 @@ export default async function HomePage() {
   return (
     <>
       {/* ══ 1. HERO — Split editorial layout ═══════════════════════════════ */}
-      <section className="bg-[#f7f7f7] min-h-[88vh] flex items-center">
-        <div className="w-full" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 40px" }}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center py-16">
+      <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[calc(100vh-72px)]">
         {/* Left: text content */}
-        <div className="flex flex-col justify-center py-16 relative">
+        <div className="flex flex-col justify-center px-6 md:px-20 py-16 md:py-24 bg-[#f7f7f7] relative">
 
           {/* Eyebrow */}
           <div className="flex items-center gap-4 mb-7">
@@ -276,38 +274,28 @@ export default async function HomePage() {
 
         {/* Right: auto-changing image slider */}
         {/* Right: image */}
-        <div className="relative hidden md:block" style={{ aspectRatio: "3/4", maxHeight: "580px" }}>
-          <div className="relative w-full h-full overflow-hidden">
-            <HeroImageSlider slides={heroSlides ?? []} fallbackUrl={heroImageUrl} />
-            {/* SS Badge — bottom left */}
-            <div className="absolute bottom-0 left-0 bg-[#3B5373] text-white px-5 py-4">
-              <div className="font-sans text-[18px] font-semibold tracking-[0.08em] uppercase">SS25</div>
-              <div className="font-sans text-[9px] tracking-[0.18em] uppercase text-white/70 mt-0.5">New In</div>
+        <div className="relative overflow-hidden bg-[#F9F9F9] min-h-[400px]">
+          <HeroImageSlider slides={heroSlides ?? []} fallbackUrl={heroImageUrl} />
+          {/* Promo chip */}
+          {heroChipCode && (
+            <div className="absolute bottom-12 left-0 bg-white px-7 py-5 border-l-[3px] border-[#3B5373] shadow-xl">
+              <div className="font-serif text-xl font-normal text-[#3B5373] tracking-[0.08em]">{heroChipCode}</div>
+              <div className="font-sans text-[9.5px] font-light tracking-[0.22em] uppercase text-[#6b7280] mt-1">{heroChipText}</div>
             </div>
-            {/* Live sold pill — top right */}
-            <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm shadow-md px-4 py-2.5 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
-              <div>
-                <p className="font-sans text-[11px] font-medium text-[#1a1a1a]">247 sold today</p>
-                <p className="font-sans text-[10px] text-[#9ca3af]">Limited stock</p>
-              </div>
-            </div>
-            {/* Promo chip */}
-            {heroChipCode && (
-              <div className="absolute bottom-12 left-0 bg-white px-7 py-5 border-l-[3px] border-[#3B5373] shadow-xl">
-                <div className="font-serif text-xl font-normal text-[#3B5373] tracking-[0.08em]">{heroChipCode}</div>
-                <div className="font-sans text-[9.5px] font-light tracking-[0.22em] uppercase text-[#6b7280] mt-1">{heroChipText}</div>
-              </div>
-            )}
+          )}
+          {/* SS Badge — bottom left */}
+          <div className="absolute bottom-0 left-0 bg-[#3B5373] text-white px-5 py-4">
+            <div className="font-sans text-[18px] font-semibold tracking-[0.08em] uppercase">SS25</div>
+            <div className="font-sans text-[9px] tracking-[0.18em] uppercase text-white/70 mt-0.5">New In</div>
           </div>
-          {/* Look Book card — bottom right overlap */}
-          <div className="absolute bottom-0 -right-6 w-[130px] overflow-hidden border-[3px] border-white shadow-lg" style={{ aspectRatio: "2/3" }}>
-            <div className="w-full h-full bg-gradient-to-b from-[#c8d6e5] to-[#2a3d55] flex items-center justify-center">
-              <p className="font-serif italic text-white/50 text-xs text-center leading-relaxed">Look<br/>Book</p>
+          {/* Live sold pill — top right */}
+          <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm shadow-md px-4 py-2.5 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
+            <div>
+              <p className="font-sans text-[11px] font-medium text-[#1a1a1a]">247 sold today</p>
+              <p className="font-sans text-[10px] text-[#9ca3af]">Limited stock</p>
             </div>
           </div>
-        </div>
-        </div>
         </div>
       </section>
 
