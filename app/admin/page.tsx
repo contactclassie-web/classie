@@ -117,6 +117,10 @@ interface SiteSettings {
   band_text: string;
   cat_links_bold: string;
   cat_links_hover: string;
+  cat_links_hover_bg: string;
+  cat_links_hover_text: string;
+  cat_num_color: string;
+  cat_text_size: string;
 }
 
 interface FeatureBarItem {
@@ -362,7 +366,11 @@ export default function AdminPage() {
     hero_pill_active: "true",
     band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
     cat_links_bold: "true",
-    cat_links_hover: "navy-fill",
+    cat_links_hover: "custom",
+    cat_links_hover_bg: "#3B5373",
+    cat_links_hover_text: "#ffffff",
+    cat_num_color: "#9ca3af",
+    cat_text_size: "1.1",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -542,7 +550,11 @@ export default function AdminPage() {
           hero_pill_active: "true",
           band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
           cat_links_bold: "true",
-          cat_links_hover: "navy-fill",
+          cat_links_hover: "custom",
+          cat_links_hover_bg: "#3B5373",
+          cat_links_hover_text: "#ffffff",
+          cat_num_color: "#9ca3af",
+          cat_text_size: "1.1",
         };
         data.forEach((row: { key: string; value: string }) => {
           if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
@@ -1898,38 +1910,99 @@ export default function AdminPage() {
           {tab === "categories" && (
             <div className="space-y-4">
               {/* Style Options */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 className="font-semibold text-gray-700 mb-4 text-sm">Quick Link Style Options</h3>
-                <div className="flex flex-wrap gap-6 items-start">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                <h3 className="font-semibold text-gray-700 text-sm">Quick Link Style</h3>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {/* Bold toggle */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500 font-medium">Bold Text</span>
-                    <button onClick={async () => {
-                      const newVal = siteSettings.cat_links_bold === "true" ? "false" : "true";
-                      setSiteSettings(s => ({ ...s, cat_links_bold: newVal }));
-                      await upsertSettings([{ key: "cat_links_bold", value: newVal }]);
-                    }} className={`w-10 h-5 rounded-full relative transition-all ${siteSettings.cat_links_bold === "true" ? "bg-[#3B5373]" : "bg-gray-300"}`}>
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>Bold Text</label>
+                    <button onClick={() => setSiteSettings(s => ({ ...s, cat_links_bold: s.cat_links_bold === "true" ? "false" : "true" }))}
+                      className={`w-10 h-5 rounded-full relative transition-all ${siteSettings.cat_links_bold === "true" ? "bg-[#3B5373]" : "bg-gray-300"}`}>
                       <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${siteSettings.cat_links_bold === "true" ? "left-5" : "left-0.5"}`} />
                     </button>
                   </div>
-                  {/* Hover effect */}
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-xs text-gray-500 font-medium">Hover Effect</span>
-                    {[
-                      { val: "navy-fill", label: "🎨 Navy Fill" },
-                      { val: "zoom",      label: "🔍 Zoom" },
-                      { val: "text-blue", label: "🔵 Text Blue" },
-                      { val: "blur",      label: "✨ Glow" },
-                    ].map(opt => (
-                      <button key={opt.val} onClick={async () => {
-                        setSiteSettings(s => ({ ...s, cat_links_hover: opt.val }));
-                        await upsertSettings([{ key: "cat_links_hover", value: opt.val }]);
-                      }} className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${siteSettings.cat_links_hover === opt.val ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-600 border-gray-200 hover:border-[#3B5373]"}`}>
-                        {opt.label}
-                      </button>
+
+                  {/* Text size */}
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>Text Size (rem)</label>
+                    <input type="number" step="0.05" min="0.8" max="2" value={siteSettings.cat_text_size}
+                      onChange={e => setSiteSettings(s => ({ ...s, cat_text_size: e.target.value }))}
+                      className={inputCls} />
+                  </div>
+
+                  {/* Number color */}
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>Number Color (01, 02…)</label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={siteSettings.cat_num_color}
+                        onChange={e => setSiteSettings(s => ({ ...s, cat_num_color: e.target.value }))}
+                        className="w-9 h-9 rounded-lg border border-gray-200 cursor-pointer p-0.5" />
+                      <input type="text" value={siteSettings.cat_num_color}
+                        onChange={e => setSiteSettings(s => ({ ...s, cat_num_color: e.target.value }))}
+                        className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373]" />
+                    </div>
+                  </div>
+
+                  {/* Hover BG */}
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>Hover Background</label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={siteSettings.cat_links_hover_bg}
+                        onChange={e => setSiteSettings(s => ({ ...s, cat_links_hover_bg: e.target.value }))}
+                        className="w-9 h-9 rounded-lg border border-gray-200 cursor-pointer p-0.5" />
+                      <input type="text" value={siteSettings.cat_links_hover_bg}
+                        onChange={e => setSiteSettings(s => ({ ...s, cat_links_hover_bg: e.target.value }))}
+                        className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373]" />
+                    </div>
+                  </div>
+
+                  {/* Hover text color */}
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>Hover Text Color</label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={siteSettings.cat_links_hover_text}
+                        onChange={e => setSiteSettings(s => ({ ...s, cat_links_hover_text: e.target.value }))}
+                        className="w-9 h-9 rounded-lg border border-gray-200 cursor-pointer p-0.5" />
+                      <input type="text" value={siteSettings.cat_links_hover_text}
+                        onChange={e => setSiteSettings(s => ({ ...s, cat_links_hover_text: e.target.value }))}
+                        className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373]" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview */}
+                <div className="border border-gray-100 rounded-xl overflow-hidden">
+                  <div className="px-5 py-3 bg-gray-50 text-[10px] uppercase tracking-widest text-gray-400 font-medium">Preview</div>
+                  <div className="grid grid-cols-3 border-t border-gray-100">
+                    {["Heels", "Clip-ons", "Collections"].map((name, i) => (
+                      <div key={name} className="group flex items-center justify-between px-5 py-4 border-r border-gray-100 last:border-r-0 cursor-pointer transition-all duration-300"
+                        style={{ ["--hover-bg" as string]: siteSettings.cat_links_hover_bg } as React.CSSProperties}
+                        onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.backgroundColor = siteSettings.cat_links_hover_bg; (e.currentTarget as HTMLDivElement).querySelectorAll("[data-cat-name]").forEach((el) => { (el as HTMLElement).style.color = siteSettings.cat_links_hover_text; }); }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.backgroundColor = ""; (e.currentTarget as HTMLDivElement).querySelectorAll("[data-cat-name]").forEach((el) => { (el as HTMLElement).style.color = ""; }); }}>
+                        <div>
+                          <p className="text-[9px] tracking-widest uppercase mb-0.5" style={{ color: siteSettings.cat_num_color }}>0{i+1}</p>
+                          <p data-cat-name className={`font-serif text-[#1a1a1a] transition-colors`} style={{ fontSize: `${siteSettings.cat_text_size}rem`, fontWeight: siteSettings.cat_links_bold === "true" ? 600 : 400 }}>{name}</p>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
+
+                <button onClick={async () => {
+                  setSettingsSaving(true);
+                  await upsertSettings([
+                    { key: "cat_links_bold",       value: siteSettings.cat_links_bold },
+                    { key: "cat_links_hover_bg",   value: siteSettings.cat_links_hover_bg },
+                    { key: "cat_links_hover_text", value: siteSettings.cat_links_hover_text },
+                    { key: "cat_num_color",        value: siteSettings.cat_num_color },
+                    { key: "cat_text_size",        value: siteSettings.cat_text_size },
+                  ]);
+                  setSettingsSaving(false);
+                }} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />{settingsSaving ? "Saving…" : "Save Style"}
+                </button>
               </div>
 
               <div className="flex items-center justify-between flex-wrap gap-3">
