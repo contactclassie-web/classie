@@ -221,10 +221,10 @@ export default async function HomePage() {
       <TrustBand />
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
-      <section className="py-20 bg-white px-6 md:px-20">
+      <section className="py-12 bg-white px-6 md:px-20">
         <div className="max-w-[1280px] mx-auto">
           {/* Header — centered like HTML design */}
-          <div className="text-center mb-14">
+          <div className="text-center mb-10">
               <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
                 Curated Edits
               </span>
