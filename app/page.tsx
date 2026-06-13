@@ -323,19 +323,15 @@ export default async function HomePage() {
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
       <section className="py-20 bg-white px-6 md:px-20">
-          {/* Header */}
-          <div className="flex items-end justify-between mb-14">
-            <div>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-7 h-px bg-[#3B5373]" />
-                <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
-                  Curated Edits
-                </span>
-              </div>
-              <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.6rem)] font-light leading-[1.08] text-[#1a1a1a]">
+        <div className="max-w-[1280px] mx-auto">
+          {/* Header — centered like HTML design */}
+          <div className="text-center mb-14">
+              <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
+                Curated Edits
+              </span>
+              <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.6rem)] font-light leading-[1.08] text-[#1a1a1a] mt-3">
                 Shop by <em className="italic text-[#3B5373]">Occasion</em>
               </h2>
-            </div>
           </div>
           <OccasionCarousel occasions={occasions} />
           {/* Numbered Quick Links Row */}
@@ -362,6 +358,7 @@ export default async function HomePage() {
               ))}
             </div>
           )}
+        </div>
       </section>
 
       {/* ══ 5. FEATURED PICKS ═════════════════════════════════════════════ */}

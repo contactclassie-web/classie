@@ -18,7 +18,7 @@ function OccasionCard({ occ }: { occ: Occasion }) {
     <Link
       href={occ.href}
       className="group relative overflow-hidden block"
-      style={{ aspectRatio: "3 / 4" }}
+      style={{ aspectRatio: "3 / 4", maxHeight: "520px" }}
     >
       {/* Background image */}
       {occ.image ? (
