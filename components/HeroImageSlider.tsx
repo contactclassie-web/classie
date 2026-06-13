@@ -43,7 +43,14 @@ export default function HeroImageSlider({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length]);
 
-  if (items.length === 0) return <div className="absolute inset-0 bg-[#F9F9F9]" />;
+  if (items.length === 0) return (
+    <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #c8d6e5 0%, #8fa8c2 50%, #3B5373 100%)" }}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-20">
+        <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: "72px", color: "#fff", letterSpacing: "0.06em" }}>✦</span>
+        <span style={{ fontFamily: "'Cormorant', serif", fontStyle: "italic", fontSize: "2rem", color: "#fff", letterSpacing: "0.1em" }}>Classie</span>
+      </div>
+    </div>
+  );
 
   return (
     <>
