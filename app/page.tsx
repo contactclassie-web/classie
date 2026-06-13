@@ -6,6 +6,7 @@ import OccasionCarousel from "@/components/OccasionCarousel";
 import FeaturedPicks from "@/components/FeaturedPicks";
 import HeroImageSlider from "@/components/HeroImageSlider";
 import HeroSection from "@/components/HeroSection";
+import TrustBand from "@/components/TrustBand";
 import {
   Product,
   CURATED_COLLECTIONS,
@@ -216,29 +217,8 @@ export default async function HomePage() {
       {/* ══ 1. HERO ═══════════════════════════════════════════════════════ */}
       <HeroSection heroSlides={heroSlides ?? []} heroImageUrl={heroImageUrl} />
 
-      {/* ══ 2. TRUST BAND — Navy scrolling ticker ══════════════════════════ */}
-      <div className="bg-[#3B5373] py-3 overflow-hidden">
-        <div className="flex animate-ticker w-max">
-          {[...bandItems, ...bandItems].map((item, i) => (
-            <span
-              key={i}
-              className="whitespace-nowrap flex items-center"
-              style={{
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: "11px",
-                fontWeight: 400,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.85)",
-                padding: "0 40px",
-              }}
-            >
-              {item}
-              <span style={{ marginLeft: "40px", fontSize: "6px", color: "rgba(255,255,255,0.35)" }}>◆</span>
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* ══ 2. TRUST BAND ══════════════════════════════════════════════════ */}
+      <TrustBand />
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
       <section className="py-20 bg-white px-6 md:px-20">

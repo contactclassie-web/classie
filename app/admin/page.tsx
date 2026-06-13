@@ -243,7 +243,7 @@ const EMPTY_SLIDE: HeroSlide = {
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band";
 type MainSection = "dashboard" | "homepage" | "catalog" | "orders" | "settings" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -254,6 +254,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "instagram":      "homepage",
   "style-inspo":    "homepage",
   "announcement":   "homepage",
+  "trust-band":     "homepage",
   "products":       "catalog",
   "collections":    "catalog",
   "categories":     "catalog",
@@ -271,6 +272,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "testimonials",   label: "Reviews" },
     { id: "instagram",      label: "Instagram" },
     { id: "style-inspo",    label: "Style Inspo" },
+    { id: "trust-band",     label: "Trust Band" },
   ],
   catalog: [
     { id: "products",    label: "Products" },
@@ -648,6 +650,7 @@ export default function AdminPage() {
     if (!authed) return;
     if (tab === "slides") { fetchSlides(); fetchSettings(); }
     if (tab === "announcement") { fetchSettings(); }
+    if (tab === "trust-band") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
@@ -2214,6 +2217,74 @@ export default function AdminPage() {
                   <Save className="w-4 h-4" />
                   {settingsSaving ? "Saving…" : "Save Logo"}
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              TRUST BAND TAB
+          ══════════════════════════════════════ */}
+          {tab === "trust-band" && (
+            <div className="space-y-6 max-w-3xl">
+              {/* Band text */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <h2 className="font-semibold text-gray-700">Navy Trust Band Text</h2>
+                <p className="text-xs text-gray-400">Items separated by · (dot) — e.g. Free Shipping ₹999+ · Easy Returns · Made in India</p>
+                <textarea rows={3} value={siteSettings.band_text} className={`${inputCls} resize-none`}
+                  onChange={(e) => setSiteSettings(s => ({ ...s, band_text: e.target.value }))}
+                  placeholder="Free Shipping ₹999+ · Easy Returns · Premium Quality · Made in India" />
+                <button onClick={async () => {
+                  setSettingsSaving(true);
+                  await upsertSettings([{ key: "band_text", value: siteSettings.band_text }]);
+                  setSettingsSaving(false);
+                }} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />{settingsSaving ? "Saving…" : "Save Band Text"}
+                </button>
+              </div>
+              {/* Features Bar Manager (white bar) */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-[#3B5373]" />
+                    <h2 className="font-semibold text-gray-700">White Features Bar</h2>
+                  </div>
+                  <button onClick={openAddFeature}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors">
+                    <Plus className="w-4 h-4" /> Add Feature
+                  </button>
+                </div>
+                {featuresBarLoading ? <p className="text-gray-400 text-sm">Loading…</p> : (
+                  <table className="w-full text-sm">
+                    <thead><tr className="border-b border-gray-100">
+                      {["Icon","Title","Subtitle","Order","Active","Actions"].map(h => (
+                        <th key={h} className="text-left py-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">{h}</th>
+                      ))}
+                    </tr></thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {featuresBarItems.map((f: FeatureBarItem) => (
+                        <tr key={f.id} className="hover:bg-gray-50/50 transition-colors">
+                          <td className="px-3 py-3 text-xl">{f.icon}</td>
+                          <td className="px-3 py-3 font-medium text-gray-800">{f.title}</td>
+                          <td className="px-3 py-3 text-xs text-gray-400">{f.subtitle || "—"}</td>
+                          <td className="px-3 py-3 text-xs text-gray-500">{f.display_order}</td>
+                          <td className="px-3 py-3">
+                            <button onClick={() => toggleFeatureActive(f)}
+                              className={`w-10 h-5 rounded-full transition-all ${f.active ? "bg-green-500" : "bg-gray-300"} relative`}>
+                              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${f.active ? "left-5" : "left-0.5"}`} />
+                            </button>
+                          </td>
+                          <td className="px-3 py-3">
+                            <div className="flex gap-2">
+                              <button onClick={() => openEditFeature(f)} className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-500"><Pencil className="w-4 h-4" /></button>
+                              <button onClick={() => deleteFeature(f.id!)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           )}
