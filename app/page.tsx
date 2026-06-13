@@ -159,13 +159,13 @@ export default async function HomePage() {
   const heroImageUrl =
     cfg["hero_image_url"] ||
     "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583";
-  const heroStat1Num = cfg["hero_stat1_number"] || "4.9★";
-  const heroStat1Label = cfg["hero_stat1_label"] || "2,000+ Reviews";
-  const heroStat2Num = cfg["hero_stat2_number"] || "₹999+";
-  const heroStat2Label = cfg["hero_stat2_label"] || "Free Shipping";
-  const heroStat3Num = cfg["hero_stat3_number"] || "COD";
-  const heroStat3Label = cfg["hero_stat3_label"] || "Available";
-  const showStats = true;
+  const heroStat1Num = cfg["hero_stat1_number"] || "";
+  const heroStat1Label = cfg["hero_stat1_label"] || "";
+  const heroStat2Num = cfg["hero_stat2_number"] || "";
+  const heroStat2Label = cfg["hero_stat2_label"] || "";
+  const heroStat3Num = cfg["hero_stat3_number"] || "";
+  const heroStat3Label = cfg["hero_stat3_label"] || "";
+  const showStats = !!(heroStat1Num || heroStat2Num || heroStat3Num);
   const heroChipCode = cfg["hero_chip_code"] || "";
   const heroChipText = cfg["hero_chip_text"] || "";
 
