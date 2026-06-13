@@ -154,18 +154,18 @@ export default async function HomePage() {
   const heroSubtitle = cfg["hero_subtitle"] || "";
   const heroCta1Text = cfg["hero_cta1_text"] || "";
   const heroCta1Url = cfg["hero_cta1_url"] || "/shop";
-  const heroCta2Text = cfg["hero_cta2_text"] || "";
-  const heroCta2Url = cfg["hero_cta2_url"] || "/shop";
+  const heroCta2Text = cfg["hero_cta2_text"] || "Explore Edits";
+  const heroCta2Url = cfg["hero_cta2_url"] || "/collections";
   const heroImageUrl =
     cfg["hero_image_url"] ||
     "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583";
-  const heroStat1Num = cfg["hero_stat1_number"] || "";
-  const heroStat1Label = cfg["hero_stat1_label"] || "";
-  const heroStat2Num = cfg["hero_stat2_number"] || "";
-  const heroStat2Label = cfg["hero_stat2_label"] || "";
-  const heroStat3Num = cfg["hero_stat3_number"] || "";
-  const heroStat3Label = cfg["hero_stat3_label"] || "";
-  const showStats = !!(heroStat1Num || heroStat2Num || heroStat3Num);
+  const heroStat1Num = cfg["hero_stat1_number"] || "4.9★";
+  const heroStat1Label = cfg["hero_stat1_label"] || "2,000+ Reviews";
+  const heroStat2Num = cfg["hero_stat2_number"] || "₹999+";
+  const heroStat2Label = cfg["hero_stat2_label"] || "Free Shipping";
+  const heroStat3Num = cfg["hero_stat3_number"] || "COD";
+  const heroStat3Label = cfg["hero_stat3_label"] || "Available";
+  const showStats = true;
   const heroChipCode = cfg["hero_chip_code"] || "";
   const heroChipText = cfg["hero_chip_text"] || "";
 
@@ -215,7 +215,7 @@ export default async function HomePage() {
       {/* ══ 1. HERO — Split editorial layout ═══════════════════════════════ */}
       <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[calc(100vh-72px)]">
         {/* Left: text content */}
-        <div className="flex flex-col justify-center px-6 md:px-20 py-16 md:py-24 bg-white relative">
+        <div className="flex flex-col justify-center px-6 md:px-20 py-16 md:py-24 bg-[#f7f7f7] relative">
           {/* Vertical line divider */}
           <div className="absolute right-0 top-[12%] bottom-[12%] w-px bg-gradient-to-b from-transparent via-[rgba(59,83,115,0.2)] to-transparent hidden md:block" />
 
@@ -252,28 +252,26 @@ export default async function HomePage() {
             {heroCta2Text && (
               <Link
                 href={heroCta2Url}
-                className="text-[10px] font-light tracking-[0.24em] uppercase text-[#3B5373] border-b border-[rgba(59,83,115,0.4)] pb-0.5 flex items-center gap-2 hover:gap-4 transition-all duration-300"
+                className="border border-[#3B5373] text-[#3B5373] px-10 py-4 text-[10px] font-light tracking-[0.28em] uppercase hover:bg-[#3B5373] hover:text-white transition-all duration-300"
               >
-                {heroCta2Text} →
+                {heroCta2Text}
               </Link>
             )}
           </div>
 
-          {/* Stats row — only show if values exist in DB */}
-          {showStats && (
-            <div className="flex gap-10 pt-10 border-t border-[rgba(59,83,115,0.1)]">
-              {stats.filter(s => s.number).map((stat) => (
-                <div key={stat.label}>
-                  <div className="font-serif text-4xl font-light text-[#1a1a1a] leading-none">
-                    {stat.number}
-                  </div>
-                  <div className="font-sans text-[9.5px] font-light tracking-[0.2em] uppercase text-[#9ca3af] mt-1.5">
-                    {stat.label}
-                  </div>
+          {/* Stats row */}
+          <div className="flex gap-8 pt-8 border-t border-[rgba(59,83,115,0.15)]">
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <div className="font-serif text-[1.4rem] font-normal text-[#3B5373] leading-none">
+                  {stat.number}
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="font-sans text-[10px] font-light tracking-[0.14em] uppercase text-[#9ca3af] mt-1">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Right: auto-changing image slider */}
