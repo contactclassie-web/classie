@@ -985,7 +985,7 @@ export default function AdminPage() {
         { key: "hero_pill_text",      value: siteSettings.hero_pill_text },
         { key: "hero_pill_sub",       value: siteSettings.hero_pill_sub },
         { key: "hero_pill_active",    value: siteSettings.hero_pill_active },
-        { key: "band_text",           value: siteSettings.band_text },
+
       ];
       await upsertSettings(rows);
     } catch { /* ignore */ }
@@ -1665,12 +1665,6 @@ export default function AdminPage() {
                       </label>
                     </div>
 
-                    <div>
-                      <label className={labelCls}>Trust Band <span className="normal-case text-gray-400 font-normal">(items separated by · )</span></label>
-                      <textarea rows={2} value={siteSettings.band_text} className={`${inputCls} resize-none`}
-                        onChange={(e) => setSiteSettings((s) => ({ ...s, band_text: e.target.value }))}
-                        placeholder="Free Shipping · Easy Returns · Premium Quality" />
-                    </div>
                     <div>
                       <label className={labelCls}>Stats (optional — leave empty to hide)</label>
                       <div className="grid grid-cols-3 gap-2">
