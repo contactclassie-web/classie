@@ -115,6 +115,8 @@ interface SiteSettings {
   hero_pill_sub: string;
   hero_pill_active: string;
   band_text: string;
+  cat_links_bold: string;
+  cat_links_hover: string;
 }
 
 interface FeatureBarItem {
@@ -359,6 +361,8 @@ export default function AdminPage() {
     hero_pill_sub: "Limited stock",
     hero_pill_active: "true",
     band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
+    cat_links_bold: "true",
+    cat_links_hover: "navy-fill",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -537,6 +541,8 @@ export default function AdminPage() {
           hero_pill_sub: "Limited stock",
           hero_pill_active: "true",
           band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
+          cat_links_bold: "true",
+          cat_links_hover: "navy-fill",
         };
         data.forEach((row: { key: string; value: string }) => {
           if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
@@ -1891,6 +1897,41 @@ export default function AdminPage() {
           ══════════════════════════════════════ */}
           {tab === "categories" && (
             <div className="space-y-4">
+              {/* Style Options */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <h3 className="font-semibold text-gray-700 mb-4 text-sm">Quick Link Style Options</h3>
+                <div className="flex flex-wrap gap-6 items-start">
+                  {/* Bold toggle */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500 font-medium">Bold Text</span>
+                    <button onClick={async () => {
+                      const newVal = siteSettings.cat_links_bold === "true" ? "false" : "true";
+                      setSiteSettings(s => ({ ...s, cat_links_bold: newVal }));
+                      await upsertSettings([{ key: "cat_links_bold", value: newVal }]);
+                    }} className={`w-10 h-5 rounded-full relative transition-all ${siteSettings.cat_links_bold === "true" ? "bg-[#3B5373]" : "bg-gray-300"}`}>
+                      <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${siteSettings.cat_links_bold === "true" ? "left-5" : "left-0.5"}`} />
+                    </button>
+                  </div>
+                  {/* Hover effect */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-xs text-gray-500 font-medium">Hover Effect</span>
+                    {[
+                      { val: "navy-fill", label: "🎨 Navy Fill" },
+                      { val: "zoom",      label: "🔍 Zoom" },
+                      { val: "text-blue", label: "🔵 Text Blue" },
+                      { val: "blur",      label: "✨ Glow" },
+                    ].map(opt => (
+                      <button key={opt.val} onClick={async () => {
+                        setSiteSettings(s => ({ ...s, cat_links_hover: opt.val }));
+                        await upsertSettings([{ key: "cat_links_hover", value: opt.val }]);
+                      }} className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${siteSettings.cat_links_hover === opt.val ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-600 border-gray-200 hover:border-[#3B5373]"}`}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-800">Shop by Category</h2>
