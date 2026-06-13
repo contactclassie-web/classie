@@ -2220,28 +2220,13 @@ export default function AdminPage() {
           ══════════════════════════════════════ */}
           {tab === "trust-band" && (
             <div className="space-y-6 max-w-3xl">
-              {/* Band text */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-                <h2 className="font-semibold text-gray-700">Navy Trust Band Text</h2>
-                <p className="text-xs text-gray-400">Items separated by · (dot) — e.g. Free Shipping ₹999+ · Easy Returns · Made in India</p>
-                <textarea rows={3} value={siteSettings.band_text} className={`${inputCls} resize-none`}
-                  onChange={(e) => setSiteSettings(s => ({ ...s, band_text: e.target.value }))}
-                  placeholder="Free Shipping ₹999+ · Easy Returns · Premium Quality · Made in India" />
-                <button onClick={async () => {
-                  setSettingsSaving(true);
-                  await upsertSettings([{ key: "band_text", value: siteSettings.band_text }]);
-                  setSettingsSaving(false);
-                }} disabled={settingsSaving}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
-                  <Save className="w-4 h-4" />{settingsSaving ? "Saving…" : "Save Band Text"}
-                </button>
-              </div>
-              {/* Features Bar Manager (white bar) */}
+              {/* Features Bar Manager */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-2">
                     <Settings className="w-4 h-4 text-[#3B5373]" />
-                    <h2 className="font-semibold text-gray-700">White Features Bar</h2>
+                    <h2 className="font-semibold text-gray-700">Trust Band Items</h2>
+                    <span className="text-xs text-gray-400 font-normal">(icon + text scrolling in navy bar)</span>
                   </div>
                   <button onClick={openAddFeature}
                     className="flex items-center gap-2 px-5 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors">
