@@ -307,15 +307,24 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 2. TRUST BAND — Navy scrolling ticker ══════════════════════════ */}
-      <div className="bg-[#3B5373] py-4 overflow-hidden">
+      <div className="bg-[#3B5373] py-3 overflow-hidden">
         <div className="flex animate-ticker w-max">
           {[...bandItems, ...bandItems].map((item, i) => (
             <span
               key={i}
-              className="font-serif text-[15px] font-light italic text-white/80 px-14 whitespace-nowrap flex items-center gap-14"
+              className="whitespace-nowrap flex items-center"
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: "11px",
+                fontWeight: 400,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.85)",
+                padding: "0 40px",
+              }}
             >
               {item}
-              <span className="not-italic text-[7px] text-white/40">◆</span>
+              <span style={{ marginLeft: "40px", fontSize: "6px", color: "rgba(255,255,255,0.35)" }}>◆</span>
             </span>
           ))}
         </div>
