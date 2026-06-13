@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-const DEFAULT_ANNOUNCEMENTS = [
-  "Use code FIRST10 for 10% OFF your first order",
-  "Free Shipping above ₹999 · Easy Returns & Exchange",
-  "Welcome to Classie — One Heel. Endless Looks.",
-];
+const DEFAULT_TEXT = "Use code FIRST10 for 10% off your first order · Free shipping above ₹999";
 
 const ALL_ANNOUNCEMENT_KEYS = [
   "announcement_1",
@@ -20,7 +16,6 @@ const ALL_ANNOUNCEMENT_KEYS = [
 
 // Highlight promo codes in gold
 function highlightText(text: string) {
-  // Highlight words like FIRST10, SAVE20, etc. (all caps, alphanumeric, 4–10 chars)
   const parts = text.split(/(\b[A-Z0-9]{4,10}\b)/g);
   return parts.map((part, i) =>
     /^[A-Z0-9]{4,10}$/.test(part)
@@ -30,8 +25,9 @@ function highlightText(text: string) {
 }
 
 export default function AnnouncementBar() {
-  const [announcements, setAnnouncements] = useState<string[]>(DEFAULT_ANNOUNCEMENTS);
-  const [speed, setSpeed] = useState("30");
+  const [announcements, setAnnouncements] = useState<string[]>([DEFAULT_TEXT]);
+  const [speed, setSpeed] = useState("25");
+  const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
     supabase
@@ -51,43 +47,31 @@ export default function AnnouncementBar() {
       });
   }, []);
 
-  const items = [...announcements, ...announcements];
-  const duration = `${speed}s`;
+  // If multiple announcements, rotate them every few seconds
+  useEffect(() => {
+    if (announcements.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIdx((i) => (i + 1) % announcements.length);
+    }, parseInt(speed) * 1000 / announcements.length);
+    return () => clearInterval(interval);
+  }, [announcements, speed]);
 
   return (
     <div
-      className="overflow-hidden py-2"
-      style={{ background: "#3B5373", fontFamily: "'Poppins', sans-serif" }}
+      style={{
+        background: "#000",
+        padding: "9px 16px",
+        textAlign: "center",
+        fontFamily: "'Poppins', sans-serif",
+        fontSize: "11px",
+        letterSpacing: "0.16em",
+        textTransform: "uppercase",
+        color: "#fff",
+      }}
     >
-      <div
-        className="announcement-track flex whitespace-nowrap"
-        style={{ animation: `announcementScroll ${duration} linear infinite` }}
-      >
-        {items.map((text, i) => (
-          <span
-            key={i}
-            className="flex-shrink-0 text-white/90"
-            style={{
-              fontSize: "11px",
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              padding: "0 48px",
-            }}
-          >
-            {highlightText(text)}
-            <span className="mx-6 text-white/30">·</span>
-          </span>
-        ))}
-      </div>
-      <style>{`
-        @keyframes announcementScroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .announcement-track:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
+      <p>
+        {highlightText(announcements[currentIdx] ?? DEFAULT_TEXT)}
+      </p>
     </div>
   );
 }
