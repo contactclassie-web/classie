@@ -44,17 +44,18 @@ function OccasionCard({ occ }: { occ: Occasion }) {
 }
 
 export default function OccasionCarousel({ occasions }: { occasions: Occasion[] }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const desktopRef = useRef<HTMLDivElement>(null);
+  const mobileRef  = useRef<HTMLDivElement>(null);
   const allItems = occasions.filter((o) => o.image);
   const show3 = allItems.slice(0, 3);
   const hasMore = allItems.length > 3;
 
   if (show3.length === 0) return null;
 
-  const scroll = (dir: "left" | "right") => {
-    if (!scrollRef.current) return;
-    const w = scrollRef.current.clientWidth;
-    scrollRef.current.scrollBy({ left: dir === "left" ? -w : w, behavior: "smooth" });
+  const scroll = (dir: "left" | "right", ref: React.RefObject<HTMLDivElement | null>) => {
+    if (!ref.current) return;
+    const w = ref.current.clientWidth / (hasMore ? 1 : 3);
+    ref.current.scrollBy({ left: dir === "left" ? -w : w, behavior: "smooth" });
   };
 
   return (
@@ -67,12 +68,12 @@ export default function OccasionCarousel({ occasions }: { occasions: Occasion[] 
       ) : (
         <>
           {/* Arrow button LEFT */}
-          <button onClick={() => scroll("left")}
+          <button onClick={() => scroll("left", desktopRef)}
             className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md hover:bg-[#3B5373] hover:text-white hover:border-[#3B5373] transition-all">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
           {/* Scrollable desktop */}
-          <div ref={scrollRef} className="hidden md:flex gap-[3px] overflow-x-auto snap-x snap-mandatory" style={{ scrollbarWidth: "none" }}>
+          <div ref={desktopRef} className="hidden md:flex gap-[3px] overflow-x-auto snap-x snap-mandatory" style={{ scrollbarWidth: "none" }}>
             {allItems.map((occ) => (
               <div key={occ.href} className="snap-start flex-shrink-0" style={{ width: "calc(33.333% - 2px)" }}>
                 <OccasionCard occ={occ} />
@@ -80,7 +81,7 @@ export default function OccasionCarousel({ occasions }: { occasions: Occasion[] 
             ))}
           </div>
           {/* Arrow button RIGHT */}
-          <button onClick={() => scroll("right")}
+          <button onClick={() => scroll("right", desktopRef)}
             className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md hover:bg-[#3B5373] hover:text-white hover:border-[#3B5373] transition-all">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
@@ -90,12 +91,12 @@ export default function OccasionCarousel({ occasions }: { occasions: Occasion[] 
       {/* Mobile: horizontal scroll with arrows */}
       <div className="md:hidden relative">
         {hasMore && (
-          <button onClick={() => scroll("left")}
+          <button onClick={() => scroll("left", mobileRef)}
             className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
         )}
-        <div ref={!hasMore ? undefined : scrollRef} className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" style={{ scrollbarWidth: "none" }}>
+        <div ref={mobileRef} className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2" style={{ scrollbarWidth: "none" }}>
           {allItems.map((occ) => (
             <div key={occ.href} className="snap-start flex-shrink-0" style={{ width: show3.length === 1 ? "100%" : "82vw" }}>
               <OccasionCard occ={occ} />
@@ -103,7 +104,7 @@ export default function OccasionCarousel({ occasions }: { occasions: Occasion[] 
           ))}
         </div>
         {hasMore && (
-          <button onClick={() => scroll("right")}
+          <button onClick={() => scroll("right", mobileRef)}
             className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
