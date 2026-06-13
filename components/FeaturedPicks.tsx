@@ -9,13 +9,18 @@ import { Product } from "@/lib/products";
 interface FeaturedPicksProps {
   latestProducts: Product[];
   bestSellers: Product[];
+  saleProducts?: Product[];
 }
 
-export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedPicksProps) {
-  const [activeTab, setActiveTab] = useState<"latest" | "bestsellers">("latest");
+export default function FeaturedPicks({ latestProducts, bestSellers, saleProducts = [] }: FeaturedPicksProps) {
+  const [activeTab, setActiveTab] = useState<"latest" | "bestsellers" | "sale">("latest");
   const router = useRouter();
 
-  const products = (activeTab === "latest" ? latestProducts : bestSellers).slice(0, 4);
+  const products = (
+    activeTab === "latest" ? latestProducts :
+    activeTab === "sale" ? saleProducts :
+    bestSellers
+  ).slice(0, 4);
 
   return (
     <section className="pt-12 pb-20 bg-white px-6 md:px-20">
@@ -38,7 +43,7 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
         <div className="relative mb-10">
           <div className="absolute bottom-0 left-0 right-0 border-b border-gray-200" />
           <div className="relative flex gap-10">
-            {(["latest", "bestsellers"] as const).map((tab) => (
+            {(["latest", "bestsellers", "sale"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -49,7 +54,7 @@ export default function FeaturedPicks({ latestProducts, bestSellers }: FeaturedP
                 }`}
                 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 300 }}
               >
-                {tab === "latest" ? "Latest Styles" : "Best Sellers"}
+                {tab === "latest" ? "Latest Styles" : tab === "bestsellers" ? "Best Sellers" : "On Sale"}
               </button>
             ))}
           </div>

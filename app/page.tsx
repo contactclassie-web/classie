@@ -32,6 +32,9 @@ export default async function HomePage() {
       : featuredProducts.length > 0
       ? featuredProducts.slice(0, 4)
       : allProducts.slice(0, 4);
+  const saleProducts = allProducts.filter(
+    (p) => p.comparePrice && p.comparePrice > p.price
+  ).slice(0, 4);
 
   // ── Supabase client ────────────────────────────────────────────────────
   const { createClient } = await import("@supabase/supabase-js");
@@ -361,99 +364,8 @@ export default async function HomePage() {
           )}
       </section>
 
-      {/* ══ 4. SHOP BY CATEGORY ════════════════════════════════════════════ */}
-      <section className="pt-16 pb-16 bg-[#1a1a1a] px-6 md:px-20">
-        <div>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-8 h-px bg-[rgba(59,83,115,0.6)]" />
-            <span
-              className="font-sans text-[10px] font-light tracking-[0.36em] uppercase"
-              style={{ color: "rgba(59,83,115,0.6)" }}
-            >
-              COLLECTIONS
-            </span>
-          </div>
-          <h2 className="font-serif text-[clamp(1.6rem,3vw,2.5rem)] font-light leading-[1.15] text-white mt-2 mb-10">
-            What Are You{" "}
-            <em className="italic text-[rgba(59,83,115,0.55)]">Looking For?</em>
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: "1px" }}>
-            {siteCategories.map((cat, catIdx) => (
-              <Link
-                key={cat.slug}
-                href={`/shop/${cat.slug}`}
-                className="group relative overflow-hidden block transition-colors duration-300 hover:bg-[#3B5373]/[0.12]"
-                style={{
-                  padding: "52px",
-                  border: "1px solid rgba(59,83,115,0.2)",
-                  minHeight: "300px",
-                }}
-              >
-                {cat.image_url && (
-                  <>
-                    <Image
-                      src={cat.image_url}
-                      alt={cat.name}
-                      fill
-                      className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                  </>
-                )}
-                <span
-                  className="absolute top-3 right-5 select-none pointer-events-none leading-none"
-                  style={{
-                    fontFamily: "var(--font-cormorant)",
-                    fontSize: "88px",
-                    fontWeight: 300,
-                    color: "rgba(59,83,115,0.2)",
-                    lineHeight: 1,
-                  }}
-                >
-                  {String(catIdx + 1).padStart(2, "0")}
-                </span>
-                <div className="relative h-full flex flex-col justify-end" style={{ minHeight: "180px" }}>
-                  <h3
-                    className="mb-3"
-                    style={{
-                      fontFamily: "var(--font-cormorant)",
-                      fontSize: "28px",
-                      fontWeight: 300,
-                      color: "white",
-                      lineHeight: 1.1,
-                    }}
-                  >
-                    {cat.name}
-                  </h3>
-                  {cat.description && (
-                    <p
-                      className="mb-5"
-                      style={{
-                        fontFamily: "var(--font-poppins)",
-                        fontSize: "13px",
-                        color: "rgba(255,255,255,0.38)",
-                        lineHeight: 1.75,
-                      }}
-                    >
-                      {cat.description}
-                    </p>
-                  )}
-                  <span
-                    className="text-xs tracking-[0.2em] uppercase transition-colors duration-300 text-white/50 group-hover:text-white"
-                    style={{ fontFamily: "var(--font-poppins)" }}
-                  >
-                    Explore →
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ══ 5. FEATURED PICKS ═════════════════════════════════════════════ */}
-      <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} />
+      <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} saleProducts={saleProducts} />
 
       {/* ══ 6. PHILOSOPHY — Image + Dark text layout ══════════════════════ */}
       <section className="grid grid-cols-1 md:grid-cols-2" style={{ minHeight: "82vh" }}>
@@ -543,61 +455,6 @@ export default async function HomePage() {
           >
             {philCtaText} →
           </Link>
-        </div>
-      </section>
-
-      {/* ══ 7. TESTIMONIALS — 3 cards ═════════════════════════════════════ */}
-      <section className="py-28 px-6 md:px-20 bg-white">
-        <div>
-          <div className="mb-14">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-8 h-px bg-[#3B5373]" />
-              <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
-                TESTIMONIALS
-              </span>
-            </div>
-            <h2 className="font-serif text-[clamp(36px,3.8vw,58px)] font-light leading-[1.05] text-[#1a1a1a]">
-              What She <em className="italic text-[#3B5373]">Said</em>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[3px]">
-            {/* Card 1 */}
-            <div className="bg-[#F9F9F9] p-12 hover:-translate-y-1.5 hover:bg-white hover:shadow-lg transition-all duration-300">
-              <div className="text-[#3B5373] text-[11px] tracking-[5px] mb-7">★★★★★</div>
-              <p className="font-serif text-lg font-light italic leading-[1.65] text-[#1a1a1a] mb-8">
-                <span className="text-[#3B5373] text-[34px] leading-none align-[-12px] mr-1">"</span>
-                The most elegant heels I&apos;ve owned. The clip-on changed my entire wardrobe game.
-              </p>
-              <div className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#9ca3af] flex items-center gap-3">
-                <span className="w-5 h-px bg-[rgba(59,83,115,0.4)]" />
-                Ananya M. — Verified Buyer
-              </div>
-            </div>
-            {/* Card 2 */}
-            <div className="bg-[#F9F9F9] p-12 hover:-translate-y-1.5 hover:bg-white hover:shadow-lg transition-all duration-300">
-              <div className="text-[#3B5373] text-[11px] tracking-[5px] mb-7">★★★★★</div>
-              <p className="font-serif text-lg font-light italic leading-[1.65] text-[#1a1a1a] mb-8">
-                <span className="text-[#3B5373] text-[34px] leading-none align-[-12px] mr-1">"</span>
-                I wore these to a wedding and got compliments all night. Comfortable from ceremony to dance floor.
-              </p>
-              <div className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#9ca3af] flex items-center gap-3">
-                <span className="w-5 h-px bg-[rgba(59,83,115,0.4)]" />
-                Priya S. — Verified Buyer
-              </div>
-            </div>
-            {/* Card 3 */}
-            <div className="bg-[#F9F9F9] p-12 hover:-translate-y-1.5 hover:bg-white hover:shadow-lg transition-all duration-300">
-              <div className="text-[#3B5373] text-[11px] tracking-[5px] mb-7">★★★★★</div>
-              <p className="font-serif text-lg font-light italic leading-[1.65] text-[#1a1a1a] mb-8">
-                <span className="text-[#3B5373] text-[34px] leading-none align-[-12px] mr-1">"</span>
-                Finally heels that are comfortable AND gorgeous. Classie understands what modern women need.
-              </p>
-              <div className="font-sans text-[10px] font-light tracking-[0.22em] uppercase text-[#9ca3af] flex items-center gap-3">
-                <span className="w-5 h-px bg-[rgba(59,83,115,0.4)]" />
-                Meera K. — Verified Buyer
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
