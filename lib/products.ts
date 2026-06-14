@@ -358,3 +358,27 @@ export async function getHeelsForPageFromDB(): Promise<HeelProduct[]> {
     }));
   }
 }
+
+export type HeelsSettings = Record<string, string>;
+
+export async function getHeelsSettings(): Promise<HeelsSettings> {
+  try {
+    const keys = [
+      "heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos",
+      "heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle",
+      "heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label",
+      "heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label",
+      "heels_why_visible","heels_why_heading","heels_why_heading_italic",
+      "heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc",
+      "heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc",
+      "heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc",
+      "heels_why_footer_text",
+    ];
+    const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
+    const m: HeelsSettings = {};
+    (data ?? []).forEach(({ key, value }: { key: string; value: string }) => { m[key] = value; });
+    return m;
+  } catch {
+    return {};
+  }
+}

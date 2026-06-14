@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getHeelsForPageFromDB } from "@/lib/products";
+import { getHeelsForPageFromDB, getHeelsSettings } from "@/lib/products";
 import HeelsPageClient from "@/components/HeelsPageClient";
 
 export const revalidate = 0; // always fresh — no cache
@@ -11,6 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default async function HeelsPage() {
-  const products = await getHeelsForPageFromDB();
-  return <HeelsPageClient initialProducts={products} />;
+  const [products, settings] = await Promise.all([
+    getHeelsForPageFromDB(),
+    getHeelsSettings(),
+  ]);
+  return <HeelsPageClient initialProducts={products} initialSettings={settings} />;
 }

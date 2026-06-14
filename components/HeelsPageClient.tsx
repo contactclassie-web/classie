@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { HeelProduct } from "@/lib/products";
+import { HeelProduct, HeelsSettings } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
 import OccasionFilterSection from "./OccasionFilterSection";
 
@@ -17,34 +17,22 @@ const WHY_DEFAULTS = {
   footerText: "Discover our curated collections designed to move seamlessly from everyday wear to special occasions.",
 };
 
-function WhyChooseSection() {
-  const [visible, setVisible] = useState(true);
-  const [cfg, setCfg] = useState(WHY_DEFAULTS);
-
-  useEffect(() => {
-    supabase.from("site_settings").select("key,value")
-      .in("key", ["heels_why_visible","heels_why_heading","heels_why_heading_italic","heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc","heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc","heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc","heels_why_footer_text"])
-      .then(({ data }) => {
-        if (!data?.length) return;
-        const m: Record<string,string> = {};
-        data.forEach(({key,value}) => { m[key]=value; });
-        if (m.heels_why_visible !== undefined) setVisible(m.heels_why_visible !== "false");
-        setCfg({
-          heading:       m.heels_why_heading       ?? WHY_DEFAULTS.heading,
-          headingItalic: m.heels_why_heading_italic ?? WHY_DEFAULTS.headingItalic,
-          card1Icon:  m.heels_why_card1_icon  ?? WHY_DEFAULTS.card1Icon,
-          card1Title: m.heels_why_card1_title ?? WHY_DEFAULTS.card1Title,
-          card1Desc:  m.heels_why_card1_desc  ?? WHY_DEFAULTS.card1Desc,
-          card2Icon:  m.heels_why_card2_icon  ?? WHY_DEFAULTS.card2Icon,
-          card2Title: m.heels_why_card2_title ?? WHY_DEFAULTS.card2Title,
-          card2Desc:  m.heels_why_card2_desc  ?? WHY_DEFAULTS.card2Desc,
-          card3Icon:  m.heels_why_card3_icon  ?? WHY_DEFAULTS.card3Icon,
-          card3Title: m.heels_why_card3_title ?? WHY_DEFAULTS.card3Title,
-          card3Desc:  m.heels_why_card3_desc  ?? WHY_DEFAULTS.card3Desc,
-          footerText: m.heels_why_footer_text ?? WHY_DEFAULTS.footerText,
-        });
-      });
-  }, []);
+function WhyChooseSection({ m }: { m: HeelsSettings }) {
+  const visible = m.heels_why_visible !== "false";
+  const cfg = {
+    heading:       m.heels_why_heading       || WHY_DEFAULTS.heading,
+    headingItalic: m.heels_why_heading_italic || WHY_DEFAULTS.headingItalic,
+    card1Icon:  m.heels_why_card1_icon  || WHY_DEFAULTS.card1Icon,
+    card1Title: m.heels_why_card1_title || WHY_DEFAULTS.card1Title,
+    card1Desc:  m.heels_why_card1_desc  || WHY_DEFAULTS.card1Desc,
+    card2Icon:  m.heels_why_card2_icon  || WHY_DEFAULTS.card2Icon,
+    card2Title: m.heels_why_card2_title || WHY_DEFAULTS.card2Title,
+    card2Desc:  m.heels_why_card2_desc  || WHY_DEFAULTS.card2Desc,
+    card3Icon:  m.heels_why_card3_icon  || WHY_DEFAULTS.card3Icon,
+    card3Title: m.heels_why_card3_title || WHY_DEFAULTS.card3Title,
+    card3Desc:  m.heels_why_card3_desc  || WHY_DEFAULTS.card3Desc,
+    footerText: m.heels_why_footer_text || WHY_DEFAULTS.footerText,
+  };
 
   const cards = [
     { icon: cfg.card1Icon, title: cfg.card1Title, desc: cfg.card1Desc },
@@ -53,7 +41,6 @@ function WhyChooseSection() {
   ];
 
   if (!visible) return null;
-
   return (
     <section className="py-16 px-6 text-center" style={{ background: "#ffffff" }}>
       <h2 className="font-serif text-[2.4rem] font-light text-[#1a1a1a] mb-10">
@@ -77,47 +64,26 @@ function WhyChooseSection() {
   );
 }
 
-// ── Hero component (reads settings from DB) ───────────────────────────
-function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heelTypeCount: number }) {
-  const [bgType, setBgType] = useState<"none"|"image"|"video"|"slider">("none");
-  const [bgUrl, setBgUrl] = useState("");
-  const [slides, setSlides] = useState<string[]>([]);
-  const [textPos, setTextPos] = useState<"left"|"center"|"right">("center");
-  const [eyebrow, setEyebrow] = useState("New Collection · SS25");
-  const [title, setTitle] = useState("Heels");
-  const [subtitle, setSubtitle] = useState("Step into your story");
-  const [showStats, setShowStats] = useState(true);
-  const [stat1Val, setStat1Val] = useState("");
-  const [stat1Label, setStat1Label] = useState("Styles");
-  const [stat2Val, setStat2Val] = useState("");
-  const [stat2Label, setStat2Label] = useState("Heel Types");
-  const [stat3Val, setStat3Val] = useState("Free");
-  const [stat3Label, setStat3Label] = useState("Shipping ₹999+");
+// ── Hero component (server-rendered settings via props) ───────────────
+function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; heelTypeCount: number; m: HeelsSettings }) {
+  const bgType   = (m.heels_hero_bg_type  || "none") as "none"|"image"|"video"|"slider";
+  const bgUrl    = m.heels_hero_bg_url    || "";
+  const textPos  = (m.heels_hero_text_pos || "center") as "left"|"center"|"right";
+  const eyebrow  = m.heels_hero_eyebrow   || "New Collection · SS25";
+  const title    = m.heels_hero_title     || "Heels";
+  const subtitle = m.heels_hero_subtitle  || "Step into your story";
+  const showStats = m.heels_hero_show_stats !== "false";
+  const stat1Val   = m.heels_hero_stat1_val   || "";
+  const stat1Label = m.heels_hero_stat1_label || "Styles";
+  const stat2Val   = m.heels_hero_stat2_val   || "";
+  const stat2Label = m.heels_hero_stat2_label || "Heel Types";
+  const stat3Val   = m.heels_hero_stat3_val   || "Free";
+  const stat3Label = m.heels_hero_stat3_label || "Shipping ₹999+";
+  let slides: string[] = [];
+  try { slides = m.heels_hero_slides ? JSON.parse(m.heels_hero_slides) : []; } catch { slides = []; }
+
   const [slideIdx, setSlideIdx] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval>|null>(null);
-
-  useEffect(() => {
-    supabase.from("site_settings").select("key,value")
-      .in("key", ["heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle","heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label","heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label"])
-      .then(({ data }) => {
-        const m: Record<string,string> = {};
-        (data ?? []).forEach(({key,value}) => { m[key]=value; });
-        if (m.heels_hero_bg_type) setBgType(m.heels_hero_bg_type as typeof bgType);
-        if (m.heels_hero_bg_url) setBgUrl(m.heels_hero_bg_url);
-        if (m.heels_hero_slides) { try { setSlides(JSON.parse(m.heels_hero_slides)); } catch { setSlides([]); } }
-        if (m.heels_hero_text_pos) setTextPos(m.heels_hero_text_pos as typeof textPos);
-        if (m.heels_hero_eyebrow) setEyebrow(m.heels_hero_eyebrow);
-        if (m.heels_hero_title) setTitle(m.heels_hero_title);
-        if (m.heels_hero_subtitle) setSubtitle(m.heels_hero_subtitle);
-        if (m.heels_hero_show_stats !== undefined) setShowStats(m.heels_hero_show_stats !== "false");
-        if (m.heels_hero_stat1_val !== undefined) setStat1Val(m.heels_hero_stat1_val);
-        if (m.heels_hero_stat1_label) setStat1Label(m.heels_hero_stat1_label);
-        if (m.heels_hero_stat2_val !== undefined) setStat2Val(m.heels_hero_stat2_val);
-        if (m.heels_hero_stat2_label) setStat2Label(m.heels_hero_stat2_label);
-        if (m.heels_hero_stat3_val) setStat3Val(m.heels_hero_stat3_val);
-        if (m.heels_hero_stat3_label) setStat3Label(m.heels_hero_stat3_label);
-      });
-  }, []);
 
   // Auto-advance slider
   useEffect(() => {
@@ -292,7 +258,7 @@ function HeelCard({ product }: { product: HeelProduct }) {
 }
 
 // ── Main client component ─────────────────────────────────────────────────
-export default function HeelsPageClient({ initialProducts }: { initialProducts: HeelProduct[] }) {
+export default function HeelsPageClient({ initialProducts, initialSettings = {} }: { initialProducts: HeelProduct[]; initialSettings?: HeelsSettings }) {
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const [selectedHeelTypes, setSelectedHeelTypes] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number>(9999);
@@ -355,7 +321,7 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
   return (
     <>
       {/* ── Hero (admin-controlled: image/video/slider + text position) ── */}
-      <HeelsHero productCount={initialProducts.length} heelTypeCount={heelTypes.length} />
+      <HeelsHero productCount={initialProducts.length} heelTypeCount={heelTypes.length} m={initialSettings} />
 
       {/* ── Occasion filter + Category links (exactly like homepage) ── */}
       <OccasionFilterSection
@@ -493,7 +459,7 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
       </section>
 
       {/* ── Why Choose Classie (admin-controlled) ───────────────────── */}
-      <WhyChooseSection />
+      <WhyChooseSection m={initialSettings} />
     </>
   );
 }
