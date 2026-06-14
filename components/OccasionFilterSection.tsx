@@ -162,9 +162,7 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick,
         </div>
 
         {/* Category links — same as homepage, right below occasion cards */}
-        {excludeCategorySlug && (
-          <CategoryLinks excludeSlug={excludeCategorySlug} />
-        )}
+        <CategoryLinks excludeSlug={excludeCategorySlug} />
 
         {/* Active filter pill */}
         {activeOccasion && (
