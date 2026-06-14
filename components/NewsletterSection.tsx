@@ -44,8 +44,13 @@ export default function NewsletterSection() {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await supabase.from("newsletter_subscribers").insert([{ email, source: "website" }]);
+    const { error } = await supabase.from("newsletter_subscribers").insert([{ email }]);
     setLoading(false);
+    if (error) {
+      console.error("Newsletter subscribe error:", error);
+      alert("Subscribe failed: " + error.message);
+      return;
+    }
     setDone(true);
     setEmail("");
   };
