@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { HeelProduct } from "@/lib/products";
+import { supabase } from "@/lib/supabase";
 import OccasionFilterSection from "./OccasionFilterSection";
 
 // ── Product card matching homepage Featured Picks style ───────────────
@@ -93,13 +94,6 @@ function HeelCard({ product }: { product: HeelProduct }) {
   );
 }
 
-// ── Unique heel types for filter sidebar ─────────────────────────────────
-function getUniqueHeelTypes(products: HeelProduct[]): string[] {
-  const types = new Set<string>();
-  products.forEach((p) => { if (p.heel_type) types.add(p.heel_type); });
-  return Array.from(types).sort();
-}
-
 // ── Main client component ─────────────────────────────────────────────────
 export default function HeelsPageClient({ initialProducts }: { initialProducts: HeelProduct[] }) {
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
@@ -107,7 +101,25 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
   const [maxPrice, setMaxPrice] = useState<number>(9999);
   const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "newest">("default");
 
-  const heelTypes = useMemo(() => getUniqueHeelTypes(initialProducts), [initialProducts]);
+  // Load filter types from DB (admin-managed)
+  const [heelTypes, setHeelTypes] = useState<string[]>(() => {
+    // Fallback: auto-generate from products
+    const types = new Set<string>();
+    initialProducts.forEach((p) => { if (p.heel_type) types.add(p.heel_type); });
+    return Array.from(types).sort();
+  });
+
+  useEffect(() => {
+    supabase.from("site_settings").select("value").eq("key", "heels_filter_heel_types").maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          try {
+            const parsed = JSON.parse(data.value);
+            if (Array.isArray(parsed) && parsed.length > 0) setHeelTypes(parsed);
+          } catch { /* use fallback */ }
+        }
+      });
+  }, []);
 
   const filtered = useMemo(() => {
     let result = [...initialProducts];
