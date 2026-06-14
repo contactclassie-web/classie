@@ -664,6 +664,17 @@ export default function AdminPage() {
     finally { setSubsLoading(false); }
   }, []);
 
+  // Real-time subscriber updates
+  useEffect(() => {
+    const channel = supabase.channel("newsletter_realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "newsletter_subscribers" },
+        (payload) => {
+          setSubscribers(prev => [payload.new as NewsletterSubscriber, ...prev]);
+        }
+      ).subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   const fetchFeaturesBar = useCallback(async () => {
     setFeaturesBarLoading(true);
     try {
