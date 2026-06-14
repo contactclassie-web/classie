@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import CategoryLinks from "./CategoryLinks";
 
 interface Occasion {
   title: string;
@@ -14,6 +15,7 @@ interface Occasion {
 interface Props {
   activeOccasion: string | null;
   onOccasionClick: (slug: string | null) => void;
+  excludeCategorySlug?: string; // hide this category from CategoryLinks strip
 }
 
 function OccasionFilterCard({
@@ -102,7 +104,7 @@ function OccasionFilterCard({
   );
 }
 
-export default function OccasionFilterSection({ activeOccasion, onOccasionClick }: Props) {
+export default function OccasionFilterSection({ activeOccasion, onOccasionClick, excludeCategorySlug }: Props) {
   const [occasions, setOccasions] = useState<Occasion[]>([]);
 
   useEffect(() => {
@@ -158,6 +160,11 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick 
             />
           ))}
         </div>
+
+        {/* Category links — same as homepage, right below occasion cards */}
+        {excludeCategorySlug && (
+          <CategoryLinks excludeSlug={excludeCategorySlug} />
+        )}
 
         {/* Active filter pill */}
         {activeOccasion && (
