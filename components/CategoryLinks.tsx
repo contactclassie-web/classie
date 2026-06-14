@@ -15,13 +15,18 @@ interface Style {
 
 const DEFAULTS: Style = { bold: true, hoverBg: "#3B5373", hoverText: "#ffffff", numColor: "#9ca3af", textSize: "1.1" };
 
-export default function CategoryLinks() {
+export default function CategoryLinks({ excludeSlug }: { excludeSlug?: string } = {}) {
   const [cats, setCats]   = useState<Cat[]>([]);
   const [style, setStyle] = useState<Style>(DEFAULTS);
 
   useEffect(() => {
     supabase.from("site_categories").select("name,slug,display_order").eq("active", true)
-      .order("display_order").then(({ data }) => { if (data) setCats(data); });
+      .order("display_order").then(({ data }) => {
+        if (data) {
+          const filtered = excludeSlug ? data.filter((c) => c.slug !== excludeSlug) : data;
+          setCats(filtered);
+        }
+      });
 
     supabase.from("site_settings").select("key,value")
       .in("key", ["cat_links_bold","cat_links_hover_bg","cat_links_hover_text","cat_num_color","cat_text_size"])

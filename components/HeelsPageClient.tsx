@@ -6,6 +6,7 @@ import Image from "next/image";
 import { HeelProduct } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
 import OccasionFilterSection from "./OccasionFilterSection";
+import CategoryLinks from "./CategoryLinks";
 
 // ── Product card matching homepage Featured Picks style ───────────────
 function HeelCard({ product }: { product: HeelProduct }) {
@@ -207,6 +208,11 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
         activeOccasion={activeOccasion}
         onOccasionClick={setActiveOccasion}
       />
+
+      {/* ── Other categories (Clip-ons + Bow — hide Heels) ─────────── */}
+      <div className="max-w-[1280px] mx-auto px-4 md:px-10 py-6">
+        <CategoryLinks excludeSlug="heels" />
+      </div>
 
       {/* ── Filter + Grid ─────────────────────────────────────────────── */}
       <section className="py-12" style={{ background: "#f5f5f5" }}>
