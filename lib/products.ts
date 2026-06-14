@@ -309,3 +309,52 @@ export async function getCollectionProductsFromDB(slug: string): Promise<Product
     return getCollection(slug);
   }
 }
+
+// ── Extended type for heels page (includes filter fields from DB) ──────────
+export interface HeelProduct extends Product {
+  heel_type: string | null;
+  tags: string[];
+}
+
+export async function getHeelsForPageFromDB(): Promise<HeelProduct[]> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category', 'heels')
+      .eq('active', true)
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      return products.filter((p) => p.category === 'heels').map((p) => ({
+        ...p,
+        heel_type: null,
+        tags: [],
+      }));
+    }
+
+    return (data as (DbProduct & { heel_type?: string | null; tags?: string[] })[]).map((row) => ({
+      slug: row.slug,
+      title: row.title,
+      price: Number(row.price),
+      comparePrice: Number(row.compare_price),
+      category: row.category as Product['category'],
+      collection: 'heels' as Product['collection'],
+      variants: {
+        type: ((row.variant_type ?? 'none') as 'size' | 'color' | 'none'),
+        options: Array.isArray(row.variants) ? row.variants : [],
+      },
+      image: row.image,
+      description: row.description,
+      featured_tab: row.featured_tab ?? null,
+      heel_type: row.heel_type ?? null,
+      tags: row.tags ?? [],
+    }));
+  } catch {
+    return products.filter((p) => p.category === 'heels').map((p) => ({
+      ...p,
+      heel_type: null,
+      tags: [],
+    }));
+  }
+}
