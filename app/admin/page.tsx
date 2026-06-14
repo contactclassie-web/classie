@@ -85,6 +85,11 @@ interface SiteSettings {
   instagram_url: string;
   philosophy_eyebrow: string;
   philosophy_headline: string;
+  philosophy_headline_italic: string;
+  philosophy_headline2: string;
+  phil_stat1_number: string; phil_stat1_label: string;
+  phil_stat2_number: string; phil_stat2_label: string;
+  phil_stat3_number: string; phil_stat3_label: string;
   philosophy_body: string;
   philosophy_cta_text: string;
   philosophy_cta_url: string;
@@ -342,10 +347,13 @@ export default function AdminPage() {
     announcement_speed: "15",
     announcement_mode: "rotate",
     philosophy_eyebrow: "Our Philosophy",
-    philosophy_headline: "One Heel. Endless Possibilities.",
+    philosophy_headline: "One Heel.", philosophy_headline_italic: "Endless", philosophy_headline2: "Possibilities.",
     philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
     philosophy_cta_text: "Our Story",
     philosophy_cta_url: "/about",
+    phil_stat1_number: "10K+", phil_stat1_label: "Happy Customers",
+    phil_stat2_number: "50+",  phil_stat2_label: "Styles Available",
+    phil_stat3_number: "4.9★", phil_stat3_label: "Avg. Rating",
     phil_f1_title: "Comfort-First Design",  phil_f1_desc: "Engineered for all-day wear without sacrificing elegance.",
     phil_f2_title: "Premium Quality",        phil_f2_desc: "Curated materials, careful craftsmanship in every pair.",
     phil_f3_title: "Free Exchange",          phil_f3_desc: "Not the right fit? Exchange hassle-free, always.",
@@ -534,10 +542,13 @@ export default function AdminPage() {
           announcement_speed: "15",
     announcement_mode: "rotate",
           philosophy_eyebrow: "Our Philosophy",
-          philosophy_headline: "One Heel. Endless Possibilities.",
+          philosophy_headline: "One Heel.", philosophy_headline_italic: "Endless", philosophy_headline2: "Possibilities.",
           philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
           philosophy_cta_text: "Our Story",
           philosophy_cta_url: "/about",
+          phil_stat1_number: "10K+", phil_stat1_label: "Happy Customers",
+          phil_stat2_number: "50+",  phil_stat2_label: "Styles Available",
+          phil_stat3_number: "4.9★", phil_stat3_label: "Avg. Rating",
           phil_f1_title: "Comfort-First Design",  phil_f1_desc: "Engineered for all-day wear without sacrificing elegance.",
           phil_f2_title: "Premium Quality",        phil_f2_desc: "Curated materials, careful craftsmanship in every pair.",
           phil_f3_title: "Free Exchange",          phil_f3_desc: "Not the right fit? Exchange hassle-free, always.",
@@ -992,10 +1003,14 @@ export default function AdminPage() {
         { key: "philosophy_body",      value: siteSettings.philosophy_body },
         { key: "philosophy_cta_text",  value: siteSettings.philosophy_cta_text },
         { key: "philosophy_cta_url",   value: siteSettings.philosophy_cta_url },
-        { key: "philosophy_image_url", value: siteSettings.philosophy_image_url },
+        { key: "philosophy_headline_italic", value: siteSettings.philosophy_headline_italic },
+        { key: "philosophy_headline2",       value: siteSettings.philosophy_headline2 },
+        { key: "philosophy_image_url",       value: siteSettings.philosophy_image_url },
+        { key: "phil_stat1_number", value: siteSettings.phil_stat1_number }, { key: "phil_stat1_label", value: siteSettings.phil_stat1_label },
+        { key: "phil_stat2_number", value: siteSettings.phil_stat2_number }, { key: "phil_stat2_label", value: siteSettings.phil_stat2_label },
+        { key: "phil_stat3_number", value: siteSettings.phil_stat3_number }, { key: "phil_stat3_label", value: siteSettings.phil_stat3_label },
         { key: "phil_f1_title", value: siteSettings.phil_f1_title }, { key: "phil_f1_desc", value: siteSettings.phil_f1_desc },
         { key: "phil_f2_title", value: siteSettings.phil_f2_title }, { key: "phil_f2_desc", value: siteSettings.phil_f2_desc },
-        { key: "phil_f3_title", value: siteSettings.phil_f3_title }, { key: "phil_f3_desc", value: siteSettings.phil_f3_desc },
       ];
       await upsertSettings(rows);
     } catch { /* ignore */ }
@@ -2628,13 +2643,19 @@ export default function AdminPage() {
                     placeholder="e.g. Our Philosophy"
                   />
                 </div>
-                <div>
-                  <label className={labelCls}>Headline</label>
-                  <input
-                    type="text" value={siteSettings.philosophy_headline} className={inputCls}
-                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_headline: e.target.value }))}
-                    placeholder="e.g. One Heel. Endless Possibilities."
-                  />
+                <div className="grid grid-cols-3 gap-3">
+                  <div><label className={labelCls}>Heading Line 1</label>
+                    <input type="text" value={siteSettings.philosophy_headline} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, philosophy_headline: e.target.value }))} placeholder="One Heel." />
+                  </div>
+                  <div><label className={labelCls}>Italic Word (navy)</label>
+                    <input type="text" value={siteSettings.philosophy_headline_italic} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, philosophy_headline_italic: e.target.value }))} placeholder="Endless" />
+                  </div>
+                  <div><label className={labelCls}>Heading Line 2</label>
+                    <input type="text" value={siteSettings.philosophy_headline2} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, philosophy_headline2: e.target.value }))} placeholder="Possibilities." />
+                  </div>
                 </div>
                 <div>
                   <label className={labelCls}>Body Text</label>
@@ -2677,13 +2698,32 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
+                {/* Stats */}
+                <div className="border-t border-gray-100 pt-4 space-y-3">
+                  <p className={labelCls + " text-sm font-semibold text-gray-700"}>Stats (leave empty to hide)</p>
+                  {([
+                    { nKey: "phil_stat1_number" as const, lKey: "phil_stat1_label" as const },
+                    { nKey: "phil_stat2_number" as const, lKey: "phil_stat2_label" as const },
+                    { nKey: "phil_stat3_number" as const, lKey: "phil_stat3_label" as const },
+                  ]).map(({ nKey, lKey }, i) => (
+                    <div key={i} className="grid grid-cols-2 gap-3">
+                      <div><label className={labelCls}>Stat {i+1} Number</label>
+                        <input type="text" value={siteSettings[nKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [nKey]: e.target.value }))} placeholder="10K+" />
+                      </div>
+                      <div><label className={labelCls}>Stat {i+1} Label</label>
+                        <input type="text" value={siteSettings[lKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [lKey]: e.target.value }))} placeholder="Happy Customers" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
                 {/* Feature Items */}
                 <div className="border-t border-gray-100 pt-4 space-y-4">
-                  <p className={labelCls + " text-sm font-semibold text-gray-700"}>3 Feature Points</p>
+                  <p className={labelCls + " text-sm font-semibold text-gray-700"}>2 Feature Points</p>
                   {([
                     { tKey: "phil_f1_title" as const, dKey: "phil_f1_desc" as const, num: "1" },
                     { tKey: "phil_f2_title" as const, dKey: "phil_f2_desc" as const, num: "2" },
-                    { tKey: "phil_f3_title" as const, dKey: "phil_f3_desc" as const, num: "3" },
+
                   ]).map(({ tKey, dKey, num }) => (
                     <div key={num} className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-xl">
                       <div><label className={labelCls}>Feature {num} Title</label>
