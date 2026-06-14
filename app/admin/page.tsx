@@ -141,8 +141,8 @@ interface SiteSettings {
   footer_logo_url: string;
   footer_tagline: string;
   footer_desc: string;
-  footer_ig_url: string;
-  footer_tiktok_url: string;
+  footer_ig_url: string; footer_tiktok_url: string;
+  footer_fb_url: string; footer_pinterest_url: string; footer_whatsapp_url: string;
   footer_shop_links: string;
   footer_help_links: string;
   footer_company_links: string;
@@ -425,7 +425,7 @@ export default function AdminPage() {
     footer_tagline: "One Heel. Endless Looks.",
     footer_desc: "Premium heels crafted for the modern woman. Made with ♥ in India.",
     footer_ig_url: "https://www.instagram.com/_classie_in/",
-    footer_tiktok_url: "",
+    footer_tiktok_url: "", footer_fb_url: "", footer_pinterest_url: "", footer_whatsapp_url: "",
     footer_shop_links: "",
     footer_help_links: "",
     footer_company_links: "",
@@ -667,7 +667,7 @@ export default function AdminPage() {
           footer_tagline: "One Heel. Endless Looks.",
           footer_desc: "Premium heels crafted for the modern woman. Made with ♥ in India.",
           footer_ig_url: "https://www.instagram.com/_classie_in/",
-          footer_tiktok_url: "",
+          footer_tiktok_url: "", footer_fb_url: "", footer_pinterest_url: "", footer_whatsapp_url: "",
           footer_shop_links: "",
           footer_help_links: "",
           footer_company_links: "",
@@ -1212,6 +1212,9 @@ export default function AdminPage() {
         { key: "footer_desc",            value: siteSettings.footer_desc },
         { key: "footer_ig_url",          value: siteSettings.footer_ig_url },
         { key: "footer_tiktok_url",      value: siteSettings.footer_tiktok_url },
+        { key: "footer_fb_url",          value: siteSettings.footer_fb_url },
+        { key: "footer_pinterest_url",   value: siteSettings.footer_pinterest_url },
+        { key: "footer_whatsapp_url",    value: siteSettings.footer_whatsapp_url },
         { key: "footer_shop_heading",    value: siteSettings.footer_shop_heading },
         { key: "footer_help_heading",    value: siteSettings.footer_help_heading },
         { key: "footer_company_heading", value: siteSettings.footer_company_heading },
@@ -2879,11 +2882,30 @@ export default function AdminPage() {
                       placeholder="https://www.instagram.com/_classie_in/" />
                   </div>
                   <div>
-                    <label className={labelCls}>TikTok URL <span className="normal-case text-gray-400 font-normal">(leave empty to hide)</span></label>
+                    <label className={labelCls}>TikTok URL</label>
                     <input type="text" value={siteSettings.footer_tiktok_url} className={inputCls}
                       onChange={(e) => setSiteSettings((s) => ({ ...s, footer_tiktok_url: e.target.value }))}
                       placeholder="https://www.tiktok.com/@classie_in" />
                   </div>
+                  <div>
+                    <label className={labelCls}>Facebook URL</label>
+                    <input type="text" value={siteSettings.footer_fb_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_fb_url: e.target.value }))}
+                      placeholder="https://www.facebook.com/classie.co.in" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Pinterest URL</label>
+                    <input type="text" value={siteSettings.footer_pinterest_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_pinterest_url: e.target.value }))}
+                      placeholder="https://pinterest.com/classie_in" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>WhatsApp URL</label>
+                    <input type="text" value={siteSettings.footer_whatsapp_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_whatsapp_url: e.target.value }))}
+                      placeholder="https://wa.me/919999999999" />
+                  </div>
+                  <p className="text-[11px] text-gray-400">Leave any field empty to hide that icon in footer</p>
                 </div>
               </div>
 
