@@ -210,7 +210,7 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
       />
 
       {/* ── Other categories (Clip-ons + Bow — hide Heels) ─────────── */}
-      <div className="max-w-[1280px] mx-auto px-4 md:px-10 py-6">
+      <div className="max-w-[1280px] mx-auto px-4 md:px-10 pt-2 pb-4">
         <CategoryLinks excludeSlug="heels" />
       </div>
 
