@@ -14,9 +14,24 @@ interface FPSettings {
 }
 
 interface FeaturedPicksProps {
-  latestProducts: Product[];
-  bestSellers: Product[];
+  latestProducts?: Product[];
+  bestSellers?: Product[];
   saleProducts?: Product[];
+}
+
+// Map DB row to Product shape
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapDbToProduct(row: any): Product {
+  return {
+    slug: row.slug ?? "", title: row.title ?? "",
+    price: row.price ?? 0, comparePrice: row.compare_price ?? 0,
+    category: row.category ?? "heels",
+    collection: row.collection ?? "heels",
+    variants: { type: row.variant_type ?? "none", options: row.variants ?? [] },
+    image: row.image_url ?? row.image ?? "",
+    description: row.description ?? "",
+    featured_tab: row.featured_tab ?? null,
+  };
 }
 
 // Color map: keyword in title/slug → gradient colors
@@ -137,11 +152,15 @@ const DEFAULT_SETTINGS: FPSettings = {
   headingItalic: "Picks",
 };
 
-export default function FeaturedPicks({ latestProducts, bestSellers, saleProducts = [] }: FeaturedPicksProps) {
+export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, saleProducts: _s }: FeaturedPicksProps) {
   const [activeTab, setActiveTab] = useState<"latest" | "bestsellers" | "sale">("latest");
   const [fps, setFps] = useState<FPSettings>(DEFAULT_SETTINGS);
+  const [latestProducts, setLatestProducts]   = useState<Product[]>(_l ?? []);
+  const [bestSellers,    setBestSellers]       = useState<Product[]>(_b ?? []);
+  const [saleProducts,   setSaleProducts]      = useState<Product[]>(_s ?? []);
 
   useEffect(() => {
+    // Fetch settings
     supabase.from("site_settings").select("key,value")
       .in("key", ["fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active","fp_eyebrow","fp_heading","fp_heading_italic"])
       .then(({ data }) => {
@@ -152,11 +171,19 @@ export default function FeaturedPicks({ latestProducts, bestSellers, saleProduct
           tab1: { label: m.fp_tab1_label ?? "Latest Styles", active: (m.fp_tab1_active ?? "true") === "true" },
           tab2: { label: m.fp_tab2_label ?? "Best Sellers",  active: (m.fp_tab2_active ?? "true") === "true" },
           tab3: { label: m.fp_tab3_label ?? "On Sale",       active: (m.fp_tab3_active ?? "true") === "true" },
-          eyebrow:      m.fp_eyebrow        ?? "New Arrivals",
-          heading:      m.fp_heading        ?? "Featured",
-          headingItalic: m.fp_heading_italic ?? "Picks",
+          eyebrow:       m.fp_eyebrow         ?? "New Arrivals",
+          heading:       m.fp_heading         ?? "Featured",
+          headingItalic: m.fp_heading_italic  ?? "Picks",
         });
       });
+
+    // Fetch products client-side for instant updates
+    supabase.from("products").select("*").eq("featured_tab", "latest").eq("active", true).limit(4)
+      .then(({ data }) => { if (data && data.length > 0) setLatestProducts(data.map(mapDbToProduct)); });
+    supabase.from("products").select("*").eq("featured_tab", "bestseller").eq("active", true).limit(4)
+      .then(({ data }) => { if (data && data.length > 0) setBestSellers(data.map(mapDbToProduct)); });
+    supabase.from("products").select("*").eq("featured_tab", "sale").eq("active", true).limit(4)
+      .then(({ data }) => { if (data && data.length > 0) setSaleProducts(data.map(mapDbToProduct)); });
   }, []);
 
   const tabs = [
