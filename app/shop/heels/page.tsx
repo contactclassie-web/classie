@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { getHeelsForPageFromDB } from "@/lib/products";
 import HeelsPageClient from "@/components/HeelsPageClient";
 
-export const revalidate = 60;
+export const revalidate = 0; // always fresh — no cache
 
 export const metadata: Metadata = {
   title: "Women's Heels — Classie",
