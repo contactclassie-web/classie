@@ -1,11 +1,115 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { HeelProduct } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
 import OccasionFilterSection from "./OccasionFilterSection";
+
+// ── Hero component (reads settings from DB) ───────────────────────────
+function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heelTypeCount: number }) {
+  const [bgType, setBgType] = useState<"none"|"image"|"video"|"slider">("none");
+  const [bgUrl, setBgUrl] = useState("");
+  const [slides, setSlides] = useState<string[]>([]);
+  const [textPos, setTextPos] = useState<"left"|"center"|"right">("center");
+  const [slideIdx, setSlideIdx] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval>|null>(null);
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos"])
+      .then(({ data }) => {
+        const m: Record<string,string> = {};
+        (data ?? []).forEach(({key,value}) => { m[key]=value; });
+        if (m.heels_hero_bg_type) setBgType(m.heels_hero_bg_type as typeof bgType);
+        if (m.heels_hero_bg_url) setBgUrl(m.heels_hero_bg_url);
+        if (m.heels_hero_slides) { try { setSlides(JSON.parse(m.heels_hero_slides)); } catch { setSlides([]); } }
+        if (m.heels_hero_text_pos) setTextPos(m.heels_hero_text_pos as typeof textPos);
+      });
+  }, []);
+
+  // Auto-advance slider
+  useEffect(() => {
+    if (bgType === "slider" && slides.length > 1) {
+      timerRef.current = setInterval(() => setSlideIdx(i => (i + 1) % slides.length), 3500);
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [bgType, slides]);
+
+  const isYouTube = bgUrl.includes("youtube.com") || bgUrl.includes("youtu.be");
+  const ytId = isYouTube ? bgUrl.match(/(?:v=|youtu\.be\/)([^&?]+)/)?.[1] : null;
+
+  const textAlign = textPos === "left" ? "items-start text-left" : textPos === "right" ? "items-end text-right" : "items-center text-center";
+  const textPad   = textPos === "left"  ? "pl-10 md:pl-20 pr-4" :
+                    textPos === "right" ? "pr-10 md:pr-20 pl-4" :
+                    "px-6";
+
+  return (
+    <section className="relative overflow-hidden" style={{ background: "#3B5373", minHeight: "320px" }}>
+      {/* Background */}
+      {bgType === "image" && bgUrl && (
+        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-40" />
+      )}
+      {bgType === "slider" && slides.length > 0 && (
+        <>
+          {slides.map((s, i) => (
+            <img key={s} src={s} alt="" className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700"
+              style={{ opacity: i === slideIdx ? 0.4 : 0 }} />
+          ))}
+          {slides.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+              {slides.map((_,i) => (
+                <button key={i} onClick={() => setSlideIdx(i)}
+                  className={`h-1.5 rounded-full transition-all ${i===slideIdx?"w-5 bg-white":"w-1.5 bg-white/40"}`} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+      {bgType === "video" && bgUrl && !isYouTube && (
+        <video src={bgUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover object-center opacity-40" />
+      )}
+      {bgType === "video" && isYouTube && ytId && (
+        <iframe src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&showinfo=0`}
+          className="absolute inset-0 w-full h-full opacity-30 pointer-events-none scale-[1.4]" allow="autoplay" />
+      )}
+
+      {/* Text */}
+      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-20`} style={{ minHeight: "320px" }}>
+        <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
+          <div className="w-8 h-px bg-white/40" />
+          <span className="text-[10px] tracking-[0.5em] uppercase text-white/60" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            New Collection · SS25
+          </span>
+          <div className="w-8 h-px bg-white/40" />
+        </div>
+        <h1 className="font-serif font-light text-white leading-none mb-5" style={{ fontSize: "clamp(64px, 10vw, 96px)" }}>
+          Heels
+        </h1>
+        <p className="font-serif italic text-white/60 text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          Step into your story
+        </p>
+        <div className="flex items-center gap-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
+          <div className="text-center">
+            <p className="text-2xl font-serif font-light text-white">{productCount}</p>
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Styles</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div className="text-center">
+            <p className="text-2xl font-serif font-light text-white">{heelTypeCount}</p>
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Heel Types</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div className="text-center">
+            <p className="text-2xl font-serif font-light text-white">Free</p>
+            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Shipping ₹999+</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 // ── Product card matching homepage Featured Picks style ───────────────
 function HeelCard({ product }: { product: HeelProduct }) {
@@ -157,50 +261,8 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
 
   return (
     <>
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section
-        className="relative flex flex-col items-center justify-center text-center py-24 px-6"
-        style={{ background: "#3B5373", minHeight: "320px" }}
-      >
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-8 h-px bg-white/40" />
-          <span
-            className="text-[10px] tracking-[0.5em] uppercase text-white/60"
-            style={{ fontFamily: "'Poppins', sans-serif" }}
-          >
-            New Collection · SS25
-          </span>
-          <div className="w-8 h-px bg-white/40" />
-        </div>
-        <h1
-          className="font-serif font-light text-white leading-none mb-5"
-          style={{ fontSize: "clamp(64px, 10vw, 96px)" }}
-        >
-          Heels
-        </h1>
-        <p
-          className="font-serif italic text-white/60 text-xl mb-8"
-          style={{ fontFamily: "'Cormorant Garamond', serif" }}
-        >
-          Step into your story
-        </p>
-        <div className="flex items-center gap-6">
-          <div className="text-center">
-            <p className="text-2xl font-serif font-light text-white">{initialProducts.length}</p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Styles</p>
-          </div>
-          <div className="w-px h-8 bg-white/20" />
-          <div className="text-center">
-            <p className="text-2xl font-serif font-light text-white">{heelTypes.length}</p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Heel Types</p>
-          </div>
-          <div className="w-px h-8 bg-white/20" />
-          <div className="text-center">
-            <p className="text-2xl font-serif font-light text-white">Free</p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Shipping ₹999+</p>
-          </div>
-        </div>
-      </section>
+      {/* ── Hero (admin-controlled: image/video/slider + text position) ── */}
+      <HeelsHero productCount={initialProducts.length} heelTypeCount={heelTypes.length} />
 
       {/* ── Occasion filter + Category links (exactly like homepage) ── */}
       <OccasionFilterSection

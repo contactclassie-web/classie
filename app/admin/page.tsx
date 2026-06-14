@@ -360,6 +360,12 @@ export default function AdminPage() {
   const [heelsFilterTypes, setHeelsFilterTypes] = useState<string[]>([]);
   const [newFilterType, setNewFilterType] = useState("");
   const [heelsFilterSaving, setHeelsFilterSaving] = useState(false);
+  // Hero settings
+  const [heelsHeroBgType, setHeelsHeroBgType] = useState<"none"|"image"|"video"|"slider">("none");
+  const [heelsHeroBgUrl, setHeelsHeroBgUrl] = useState("");
+  const [heelsHeroSlides, setHeelsHeroSlides] = useState<string[]>([]);
+  const [heelsHeroTextPos, setHeelsHeroTextPos] = useState<"left"|"center"|"right">("center");
+  const [heelsHeroSaving, setHeelsHeroSaving] = useState(false);
 
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -606,18 +612,43 @@ export default function AdminPage() {
   const fetchHeelsPage = useCallback(async () => {
     setHeelsPageLoading(true);
     try {
-      const { data } = await supabase.from("products").select("*").eq("category", "heels").order("created_at", { ascending: false });
+      const [{ data }, { data: settings }] = await Promise.all([
+        supabase.from("products").select("*").eq("category", "heels").order("created_at", { ascending: false }),
+        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos"]),
+      ]);
       if (data) setHeelsPageProducts(data as DbProduct[]);
-      const { data: s } = await supabase.from("site_settings").select("value").eq("key", "heels_filter_heel_types").maybeSingle();
-      if (s?.value) { try { setHeelsFilterTypes(JSON.parse(s.value)); } catch { setHeelsFilterTypes([]); } }
+      const m: Record<string,string> = {};
+      (settings ?? []).forEach(({key,value}) => { m[key]=value; });
+      if (m.heels_filter_heel_types) { try { setHeelsFilterTypes(JSON.parse(m.heels_filter_heel_types)); } catch { setHeelsFilterTypes([]); } }
       else if (data) {
         const types = new Set<string>();
         (data as DbProduct[]).forEach((p) => { if (p.heel_type) types.add(p.heel_type); });
         setHeelsFilterTypes(Array.from(types).sort());
       }
+      if (m.heels_hero_bg_type) setHeelsHeroBgType(m.heels_hero_bg_type as "none"|"image"|"video"|"slider");
+      if (m.heels_hero_bg_url) setHeelsHeroBgUrl(m.heels_hero_bg_url);
+      if (m.heels_hero_slides) { try { setHeelsHeroSlides(JSON.parse(m.heels_hero_slides)); } catch { setHeelsHeroSlides([]); } }
+      if (m.heels_hero_text_pos) setHeelsHeroTextPos(m.heels_hero_text_pos as "left"|"center"|"right");
     } catch { /* ignore */ }
     finally { setHeelsPageLoading(false); }
   }, []);
+
+  const saveHeelsHero = async () => {
+    setHeelsHeroSaving(true);
+    try {
+      const pairs = [
+        { key: "heels_hero_bg_type", value: heelsHeroBgType },
+        { key: "heels_hero_bg_url", value: heelsHeroBgUrl },
+        { key: "heels_hero_slides", value: JSON.stringify(heelsHeroSlides) },
+        { key: "heels_hero_text_pos", value: heelsHeroTextPos },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } catch { /* ignore */ }
+    finally { setHeelsHeroSaving(false); }
+  };
 
   const saveHeelsFilterTypes = async (types: string[]) => {
     setHeelsFilterSaving(true);
@@ -2079,6 +2110,77 @@ export default function AdminPage() {
             <div className="space-y-8">
               {heelsPageLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading…</div> : (
                 <>
+                  {/* ── Hero Settings ─────────────────────────────────── */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Background image / video aur text position set karo. Save karte hi live ho jaata hai.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                      {/* Background type */}
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Background Type</label>
+                        <div className="flex gap-2 flex-wrap">
+                          {(["none","image","video","slider"] as const).map(t => (
+                            <button key={t} onClick={()=>setHeelsHeroBgType(t)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${heelsHeroBgType===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {t === "none" ? "Plain Color" : t === "slider" ? "Image Slider" : t === "image" ? "Single Image" : "Video"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* URL input for image/video */}
+                      {(heelsHeroBgType === "image" || heelsHeroBgType === "video") && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">
+                            {heelsHeroBgType === "image" ? "Image URL" : "Video URL (mp4 or YouTube)"}
+                          </label>
+                          <input type="text" value={heelsHeroBgUrl} onChange={e=>setHeelsHeroBgUrl(e.target.value)}
+                            placeholder={heelsHeroBgType==="image" ? "https://cdn.shopify.com/..." : "https://...mp4 or YouTube URL"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          {heelsHeroBgUrl && heelsHeroBgType==="image" && (
+                            <img src={heelsHeroBgUrl} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Slider URLs */}
+                      {heelsHeroBgType === "slider" && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Slider Images (one per line)</label>
+                          <textarea rows={4} value={heelsHeroSlides.join("\n")} onChange={e=>setHeelsHeroSlides(e.target.value.split("\n").map(x=>x.trim()).filter(Boolean))}
+                            placeholder={"https://image1.jpg\nhttps://image2.jpg\nhttps://image3.jpg"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg font-mono"/>
+                          <div className="flex gap-2 mt-2 flex-wrap">
+                            {heelsHeroSlides.filter(Boolean).map((url,i)=>(
+                              <img key={i} src={url} alt="" className="h-14 w-14 object-cover rounded object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Text position */}
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Text Position</label>
+                        <div className="flex gap-2">
+                          {(["left","center","right"] as const).map(pos => (
+                            <button key={pos} onClick={()=>setHeelsHeroTextPos(pos)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${heelsHeroTextPos===pos?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {pos === "left" ? "⬅ Left" : pos === "right" ? "Right ➡" : "⬛ Center"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <button onClick={saveHeelsHero} disabled={heelsHeroSaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>
+                        {heelsHeroSaving ? "Saving…" : "Save Hero Settings"}
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Products table */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
