@@ -47,6 +47,7 @@ interface DbProduct {
   heel_height?: string;
   ankle_strap?: boolean;
   shoe_fit?: string;
+  tags?: string[];
   cod_available: boolean;
   free_shipping: boolean;
   is_featured: boolean;
@@ -264,7 +265,7 @@ const EMPTY_PRODUCT: DbProduct = {
   title: "", slug: "", price: 0, compare_price: 0,
   category: "heels", description: "", image: "", images: [],
   variant_type: "none", variants: [], heel_type: "", toe_style: "",
-  heel_height: "", ankle_strap: false, shoe_fit: "",
+  heel_height: "", ankle_strap: false, shoe_fit: "", tags: [],
   cod_available: true, free_shipping: false, is_featured: false, featured_tab: null, active: true,
 };
 
@@ -3503,6 +3504,17 @@ export default function AdminPage() {
                     <input type="checkbox" checked={productModal.data.ankle_strap ?? false} onChange={(e) => setProductField("ankle_strap", e.target.checked)} className="w-4 h-4 accent-[#3B5373]" />
                     Ankle Strap
                   </label>
+                  <div>
+                    <label className={labelCls}>Tags (comma separated) — used for occasion filter</label>
+                    <input
+                      type="text"
+                      value={productModal.data.tags?.join(", ") ?? ""}
+                      onChange={(e) => setProductField("tags", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
+                      className={inputCls}
+                      placeholder="e.g. heels, date, festive, block heel, black"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1">Tip: add &quot;date&quot;, &quot;festive&quot; or &quot;everyday&quot; to match occasion filters</p>
+                  </div>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-3">
