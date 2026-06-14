@@ -61,16 +61,12 @@ function ProductCard({ product, isNew }: { product: Product; isNew?: boolean }) 
         {/* Product image */}
         {product.image && (
           <Image src={product.image} alt={product.title} fill
-            className="object-cover object-top opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 50vw, 25vw" />
         )}
 
-        {/* Ghost name overlay */}
-        <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity duration-300">
-          <p className="font-serif text-center text-white/20 text-[1.1rem] font-light leading-tight px-4">
-            {product.title.split(" ").slice(0, 2).join("\n")}
-          </p>
-        </div>
+        {/* Dark overlay on hover */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
