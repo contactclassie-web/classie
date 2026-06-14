@@ -8,7 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home,
+  Star, Camera, Palette, Home, Layout,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -137,6 +137,19 @@ interface SiteSettings {
   cat_links_hover_text: string;
   cat_num_color: string;
   cat_text_size: string;
+  // Footer
+  footer_logo_url: string;
+  footer_tagline: string;
+  footer_desc: string;
+  footer_ig_url: string;
+  footer_tiktok_url: string;
+  footer_shop_links: string;
+  footer_help_links: string;
+  footer_company_links: string;
+  footer_copyright: string;
+  footer_shop_heading: string;
+  footer_help_heading: string;
+  footer_company_heading: string;
 }
 
 interface FeatureBarItem {
@@ -266,8 +279,10 @@ const EMPTY_SLIDE: HeroSlide = {
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white";
 const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1";
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band";
-type MainSection = "dashboard" | "homepage" | "catalog" | "orders" | "settings" | "messages";
+interface FooterLinkItem { text: string; url: string; }
+
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band";
+type MainSection = "dashboard" | "homepage" | "catalog" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -283,6 +298,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "categories":     "catalog",
   "orders":         "orders",
   "settings":       "settings",
+  "footer":         "footer",
   "messages":       "messages",
 };
 
@@ -304,6 +320,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   ],
   orders:   [],
   settings: [],
+  footer:   [],
   messages: [],
 };
 
@@ -404,6 +421,18 @@ export default function AdminPage() {
     cat_links_hover_text: "#ffffff",
     cat_num_color: "#9ca3af",
     cat_text_size: "1.1",
+    footer_logo_url: "",
+    footer_tagline: "One Heel. Endless Looks.",
+    footer_desc: "Premium heels crafted for the modern woman. Made with ♥ in India.",
+    footer_ig_url: "https://www.instagram.com/_classie_in/",
+    footer_tiktok_url: "",
+    footer_shop_links: "",
+    footer_help_links: "",
+    footer_company_links: "",
+    footer_copyright: `© ${new Date().getFullYear()} Classie. All rights reserved.`,
+    footer_shop_heading: "SHOP",
+    footer_help_heading: "HELP",
+    footer_company_heading: "COMPANY",
   });
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
@@ -509,6 +538,35 @@ export default function AdminPage() {
   const [styleInspoSaving, setStyleInspoSaving] = useState(false);
   const [deleteStyleInspoConfirm, setDeleteStyleInspoConfirm] = useState<string | null>(null);
 
+  // Footer link editors
+  const DEFAULT_FOOTER_SHOP: FooterLinkItem[] = [
+    { text: "Heels", url: "/shop/heels" },
+    { text: "Clip-ons", url: "/shop/clips" },
+    { text: "Bow Collection", url: "/shop/bow" },
+    { text: "The Date Edit", url: "/the-date-edit" },
+    { text: "The Festive Edit", url: "/the-festive-edit" },
+    { text: "Hot Deals", url: "/hot-deals" },
+  ];
+  const DEFAULT_FOOTER_HELP: FooterLinkItem[] = [
+    { text: "Size Guide", url: "/size-guide" },
+    { text: "Shipping Info", url: "/shipping" },
+    { text: "Returns & Exchanges", url: "/returns" },
+    { text: "Track Order", url: "/track-order" },
+    { text: "FAQ", url: "/faq" },
+    { text: "Contact Us", url: "/contact" },
+  ];
+  const DEFAULT_FOOTER_COMPANY: FooterLinkItem[] = [
+    { text: "About Classie", url: "/about" },
+    { text: "Style Ideas", url: "/style-ideas" },
+    { text: "Press", url: "/press" },
+    { text: "Privacy Policy", url: "/privacy-policy" },
+    { text: "Terms of Use", url: "/terms" },
+    { text: "", url: "" },
+  ];
+  const [footerShopLinks, setFooterShopLinks] = useState<FooterLinkItem[]>(DEFAULT_FOOTER_SHOP);
+  const [footerHelpLinks, setFooterHelpLinks] = useState<FooterLinkItem[]>(DEFAULT_FOOTER_HELP);
+  const [footerCompanyLinks, setFooterCompanyLinks] = useState<FooterLinkItem[]>(DEFAULT_FOOTER_COMPANY);
+
   // ── Fetch functions ──────────────────────────────────────────────────────
 
   const fetchOrders = useCallback(async () => {
@@ -605,6 +663,18 @@ export default function AdminPage() {
           cat_links_hover_text: "#ffffff",
           cat_num_color: "#9ca3af",
           cat_text_size: "1.1",
+          footer_logo_url: "",
+          footer_tagline: "One Heel. Endless Looks.",
+          footer_desc: "Premium heels crafted for the modern woman. Made with ♥ in India.",
+          footer_ig_url: "https://www.instagram.com/_classie_in/",
+          footer_tiktok_url: "",
+          footer_shop_links: "",
+          footer_help_links: "",
+          footer_company_links: "",
+          footer_copyright: `© ${new Date().getFullYear()} Classie. All rights reserved.`,
+          footer_shop_heading: "SHOP",
+          footer_help_heading: "HELP",
+          footer_company_heading: "COMPANY",
         };
         data.forEach((row: { key: string; value: string }) => {
           if (row.key in merged) (merged as unknown as Record<string, string>)[row.key] = row.value;
@@ -663,6 +733,28 @@ export default function AdminPage() {
     } catch { /* ignore */ }
     finally { setSubsLoading(false); }
   }, []);
+
+  // Sync footer link editor state when settings are fetched
+  useEffect(() => {
+    if (tab !== "footer") return;
+    const tryParse = (json: string, fallback: FooterLinkItem[]): FooterLinkItem[] => {
+      if (!json) return fallback;
+      try {
+        const parsed = JSON.parse(json);
+        if (Array.isArray(parsed)) {
+          // Ensure 6 rows for the editor
+          const arr = (parsed as FooterLinkItem[]).slice(0, 6);
+          while (arr.length < 6) arr.push({ text: "", url: "" });
+          return arr;
+        }
+      } catch { /* ignore */ }
+      return fallback;
+    };
+    setFooterShopLinks(tryParse(siteSettings.footer_shop_links, DEFAULT_FOOTER_SHOP));
+    setFooterHelpLinks(tryParse(siteSettings.footer_help_links, DEFAULT_FOOTER_HELP));
+    setFooterCompanyLinks(tryParse(siteSettings.footer_company_links, DEFAULT_FOOTER_COMPANY));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, siteSettings.footer_shop_links, siteSettings.footer_help_links, siteSettings.footer_company_links]);
 
   // Real-time subscriber updates
   useEffect(() => {
@@ -733,6 +825,7 @@ export default function AdminPage() {
     if (tab === "announcement") { fetchSettings(); }
     if (tab === "trust-band") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
+    if (tab === "footer") { fetchSettings(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
     if (tab === "categories") fetchCategories();
@@ -1110,6 +1203,27 @@ export default function AdminPage() {
     finally { setSettingsSaving(false); }
   };
 
+  const saveFooter = async () => {
+    setSettingsSaving(true);
+    try {
+      await upsertSettings([
+        { key: "footer_logo_url",        value: siteSettings.footer_logo_url },
+        { key: "footer_tagline",         value: siteSettings.footer_tagline },
+        { key: "footer_desc",            value: siteSettings.footer_desc },
+        { key: "footer_ig_url",          value: siteSettings.footer_ig_url },
+        { key: "footer_tiktok_url",      value: siteSettings.footer_tiktok_url },
+        { key: "footer_shop_heading",    value: siteSettings.footer_shop_heading },
+        { key: "footer_help_heading",    value: siteSettings.footer_help_heading },
+        { key: "footer_company_heading", value: siteSettings.footer_company_heading },
+        { key: "footer_shop_links",      value: JSON.stringify(footerShopLinks.filter(l => l.text || l.url)) },
+        { key: "footer_help_links",      value: JSON.stringify(footerHelpLinks.filter(l => l.text || l.url)) },
+        { key: "footer_company_links",   value: JSON.stringify(footerCompanyLinks.filter(l => l.text || l.url)) },
+        { key: "footer_copyright",       value: siteSettings.footer_copyright },
+      ]);
+    } catch { /* ignore */ }
+    finally { setSettingsSaving(false); }
+  };
+
   // ── Features Bar actions ──────────────────────────────────────────────────
 
   const openAddFeature = () => setFeaturesBarModal({ open: true, mode: "add", data: { ...EMPTY_FEATURE } });
@@ -1201,6 +1315,7 @@ export default function AdminPage() {
     { id: "catalog",   label: "Catalog",    icon: ImageIcon, badge: dbProducts.length },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
+    { id: "footer",    label: "Footer",     icon: Layout },
     { id: "messages",  label: "Messages",   icon: MessageSquare, badge: messages.length },
   ];
 
@@ -1276,7 +1391,8 @@ export default function AdminPage() {
                mainSection === "homepage" ? "Homepage" :
                mainSection === "catalog" ? "Catalog" :
                mainSection === "orders" ? "Orders" :
-               mainSection === "settings" ? "Settings" : "Messages"}
+               mainSection === "settings" ? "Settings" :
+               mainSection === "footer" ? "Footer" : "Messages"}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">Classie Admin Panel</p>
           </div>
@@ -2803,6 +2919,141 @@ export default function AdminPage() {
                 </button>
               </div>
 
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              FOOTER TAB
+          ══════════════════════════════════════ */}
+          {tab === "footer" && (
+            <div className="space-y-6 max-w-4xl">
+
+              {/* Brand */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Layout className="w-4 h-4 text-[#3B5373]" />
+                  <h2 className="font-semibold text-gray-700">Brand</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Logo URL <span className="normal-case text-gray-400 font-normal">(leave empty for ✦ CLASSIE text)</span></label>
+                    <input type="text" value={siteSettings.footer_logo_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_logo_url: e.target.value }))}
+                      placeholder="https://cdn.example.com/logo.png" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Tagline (italic serif)</label>
+                    <input type="text" value={siteSettings.footer_tagline} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_tagline: e.target.value }))}
+                      placeholder="One Heel. Endless Looks." />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className={labelCls}>Description</label>
+                    <textarea rows={2} value={siteSettings.footer_desc} className={`${inputCls} resize-none`}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_desc: e.target.value }))}
+                      placeholder="Premium heels crafted for the modern woman." />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Instagram URL</label>
+                    <input type="text" value={siteSettings.footer_ig_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_ig_url: e.target.value }))}
+                      placeholder="https://www.instagram.com/_classie_in/" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>TikTok URL <span className="normal-case text-gray-400 font-normal">(leave empty to hide)</span></label>
+                    <input type="text" value={siteSettings.footer_tiktok_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_tiktok_url: e.target.value }))}
+                      placeholder="https://www.tiktok.com/@classie_in" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Link Columns */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* SHOP */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+                  <div>
+                    <label className={labelCls}>Shop Column Heading</label>
+                    <input type="text" value={siteSettings.footer_shop_heading} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_shop_heading: e.target.value }))}
+                      placeholder="SHOP" />
+                  </div>
+                  <p className={labelCls}>Links</p>
+                  {footerShopLinks.map((link, i) => (
+                    <div key={i} className="flex gap-1.5">
+                      <input type="text" value={link.text} placeholder="Text"
+                        className={`${inputCls} flex-1`}
+                        onChange={(e) => { const n = [...footerShopLinks]; n[i] = { ...n[i], text: e.target.value }; setFooterShopLinks(n); }} />
+                      <input type="text" value={link.url} placeholder="/url"
+                        className={`${inputCls} flex-1`}
+                        onChange={(e) => { const n = [...footerShopLinks]; n[i] = { ...n[i], url: e.target.value }; setFooterShopLinks(n); }} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* HELP */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+                  <div>
+                    <label className={labelCls}>Help Column Heading</label>
+                    <input type="text" value={siteSettings.footer_help_heading} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_help_heading: e.target.value }))}
+                      placeholder="HELP" />
+                  </div>
+                  <p className={labelCls}>Links</p>
+                  {footerHelpLinks.map((link, i) => (
+                    <div key={i} className="flex gap-1.5">
+                      <input type="text" value={link.text} placeholder="Text"
+                        className={`${inputCls} flex-1`}
+                        onChange={(e) => { const n = [...footerHelpLinks]; n[i] = { ...n[i], text: e.target.value }; setFooterHelpLinks(n); }} />
+                      <input type="text" value={link.url} placeholder="/url"
+                        className={`${inputCls} flex-1`}
+                        onChange={(e) => { const n = [...footerHelpLinks]; n[i] = { ...n[i], url: e.target.value }; setFooterHelpLinks(n); }} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* COMPANY */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+                  <div>
+                    <label className={labelCls}>Company Column Heading</label>
+                    <input type="text" value={siteSettings.footer_company_heading} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, footer_company_heading: e.target.value }))}
+                      placeholder="COMPANY" />
+                  </div>
+                  <p className={labelCls}>Links</p>
+                  {footerCompanyLinks.map((link, i) => (
+                    <div key={i} className="flex gap-1.5">
+                      <input type="text" value={link.text} placeholder="Text"
+                        className={`${inputCls} flex-1`}
+                        onChange={(e) => { const n = [...footerCompanyLinks]; n[i] = { ...n[i], text: e.target.value }; setFooterCompanyLinks(n); }} />
+                      <input type="text" value={link.url} placeholder="/url"
+                        className={`${inputCls} flex-1`}
+                        onChange={(e) => { const n = [...footerCompanyLinks]; n[i] = { ...n[i], url: e.target.value }; setFooterCompanyLinks(n); }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom bar */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <h2 className="font-semibold text-gray-700 text-sm">Bottom Bar</h2>
+                <div>
+                  <label className={labelCls}>Copyright Text</label>
+                  <input type="text" value={siteSettings.footer_copyright} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, footer_copyright: e.target.value }))}
+                    placeholder={`© ${new Date().getFullYear()} Classie. All rights reserved.`} />
+                </div>
+                <p className="text-xs text-gray-400">Payment badges (Visa, Mastercard, UPI, COD, Net Banking) are shown automatically.</p>
+              </div>
+
+              {/* Save button */}
+              <div>
+                <button onClick={saveFooter} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Footer"}
+                </button>
+              </div>
             </div>
           )}
 
