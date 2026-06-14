@@ -85,6 +85,8 @@ interface SiteSettings {
   instagram_url: string;
   ig_handle: string; ig_heading: string; ig_subtext: string;
   ig_follow_text: string; ig_follow_url: string;
+  nl_eyebrow: string; nl_heading: string; nl_heading_italic: string; nl_subtext: string;
+  nl_placeholder: string; nl_btn_text: string; nl_success_text: string;
   philosophy_eyebrow: string;
   philosophy_headline: string;
   philosophy_headline_italic: string;
@@ -181,7 +183,8 @@ interface ContactMessage {
 interface NewsletterSubscriber {
   id: string;
   email: string;
-  created_at: string;
+  created_at?: string;
+  subscribed_at?: string;
 }
 
 interface Testimonial {
@@ -346,6 +349,10 @@ export default function AdminPage() {
     logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
     ig_handle: "@classie_in", ig_heading: "Style Inspo", ig_subtext: "Tag us to be featured",
     ig_follow_text: "Follow @classie_in →", ig_follow_url: "https://www.instagram.com/_classie_in/",
+    nl_eyebrow: "STAY CONNECTED", nl_heading: "Be the First to", nl_heading_italic: "Know",
+    nl_subtext: "New arrivals and exclusive edits — straight to your inbox.",
+    nl_placeholder: "Your email address", nl_btn_text: "Subscribe",
+    nl_success_text: "✓ You're on the list. We'll be in touch soon.",
     announcement_1: "", announcement_2: "", announcement_3: "",
     announcement_4: "", announcement_5: "", announcement_6: "",
     announcement_speed: "15",
@@ -543,6 +550,10 @@ export default function AdminPage() {
           logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
           ig_handle: "@classie_in", ig_heading: "Style Inspo", ig_subtext: "Tag us to be featured",
           ig_follow_text: "Follow @classie_in →", ig_follow_url: "https://www.instagram.com/_classie_in/",
+          nl_eyebrow: "STAY CONNECTED", nl_heading: "Be the First to", nl_heading_italic: "Know",
+          nl_subtext: "New arrivals and exclusive edits — straight to your inbox.",
+          nl_placeholder: "Your email address", nl_btn_text: "Subscribe",
+          nl_success_text: "✓ You're on the list. We'll be in touch soon.",
           announcement_1: "", announcement_2: "", announcement_3: "",
           announcement_4: "", announcement_5: "", announcement_6: "",
           announcement_speed: "15",
@@ -996,6 +1007,22 @@ export default function AdminPage() {
         { key: "instagram_url",   value: siteSettings.instagram_url },
       ];
       await upsertSettings(rows);
+    } catch { /* ignore */ }
+    finally { setSettingsSaving(false); }
+  };
+
+  const saveNewsletterSettings = async () => {
+    setSettingsSaving(true);
+    try {
+      await upsertSettings([
+        { key: "nl_eyebrow",         value: siteSettings.nl_eyebrow },
+        { key: "nl_heading",         value: siteSettings.nl_heading },
+        { key: "nl_heading_italic",  value: siteSettings.nl_heading_italic },
+        { key: "nl_subtext",         value: siteSettings.nl_subtext },
+        { key: "nl_placeholder",     value: siteSettings.nl_placeholder },
+        { key: "nl_btn_text",        value: siteSettings.nl_btn_text },
+        { key: "nl_success_text",    value: siteSettings.nl_success_text },
+      ]);
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
   };
@@ -2836,6 +2863,47 @@ export default function AdminPage() {
               )}
 
               {msgSubTab === "newsletter" && (
+                <div className="space-y-4">
+                {/* Newsletter Section Text Controls */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+                  <h2 className="font-semibold text-gray-700">Newsletter Section Text</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className={labelCls}>Eyebrow</label>
+                      <input type="text" value={siteSettings.nl_eyebrow} className={inputCls}
+                        onChange={e => setSiteSettings(s => ({ ...s, nl_eyebrow: e.target.value }))} placeholder="STAY CONNECTED" />
+                    </div>
+                    <div><label className={labelCls}>Heading (italic last word)</label>
+                      <div className="flex gap-2">
+                        <input type="text" value={siteSettings.nl_heading} className={inputCls}
+                          onChange={e => setSiteSettings(s => ({ ...s, nl_heading: e.target.value }))} placeholder="Be the First to" />
+                        <input type="text" value={siteSettings.nl_heading_italic} className={inputCls}
+                          onChange={e => setSiteSettings(s => ({ ...s, nl_heading_italic: e.target.value }))} placeholder="Know" />
+                      </div>
+                    </div>
+                    <div className="col-span-2"><label className={labelCls}>Subtext</label>
+                      <input type="text" value={siteSettings.nl_subtext} className={inputCls}
+                        onChange={e => setSiteSettings(s => ({ ...s, nl_subtext: e.target.value }))} placeholder="New arrivals and exclusive edits…" />
+                    </div>
+                    <div><label className={labelCls}>Placeholder Text</label>
+                      <input type="text" value={siteSettings.nl_placeholder} className={inputCls}
+                        onChange={e => setSiteSettings(s => ({ ...s, nl_placeholder: e.target.value }))} placeholder="Your email address" />
+                    </div>
+                    <div><label className={labelCls}>Button Text</label>
+                      <input type="text" value={siteSettings.nl_btn_text} className={inputCls}
+                        onChange={e => setSiteSettings(s => ({ ...s, nl_btn_text: e.target.value }))} placeholder="Subscribe" />
+                    </div>
+                    <div className="col-span-2"><label className={labelCls}>Success Message</label>
+                      <input type="text" value={siteSettings.nl_success_text} className={inputCls}
+                        onChange={e => setSiteSettings(s => ({ ...s, nl_success_text: e.target.value }))} placeholder="✓ You're on the list." />
+                    </div>
+                  </div>
+                  <button onClick={saveNewsletterSettings} disabled={settingsSaving}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4" />{settingsSaving ? "Saving…" : "Save Newsletter Text"}
+                  </button>
+                </div>
+
+                {/* Subscribers List */}
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                   {subsLoading ? (
                     <div className="p-12 text-center text-gray-400 text-sm">Loading subscribers…</div>
@@ -2860,7 +2928,7 @@ export default function AdminPage() {
                               <td className="px-5 py-4 text-xs text-gray-400">{i + 1}</td>
                               <td className="px-5 py-4 font-medium text-gray-700">{s.email}</td>
                               <td className="px-5 py-4 text-xs text-gray-400">
-                                {new Date(s.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                                {new Date(s.subscribed_at ?? s.created_at ?? "").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                               </td>
                             </tr>
                           ))}
@@ -2868,6 +2936,7 @@ export default function AdminPage() {
                       </table>
                     </div>
                   )}
+                </div>
                 </div>
               )}
             </div>
