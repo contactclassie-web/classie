@@ -13,12 +13,15 @@ function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heel
   const [bgUrl, setBgUrl] = useState("");
   const [slides, setSlides] = useState<string[]>([]);
   const [textPos, setTextPos] = useState<"left"|"center"|"right">("center");
+  const [eyebrow, setEyebrow] = useState("New Collection · SS25");
+  const [title, setTitle] = useState("Heels");
+  const [subtitle, setSubtitle] = useState("Step into your story");
   const [slideIdx, setSlideIdx] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval>|null>(null);
 
   useEffect(() => {
     supabase.from("site_settings").select("key,value")
-      .in("key", ["heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos"])
+      .in("key", ["heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle"])
       .then(({ data }) => {
         const m: Record<string,string> = {};
         (data ?? []).forEach(({key,value}) => { m[key]=value; });
@@ -26,6 +29,9 @@ function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heel
         if (m.heels_hero_bg_url) setBgUrl(m.heels_hero_bg_url);
         if (m.heels_hero_slides) { try { setSlides(JSON.parse(m.heels_hero_slides)); } catch { setSlides([]); } }
         if (m.heels_hero_text_pos) setTextPos(m.heels_hero_text_pos as typeof textPos);
+        if (m.heels_hero_eyebrow) setEyebrow(m.heels_hero_eyebrow);
+        if (m.heels_hero_title) setTitle(m.heels_hero_title);
+        if (m.heels_hero_subtitle) setSubtitle(m.heels_hero_subtitle);
       });
   }, []);
 
@@ -80,16 +86,18 @@ function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heel
         <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
           <div className="w-8 h-px bg-white/40" />
           <span className="text-[10px] tracking-[0.5em] uppercase text-white/60" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            New Collection · SS25
+            {eyebrow}
           </span>
           <div className="w-8 h-px bg-white/40" />
         </div>
         <h1 className="font-serif font-light text-white leading-none mb-5" style={{ fontSize: "clamp(64px, 10vw, 96px)" }}>
-          Heels
+          {title}
         </h1>
-        <p className="font-serif italic text-white/60 text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-          Step into your story
-        </p>
+        {subtitle && (
+          <p className="font-serif italic text-white/60 text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            {subtitle}
+          </p>
+        )}
         <div className="flex items-center gap-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
           <div className="text-center">
             <p className="text-2xl font-serif font-light text-white">{productCount}</p>

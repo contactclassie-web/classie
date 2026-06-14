@@ -365,6 +365,9 @@ export default function AdminPage() {
   const [heelsHeroBgUrl, setHeelsHeroBgUrl] = useState("");
   const [heelsHeroSlides, setHeelsHeroSlides] = useState<string[]>([]);
   const [heelsHeroTextPos, setHeelsHeroTextPos] = useState<"left"|"center"|"right">("center");
+  const [heelsHeroEyebrow, setHeelsHeroEyebrow] = useState("New Collection · SS25");
+  const [heelsHeroTitle, setHeelsHeroTitle] = useState("Heels");
+  const [heelsHeroSubtitle, setHeelsHeroSubtitle] = useState("Step into your story");
   const [heelsHeroSaving, setHeelsHeroSaving] = useState(false);
 
 
@@ -614,7 +617,7 @@ export default function AdminPage() {
     try {
       const [{ data }, { data: settings }] = await Promise.all([
         supabase.from("products").select("*").eq("category", "heels").order("created_at", { ascending: false }),
-        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos"]),
+        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle"]),
       ]);
       if (data) setHeelsPageProducts(data as DbProduct[]);
       const m: Record<string,string> = {};
@@ -629,6 +632,9 @@ export default function AdminPage() {
       if (m.heels_hero_bg_url) setHeelsHeroBgUrl(m.heels_hero_bg_url);
       if (m.heels_hero_slides) { try { setHeelsHeroSlides(JSON.parse(m.heels_hero_slides)); } catch { setHeelsHeroSlides([]); } }
       if (m.heels_hero_text_pos) setHeelsHeroTextPos(m.heels_hero_text_pos as "left"|"center"|"right");
+      if (m.heels_hero_eyebrow) setHeelsHeroEyebrow(m.heels_hero_eyebrow);
+      if (m.heels_hero_title) setHeelsHeroTitle(m.heels_hero_title);
+      if (m.heels_hero_subtitle) setHeelsHeroSubtitle(m.heels_hero_subtitle);
     } catch { /* ignore */ }
     finally { setHeelsPageLoading(false); }
   }, []);
@@ -637,10 +643,13 @@ export default function AdminPage() {
     setHeelsHeroSaving(true);
     try {
       const pairs = [
-        { key: "heels_hero_bg_type", value: heelsHeroBgType },
-        { key: "heels_hero_bg_url", value: heelsHeroBgUrl },
-        { key: "heels_hero_slides", value: JSON.stringify(heelsHeroSlides) },
+        { key: "heels_hero_bg_type",  value: heelsHeroBgType },
+        { key: "heels_hero_bg_url",   value: heelsHeroBgUrl },
+        { key: "heels_hero_slides",   value: JSON.stringify(heelsHeroSlides) },
         { key: "heels_hero_text_pos", value: heelsHeroTextPos },
+        { key: "heels_hero_eyebrow",  value: heelsHeroEyebrow },
+        { key: "heels_hero_title",    value: heelsHeroTitle },
+        { key: "heels_hero_subtitle", value: heelsHeroSubtitle },
       ];
       for (const p of pairs) {
         await supabase.from("site_settings").delete().eq("key", p.key);
@@ -2159,6 +2168,29 @@ export default function AdminPage() {
                           </div>
                         </div>
                       )}
+
+                      {/* Text content */}
+                      <div className="space-y-3">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block">Hero Text</label>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Eyebrow (small top text)</p>
+                          <input type="text" value={heelsHeroEyebrow} onChange={e=>setHeelsHeroEyebrow(e.target.value)}
+                            placeholder="New Collection · SS25"
+                            className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Main Title (big heading)</p>
+                          <input type="text" value={heelsHeroTitle} onChange={e=>setHeelsHeroTitle(e.target.value)}
+                            placeholder="Heels"
+                            className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Subtitle (italic line below)</p>
+                          <input type="text" value={heelsHeroSubtitle} onChange={e=>setHeelsHeroSubtitle(e.target.value)}
+                            placeholder="Step into your story"
+                            className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
 
                       {/* Text position */}
                       <div>
