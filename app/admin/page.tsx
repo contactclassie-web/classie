@@ -83,6 +83,8 @@ interface SiteSettings {
   announcement_mode: string;
   whatsapp_number: string;
   instagram_url: string;
+  ig_handle: string; ig_heading: string; ig_subtext: string;
+  ig_follow_text: string; ig_follow_url: string;
   philosophy_eyebrow: string;
   philosophy_headline: string;
   philosophy_headline_italic: string;
@@ -342,6 +344,8 @@ export default function AdminPage() {
   // Site Settings
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
+    ig_handle: "@classie_in", ig_heading: "Style Inspo", ig_subtext: "Tag us to be featured",
+    ig_follow_text: "Follow @classie_in →", ig_follow_url: "https://www.instagram.com/_classie_in/",
     announcement_1: "", announcement_2: "", announcement_3: "",
     announcement_4: "", announcement_5: "", announcement_6: "",
     announcement_speed: "15",
@@ -537,6 +541,8 @@ export default function AdminPage() {
       if (!error && data) {
         const merged: SiteSettings = {
           logo_image_url: "", announcement_text: "", whatsapp_number: "", instagram_url: "",
+          ig_handle: "@classie_in", ig_heading: "Style Inspo", ig_subtext: "Tag us to be featured",
+          ig_follow_text: "Follow @classie_in →", ig_follow_url: "https://www.instagram.com/_classie_in/",
           announcement_1: "", announcement_2: "", announcement_3: "",
           announcement_4: "", announcement_5: "", announcement_6: "",
           announcement_speed: "15",
@@ -990,6 +996,20 @@ export default function AdminPage() {
         { key: "instagram_url",   value: siteSettings.instagram_url },
       ];
       await upsertSettings(rows);
+    } catch { /* ignore */ }
+    finally { setSettingsSaving(false); }
+  };
+
+  const saveInstagramSettings = async () => {
+    setSettingsSaving(true);
+    try {
+      await upsertSettings([
+        { key: "ig_handle",      value: siteSettings.ig_handle },
+        { key: "ig_heading",     value: siteSettings.ig_heading },
+        { key: "ig_subtext",     value: siteSettings.ig_subtext },
+        { key: "ig_follow_text", value: siteSettings.ig_follow_text },
+        { key: "ig_follow_url",  value: siteSettings.ig_follow_url },
+      ]);
     } catch { /* ignore */ }
     finally { setSettingsSaving(false); }
   };
@@ -2929,7 +2949,42 @@ export default function AdminPage() {
 
           {/* ══ INSTAGRAM TAB ══════════════════════════════════════════════ */}
           {tab === "instagram" && (
-            <div className="space-y-4">
+            <div className="space-y-6">
+
+              {/* Section Header Settings */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+                <h2 className="font-semibold text-gray-700">Section Header & Link</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className={labelCls}>Handle (shown above heading)</label>
+                    <input type="text" value={siteSettings.ig_handle} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, ig_handle: e.target.value }))} placeholder="@classie_in" />
+                  </div>
+                  <div><label className={labelCls}>Section Heading (last word = italic)</label>
+                    <input type="text" value={siteSettings.ig_heading} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, ig_heading: e.target.value }))} placeholder="Style Inspo" />
+                  </div>
+                  <div><label className={labelCls}>Subtext</label>
+                    <input type="text" value={siteSettings.ig_subtext} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, ig_subtext: e.target.value }))} placeholder="Tag us to be featured" />
+                  </div>
+                  <div><label className={labelCls}>Follow Button Text</label>
+                    <input type="text" value={siteSettings.ig_follow_text} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, ig_follow_text: e.target.value }))} placeholder="Follow @classie_in →" />
+                  </div>
+                </div>
+                <div><label className={labelCls}>Follow Button URL</label>
+                  <input type="url" value={siteSettings.ig_follow_url} className={inputCls}
+                    onChange={e => setSiteSettings(s => ({ ...s, ig_follow_url: e.target.value }))} placeholder="https://www.instagram.com/..." />
+                </div>
+                <button onClick={saveInstagramSettings} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Section Settings"}
+                </button>
+              </div>
+
+              {/* Images list */}
+              <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-800">Instagram Feed Images</h2>
@@ -2995,6 +3050,7 @@ export default function AdminPage() {
                   </div>
                 </div>
               )}
+            </div>
             </div>
           )}
 
