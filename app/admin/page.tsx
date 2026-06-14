@@ -368,6 +368,13 @@ export default function AdminPage() {
   const [heelsHeroEyebrow, setHeelsHeroEyebrow] = useState("New Collection · SS25");
   const [heelsHeroTitle, setHeelsHeroTitle] = useState("Heels");
   const [heelsHeroSubtitle, setHeelsHeroSubtitle] = useState("Step into your story");
+  const [heelsHeroShowStats, setHeelsHeroShowStats] = useState(true);
+  const [heelsHeroStat1Val, setHeelsHeroStat1Val] = useState(""); // empty = auto (product count)
+  const [heelsHeroStat1Label, setHeelsHeroStat1Label] = useState("Styles");
+  const [heelsHeroStat2Val, setHeelsHeroStat2Val] = useState(""); // empty = auto (heel types)
+  const [heelsHeroStat2Label, setHeelsHeroStat2Label] = useState("Heel Types");
+  const [heelsHeroStat3Val, setHeelsHeroStat3Val] = useState("Free");
+  const [heelsHeroStat3Label, setHeelsHeroStat3Label] = useState("Shipping ₹999+");
   const [heelsHeroSaving, setHeelsHeroSaving] = useState(false);
 
 
@@ -617,7 +624,7 @@ export default function AdminPage() {
     try {
       const [{ data }, { data: settings }] = await Promise.all([
         supabase.from("products").select("*").eq("category", "heels").order("created_at", { ascending: false }),
-        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle"]),
+        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle","heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label","heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label"]),
       ]);
       if (data) setHeelsPageProducts(data as DbProduct[]);
       const m: Record<string,string> = {};
@@ -635,6 +642,13 @@ export default function AdminPage() {
       if (m.heels_hero_eyebrow) setHeelsHeroEyebrow(m.heels_hero_eyebrow);
       if (m.heels_hero_title) setHeelsHeroTitle(m.heels_hero_title);
       if (m.heels_hero_subtitle) setHeelsHeroSubtitle(m.heels_hero_subtitle);
+      if (m.heels_hero_show_stats !== undefined) setHeelsHeroShowStats(m.heels_hero_show_stats !== "false");
+      if (m.heels_hero_stat1_val !== undefined) setHeelsHeroStat1Val(m.heels_hero_stat1_val);
+      if (m.heels_hero_stat1_label) setHeelsHeroStat1Label(m.heels_hero_stat1_label);
+      if (m.heels_hero_stat2_val !== undefined) setHeelsHeroStat2Val(m.heels_hero_stat2_val);
+      if (m.heels_hero_stat2_label) setHeelsHeroStat2Label(m.heels_hero_stat2_label);
+      if (m.heels_hero_stat3_val) setHeelsHeroStat3Val(m.heels_hero_stat3_val);
+      if (m.heels_hero_stat3_label) setHeelsHeroStat3Label(m.heels_hero_stat3_label);
     } catch { /* ignore */ }
     finally { setHeelsPageLoading(false); }
   }, []);
@@ -647,9 +661,16 @@ export default function AdminPage() {
         { key: "heels_hero_bg_url",   value: heelsHeroBgUrl },
         { key: "heels_hero_slides",   value: JSON.stringify(heelsHeroSlides) },
         { key: "heels_hero_text_pos", value: heelsHeroTextPos },
-        { key: "heels_hero_eyebrow",  value: heelsHeroEyebrow },
-        { key: "heels_hero_title",    value: heelsHeroTitle },
-        { key: "heels_hero_subtitle", value: heelsHeroSubtitle },
+        { key: "heels_hero_eyebrow",     value: heelsHeroEyebrow },
+        { key: "heels_hero_title",       value: heelsHeroTitle },
+        { key: "heels_hero_subtitle",    value: heelsHeroSubtitle },
+        { key: "heels_hero_show_stats",  value: heelsHeroShowStats ? "true" : "false" },
+        { key: "heels_hero_stat1_val",   value: heelsHeroStat1Val },
+        { key: "heels_hero_stat1_label", value: heelsHeroStat1Label },
+        { key: "heels_hero_stat2_val",   value: heelsHeroStat2Val },
+        { key: "heels_hero_stat2_label", value: heelsHeroStat2Label },
+        { key: "heels_hero_stat3_val",   value: heelsHeroStat3Val },
+        { key: "heels_hero_stat3_label", value: heelsHeroStat3Label },
       ];
       for (const p of pairs) {
         await supabase.from("site_settings").delete().eq("key", p.key);
@@ -2203,6 +2224,37 @@ export default function AdminPage() {
                             </button>
                           ))}
                         </div>
+                      </div>
+
+                      {/* Stats section */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Stats Bar (12 STYLES | 4 HEEL TYPES | Free)</label>
+                          <button onClick={()=>setHeelsHeroShowStats(v=>!v)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${heelsHeroShowStats?"bg-[#3B5373]":"bg-gray-200"}`}>
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${heelsHeroShowStats?"translate-x-6":"translate-x-1"}`}/>
+                          </button>
+                        </div>
+                        {heelsHeroShowStats && (
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { val: heelsHeroStat1Val, setVal: setHeelsHeroStat1Val, label: heelsHeroStat1Label, setLabel: setHeelsHeroStat1Label, placeholder: "Auto (product count)", lph: "Styles" },
+                              { val: heelsHeroStat2Val, setVal: setHeelsHeroStat2Val, label: heelsHeroStat2Label, setLabel: setHeelsHeroStat2Label, placeholder: "Auto (heel types)", lph: "Heel Types" },
+                              { val: heelsHeroStat3Val, setVal: setHeelsHeroStat3Val, label: heelsHeroStat3Label, setLabel: setHeelsHeroStat3Label, placeholder: "Free", lph: "Shipping ₹999+" },
+                            ].map((s, i) => (
+                              <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                                <p className="text-[10px] text-gray-400 font-medium">Stat {i+1}</p>
+                                <input type="text" value={s.val} onChange={e=>s.setVal(e.target.value)}
+                                  placeholder={s.placeholder}
+                                  className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                                <input type="text" value={s.label} onChange={e=>s.setLabel(e.target.value)}
+                                  placeholder={s.lph}
+                                  className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                                <p className="text-[9px] text-gray-300">{i<2?"Value blank = auto count":""}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <button onClick={saveHeelsHero} disabled={heelsHeroSaving}

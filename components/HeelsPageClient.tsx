@@ -16,12 +16,19 @@ function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heel
   const [eyebrow, setEyebrow] = useState("New Collection · SS25");
   const [title, setTitle] = useState("Heels");
   const [subtitle, setSubtitle] = useState("Step into your story");
+  const [showStats, setShowStats] = useState(true);
+  const [stat1Val, setStat1Val] = useState("");
+  const [stat1Label, setStat1Label] = useState("Styles");
+  const [stat2Val, setStat2Val] = useState("");
+  const [stat2Label, setStat2Label] = useState("Heel Types");
+  const [stat3Val, setStat3Val] = useState("Free");
+  const [stat3Label, setStat3Label] = useState("Shipping ₹999+");
   const [slideIdx, setSlideIdx] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval>|null>(null);
 
   useEffect(() => {
     supabase.from("site_settings").select("key,value")
-      .in("key", ["heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle"])
+      .in("key", ["heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle","heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label","heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label"])
       .then(({ data }) => {
         const m: Record<string,string> = {};
         (data ?? []).forEach(({key,value}) => { m[key]=value; });
@@ -32,6 +39,13 @@ function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heel
         if (m.heels_hero_eyebrow) setEyebrow(m.heels_hero_eyebrow);
         if (m.heels_hero_title) setTitle(m.heels_hero_title);
         if (m.heels_hero_subtitle) setSubtitle(m.heels_hero_subtitle);
+        if (m.heels_hero_show_stats !== undefined) setShowStats(m.heels_hero_show_stats !== "false");
+        if (m.heels_hero_stat1_val !== undefined) setStat1Val(m.heels_hero_stat1_val);
+        if (m.heels_hero_stat1_label) setStat1Label(m.heels_hero_stat1_label);
+        if (m.heels_hero_stat2_val !== undefined) setStat2Val(m.heels_hero_stat2_val);
+        if (m.heels_hero_stat2_label) setStat2Label(m.heels_hero_stat2_label);
+        if (m.heels_hero_stat3_val) setStat3Val(m.heels_hero_stat3_val);
+        if (m.heels_hero_stat3_label) setStat3Label(m.heels_hero_stat3_label);
       });
   }, []);
 
@@ -98,22 +112,23 @@ function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heel
             {subtitle}
           </p>
         )}
-        <div className="flex items-center gap-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
-          <div className="text-center">
-            <p className="text-2xl font-serif font-light text-white">{productCount}</p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Styles</p>
+        {showStats && (
+          <div className="flex items-center gap-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
+            {[
+              { val: stat1Val || String(productCount), label: stat1Label },
+              { val: stat2Val || String(heelTypeCount), label: stat2Label },
+              { val: stat3Val, label: stat3Label },
+            ].map((s, i) => (
+              <>
+                {i > 0 && <div key={`div-${i}`} className="w-px h-8 bg-white/20" />}
+                <div key={s.label} className="text-center">
+                  <p className="text-2xl font-serif font-light text-white">{s.val}</p>
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.label}</p>
+                </div>
+              </>
+            ))}
           </div>
-          <div className="w-px h-8 bg-white/20" />
-          <div className="text-center">
-            <p className="text-2xl font-serif font-light text-white">{heelTypeCount}</p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Heel Types</p>
-          </div>
-          <div className="w-px h-8 bg-white/20" />
-          <div className="text-center">
-            <p className="text-2xl font-serif font-light text-white">Free</p>
-            <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>Shipping ₹999+</p>
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );
