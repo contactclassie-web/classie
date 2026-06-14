@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Plus, ArrowLeft, ToggleLeft, ToggleRight, X } from "lucide-react";
 
-const ADMIN_PASSWORD = "classie@admin123";
-
 interface HeelProduct {
   id: string;
   slug: string;
@@ -23,7 +21,6 @@ interface HeelProduct {
 export default function HeelsAdminPage() {
   const router = useRouter();
   const [authed, setAuthed] = useState(false);
-  const [pw, setPw] = useState("");
 
   const [products, setProducts] = useState<HeelProduct[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,17 +30,14 @@ export default function HeelsAdminPage() {
   const [newType, setNewType] = useState("");
   const [filterSaving, setFilterSaving] = useState(false);
 
-  // Auth check
+  // Auth check — reuse main admin session, redirect if not logged in
   useEffect(() => {
-    if (sessionStorage.getItem("classie_admin") === "ok") setAuthed(true);
-  }, []);
-
-  const login = () => {
-    if (pw === ADMIN_PASSWORD) {
-      sessionStorage.setItem("classie_admin", "ok");
+    if (sessionStorage.getItem("classie_admin") === "ok") {
       setAuthed(true);
+    } else {
+      router.replace("/admin");
     }
-  };
+  }, [router]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -98,27 +92,7 @@ export default function HeelsAdminPage() {
     await saveFilterTypes(updated);
   };
 
-  // ── Login screen ─────────────────────────────────────────────────────
-  if (!authed) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f5]">
-        <div className="bg-white p-8 rounded-2xl shadow-sm w-full max-w-sm space-y-4">
-          <h1 className="font-serif text-2xl text-[#1a1a1a]">Heels Admin</h1>
-          <input
-            type="password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && login()}
-            placeholder="Password"
-            className="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-[#3B5373]"
-          />
-          <button onClick={login} className="w-full bg-[#3B5373] text-white py-2.5 text-sm font-medium hover:bg-[#2d3f4f] transition-colors">
-            Login
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (!authed) return null; // redirecting to /admin
 
   // ── Main UI ───────────────────────────────────────────────────────────
   return (
