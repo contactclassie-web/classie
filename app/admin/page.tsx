@@ -282,8 +282,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "orders" | "settings" | "footer" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -298,6 +298,8 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "collections":    "catalog",
   "categories":     "catalog",
   "heels-page":     "heels",
+  "clips-page":     "clips-page",
+  "bow-page":       "bow-page",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -321,7 +323,9 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "collections", label: "Collections" },
     { id: "categories",  label: "Categories" },
   ],
-  heels:    [{ id: "heels-page", label: "Heels Page" }],
+  heels:       [{ id: "heels-page", label: "Heels Page" }],
+  "clips-page": [{ id: "clips-page", label: "Clips Page" }],
+  "bow-page":   [{ id: "bow-page",   label: "Bow Page" }],
   orders:   [],
   settings: [],
   footer:   [],
@@ -391,6 +395,78 @@ export default function AdminPage() {
   const [whyFooterText, setWhyFooterText] = useState("Discover our curated collections designed to move seamlessly from everyday wear to special occasions.");
   const [whyVisible, setWhyVisible] = useState(true);
   const [whySaving, setWhySaving] = useState(false);
+
+  // ── Clips Page state ──────────────────────────────────────────────────
+  const [clipsPageProducts, setClipsPageProducts] = useState<DbProduct[]>([]);
+  const [clipsPageLoading, setClipsPageLoading] = useState(false);
+  const [clipsFilterTypes, setClipsFilterTypes] = useState<string[]>([]);
+  const [newClipsFilterType, setNewClipsFilterType] = useState("");
+  const [clipsFilterSaving, setClipsFilterSaving] = useState(false);
+  const [clipsHeroBgType, setClipsHeroBgType] = useState<"none"|"image"|"video"|"slider">("none");
+  const [clipsHeroBgUrl, setClipsHeroBgUrl] = useState("");
+  const [clipsHeroSlides, setClipsHeroSlides] = useState<string[]>([]);
+  const [clipsHeroTextPos, setClipsHeroTextPos] = useState<"left"|"center"|"right">("center");
+  const [clipsHeroEyebrow, setClipsHeroEyebrow] = useState("New Collection · SS25");
+  const [clipsHeroTitle, setClipsHeroTitle] = useState("Clip-ons");
+  const [clipsHeroSubtitle, setClipsHeroSubtitle] = useState("Transform any look instantly");
+  const [clipsHeroShowStats, setClipsHeroShowStats] = useState(true);
+  const [clipsHeroStat1Val, setClipsHeroStat1Val] = useState("");
+  const [clipsHeroStat1Label, setClipsHeroStat1Label] = useState("Styles");
+  const [clipsHeroStat2Val, setClipsHeroStat2Val] = useState("");
+  const [clipsHeroStat2Label, setClipsHeroStat2Label] = useState("Filter Types");
+  const [clipsHeroStat3Val, setClipsHeroStat3Val] = useState("Free");
+  const [clipsHeroStat3Label, setClipsHeroStat3Label] = useState("Shipping ₹999+");
+  const [clipsHeroSaving, setClipsHeroSaving] = useState(false);
+  const [clipsWhyHeading, setClipsWhyHeading] = useState("Why Choose");
+  const [clipsWhyHeadingItalic, setClipsWhyHeadingItalic] = useState("Classie?");
+  const [clipsWhyCard1Icon, setClipsWhyCard1Icon] = useState("✨");
+  const [clipsWhyCard1Title, setClipsWhyCard1Title] = useState("Mix & Match");
+  const [clipsWhyCard1Desc, setClipsWhyCard1Desc] = useState("Swap styles in seconds.");
+  const [clipsWhyCard2Icon, setClipsWhyCard2Icon] = useState("💎");
+  const [clipsWhyCard2Title, setClipsWhyCard2Title] = useState("Rhinestone Finish");
+  const [clipsWhyCard2Desc, setClipsWhyCard2Desc] = useState("Handcrafted crystals.");
+  const [clipsWhyCard3Icon, setClipsWhyCard3Icon] = useState("🔗");
+  const [clipsWhyCard3Title, setClipsWhyCard3Title] = useState("Fits Any Heel");
+  const [clipsWhyCard3Desc, setClipsWhyCard3Desc] = useState("Clips onto any Classie heel.");
+  const [clipsWhyFooterText, setClipsWhyFooterText] = useState("Discover our curated clip-ons designed to transform any look instantly.");
+  const [clipsWhyVisible, setClipsWhyVisible] = useState(true);
+  const [clipsWhySaving, setClipsWhySaving] = useState(false);
+
+  // ── Bow Page state ────────────────────────────────────────────────────
+  const [bowPageProducts, setBowPageProducts] = useState<DbProduct[]>([]);
+  const [bowPageLoading, setBowPageLoading] = useState(false);
+  const [bowFilterTypes, setBowFilterTypes] = useState<string[]>([]);
+  const [newBowFilterType, setNewBowFilterType] = useState("");
+  const [bowFilterSaving, setBowFilterSaving] = useState(false);
+  const [bowHeroBgType, setBowHeroBgType] = useState<"none"|"image"|"video"|"slider">("none");
+  const [bowHeroBgUrl, setBowHeroBgUrl] = useState("");
+  const [bowHeroSlides, setBowHeroSlides] = useState<string[]>([]);
+  const [bowHeroTextPos, setBowHeroTextPos] = useState<"left"|"center"|"right">("center");
+  const [bowHeroEyebrow, setBowHeroEyebrow] = useState("New Collection · SS25");
+  const [bowHeroTitle, setBowHeroTitle] = useState("Bow Collection");
+  const [bowHeroSubtitle, setBowHeroSubtitle] = useState("Romance in every step");
+  const [bowHeroShowStats, setBowHeroShowStats] = useState(true);
+  const [bowHeroStat1Val, setBowHeroStat1Val] = useState("");
+  const [bowHeroStat1Label, setBowHeroStat1Label] = useState("Styles");
+  const [bowHeroStat2Val, setBowHeroStat2Val] = useState("");
+  const [bowHeroStat2Label, setBowHeroStat2Label] = useState("Filter Types");
+  const [bowHeroStat3Val, setBowHeroStat3Val] = useState("Free");
+  const [bowHeroStat3Label, setBowHeroStat3Label] = useState("Shipping ₹999+");
+  const [bowHeroSaving, setBowHeroSaving] = useState(false);
+  const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
+  const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
+  const [bowWhyCard1Icon, setBowWhyCard1Icon] = useState("🎀");
+  const [bowWhyCard1Title, setBowWhyCard1Title] = useState("Delicate Design");
+  const [bowWhyCard1Desc, setBowWhyCard1Desc] = useState("Soft ribbon bows.");
+  const [bowWhyCard2Icon, setBowWhyCard2Icon] = useState("🌸");
+  const [bowWhyCard2Title, setBowWhyCard2Title] = useState("Versatile Style");
+  const [bowWhyCard2Desc, setBowWhyCard2Desc] = useState("From brunch to events.");
+  const [bowWhyCard3Icon, setBowWhyCard3Icon] = useState("👛");
+  const [bowWhyCard3Title, setBowWhyCard3Title] = useState("Gift-Ready");
+  const [bowWhyCard3Desc, setBowWhyCard3Desc] = useState("Perfect as a gift.");
+  const [bowWhyFooterText, setBowWhyFooterText] = useState("Discover our curated bow collection designed for romance in every step.");
+  const [bowWhyVisible, setBowWhyVisible] = useState(true);
+  const [bowWhySaving, setBowWhySaving] = useState(false);
 
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -743,6 +819,218 @@ export default function AdminPage() {
     finally { setHeelsFilterSaving(false); }
   };
 
+  // ── Clips Page fetch/save ─────────────────────────────────────────────────
+  const fetchClipsPage = useCallback(async () => {
+    setClipsPageLoading(true);
+    try {
+      const settingsKeys = ["clips_filter_types","clips_hero_bg_type","clips_hero_bg_url","clips_hero_slides","clips_hero_text_pos","clips_hero_eyebrow","clips_hero_title","clips_hero_subtitle","clips_hero_show_stats","clips_hero_stat1_val","clips_hero_stat1_label","clips_hero_stat2_val","clips_hero_stat2_label","clips_hero_stat3_val","clips_hero_stat3_label","clips_why_heading","clips_why_heading_italic","clips_why_card1_icon","clips_why_card1_title","clips_why_card1_desc","clips_why_card2_icon","clips_why_card2_title","clips_why_card2_desc","clips_why_card3_icon","clips_why_card3_title","clips_why_card3_desc","clips_why_footer_text","clips_why_visible"];
+      const [{ data }, { data: settings }] = await Promise.all([
+        supabase.from("products").select("*").eq("category", "clips").order("created_at", { ascending: false }),
+        supabase.from("site_settings").select("key,value").in("key", settingsKeys),
+      ]);
+      if (data) setClipsPageProducts(data as DbProduct[]);
+      const m: Record<string,string> = {};
+      (settings ?? []).forEach(({key,value}) => { m[key]=value; });
+      if (m.clips_filter_types) { try { setClipsFilterTypes(JSON.parse(m.clips_filter_types)); } catch { setClipsFilterTypes([]); } }
+      if (m.clips_hero_bg_type) setClipsHeroBgType(m.clips_hero_bg_type as "none"|"image"|"video"|"slider");
+      if (m.clips_hero_bg_url) setClipsHeroBgUrl(m.clips_hero_bg_url);
+      if (m.clips_hero_slides) { try { setClipsHeroSlides(JSON.parse(m.clips_hero_slides)); } catch { setClipsHeroSlides([]); } }
+      if (m.clips_hero_text_pos) setClipsHeroTextPos(m.clips_hero_text_pos as "left"|"center"|"right");
+      if (m.clips_hero_eyebrow) setClipsHeroEyebrow(m.clips_hero_eyebrow);
+      if (m.clips_hero_title) setClipsHeroTitle(m.clips_hero_title);
+      if (m.clips_hero_subtitle) setClipsHeroSubtitle(m.clips_hero_subtitle);
+      if (m.clips_hero_show_stats !== undefined) setClipsHeroShowStats(m.clips_hero_show_stats !== "false");
+      if (m.clips_hero_stat1_val !== undefined) setClipsHeroStat1Val(m.clips_hero_stat1_val);
+      if (m.clips_hero_stat1_label) setClipsHeroStat1Label(m.clips_hero_stat1_label);
+      if (m.clips_hero_stat2_val !== undefined) setClipsHeroStat2Val(m.clips_hero_stat2_val);
+      if (m.clips_hero_stat2_label) setClipsHeroStat2Label(m.clips_hero_stat2_label);
+      if (m.clips_hero_stat3_val) setClipsHeroStat3Val(m.clips_hero_stat3_val);
+      if (m.clips_hero_stat3_label) setClipsHeroStat3Label(m.clips_hero_stat3_label);
+      if (m.clips_why_heading) setClipsWhyHeading(m.clips_why_heading);
+      if (m.clips_why_heading_italic) setClipsWhyHeadingItalic(m.clips_why_heading_italic);
+      if (m.clips_why_card1_icon) setClipsWhyCard1Icon(m.clips_why_card1_icon);
+      if (m.clips_why_card1_title) setClipsWhyCard1Title(m.clips_why_card1_title);
+      if (m.clips_why_card1_desc) setClipsWhyCard1Desc(m.clips_why_card1_desc);
+      if (m.clips_why_card2_icon) setClipsWhyCard2Icon(m.clips_why_card2_icon);
+      if (m.clips_why_card2_title) setClipsWhyCard2Title(m.clips_why_card2_title);
+      if (m.clips_why_card2_desc) setClipsWhyCard2Desc(m.clips_why_card2_desc);
+      if (m.clips_why_card3_icon) setClipsWhyCard3Icon(m.clips_why_card3_icon);
+      if (m.clips_why_card3_title) setClipsWhyCard3Title(m.clips_why_card3_title);
+      if (m.clips_why_card3_desc) setClipsWhyCard3Desc(m.clips_why_card3_desc);
+      if (m.clips_why_footer_text) setClipsWhyFooterText(m.clips_why_footer_text);
+      if (m.clips_why_visible !== undefined) setClipsWhyVisible(m.clips_why_visible !== "false");
+    } catch { /* ignore */ }
+    finally { setClipsPageLoading(false); }
+  }, []);
+
+  const saveClipsHero = async () => {
+    setClipsHeroSaving(true);
+    try {
+      const pairs = [
+        { key: "clips_hero_bg_type",  value: clipsHeroBgType },
+        { key: "clips_hero_bg_url",   value: clipsHeroBgUrl },
+        { key: "clips_hero_slides",   value: JSON.stringify(clipsHeroSlides) },
+        { key: "clips_hero_text_pos", value: clipsHeroTextPos },
+        { key: "clips_hero_eyebrow",     value: clipsHeroEyebrow },
+        { key: "clips_hero_title",       value: clipsHeroTitle },
+        { key: "clips_hero_subtitle",    value: clipsHeroSubtitle },
+        { key: "clips_hero_show_stats",  value: clipsHeroShowStats ? "true" : "false" },
+        { key: "clips_hero_stat1_val",   value: clipsHeroStat1Val },
+        { key: "clips_hero_stat1_label", value: clipsHeroStat1Label },
+        { key: "clips_hero_stat2_val",   value: clipsHeroStat2Val },
+        { key: "clips_hero_stat2_label", value: clipsHeroStat2Label },
+        { key: "clips_hero_stat3_val",   value: clipsHeroStat3Val },
+        { key: "clips_hero_stat3_label", value: clipsHeroStat3Label },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } catch { /* ignore */ }
+    finally { setClipsHeroSaving(false); }
+  };
+
+  const saveClipsWhy = async () => {
+    setClipsWhySaving(true);
+    try {
+      const pairs = [
+        { key: "clips_why_heading",        value: clipsWhyHeading },
+        { key: "clips_why_heading_italic",  value: clipsWhyHeadingItalic },
+        { key: "clips_why_card1_icon",      value: clipsWhyCard1Icon },
+        { key: "clips_why_card1_title",     value: clipsWhyCard1Title },
+        { key: "clips_why_card1_desc",      value: clipsWhyCard1Desc },
+        { key: "clips_why_card2_icon",      value: clipsWhyCard2Icon },
+        { key: "clips_why_card2_title",     value: clipsWhyCard2Title },
+        { key: "clips_why_card2_desc",      value: clipsWhyCard2Desc },
+        { key: "clips_why_card3_icon",      value: clipsWhyCard3Icon },
+        { key: "clips_why_card3_title",     value: clipsWhyCard3Title },
+        { key: "clips_why_card3_desc",      value: clipsWhyCard3Desc },
+        { key: "clips_why_footer_text",     value: clipsWhyFooterText },
+        { key: "clips_why_visible",         value: clipsWhyVisible ? "true" : "false" },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } catch { /* ignore */ }
+    finally { setClipsWhySaving(false); }
+  };
+
+  const saveClipsFilterTypes = async (types: string[]) => {
+    setClipsFilterSaving(true);
+    try {
+      await supabase.from("site_settings").delete().eq("key", "clips_filter_types");
+      await supabase.from("site_settings").insert({ key: "clips_filter_types", value: JSON.stringify(types) });
+    } catch { /* ignore */ }
+    finally { setClipsFilterSaving(false); }
+  };
+
+  // ── Bow Page fetch/save ───────────────────────────────────────────────────
+  const fetchBowPage = useCallback(async () => {
+    setBowPageLoading(true);
+    try {
+      const settingsKeys = ["bow_filter_types","bow_hero_bg_type","bow_hero_bg_url","bow_hero_slides","bow_hero_text_pos","bow_hero_eyebrow","bow_hero_title","bow_hero_subtitle","bow_hero_show_stats","bow_hero_stat1_val","bow_hero_stat1_label","bow_hero_stat2_val","bow_hero_stat2_label","bow_hero_stat3_val","bow_hero_stat3_label","bow_why_heading","bow_why_heading_italic","bow_why_card1_icon","bow_why_card1_title","bow_why_card1_desc","bow_why_card2_icon","bow_why_card2_title","bow_why_card2_desc","bow_why_card3_icon","bow_why_card3_title","bow_why_card3_desc","bow_why_footer_text","bow_why_visible"];
+      const [{ data }, { data: settings }] = await Promise.all([
+        supabase.from("products").select("*").eq("category", "bow").order("created_at", { ascending: false }),
+        supabase.from("site_settings").select("key,value").in("key", settingsKeys),
+      ]);
+      if (data) setBowPageProducts(data as DbProduct[]);
+      const m: Record<string,string> = {};
+      (settings ?? []).forEach(({key,value}) => { m[key]=value; });
+      if (m.bow_filter_types) { try { setBowFilterTypes(JSON.parse(m.bow_filter_types)); } catch { setBowFilterTypes([]); } }
+      if (m.bow_hero_bg_type) setBowHeroBgType(m.bow_hero_bg_type as "none"|"image"|"video"|"slider");
+      if (m.bow_hero_bg_url) setBowHeroBgUrl(m.bow_hero_bg_url);
+      if (m.bow_hero_slides) { try { setBowHeroSlides(JSON.parse(m.bow_hero_slides)); } catch { setBowHeroSlides([]); } }
+      if (m.bow_hero_text_pos) setBowHeroTextPos(m.bow_hero_text_pos as "left"|"center"|"right");
+      if (m.bow_hero_eyebrow) setBowHeroEyebrow(m.bow_hero_eyebrow);
+      if (m.bow_hero_title) setBowHeroTitle(m.bow_hero_title);
+      if (m.bow_hero_subtitle) setBowHeroSubtitle(m.bow_hero_subtitle);
+      if (m.bow_hero_show_stats !== undefined) setBowHeroShowStats(m.bow_hero_show_stats !== "false");
+      if (m.bow_hero_stat1_val !== undefined) setBowHeroStat1Val(m.bow_hero_stat1_val);
+      if (m.bow_hero_stat1_label) setBowHeroStat1Label(m.bow_hero_stat1_label);
+      if (m.bow_hero_stat2_val !== undefined) setBowHeroStat2Val(m.bow_hero_stat2_val);
+      if (m.bow_hero_stat2_label) setBowHeroStat2Label(m.bow_hero_stat2_label);
+      if (m.bow_hero_stat3_val) setBowHeroStat3Val(m.bow_hero_stat3_val);
+      if (m.bow_hero_stat3_label) setBowHeroStat3Label(m.bow_hero_stat3_label);
+      if (m.bow_why_heading) setBowWhyHeading(m.bow_why_heading);
+      if (m.bow_why_heading_italic) setBowWhyHeadingItalic(m.bow_why_heading_italic);
+      if (m.bow_why_card1_icon) setBowWhyCard1Icon(m.bow_why_card1_icon);
+      if (m.bow_why_card1_title) setBowWhyCard1Title(m.bow_why_card1_title);
+      if (m.bow_why_card1_desc) setBowWhyCard1Desc(m.bow_why_card1_desc);
+      if (m.bow_why_card2_icon) setBowWhyCard2Icon(m.bow_why_card2_icon);
+      if (m.bow_why_card2_title) setBowWhyCard2Title(m.bow_why_card2_title);
+      if (m.bow_why_card2_desc) setBowWhyCard2Desc(m.bow_why_card2_desc);
+      if (m.bow_why_card3_icon) setBowWhyCard3Icon(m.bow_why_card3_icon);
+      if (m.bow_why_card3_title) setBowWhyCard3Title(m.bow_why_card3_title);
+      if (m.bow_why_card3_desc) setBowWhyCard3Desc(m.bow_why_card3_desc);
+      if (m.bow_why_footer_text) setBowWhyFooterText(m.bow_why_footer_text);
+      if (m.bow_why_visible !== undefined) setBowWhyVisible(m.bow_why_visible !== "false");
+    } catch { /* ignore */ }
+    finally { setBowPageLoading(false); }
+  }, []);
+
+  const saveBowHero = async () => {
+    setBowHeroSaving(true);
+    try {
+      const pairs = [
+        { key: "bow_hero_bg_type",  value: bowHeroBgType },
+        { key: "bow_hero_bg_url",   value: bowHeroBgUrl },
+        { key: "bow_hero_slides",   value: JSON.stringify(bowHeroSlides) },
+        { key: "bow_hero_text_pos", value: bowHeroTextPos },
+        { key: "bow_hero_eyebrow",     value: bowHeroEyebrow },
+        { key: "bow_hero_title",       value: bowHeroTitle },
+        { key: "bow_hero_subtitle",    value: bowHeroSubtitle },
+        { key: "bow_hero_show_stats",  value: bowHeroShowStats ? "true" : "false" },
+        { key: "bow_hero_stat1_val",   value: bowHeroStat1Val },
+        { key: "bow_hero_stat1_label", value: bowHeroStat1Label },
+        { key: "bow_hero_stat2_val",   value: bowHeroStat2Val },
+        { key: "bow_hero_stat2_label", value: bowHeroStat2Label },
+        { key: "bow_hero_stat3_val",   value: bowHeroStat3Val },
+        { key: "bow_hero_stat3_label", value: bowHeroStat3Label },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } catch { /* ignore */ }
+    finally { setBowHeroSaving(false); }
+  };
+
+  const saveBowWhy = async () => {
+    setBowWhySaving(true);
+    try {
+      const pairs = [
+        { key: "bow_why_heading",        value: bowWhyHeading },
+        { key: "bow_why_heading_italic",  value: bowWhyHeadingItalic },
+        { key: "bow_why_card1_icon",      value: bowWhyCard1Icon },
+        { key: "bow_why_card1_title",     value: bowWhyCard1Title },
+        { key: "bow_why_card1_desc",      value: bowWhyCard1Desc },
+        { key: "bow_why_card2_icon",      value: bowWhyCard2Icon },
+        { key: "bow_why_card2_title",     value: bowWhyCard2Title },
+        { key: "bow_why_card2_desc",      value: bowWhyCard2Desc },
+        { key: "bow_why_card3_icon",      value: bowWhyCard3Icon },
+        { key: "bow_why_card3_title",     value: bowWhyCard3Title },
+        { key: "bow_why_card3_desc",      value: bowWhyCard3Desc },
+        { key: "bow_why_footer_text",     value: bowWhyFooterText },
+        { key: "bow_why_visible",         value: bowWhyVisible ? "true" : "false" },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } catch { /* ignore */ }
+    finally { setBowWhySaving(false); }
+  };
+
+  const saveBowFilterTypes = async (types: string[]) => {
+    setBowFilterSaving(true);
+    try {
+      await supabase.from("site_settings").delete().eq("key", "bow_filter_types");
+      await supabase.from("site_settings").insert({ key: "bow_filter_types", value: JSON.stringify(types) });
+    } catch { /* ignore */ }
+    finally { setBowFilterSaving(false); }
+  };
+
   const fetchSlides = useCallback(async () => {
     setSlidesLoading(true);
     try {
@@ -982,13 +1270,15 @@ export default function AdminPage() {
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
     if (tab === "heels-page") fetchHeelsPage();
+    if (tab === "clips-page") fetchClipsPage();
+    if (tab === "bow-page") fetchBowPage();
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -1471,7 +1761,9 @@ export default function AdminPage() {
     { id: "dashboard", label: "Dashboard",  icon: LayoutDashboard },
     { id: "homepage",  label: "Homepage",   icon: Home },
     { id: "catalog",   label: "Catalog",    icon: ImageIcon, badge: dbProducts.length },
-    { id: "heels",     label: "Heels Page", icon: Layers },
+    { id: "heels",       label: "Heels Page",  icon: Layers },
+    { id: "clips-page", label: "Clips Page",  icon: Sparkles },
+    { id: "bow-page",   label: "Bow Page",    icon: Sparkles },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -1504,7 +1796,9 @@ export default function AdminPage() {
               id === "settings" ? "settings" :
               id === "footer" ? "footer" :
               id === "messages" ? "messages" :
-              (SECTION_SUBTABS[id][0]?.id ?? "dashboard");
+              id === "clips-page" ? "clips-page" :
+              id === "bow-page" ? "bow-page" :
+              (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
                 key={id}
@@ -1552,6 +1846,8 @@ export default function AdminPage() {
                mainSection === "homepage" ? "Homepage" :
                mainSection === "catalog" ? "Catalog" :
                mainSection === "heels" ? "Heels Page" :
+               mainSection === "clips-page" ? "Clips Page" :
+               mainSection === "bow-page" ? "Bow Page" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -2468,6 +2764,490 @@ export default function AdminPage() {
                         </button>
                       </div>
                       <p className="text-[10px] text-gray-400">Enter dabao ya Add karo — live filter sidebar turant update hoti hai.</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              CLIPS PAGE TAB
+          ══════════════════════════════════════ */}
+          {tab === "clips-page" && (
+            <div className="space-y-8">
+              {clipsPageLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading…</div> : (
+                <>
+                  {/* ── Hero Settings ─────────────────────────────────── */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Clips page hero background aur text set karo.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Background Type</label>
+                        <div className="flex gap-2 flex-wrap">
+                          {(["none","image","video","slider"] as const).map(t => (
+                            <button key={t} onClick={()=>setClipsHeroBgType(t)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${clipsHeroBgType===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {t === "none" ? "Plain Color" : t === "slider" ? "Image Slider" : t === "image" ? "Single Image" : "Video"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {(clipsHeroBgType === "image" || clipsHeroBgType === "video") && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">
+                            {clipsHeroBgType === "image" ? "Image URL" : "Video URL (mp4 or YouTube)"}
+                          </label>
+                          <input type="text" value={clipsHeroBgUrl} onChange={e=>setClipsHeroBgUrl(e.target.value)}
+                            placeholder={clipsHeroBgType==="image" ? "https://cdn.shopify.com/..." : "https://...mp4 or YouTube URL"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          {clipsHeroBgUrl && clipsHeroBgType==="image" && (
+                            <img src={clipsHeroBgUrl} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                          )}
+                        </div>
+                      )}
+                      {clipsHeroBgType === "slider" && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Slider Images (one per line)</label>
+                          <textarea rows={4} value={clipsHeroSlides.join("\n")} onChange={e=>setClipsHeroSlides(e.target.value.split("\n").map(x=>x.trim()).filter(Boolean))}
+                            placeholder={"https://image1.jpg\nhttps://image2.jpg"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg font-mono"/>
+                        </div>
+                      )}
+                      <div className="space-y-3">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block">Hero Text</label>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Eyebrow</p>
+                          <input type="text" value={clipsHeroEyebrow} onChange={e=>setClipsHeroEyebrow(e.target.value)} placeholder="New Collection · SS25" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Main Title</p>
+                          <input type="text" value={clipsHeroTitle} onChange={e=>setClipsHeroTitle(e.target.value)} placeholder="Clip-ons" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Subtitle</p>
+                          <input type="text" value={clipsHeroSubtitle} onChange={e=>setClipsHeroSubtitle(e.target.value)} placeholder="Transform any look instantly" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Text Position</label>
+                        <div className="flex gap-2">
+                          {(["left","center","right"] as const).map(pos => (
+                            <button key={pos} onClick={()=>setClipsHeroTextPos(pos)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${clipsHeroTextPos===pos?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {pos === "left" ? "⬅ Left" : pos === "right" ? "Right ➡" : "⬛ Center"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Stats Bar</label>
+                          <button onClick={()=>setClipsHeroShowStats(v=>!v)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${clipsHeroShowStats?"bg-[#3B5373]":"bg-gray-200"}`}>
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${clipsHeroShowStats?"translate-x-6":"translate-x-1"}`}/>
+                          </button>
+                        </div>
+                        {clipsHeroShowStats && (
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { val: clipsHeroStat1Val, setVal: setClipsHeroStat1Val, label: clipsHeroStat1Label, setLabel: setClipsHeroStat1Label, ph: "Auto (count)", lph: "Styles" },
+                              { val: clipsHeroStat2Val, setVal: setClipsHeroStat2Val, label: clipsHeroStat2Label, setLabel: setClipsHeroStat2Label, ph: "Auto (types)", lph: "Filter Types" },
+                              { val: clipsHeroStat3Val, setVal: setClipsHeroStat3Val, label: clipsHeroStat3Label, setLabel: setClipsHeroStat3Label, ph: "Free", lph: "Shipping ₹999+" },
+                            ].map((s, i) => (
+                              <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                                <p className="text-[10px] text-gray-400 font-medium">Stat {i+1}</p>
+                                <input type="text" value={s.val} onChange={e=>s.setVal(e.target.value)} placeholder={s.ph} className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                                <input type="text" value={s.label} onChange={e=>s.setLabel(e.target.value)} placeholder={s.lph} className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <button onClick={saveClipsHero} disabled={clipsHeroSaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>{clipsHeroSaving ? "Saving…" : "Save Hero Settings"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── Why Choose Section ──────────────────────────── */}
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">&ldquo;Why Choose&rdquo; Section</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">3 cards section — toggle ON/OFF ya edit karo</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-gray-400">{clipsWhyVisible ? "Visible" : "Hidden"}</span>
+                        <button onClick={()=>setClipsWhyVisible(v=>!v)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${clipsWhyVisible?"bg-[#3B5373]":"bg-gray-200"}`}>
+                          <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${clipsWhyVisible?"translate-x-6":"translate-x-1"}`}/>
+                        </button>
+                      </div>
+                    </div>
+                    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5 ${!clipsWhyVisible?"opacity-50 pointer-events-none":""}`}>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Heading (normal)</p>
+                          <input type="text" value={clipsWhyHeading} onChange={e=>setClipsWhyHeading(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Heading (italic/colored)</p>
+                          <input type="text" value={clipsWhyHeadingItalic} onChange={e=>setClipsWhyHeadingItalic(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[
+                          { icon: clipsWhyCard1Icon, setIcon: setClipsWhyCard1Icon, title: clipsWhyCard1Title, setTitle: setClipsWhyCard1Title, desc: clipsWhyCard1Desc, setDesc: setClipsWhyCard1Desc, n: 1 },
+                          { icon: clipsWhyCard2Icon, setIcon: setClipsWhyCard2Icon, title: clipsWhyCard2Title, setTitle: setClipsWhyCard2Title, desc: clipsWhyCard2Desc, setDesc: setClipsWhyCard2Desc, n: 2 },
+                          { icon: clipsWhyCard3Icon, setIcon: setClipsWhyCard3Icon, title: clipsWhyCard3Title, setTitle: setClipsWhyCard3Title, desc: clipsWhyCard3Desc, setDesc: setClipsWhyCard3Desc, n: 3 },
+                        ].map(c => (
+                          <div key={c.n} className="border border-gray-100 rounded-xl p-4 space-y-2.5">
+                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Card {c.n}</p>
+                            <div className="flex gap-2">
+                              <input type="text" value={c.icon} onChange={e=>c.setIcon(e.target.value)} placeholder="emoji" className="w-16 border border-gray-200 text-lg px-2 py-1.5 text-center focus:outline-none focus:border-[#3B5373] rounded"/>
+                              <input type="text" value={c.title} onChange={e=>c.setTitle(e.target.value)} placeholder="Card Title" className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                            </div>
+                            <textarea rows={2} value={c.desc} onChange={e=>c.setDesc(e.target.value)} placeholder="Card description..." className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded resize-none"/>
+                          </div>
+                        ))}
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1">Footer text (below cards)</p>
+                        <textarea rows={2} value={clipsWhyFooterText} onChange={e=>setClipsWhyFooterText(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg resize-none"/>
+                      </div>
+                      <button onClick={saveClipsWhy} disabled={clipsWhySaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>{clipsWhySaving ? "Saving…" : "Save Why Choose Section"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Products table */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">Clips on Page</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">{clipsPageProducts.filter(p=>p.active).length} showing · {clipsPageProducts.filter(p=>!p.active).length} hidden</p>
+                      </div>
+                      <a href="/shop/clips" target="_blank" className="text-xs text-[#3B5373] border border-[#3B5373] px-3 py-1.5 hover:bg-[#3B5373] hover:text-white transition-colors">
+                        View Live Page →
+                      </a>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-gray-100 bg-gray-50">
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium">Product</th>
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium hidden md:table-cell">Tags</th>
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium">Price</th>
+                            <th className="px-4 py-3 text-center text-[10px] tracking-widest uppercase text-gray-400 font-medium w-28">Show on Page</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {clipsPageProducts.map((p, i) => (
+                            <tr key={p.id} className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${i%2===0?"":"bg-gray-50/30"}`}>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-3">
+                                  {p.image && <img src={p.image} alt={p.title} className="w-11 h-11 object-cover object-top rounded flex-shrink-0" />}
+                                  <div>
+                                    <p className="font-medium text-gray-800 text-sm">{p.title}</p>
+                                    {p.featured_tab && <span className={`text-[9px] tracking-wider uppercase px-1.5 py-0.5 rounded mt-0.5 inline-block ${p.featured_tab==="latest"?"bg-[#e8f0fe] text-blue-600":p.featured_tab==="bestseller"?"bg-[#fef3c7] text-yellow-700":"bg-[#fee2e2] text-red-600"}`}>{p.featured_tab}</span>}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 hidden md:table-cell">
+                                <div className="flex flex-wrap gap-1">
+                                  {(p.tags??[]).map((t:string)=><span key={t} className="text-[9px] tracking-wider uppercase bg-[#f0ecff] text-[#3B5373] px-1.5 py-0.5 rounded">{t}</span>)}
+                                  {(!p.tags||p.tags.length===0)&&<span className="text-gray-300 text-xs">—</span>}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-700">₹{p.price?.toLocaleString("en-IN")}</td>
+                              <td className="px-4 py-3 text-center">
+                                <button onClick={async()=>{await supabase.from("products").update({active:!p.active}).eq("id",p.id);setClipsPageProducts(prev=>prev.map(x=>x.id===p.id?{...x,active:!x.active}:x));}}
+                                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${p.active?"bg-[#3B5373]":"bg-gray-200"}`}>
+                                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${p.active?"translate-x-6":"translate-x-1"}`}/>
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {clipsPageProducts.length===0&&<div className="p-10 text-center text-gray-400 text-sm">No clips found. Add from Catalog → Products (category = clips).</div>}
+                    </div>
+                  </div>
+
+                  {/* Filter types */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Filter Sidebar — Clip Types</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Clips page ke filter sidebar mein yeh options dikhte hain.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                      <div className="flex flex-wrap gap-2 min-h-[36px]">
+                        {clipsFilterTypes.map(ft=>(
+                          <span key={ft} className="inline-flex items-center gap-1.5 bg-[#f0ecff] text-[#3B5373] text-xs font-medium px-3 py-1.5 rounded-full">
+                            {ft}
+                            <button onClick={async()=>{const u=clipsFilterTypes.filter(x=>x!==ft);setClipsFilterTypes(u);await saveClipsFilterTypes(u);}} className="text-[#3B5373]/60 hover:text-red-500 transition-colors text-sm leading-none">×</button>
+                          </span>
+                        ))}
+                        {clipsFilterTypes.length===0&&<p className="text-xs text-gray-300">No filter types yet.</p>}
+                      </div>
+                      <div className="flex gap-2">
+                        <input type="text" value={newClipsFilterType} onChange={e=>setNewClipsFilterType(e.target.value)}
+                          onKeyDown={async e=>{if(e.key==="Enter"&&newClipsFilterType.trim()){const u=[...clipsFilterTypes,newClipsFilterType.trim()];setClipsFilterTypes(u);setNewClipsFilterType("");await saveClipsFilterTypes(u);}}}
+                          placeholder="e.g. Crystal, Floral…" className="flex-1 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        <button onClick={async()=>{if(!newClipsFilterType.trim())return;const u=[...clipsFilterTypes,newClipsFilterType.trim()];setClipsFilterTypes(u);setNewClipsFilterType("");await saveClipsFilterTypes(u);}}
+                          disabled={clipsFilterSaving||!newClipsFilterType.trim()} className="px-4 py-2 bg-[#3B5373] text-white text-sm font-medium hover:bg-[#2d3f4f] rounded-lg disabled:opacity-50 transition-colors">
+                          {clipsFilterSaving?"Saving…":"Add"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              BOW PAGE TAB
+          ══════════════════════════════════════ */}
+          {tab === "bow-page" && (
+            <div className="space-y-8">
+              {bowPageLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading…</div> : (
+                <>
+                  {/* ── Hero Settings ─────────────────────────────────── */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Bow page hero background aur text set karo.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Background Type</label>
+                        <div className="flex gap-2 flex-wrap">
+                          {(["none","image","video","slider"] as const).map(t => (
+                            <button key={t} onClick={()=>setBowHeroBgType(t)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${bowHeroBgType===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {t === "none" ? "Plain Color" : t === "slider" ? "Image Slider" : t === "image" ? "Single Image" : "Video"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {(bowHeroBgType === "image" || bowHeroBgType === "video") && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">
+                            {bowHeroBgType === "image" ? "Image URL" : "Video URL (mp4 or YouTube)"}
+                          </label>
+                          <input type="text" value={bowHeroBgUrl} onChange={e=>setBowHeroBgUrl(e.target.value)}
+                            placeholder={bowHeroBgType==="image" ? "https://cdn.shopify.com/..." : "https://...mp4 or YouTube URL"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          {bowHeroBgUrl && bowHeroBgType==="image" && (
+                            <img src={bowHeroBgUrl} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                          )}
+                        </div>
+                      )}
+                      {bowHeroBgType === "slider" && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Slider Images (one per line)</label>
+                          <textarea rows={4} value={bowHeroSlides.join("\n")} onChange={e=>setBowHeroSlides(e.target.value.split("\n").map(x=>x.trim()).filter(Boolean))}
+                            placeholder={"https://image1.jpg\nhttps://image2.jpg"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg font-mono"/>
+                        </div>
+                      )}
+                      <div className="space-y-3">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block">Hero Text</label>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Eyebrow</p>
+                          <input type="text" value={bowHeroEyebrow} onChange={e=>setBowHeroEyebrow(e.target.value)} placeholder="New Collection · SS25" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Main Title</p>
+                          <input type="text" value={bowHeroTitle} onChange={e=>setBowHeroTitle(e.target.value)} placeholder="Bow Collection" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Subtitle</p>
+                          <input type="text" value={bowHeroSubtitle} onChange={e=>setBowHeroSubtitle(e.target.value)} placeholder="Romance in every step" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Text Position</label>
+                        <div className="flex gap-2">
+                          {(["left","center","right"] as const).map(pos => (
+                            <button key={pos} onClick={()=>setBowHeroTextPos(pos)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${bowHeroTextPos===pos?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {pos === "left" ? "⬅ Left" : pos === "right" ? "Right ➡" : "⬛ Center"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Stats Bar</label>
+                          <button onClick={()=>setBowHeroShowStats(v=>!v)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${bowHeroShowStats?"bg-[#3B5373]":"bg-gray-200"}`}>
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${bowHeroShowStats?"translate-x-6":"translate-x-1"}`}/>
+                          </button>
+                        </div>
+                        {bowHeroShowStats && (
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { val: bowHeroStat1Val, setVal: setBowHeroStat1Val, label: bowHeroStat1Label, setLabel: setBowHeroStat1Label, ph: "Auto (count)", lph: "Styles" },
+                              { val: bowHeroStat2Val, setVal: setBowHeroStat2Val, label: bowHeroStat2Label, setLabel: setBowHeroStat2Label, ph: "Auto (types)", lph: "Filter Types" },
+                              { val: bowHeroStat3Val, setVal: setBowHeroStat3Val, label: bowHeroStat3Label, setLabel: setBowHeroStat3Label, ph: "Free", lph: "Shipping ₹999+" },
+                            ].map((s, i) => (
+                              <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                                <p className="text-[10px] text-gray-400 font-medium">Stat {i+1}</p>
+                                <input type="text" value={s.val} onChange={e=>s.setVal(e.target.value)} placeholder={s.ph} className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                                <input type="text" value={s.label} onChange={e=>s.setLabel(e.target.value)} placeholder={s.lph} className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <button onClick={saveBowHero} disabled={bowHeroSaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>{bowHeroSaving ? "Saving…" : "Save Hero Settings"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── Why Choose Section ──────────────────────────── */}
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">&ldquo;Why Choose&rdquo; Section</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">3 cards section — toggle ON/OFF ya edit karo</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-gray-400">{bowWhyVisible ? "Visible" : "Hidden"}</span>
+                        <button onClick={()=>setBowWhyVisible(v=>!v)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${bowWhyVisible?"bg-[#3B5373]":"bg-gray-200"}`}>
+                          <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${bowWhyVisible?"translate-x-6":"translate-x-1"}`}/>
+                        </button>
+                      </div>
+                    </div>
+                    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5 ${!bowWhyVisible?"opacity-50 pointer-events-none":""}`}>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Heading (normal)</p>
+                          <input type="text" value={bowWhyHeading} onChange={e=>setBowWhyHeading(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Heading (italic/colored)</p>
+                          <input type="text" value={bowWhyHeadingItalic} onChange={e=>setBowWhyHeadingItalic(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[
+                          { icon: bowWhyCard1Icon, setIcon: setBowWhyCard1Icon, title: bowWhyCard1Title, setTitle: setBowWhyCard1Title, desc: bowWhyCard1Desc, setDesc: setBowWhyCard1Desc, n: 1 },
+                          { icon: bowWhyCard2Icon, setIcon: setBowWhyCard2Icon, title: bowWhyCard2Title, setTitle: setBowWhyCard2Title, desc: bowWhyCard2Desc, setDesc: setBowWhyCard2Desc, n: 2 },
+                          { icon: bowWhyCard3Icon, setIcon: setBowWhyCard3Icon, title: bowWhyCard3Title, setTitle: setBowWhyCard3Title, desc: bowWhyCard3Desc, setDesc: setBowWhyCard3Desc, n: 3 },
+                        ].map(c => (
+                          <div key={c.n} className="border border-gray-100 rounded-xl p-4 space-y-2.5">
+                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Card {c.n}</p>
+                            <div className="flex gap-2">
+                              <input type="text" value={c.icon} onChange={e=>c.setIcon(e.target.value)} placeholder="emoji" className="w-16 border border-gray-200 text-lg px-2 py-1.5 text-center focus:outline-none focus:border-[#3B5373] rounded"/>
+                              <input type="text" value={c.title} onChange={e=>c.setTitle(e.target.value)} placeholder="Card Title" className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                            </div>
+                            <textarea rows={2} value={c.desc} onChange={e=>c.setDesc(e.target.value)} placeholder="Card description..." className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded resize-none"/>
+                          </div>
+                        ))}
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1">Footer text (below cards)</p>
+                        <textarea rows={2} value={bowWhyFooterText} onChange={e=>setBowWhyFooterText(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg resize-none"/>
+                      </div>
+                      <button onClick={saveBowWhy} disabled={bowWhySaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>{bowWhySaving ? "Saving…" : "Save Why Choose Section"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Products table */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">Bow Collection on Page</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">{bowPageProducts.filter(p=>p.active).length} showing · {bowPageProducts.filter(p=>!p.active).length} hidden</p>
+                      </div>
+                      <a href="/shop/bow" target="_blank" className="text-xs text-[#3B5373] border border-[#3B5373] px-3 py-1.5 hover:bg-[#3B5373] hover:text-white transition-colors">
+                        View Live Page →
+                      </a>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-gray-100 bg-gray-50">
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium">Product</th>
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium hidden md:table-cell">Tags</th>
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium">Price</th>
+                            <th className="px-4 py-3 text-center text-[10px] tracking-widest uppercase text-gray-400 font-medium w-28">Show on Page</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {bowPageProducts.map((p, i) => (
+                            <tr key={p.id} className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${i%2===0?"":"bg-gray-50/30"}`}>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-3">
+                                  {p.image && <img src={p.image} alt={p.title} className="w-11 h-11 object-cover object-top rounded flex-shrink-0" />}
+                                  <div>
+                                    <p className="font-medium text-gray-800 text-sm">{p.title}</p>
+                                    {p.featured_tab && <span className={`text-[9px] tracking-wider uppercase px-1.5 py-0.5 rounded mt-0.5 inline-block ${p.featured_tab==="latest"?"bg-[#e8f0fe] text-blue-600":p.featured_tab==="bestseller"?"bg-[#fef3c7] text-yellow-700":"bg-[#fee2e2] text-red-600"}`}>{p.featured_tab}</span>}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 hidden md:table-cell">
+                                <div className="flex flex-wrap gap-1">
+                                  {(p.tags??[]).map((t:string)=><span key={t} className="text-[9px] tracking-wider uppercase bg-[#f0ecff] text-[#3B5373] px-1.5 py-0.5 rounded">{t}</span>)}
+                                  {(!p.tags||p.tags.length===0)&&<span className="text-gray-300 text-xs">—</span>}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-700">₹{p.price?.toLocaleString("en-IN")}</td>
+                              <td className="px-4 py-3 text-center">
+                                <button onClick={async()=>{await supabase.from("products").update({active:!p.active}).eq("id",p.id);setBowPageProducts(prev=>prev.map(x=>x.id===p.id?{...x,active:!x.active}:x));}}
+                                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${p.active?"bg-[#3B5373]":"bg-gray-200"}`}>
+                                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${p.active?"translate-x-6":"translate-x-1"}`}/>
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {bowPageProducts.length===0&&<div className="p-10 text-center text-gray-400 text-sm">No bow items found. Add from Catalog → Products (category = bow).</div>}
+                    </div>
+                  </div>
+
+                  {/* Filter types */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Filter Sidebar — Bow Types</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Bow page ke filter sidebar mein yeh options dikhte hain.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                      <div className="flex flex-wrap gap-2 min-h-[36px]">
+                        {bowFilterTypes.map(ft=>(
+                          <span key={ft} className="inline-flex items-center gap-1.5 bg-[#f0ecff] text-[#3B5373] text-xs font-medium px-3 py-1.5 rounded-full">
+                            {ft}
+                            <button onClick={async()=>{const u=bowFilterTypes.filter(x=>x!==ft);setBowFilterTypes(u);await saveBowFilterTypes(u);}} className="text-[#3B5373]/60 hover:text-red-500 transition-colors text-sm leading-none">×</button>
+                          </span>
+                        ))}
+                        {bowFilterTypes.length===0&&<p className="text-xs text-gray-300">No filter types yet.</p>}
+                      </div>
+                      <div className="flex gap-2">
+                        <input type="text" value={newBowFilterType} onChange={e=>setNewBowFilterType(e.target.value)}
+                          onKeyDown={async e=>{if(e.key==="Enter"&&newBowFilterType.trim()){const u=[...bowFilterTypes,newBowFilterType.trim()];setBowFilterTypes(u);setNewBowFilterType("");await saveBowFilterTypes(u);}}}
+                          placeholder="e.g. Satin, Organza…" className="flex-1 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        <button onClick={async()=>{if(!newBowFilterType.trim())return;const u=[...bowFilterTypes,newBowFilterType.trim()];setBowFilterTypes(u);setNewBowFilterType("");await saveBowFilterTypes(u);}}
+                          disabled={bowFilterSaving||!newBowFilterType.trim()} className="px-4 py-2 bg-[#3B5373] text-white text-sm font-medium hover:bg-[#2d3f4f] rounded-lg disabled:opacity-50 transition-colors">
+                          {bowFilterSaving?"Saving…":"Add"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </>

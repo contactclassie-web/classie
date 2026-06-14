@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heels Collection — Classie</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#3B5373;--gold:#c9a96e;--light:#f5f5f5;--white:#fff;--text:#1a1a1a;--gray:#888}
+body{font-family:'Poppins',sans-serif;background:#fff;color:var(--text)}
+
+/* ── Announcement Bar ── */
+.ann-bar{background:var(--navy);color:#fff;text-align:center;padding:10px 16px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase}
+
+/* ── Navbar ── */
+nav{background:#fff;border-bottom:1px solid #e8e8e8;height:68px;display:flex;align-items:center;padding:0 48px;position:sticky;top:0;z-index:100}
+.nav-left{display:flex;gap:28px;flex:1}
+.nav-left a{font-family:'Poppins';font-size:13px;color:var(--navy);text-decoration:none;letter-spacing:0.04em}
+.nav-left a.active{border-bottom:1.5px solid var(--navy);padding-bottom:2px}
+.logo{font-family:'Cormorant Garamond';font-size:26px;font-weight:400;letter-spacing:8px;color:var(--navy);text-align:center;flex:1;white-space:nowrap}
+.nav-right{display:flex;gap:20px;align-items:center;flex:1;justify-content:flex-end}
+.nav-right a{color:var(--navy);text-decoration:none;font-size:13px;letter-spacing:0.04em}
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--navy);display:flex;align-items:center}
+.cart-wrap{position:relative}
+.cart-badge{position:absolute;top:-8px;right:-8px;background:var(--navy);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-family:'Poppins'}
+
+/* ── Hero ── */
+.hero{background:var(--navy);height:420px;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 40px,rgba(255,255,255,0.025) 40px,rgba(255,255,255,0.025) 41px)}
+.hero-content{position:relative;z-index:2}
+.hero-eyebrow{font-family:'Poppins';font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.hero-heading{font-family:'Cormorant Garamond';font-size:96px;font-weight:300;color:#fff;line-height:1;margin-bottom:16px}
+.hero-divider{width:56px;height:1px;background:var(--gold);margin:0 auto 20px}
+.hero-sub{font-family:'Cormorant Garamond';font-size:20px;font-style:italic;color:rgba(255,255,255,0.65)}
+
+/* ── Occasions ── */
+.occasions{padding:60px 48px}
+.section-eyebrow{font-family:'Poppins';font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:10px}
+.section-heading{font-family:'Cormorant Garamond';font-size:36px;font-weight:400;text-align:center;color:var(--navy);margin-bottom:40px}
+.section-heading em{font-style:italic;font-weight:300}
+.occ-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.occ-card{position:relative;aspect-ratio:3/4;max-height:460px;overflow:hidden;cursor:pointer}
+.occ-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.7s ease,filter 0.7s ease}
+.occ-card:hover img{transform:scale(1.06);filter:brightness(0.75)}
+.occ-overlay{position:absolute;inset:0;background:linear-gradient(160deg,transparent 38%,rgba(26,26,26,0.75) 100%)}
+.occ-label{position:absolute;bottom:0;left:0;padding:20px 24px 24px}
+.occ-tag{font-family:'Poppins';font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px}
+.occ-title{font-family:'Cormorant Garamond';font-size:26px;font-weight:300;color:#fff;line-height:1.1;margin-bottom:12px}
+.occ-shop{font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:6px;transition:color 0.3s,gap 0.3s}
+.occ-card:hover .occ-shop{color:#fff;gap:10px}
+.occ-card.active-filter{outline:2.5px solid var(--gold);outline-offset:-2px}
+
+/* ── Main Content ── */
+.main-wrap{display:flex;padding:48px 48px 64px;gap:48px;background:var(--white)}
+
+/* ── Sidebar ── */
+.sidebar{width:240px;flex-shrink:0}
+.sidebar-header{font-family:'Poppins';font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.sidebar hr{border:none;border-top:1px solid var(--navy);margin-bottom:24px}
+.filter-group{margin-bottom:24px}
+.filter-title{font-family:'Cormorant Garamond';font-size:18px;font-weight:600;color:var(--navy);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.filter-title svg{transition:transform 0.2s}
+.filter-opts{display:flex;flex-direction:column;gap:8px}
+.filter-opt{display:flex;align-items:center;gap:10px;font-size:13px;color:#444;cursor:pointer}
+.filter-opt input[type=checkbox]{accent-color:var(--navy);width:15px;height:15px;cursor:pointer}
+.price-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.price-input{border:1px solid #ddd;padding:6px 10px;font-size:12px;width:90px;font-family:'Poppins';outline:none;border-radius:2px}
+.price-input:focus{border-color:var(--navy)}
+.price-hint{font-size:11px;color:var(--gold)}
+.filter-divider{border:none;border-top:1px solid #eee;margin:16px 0}
+.clear-all{font-size:11px;color:var(--gold);cursor:pointer;letter-spacing:1px;text-transform:uppercase;margin-top:8px;display:inline-block}
+
+/* ── Grid Area ── */
+.grid-area{flex:1}
+.grid-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #eee}
+.grid-count{font-size:12px;color:var(--gray);letter-spacing:1px}
+.grid-sort{font-size:12px;color:var(--navy);border:1px solid #e0e0e0;padding:6px 14px;border-radius:2px;cursor:pointer;font-family:'Poppins';outline:none;background:#fff}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 16px}
+
+/* ── Product Card ── */
+.p-card{cursor:pointer}
+.p-card-img{position:relative;aspect-ratio:3/4;overflow:hidden;background:#f0ebe4}
+.p-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease}
+.p-card:hover .p-card-img img{transform:scale(1.04)}
+.p-badge{position:absolute;top:10px;left:10px;background:#1a1a1a;color:#fff;font-family:'Poppins';font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:4px 8px;border-radius:2px;z-index:2}
+.p-badge.new{background:var(--text)}
+.p-heart{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.9);border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;z-index:2;font-size:14px}
+.p-card:hover .p-heart{opacity:1}
+.p-heart.liked{opacity:1;color:red}
+.p-quick-add{position:absolute;bottom:0;left:0;right:0;background:var(--navy);color:#fff;font-family:'Poppins';font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:12px;text-align:center;border:none;cursor:pointer;transform:translateY(100%);transition:transform 0.3s ease}
+.p-card:hover .p-quick-add{transform:translateY(0)}
+.p-info{padding:12px 0 0}
+.p-name{font-family:'Cormorant Garamond';font-size:16px;font-weight:400;color:var(--text);margin-bottom:4px}
+.p-price{font-size:13px;display:flex;gap:8px;align-items:center}
+.p-sale{font-family:'Poppins';font-weight:600;color:var(--text)}
+.p-orig{font-family:'Poppins';color:var(--gray);text-decoration:line-through;font-size:12px}
+
+/* ── Load More ── */
+.load-more-wrap{text-align:center;margin-top:48px}
+.load-more{background:#fff;border:1.5px solid var(--navy);color:var(--navy);font-family:'Poppins';font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:14px 48px;cursor:pointer;transition:all 0.3s}
+.load-more:hover{background:var(--navy);color:#fff}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:32px;right:32px;background:var(--navy);color:#fff;padding:14px 24px;font-family:'Poppins';font-size:12px;letter-spacing:1px;border-radius:3px;opacity:0;transform:translateY(12px);transition:all 0.3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── Mobile Filters Button ── */
+.mobile-filter-btn{display:none;margin-bottom:20px;background:#fff;border:1.5px solid var(--navy);color:var(--navy);font-family:'Poppins';font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;cursor:pointer;width:100%}
+
+/* ── Responsive ── */
+@media(max-width:1024px){.product-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-left{display:none}
+  .logo{text-align:left;letter-spacing:5px;font-size:22px}
+  .nav-right a{display:none}
+  .hero{height:300px}
+  .hero-heading{font-size:60px}
+  .occasions{padding:40px 20px}
+  .occ-grid{grid-template-columns:repeat(1,1fr);gap:2px}
+  .occ-card{max-height:280px}
+  .main-wrap{flex-direction:column;padding:32px 20px}
+  .sidebar{width:100%;display:none}
+  .sidebar.open{display:block}
+  .mobile-filter-btn{display:block}
+  .product-grid{grid-template-columns:repeat(2,1fr);gap:12px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- Announcement Bar -->
+<div class="ann-bar">✦ Free Shipping above ₹999 &nbsp;·&nbsp; Use code FIRST10 for 10% OFF &nbsp;·&nbsp; Easy Returns & Exchange ✦</div>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-left">
+    <a href="#" class="active">Heels</a>
+    <a href="#">Clip-ons</a>
+    <a href="#">Collections</a>
+    <a href="#">Style Ideas</a>
+  </div>
+  <div class="logo">✦ C L A S S I E</div>
+  <div class="nav-right">
+    <a href="#">Hot Deals</a>
+    <a href="#">About</a>
+    <button class="icon-btn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <button class="icon-btn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <div class="cart-wrap">
+      <button class="icon-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </button>
+      <span class="cart-badge">2</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-content">
+    <p class="hero-eyebrow">New Collection · SS25</p>
+    <h1 class="hero-heading">Heels</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">Step into your story with Classie.</p>
+  </div>
+</div>
+
+<!-- Shop by Occasion -->
+<section class="occasions">
+  <p class="section-eyebrow">Curated Edits</p>
+  <h2 class="section-heading">Shop by <em>Occasion</em></h2>
+  <p style="text-align:center;font-size:12px;color:#999;margin-top:-28px;margin-bottom:32px;letter-spacing:1px">Click an occasion to filter heels below</p>
+  <div class="occ-grid">
+    <div class="occ-card" onclick="filterOccasion('date',this)">
+      <!-- Real image will come from Supabase DB -->
+      <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=800&fit=crop&crop=center" alt="Date Edit"/>
+      <div class="occ-overlay"></div>
+      <div class="occ-label">
+        <p class="occ-tag">For Her</p>
+        <h3 class="occ-title">The Date Edit</h3>
+        <span class="occ-shop">Shop Now <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </div>
+    </div>
+    <div class="occ-card" onclick="filterOccasion('everyday',this)">
+      <img src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=600&h=800&fit=crop&crop=center" alt="Everyday"/>
+      <div class="occ-overlay"></div>
+      <div class="occ-label">
+        <p class="occ-tag">Daily Wear</p>
+        <h3 class="occ-title">The Everyday Edit</h3>
+        <span class="occ-shop">Shop Now <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </div>
+    </div>
+    <div class="occ-card" onclick="filterOccasion('festive',this)">
+      <img src="https://images.unsplash.com/photo-1535530992830-e25d07cfa780?w=600&h=800&fit=crop&crop=center" alt="Festive"/>
+      <div class="occ-overlay"></div>
+      <div class="occ-label">
+        <p class="occ-tag">Celebrations</p>
+        <h3 class="occ-title">The Festive Edit</h3>
+        <span class="occ-shop">Shop Now <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+      </div>
+    </div>
+  </div>
+  <!-- Active filter pill -->
+  <div id="active-occ-wrap" style="text-align:center;margin-top:20px;display:none">
+    <span id="active-occ-pill" style="display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border-radius:20px">
+      <span id="active-occ-text"></span>
+      <span onclick="clearOccasion()" style="cursor:pointer;opacity:0.7;font-size:14px">✕</span>
+    </span>
+  </div>
+</section>
+
+<!-- Main: Sidebar + Grid -->
+<div class="main-wrap">
+
+  <!-- Mobile filter btn -->
+  <button class="mobile-filter-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+    ⚙ Filters
+  </button>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <p class="sidebar-header">Filters</p>
+    <hr/>
+
+    <div class="filter-group">
+      <div class="filter-title">Availability <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg></div>
+      <div class="filter-opts">
+        <label class="filter-opt"><input type="checkbox" checked/> In stock</label>
+        <label class="filter-opt"><input type="checkbox"/> Out of stock</label>
+      </div>
+    </div>
+    <hr class="filter-divider"/>
+
+    <div class="filter-group">
+      <div class="filter-title">Price <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg></div>
+      <div class="price-row">
+        <input class="price-input" placeholder="₹ 0" value="₹ 0"/>
+        <span style="font-size:12px;color:#999">to</span>
+        <input class="price-input" placeholder="₹ 1,999" value="₹ 1,999"/>
+      </div>
+      <p class="price-hint">Highest price: ₹1,999</p>
+    </div>
+    <hr class="filter-divider"/>
+
+    <div class="filter-group">
+      <div class="filter-title">Heel Type <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg></div>
+      <div class="filter-opts">
+        <label class="filter-opt"><input type="checkbox"/> Block Heel</label>
+        <label class="filter-opt"><input type="checkbox"/> Slim Heel</label>
+        <label class="filter-opt"><input type="checkbox"/> Kitten Heel</label>
+        <label class="filter-opt"><input type="checkbox"/> Sculpted Heel</label>
+      </div>
+    </div>
+    <hr class="filter-divider"/>
+
+    <span class="clear-all" onclick="clearFilters()">Clear All Filters</span>
+  </aside>
+
+  <!-- Grid -->
+  <div class="grid-area">
+    <div class="grid-toolbar">
+      <span class="grid-count" id="item-count">8 items</span>
+      <select class="grid-sort">
+        <option>Featured</option>
+        <option>Price: Low to High</option>
+        <option>Price: High to Low</option>
+        <option>Newest</option>
+      </select>
+    </div>
+
+    <div class="product-grid" id="product-grid">
+
+      <!-- Card 1 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583" alt="Clessia Wine"/>
+          <span class="p-badge">−11%</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Clessia Wine')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Clessia Wine</p>
+          <div class="p-price"><span class="p-sale">₹1,699</span><span class="p-orig">₹1,899</span></div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/89.png?v=1767460150" alt="Velora Ivory"/>
+          <span class="p-badge new">New</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Velora Ivory')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Velora Ivory</p>
+          <div class="p-price"><span class="p-sale">₹1,799</span><span class="p-orig">₹1,999</span></div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/103.png?v=1767437754" alt="Modiva Rose Gold"/>
+          <span class="p-badge">−11%</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Modiva Rose Gold')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Modiva Rose Gold</p>
+          <div class="p-price"><span class="p-sale">₹1,599</span><span class="p-orig">₹1,799</span></div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/254.png?v=1767818723" alt="Tressa Teal"/>
+          <span class="p-badge">−12%</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Tressa Teal')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Tressa Teal</p>
+          <div class="p-price"><span class="p-sale">₹1,499</span><span class="p-orig">₹1,699</span></div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/39.png?v=1766919149" alt="Gloss Belle Mocha"/>
+          <span class="p-badge">−10%</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Gloss Belle Mocha')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Gloss Belle Mocha</p>
+          <div class="p-price"><span class="p-sale">₹1,799</span><span class="p-orig">₹1,999</span></div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/58.png?v=1767126020" alt="Crovia Chocolate"/>
+          <span class="p-badge new">New</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Crovia Chocolate')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Crovia Chocolate</p>
+          <div class="p-price"><span class="p-sale">₹1,699</span><span class="p-orig">₹1,899</span></div>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/17_fc5c95f2-f403-4090-abdf-3c6a93afec00.png?v=1766915208" alt="Solara Black"/>
+          <span class="p-badge">−10%</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Solara Black')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Solara Black</p>
+          <div class="p-price"><span class="p-sale">₹1,899</span><span class="p-orig">₹2,099</span></div>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="p-card">
+        <div class="p-card-img">
+          <img src="https://cdn.shopify.com/s/files/1/0961/1286/9690/files/261.png?v=1767786587" alt="Luxe Nude Beige"/>
+          <span class="p-badge">−11%</span>
+          <button class="p-heart" onclick="toggleHeart(this)">♡</button>
+          <button class="p-quick-add" onclick="addToCart('Luxe Nude Beige')">Quick Add</button>
+        </div>
+        <div class="p-info">
+          <p class="p-name">Luxe Nude Beige</p>
+          <div class="p-price"><span class="p-sale">₹1,599</span><span class="p-orig">₹1,799</span></div>
+        </div>
+      </div>
+
+    </div><!-- /product-grid -->
+
+    <div class="load-more-wrap">
+      <button class="load-more">Load More</button>
+    </div>
+  </div><!-- /grid-area -->
+</div><!-- /main-wrap -->
+
+<!-- Why Choose Classie — below grid, above footer -->
+<section style="background:#f5f5f5;padding:64px 48px;text-align:center">
+  <h2 style="font-family:'Cormorant Garamond';font-size:38px;font-weight:400;color:var(--text);margin-bottom:40px">Why Choose Classie?</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:860px;margin:0 auto 40px">
+    <div style="background:#fff;padding:36px 28px;border-radius:4px;box-shadow:0 1px 8px rgba(0,0,0,0.06)">
+      <div style="font-size:36px;margin-bottom:16px">✨</div>
+      <p style="font-family:'Poppins';font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">Designed to Transform</p>
+      <p style="font-size:12px;color:#777;line-height:1.8">Interchangeable clip-ons that let one heel match every look.</p>
+    </div>
+    <div style="background:#fff;padding:36px 28px;border-radius:4px;box-shadow:0 1px 8px rgba(0,0,0,0.06)">
+      <div style="font-size:36px;margin-bottom:16px">👠</div>
+      <p style="font-family:'Poppins';font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">Made for Everyday Wear</p>
+      <p style="font-size:12px;color:#777;line-height:1.8">Comfort-focused designs made for real movement.</p>
+    </div>
+    <div style="background:#fff;padding:36px 28px;border-radius:4px;box-shadow:0 1px 8px rgba(0,0,0,0.06)">
+      <div style="font-size:36px;margin-bottom:16px">♻️</div>
+      <p style="font-family:'Poppins';font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">Style That Lasts</p>
+      <p style="font-size:12px;color:#777;line-height:1.8">Reusable clip-ons designed to be worn again and again.</p>
+    </div>
+  </div>
+  <p style="font-size:13px;color:#555;line-height:2;max-width:680px;margin:0 auto">
+    Discover our curated collections designed to move seamlessly from everyday wear to special occasions.<br/>
+    Thoughtfully crafted heels and interchangeable clip-on accessories let you style one look in multiple ways.<br/>
+    Explore <a href="#" style="color:var(--navy);font-weight:500;text-decoration:underline">Heels</a>, shop <a href="#" style="color:var(--navy);font-weight:500;text-decoration:underline">Rhinestone Charm Clip-ons</a>, or browse our <a href="#" style="color:var(--navy);font-weight:500;text-decoration:underline">Bloom &amp; Bow Clip-ons</a>.
+  </p>
+</section>
+
+<!-- Footer -->
+<footer style="background:var(--navy);color:#fff;padding:48px 48px 28px;margin-top:32px">
+  <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px">
+    <div>
+      <div style="font-family:'Cormorant Garamond';font-size:24px;letter-spacing:6px;margin-bottom:12px">✦ CLASSIE</div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.7">One Heel. Endless Looks.<br/>Premium heels & accessories for the modern woman.</p>
+    </div>
+    <div>
+      <p style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Shop</p>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:rgba(255,255,255,0.7)">
+        <a href="#" style="color:inherit;text-decoration:none">Heels</a>
+        <a href="#" style="color:inherit;text-decoration:none">Clip-ons</a>
+        <a href="#" style="color:inherit;text-decoration:none">New Arrivals</a>
+        <a href="#" style="color:inherit;text-decoration:none">Hot Deals</a>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Help</p>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:rgba(255,255,255,0.7)">
+        <a href="#" style="color:inherit;text-decoration:none">FAQs</a>
+        <a href="#" style="color:inherit;text-decoration:none">Shipping Policy</a>
+        <a href="#" style="color:inherit;text-decoration:none">Returns</a>
+        <a href="#" style="color:inherit;text-decoration:none">Contact Us</a>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Company</p>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:rgba(255,255,255,0.7)">
+        <a href="#" style="color:inherit;text-decoration:none">About Us</a>
+        <a href="#" style="color:inherit;text-decoration:none">Style Ideas</a>
+        <a href="#" style="color:inherit;text-decoration:none">Privacy Policy</a>
+        <a href="#" style="color:inherit;text-decoration:none">Terms</a>
+      </div>
+    </div>
+  </div>
+  <div style="border-top:1px solid rgba(255,255,255,0.15);padding-top:20px;display:flex;justify-content:space-between;align-items:center">
+    <p style="font-size:11px;color:rgba(255,255,255,0.45)">© 2025 Classie. All rights reserved.</p>
+    <p style="font-size:11px;color:rgba(255,255,255,0.45)">Made with ♥ in India</p>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ Added to cart!</div>
+
+<script>
+function addToCart(name){
+  const t=document.getElementById('toast');
+  t.textContent='✓ '+name+' added to cart!';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function toggleHeart(btn){
+  if(btn.textContent==='♡'){btn.textContent='♥';btn.style.color='#e53935';btn.classList.add('liked')}
+  else{btn.textContent='♡';btn.style.color='';btn.classList.remove('liked')}
+}
+function filterOccasion(occ,card){
+  document.querySelectorAll('.occ-card').forEach(c=>c.classList.remove('active-filter'));
+  card.classList.add('active-filter');
+  // Show active pill
+  const wrap=document.getElementById('active-occ-wrap');
+  const text=document.getElementById('active-occ-text');
+  text.textContent=card.querySelector('.occ-title').textContent;
+  wrap.style.display='block';
+  // Scroll to grid
+  document.querySelector('.main-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+  // Show "filtered" count
+  document.getElementById('item-count').textContent='3 items (filtered)';
+}
+function clearOccasion(){
+  document.querySelectorAll('.occ-card').forEach(c=>c.classList.remove('active-filter'));
+  document.getElementById('active-occ-wrap').style.display='none';
+  document.getElementById('item-count').textContent='8 items';
+}
+function clearFilters(){
+  document.querySelectorAll('.filter-opt input').forEach(i=>i.checked=false);
+  document.querySelectorAll('.occ-card').forEach(c=>c.classList.remove('active-filter'));
+}
+</script>
+</body>
+</html>

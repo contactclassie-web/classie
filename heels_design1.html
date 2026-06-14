@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Heels — CLASSIE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; color: #1a1a1a; background: #fff; }
+
+    /* ── Announcement Bar ── */
+    .announcement-bar {
+      background: #3B5373;
+      color: #fff;
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      padding: 9px 20px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ── Navbar ── */
+    nav {
+      background: #fff;
+      height: 64px;
+      border-bottom: 1px solid #e5e5e5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 80px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: 6px;
+      color: #3B5373;
+      text-decoration: none;
+      flex: 1;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      align-items: center;
+      flex: 1;
+      justify-content: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #3B5373;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 0.6; }
+    .nav-links a.active {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+    .nav-icons {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+      align-items: center;
+    }
+    .nav-icons svg { cursor: pointer; color: #3B5373; transition: opacity 0.2s; }
+    .nav-icons svg:hover { opacity: 0.6; }
+    .cart-wrap { position: relative; }
+    .cart-badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 16px; height: 16px;
+      background: #c9a96e;
+      border-radius: 50%;
+      font-size: 9px;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      height: 500px;
+      background: #3B5373;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255,255,255,0.025) 0px,
+        rgba(255,255,255,0.025) 1px,
+        transparent 1px,
+        transparent 20px
+      );
+    }
+    .hero-inner { position: relative; z-index: 1; }
+    .hero-eyebrow {
+      color: #c9a96e;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 16px;
+    }
+    .hero-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 100px;
+      font-weight: 300;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+    .hero-hr {
+      width: 60px;
+      border: none;
+      border-top: 1.5px solid #c9a96e;
+      margin: 0 auto 20px;
+    }
+    .hero-sub {
+      color: rgba(255,255,255,0.65);
+      font-size: 20px;
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+    }
+
+    /* ── Occasions ── */
+    .occasions-section {
+      background: #fff;
+      padding: 60px 80px;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      color: #3B5373;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 32px;
+    }
+    .occasions-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .occasion-card {
+      width: 190px;
+      height: 230px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 20px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      overflow: hidden;
+    }
+    .occasion-card:hover { transform: scale(1.03); }
+    .occ-0 { background: #3B5373; }
+    .occ-1 { background: #4a6280; }
+    .occ-2 { background: #2d4060; }
+    .occ-3 { background: #3B5373; }
+    .occ-4 { background: #4a6280; }
+    .occasion-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #fff;
+      letter-spacing: 1.5px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* ── Main Section ── */
+    .main-section {
+      padding: 60px 80px;
+      display: flex;
+      gap: 0;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px;
+      min-width: 260px;
+      margin-right: 48px;
+    }
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .sidebar-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: #c9a96e;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+    .clear-all {
+      font-size: 12px;
+      color: #c9a96e;
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: 'Inter', sans-serif;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .sidebar-divider {
+      border: none;
+      border-top: 1px solid #3B5373;
+      margin-bottom: 24px;
+    }
+    .filter-group { margin-bottom: 24px; }
+    .filter-group-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #3B5373;
+      margin-bottom: 12px;
+    }
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+      cursor: pointer;
+    }
+    .filter-option input[type="checkbox"] {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #3B5373;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      background: #fff;
+      transition: background 0.2s;
+    }
+    .filter-option input[type="checkbox"]:checked {
+      background: #3B5373;
+    }
+    .filter-option input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 0px;
+      width: 5px; height: 9px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+    .filter-option label {
+      font-size: 13px;
+      color: #444;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+    .price-inputs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .price-inputs input {
+      width: 90px;
+      height: 36px;
+      border: 1.5px solid #ddd;
+      border-radius: 3px;
+      padding: 0 10px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .price-inputs input:focus { border-color: #3B5373; }
+    .price-inputs span { font-size: 13px; color: #999; }
+
+    /* ── Grid ── */
+    .grid-section { flex: 1; }
+    .grid-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .items-count {
+      font-size: 13px;
+      color: #888;
+      font-family: 'Inter', sans-serif;
+    }
+    .sort-select {
+      font-size: 13px;
+      color: #444;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid #ddd;
+      padding: 6px 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      background: #fff;
+      outline: none;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px 20px;
+    }
+    .product-card {
+      position: relative;
+      cursor: pointer;
+    }
+    .product-card:hover .add-to-bag {
+      opacity: 1;
+    }
+    .card-image-wrap {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+    }
+    .card-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s;
+    }
+    .product-card:hover .card-image-wrap img {
+      transform: scale(1.04);
+    }
+    .sale-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #3B5373;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      font-family: 'Inter', sans-serif;
+    }
+    .add-to-bag {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: rgba(59,83,115,0.92);
+      color: #fff;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      color: #1a1a1a;
+      margin-top: 12px;
+      font-weight: 400;
+    }
+    .card-price {
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      margin-top: 5px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .price-current {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .price-old {
+      text-decoration: line-through;
+      color: #999;
+    }
+
+    /* ── Load More ── */
+    .load-more-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 48px;
+    }
+    .load-more-btn {
+      border: 1.5px solid #3B5373;
+      background: transparent;
+      color: #3B5373;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      height: 44px;
+      padding: 0 48px;
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s;
+    }
+    .load-more-btn:hover {
+      background: #3B5373;
+      color: #fff;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: #3B5373;
+      color: #fff;
+      padding: 40px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      letter-spacing: 6px;
+      color: #fff;
+    }
+    .footer-tagline {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      font-style: italic;
+      margin-top: 4px;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #3B5373;
+      color: #fff;
+      height: 48px;
+      padding: 0 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 999;
+      transition: opacity 0.3s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── Mobile Filter Toggle ── */
+    .filter-toggle-btn {
+      display: none;
+      margin-bottom: 16px;
+      background: #3B5373;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero-heading { font-size: 60px; }
+      .occasions-section { padding: 40px 20px; }
+      .occasions-row { overflow-x: auto; gap: 12px; padding-bottom: 8px; }
+      .occasion-card { min-width: 150px; }
+      .main-section { padding: 40px 20px; flex-direction: column; }
+      .sidebar { width: 100%; margin-right: 0; margin-bottom: 24px; display: none; }
+      .sidebar.open { display: block; }
+      .filter-toggle-btn { display: block; }
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 12px; }
+      footer { padding: 30px 20px; flex-direction: column; gap: 12px; text-align: center; }
+      .nav-logo { font-size: 20px; letter-spacing: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    ✦ Free Shipping above ₹999 &nbsp;·&nbsp; Use code FIRST10 for 10% OFF &nbsp;·&nbsp; Easy Returns ✦
+  </div>
+
+  <!-- Navbar -->
+  <nav>
+    <a href="#" class="nav-logo">✦ CLASSIE</a>
+    <ul class="nav-links">
+      <li><a href="#" class="active">Heels</a></li>
+      <li><a href="#">Clip-ons</a></li>
+      <li><a href="#">Style Ideas</a></li>
+      <li><a href="#">Hot Deals</a></li>
+    </ul>
+    <div class="nav-icons">
+      <!-- Search -->
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <!-- Cart -->
+      <div class="cart-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <div class="cart-badge" id="cartBadge">0</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">New Collection · SS25</div>
+      <h1 class="hero-heading">Heels</h1>
+      <hr class="hero-hr"/>
+      <p class="hero-sub">Step into your story.</p>
+    </div>
+  </section>
+
+  <!-- Shop by Occasion -->
+  <section class="occasions-section">
+    <div class="section-label">Shop by Occasion</div>
+    <div class="occasions-row">
+      <div class="occasion-card occ-0"><span class="occasion-label">The Date<br>Edit</span></div>
+      <div class="occasion-card occ-1"><span class="occasion-label">The Everyday<br>Edit</span></div>
+      <div class="occasion-card occ-2"><span class="occasion-label">The Festive<br>Edit</span></div>
+      <div class="occasion-card occ-3"><span class="occasion-label">The Party<br>Edit</span></div>
+      <div class="occasion-card occ-4"><span class="occasion-label">The Work<br>Edit</span></div>
+    </div>
+  </section>
+
+  <!-- Main Section -->
+  <section class="main-section">
+
+    <!-- Filter Toggle (mobile) -->
+    <button class="filter-toggle-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ Filters</button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Filters</span>
+        <button class="clear-all" onclick="clearFilters()">Clear All</button>
+      </div>
+      <hr class="sidebar-divider"/>
+
+      <!-- Availability -->
+      <div class="filter-group">
+        <div class="filter-group-title">Availability</div>
+        <label class="filter-option">
+          <input type="checkbox" checked/> <span>In stock</span>
+        </label>
+        <label class="filter-option">
+          <input type="checkbox"/> <span>Out of stock</span>
+        </label>
+      </div>
+
+      <!-- Price -->
+      <div class="filter-group">
+        <div class="filter-group-title">Price</div>
+        <div class="price-inputs">
+          <input type="number" placeholder="₹ Min" value="1000"/>
+          <span>—</span>
+          <input type="number" placeholder="₹ Max" value="2500"/>
+        </div>
+      </div>
+
+      <!-- Heel Type -->
+      <div class="filter-group">
+        <div class="filter-group-title">Heel Type</div>
+        <label class="filter-option"><input type="checkbox"/> <span>Block Heel</span></label>
+        <label class="filter-option"><input type="checkbox"/> <span>Slim Heel</span></label>
+        <label class="filter-option"><input type="checkbox"/> <span>Kitten Heel</span></label>
+        <label class="filter-option"><input type="checkbox"/> <span>Sculpted Heel</span></label>
+      </div>
+    </aside>
+
+    <!-- Product Grid -->
+    <div class="grid-section">
+      <div class="grid-toolbar">
+        <span class="items-count">8 items</span>
+        <select class="sort-select">
+          <option>Sort: Featured</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+          <option>Newest First</option>
+        </select>
+      </div>
+
+      <div class="product-grid" id="productGrid">
+        <!-- Products injected by JS -->
+      </div>
+
+      <div class="load-more-wrap">
+        <button class="load-more-btn">Load More</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      <div class="footer-logo">✦ CLASSIE</div>
+      <div class="footer-tagline">Elegance is a choice.</div>
+    </div>
+    <div class="footer-copy">© 2025 Classie. All rights reserved.</div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">✓ Added to cart!</div>
+
+  <script>
+    const products = [
+      { name: 'Clessia Wine',      price: 1699, was: 1899, bg: 'c9a096' },
+      { name: 'Velora Ivory',      price: 1799, was: 1999, bg: 'e8d5c4' },
+      { name: 'Modiva Rose Gold',  price: 1599, was: 1799, bg: 'd4a9a0' },
+      { name: 'Tressa Teal',       price: 1499, was: 1699, bg: '7da9a8' },
+      { name: 'Gloss Belle Mocha', price: 1799, was: 1999, bg: 'b08070' },
+      { name: 'Crovia Chocolate',  price: 1699, was: 1899, bg: '8b6355' },
+      { name: 'Solara Black',      price: 1899, was: 2099, bg: '3d3d3d' },
+      { name: 'Luxe Nude Beige',   price: 1599, was: 1799, bg: 'd4c4b0' },
+    ];
+
+    let cartCount = 0;
+
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = products.map((p, i) => `
+        <div class="product-card">
+          <div class="card-image-wrap">
+            <img src="https://placehold.co/400x533/${p.bg}/ffffff?text=%20" alt="${p.name}" loading="lazy"/>
+            <span class="sale-badge">Sale</span>
+            <button class="add-to-bag" onclick="addToCart('${p.name}')">Add to Bag</button>
+          </div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-price">
+            <span class="price-current">₹${p.price.toLocaleString('en-IN')}</span>
+            <span class="price-old">₹${p.was.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    let toastTimer;
+    function addToCart(name) {
+      cartCount++;
+      document.getElementById('cartBadge').textContent = cartCount;
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function clearFilters() {
+      document.querySelectorAll('.sidebar input[type="checkbox"]').forEach(cb => cb.checked = false);
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>

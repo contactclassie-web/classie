@@ -382,3 +382,67 @@ export async function getHeelsSettings(): Promise<HeelsSettings> {
     return {};
   }
 }
+
+// ── Generic category functions (for clips, bow, etc.) ─────────────────────
+
+export async function getShopCategoryProducts(category: string): Promise<HeelProduct[]> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category', category)
+      .eq('active', true)
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      return products
+        .filter((p) => p.category === category)
+        .map((p) => ({ ...p, heel_type: null, tags: [] }));
+    }
+
+    return (data as (DbProduct & { heel_type?: string | null; tags?: string[] })[]).map((row) => ({
+      slug: row.slug,
+      title: row.title,
+      price: Number(row.price),
+      comparePrice: Number(row.compare_price),
+      category: row.category as Product['category'],
+      collection: deriveCollection(row.slug, row.category),
+      variants: {
+        type: ((row.variant_type ?? 'none') as 'size' | 'color' | 'none'),
+        options: Array.isArray(row.variants) ? row.variants : [],
+      },
+      image: row.image,
+      description: row.description,
+      featured_tab: row.featured_tab ?? null,
+      heel_type: row.heel_type ?? null,
+      tags: row.tags ?? [],
+    }));
+  } catch {
+    return products
+      .filter((p) => p.category === category)
+      .map((p) => ({ ...p, heel_type: null, tags: [] }));
+  }
+}
+
+export async function getShopCategorySettings(prefix: string): Promise<HeelsSettings> {
+  try {
+    const keys = [
+      `${prefix}_hero_bg_type`, `${prefix}_hero_bg_url`, `${prefix}_hero_slides`, `${prefix}_hero_text_pos`,
+      `${prefix}_hero_eyebrow`, `${prefix}_hero_title`, `${prefix}_hero_subtitle`,
+      `${prefix}_hero_show_stats`, `${prefix}_hero_stat1_val`, `${prefix}_hero_stat1_label`,
+      `${prefix}_hero_stat2_val`, `${prefix}_hero_stat2_label`, `${prefix}_hero_stat3_val`, `${prefix}_hero_stat3_label`,
+      `${prefix}_why_visible`, `${prefix}_why_heading`, `${prefix}_why_heading_italic`,
+      `${prefix}_why_card1_icon`, `${prefix}_why_card1_title`, `${prefix}_why_card1_desc`,
+      `${prefix}_why_card2_icon`, `${prefix}_why_card2_title`, `${prefix}_why_card2_desc`,
+      `${prefix}_why_card3_icon`, `${prefix}_why_card3_title`, `${prefix}_why_card3_desc`,
+      `${prefix}_why_footer_text`,
+      `${prefix}_filter_types`,
+    ];
+    const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
+    const m: HeelsSettings = {};
+    (data ?? []).forEach(({ key, value }: { key: string; value: string }) => { m[key] = value; });
+    return m;
+  } catch {
+    return {};
+  }
+}
