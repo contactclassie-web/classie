@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Product } from "@/lib/products";
+import { supabase } from "@/lib/supabase";
+
+interface TabConfig { label: string; active: boolean; }
+interface FPSettings {
+  tab1: TabConfig; tab2: TabConfig; tab3: TabConfig;
+  eyebrow: string; heading: string; headingItalic: string;
+}
 
 interface FeaturedPicksProps {
   latestProducts: Product[];
@@ -121,14 +128,44 @@ function ProductCard({ product, isNew }: { product: Product; isNew?: boolean }) 
   );
 }
 
+const DEFAULT_SETTINGS: FPSettings = {
+  tab1: { label: "Latest Styles",  active: true },
+  tab2: { label: "Best Sellers",   active: true },
+  tab3: { label: "On Sale",        active: true },
+  eyebrow: "New Arrivals",
+  heading: "Featured",
+  headingItalic: "Picks",
+};
+
 export default function FeaturedPicks({ latestProducts, bestSellers, saleProducts = [] }: FeaturedPicksProps) {
   const [activeTab, setActiveTab] = useState<"latest" | "bestsellers" | "sale">("latest");
+  const [fps, setFps] = useState<FPSettings>(DEFAULT_SETTINGS);
 
-  const products = (
-    activeTab === "latest" ? latestProducts :
-    activeTab === "sale"   ? saleProducts :
-    bestSellers
-  ).slice(0, 4);
+  useEffect(() => {
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active","fp_eyebrow","fp_heading","fp_heading_italic"])
+      .then(({ data }) => {
+        if (!data || data.length === 0) return;
+        const m: Record<string, string> = {};
+        data.forEach(({ key, value }) => { m[key] = value; });
+        setFps({
+          tab1: { label: m.fp_tab1_label ?? "Latest Styles", active: (m.fp_tab1_active ?? "true") === "true" },
+          tab2: { label: m.fp_tab2_label ?? "Best Sellers",  active: (m.fp_tab2_active ?? "true") === "true" },
+          tab3: { label: m.fp_tab3_label ?? "On Sale",       active: (m.fp_tab3_active ?? "true") === "true" },
+          eyebrow:      m.fp_eyebrow        ?? "New Arrivals",
+          heading:      m.fp_heading        ?? "Featured",
+          headingItalic: m.fp_heading_italic ?? "Picks",
+        });
+      });
+  }, []);
+
+  const tabs = [
+    { key: "latest"      as const, cfg: fps.tab1, products: latestProducts },
+    { key: "bestsellers" as const, cfg: fps.tab2, products: bestSellers    },
+    { key: "sale"        as const, cfg: fps.tab3, products: saleProducts   },
+  ].filter(t => t.cfg.active);
+
+  const products = (tabs.find(t => t.key === activeTab) ?? tabs[0])?.products.slice(0, 4) ?? [];
 
   return (
     <section className="pt-12 pb-16 px-6 md:px-20" style={{ background: "#f5f5f5" }}>
@@ -138,14 +175,14 @@ export default function FeaturedPicks({ latestProducts, bestSellers, saleProduct
         <div className="flex items-center gap-3 mb-3">
           <div className="w-7 h-px bg-[#3B5373]" />
           <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">
-            New Arrivals
+            {fps.eyebrow}
           </span>
         </div>
 
         {/* Heading row */}
         <div className="flex items-end justify-between mb-6">
           <h2 className="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] font-bold leading-[1.1] text-[#1a1a1a]">
-            Featured <em className="italic font-light text-[#3B5373]">Picks</em>
+            {fps.heading} <em className="italic font-light text-[#3B5373]">{fps.headingItalic}</em>
           </h2>
           <Link href="/shop" className="hidden md:flex items-center gap-1.5 text-[11px] tracking-[0.15em] uppercase text-[#3B5373] hover:text-[#2a3d55] transition-colors font-medium border-b border-[#3B5373] pb-0.5">
             View All <span>→</span>
@@ -156,12 +193,12 @@ export default function FeaturedPicks({ latestProducts, bestSellers, saleProduct
         <div className="relative mb-8">
           <div className="absolute bottom-0 left-0 right-0 border-b border-gray-300" />
           <div className="relative flex gap-8">
-            {(["latest", "bestsellers", "sale"] as const).map((tab) => (
-              <button key={tab} onClick={() => setActiveTab(tab)}
+            {tabs.map(({ key, cfg }) => (
+              <button key={key} onClick={() => setActiveTab(key)}
                 className={`relative pb-3 text-[11px] tracking-[0.15em] uppercase font-medium transition-colors duration-200 ${
-                  activeTab === tab ? "text-[#1a1a1a] border-b-2 border-[#3B5373]" : "text-gray-400 hover:text-gray-600"
+                  activeTab === key ? "text-[#1a1a1a] border-b-2 border-[#3B5373]" : "text-gray-400 hover:text-gray-600"
                 }`} style={{ fontFamily: "'Poppins', sans-serif" }}>
-                {tab === "latest" ? "Latest Styles" : tab === "bestsellers" ? "Best Sellers" : "On Sale"}
+                {cfg.label}
               </button>
             ))}
           </div>

@@ -115,6 +115,10 @@ interface SiteSettings {
   hero_pill_sub: string;
   hero_pill_active: string;
   band_text: string;
+  fp_tab1_label: string; fp_tab1_active: string;
+  fp_tab2_label: string; fp_tab2_active: string;
+  fp_tab3_label: string; fp_tab3_active: string;
+  fp_eyebrow: string; fp_heading: string; fp_heading_italic: string;
   cat_links_bold: string;
   cat_links_hover: string;
   cat_links_hover_bg: string;
@@ -365,6 +369,10 @@ export default function AdminPage() {
     hero_pill_sub: "Limited stock",
     hero_pill_active: "true",
     band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
+    fp_tab1_label: "Latest Styles", fp_tab1_active: "true",
+    fp_tab2_label: "Best Sellers",  fp_tab2_active: "true",
+    fp_tab3_label: "On Sale",       fp_tab3_active: "true",
+    fp_eyebrow: "New Arrivals", fp_heading: "Featured", fp_heading_italic: "Picks",
     cat_links_bold: "true",
     cat_links_hover: "custom",
     cat_links_hover_bg: "#3B5373",
@@ -549,6 +557,10 @@ export default function AdminPage() {
           hero_pill_sub: "Limited stock",
           hero_pill_active: "true",
           band_text: "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design",
+          fp_tab1_label: "Latest Styles", fp_tab1_active: "true",
+          fp_tab2_label: "Best Sellers",  fp_tab2_active: "true",
+          fp_tab3_label: "On Sale",       fp_tab3_active: "true",
+          fp_eyebrow: "New Arrivals", fp_heading: "Featured", fp_heading_italic: "Picks",
           cat_links_bold: "true",
           cat_links_hover: "custom",
           cat_links_hover_bg: "#3B5373",
@@ -673,7 +685,7 @@ export default function AdminPage() {
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
     if (tab === "categories") fetchCategories();
-    if (tab === "featured-picks") fetchFeaturedPicks();
+    if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
@@ -2105,7 +2117,55 @@ export default function AdminPage() {
               FEATURED PICKS TAB
           ══════════════════════════════════════ */}
           {tab === "featured-picks" && (
-            <div className="space-y-4">
+            <div className="space-y-5">
+              {/* Tab Settings */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                <h3 className="font-semibold text-gray-700 text-sm">Section Text & Tabs</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div><label className={labelCls}>Eyebrow</label><input type="text" value={siteSettings.fp_eyebrow} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, fp_eyebrow: e.target.value }))} /></div>
+                  <div><label className={labelCls}>Heading</label><input type="text" value={siteSettings.fp_heading} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, fp_heading: e.target.value }))} /></div>
+                  <div><label className={labelCls}>Heading Italic</label><input type="text" value={siteSettings.fp_heading_italic} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, fp_heading_italic: e.target.value }))} /></div>
+                </div>
+                <div className="border-t border-gray-100 pt-4">
+                  <p className={labelCls + " mb-3"}>Tabs</p>
+                  <div className="space-y-3">
+                    {([
+                      { labelKey: "fp_tab1_label" as const, activeKey: "fp_tab1_active" as const, num: "Tab 1" },
+                      { labelKey: "fp_tab2_label" as const, activeKey: "fp_tab2_active" as const, num: "Tab 2" },
+                      { labelKey: "fp_tab3_label" as const, activeKey: "fp_tab3_active" as const, num: "Tab 3" },
+                    ]).map(({ labelKey, activeKey, num }) => (
+                      <div key={num} className="flex items-center gap-3">
+                        <span className="text-xs text-gray-400 w-10">{num}</span>
+                        <input type="text" value={siteSettings[labelKey]} className={inputCls + " flex-1"}
+                          onChange={e => setSiteSettings(s => ({ ...s, [labelKey]: e.target.value }))} />
+                        <button onClick={() => setSiteSettings(s => ({ ...s, [activeKey]: s[activeKey] === "true" ? "false" : "true" }))}
+                          className={`w-10 h-5 rounded-full relative flex-shrink-0 transition-all ${siteSettings[activeKey] === "true" ? "bg-[#3B5373]" : "bg-gray-300"}`}>
+                          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${siteSettings[activeKey] === "true" ? "left-5" : "left-0.5"}`} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={async () => {
+                  setSettingsSaving(true);
+                  await upsertSettings([
+                    { key: "fp_eyebrow",         value: siteSettings.fp_eyebrow },
+                    { key: "fp_heading",          value: siteSettings.fp_heading },
+                    { key: "fp_heading_italic",   value: siteSettings.fp_heading_italic },
+                    { key: "fp_tab1_label",       value: siteSettings.fp_tab1_label },
+                    { key: "fp_tab1_active",      value: siteSettings.fp_tab1_active },
+                    { key: "fp_tab2_label",       value: siteSettings.fp_tab2_label },
+                    { key: "fp_tab2_active",      value: siteSettings.fp_tab2_active },
+                    { key: "fp_tab3_label",       value: siteSettings.fp_tab3_label },
+                    { key: "fp_tab3_active",      value: siteSettings.fp_tab3_active },
+                  ]);
+                  setSettingsSaving(false);
+                }} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-60 transition-colors">
+                  <Save className="w-4 h-4" />{settingsSaving ? "Saving…" : "Save Settings"}
+                </button>
+              </div>
+
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-500">Manage products shown in Latest Styles and Best Sellers sections</p>
                 <button onClick={fetchFeaturedPicks} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
