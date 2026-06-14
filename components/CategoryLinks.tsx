@@ -15,7 +15,7 @@ interface Style {
 
 const DEFAULTS: Style = { bold: true, hoverBg: "#3B5373", hoverText: "#ffffff", numColor: "#9ca3af", textSize: "1.1" };
 
-export default function CategoryLinks({ excludeSlug }: { excludeSlug?: string } = {}) {
+export default function CategoryLinks({ excludeSlug, activeSlug }: { excludeSlug?: string; activeSlug?: string } = {}) {
   const [cats, setCats]   = useState<Cat[]>([]);
   const [style, setStyle] = useState<Style>(DEFAULTS);
 
@@ -49,30 +49,43 @@ export default function CategoryLinks({ excludeSlug }: { excludeSlug?: string } 
   return (
     <div className="mt-5 border border-[#e5e5e5] rounded-sm overflow-hidden"
       style={{ gridTemplateColumns: `repeat(${Math.min(cats.length, 4)}, 1fr)`, display: "grid" }}>
-      {cats.slice(0, 4).map((cat, idx) => (
-        <Link key={cat.slug} href={`/shop/${cat.slug}`}
-          className="group flex flex-col justify-center px-7 py-5 bg-white border-r border-[#e5e5e5] last:border-r-0 transition-all duration-300"
-          onMouseEnter={e => {
-            const el = e.currentTarget as HTMLAnchorElement;
-            el.style.backgroundColor = style.hoverBg;
-            el.querySelectorAll<HTMLElement>("[data-cat-name]").forEach(c => { c.style.color = style.hoverText; });
-            el.querySelectorAll<HTMLElement>("[data-cat-num]").forEach(c => { c.style.color = style.hoverText + "80"; });
-          }}
-          onMouseLeave={e => {
-            const el = e.currentTarget as HTMLAnchorElement;
-            el.style.backgroundColor = "";
-            el.querySelectorAll<HTMLElement>("[data-cat-name],[data-cat-num]").forEach(c => { c.style.color = ""; });
-          }}>
-          <p data-cat-num className="font-sans text-[10px] tracking-[0.15em] mb-1.5 transition-colors"
-            style={{ color: style.numColor }}>
-            0{idx + 1}
-          </p>
-          <p data-cat-name className="font-serif text-[#1a1a1a] transition-colors"
-            style={{ fontSize: `${style.textSize}rem`, fontWeight: style.bold ? 600 : 400, letterSpacing: "0.01em" }}>
-            {cat.name}
-          </p>
-        </Link>
-      ))}
+      {cats.slice(0, 4).map((cat, idx) => {
+        const isActive = activeSlug === cat.slug;
+        return (
+          <Link key={cat.slug} href={`/shop/${cat.slug}`}
+            className="group flex flex-col justify-center px-7 py-5 border-r border-[#e5e5e5] last:border-r-0 transition-all duration-300"
+            style={{ backgroundColor: isActive ? style.hoverBg : "white" }}
+            onMouseEnter={e => {
+              if (isActive) return;
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.backgroundColor = style.hoverBg;
+              el.querySelectorAll<HTMLElement>("[data-cat-name]").forEach(c => { c.style.color = style.hoverText; });
+              el.querySelectorAll<HTMLElement>("[data-cat-num]").forEach(c => { c.style.color = style.hoverText + "80"; });
+            }}
+            onMouseLeave={e => {
+              if (isActive) return;
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.backgroundColor = "";
+              el.querySelectorAll<HTMLElement>("[data-cat-name],[data-cat-num]").forEach(c => { c.style.color = ""; });
+            }}>
+            <p data-cat-num className="font-sans text-[10px] tracking-[0.15em] mb-1.5 transition-colors"
+              style={{ color: isActive ? style.hoverText + "90" : style.numColor }}>
+              0{idx + 1}
+            </p>
+            <div className="flex items-center gap-2">
+              <p data-cat-name className="font-serif transition-colors"
+                style={{ fontSize: `${style.textSize}rem`, fontWeight: style.bold ? 600 : 400, letterSpacing: "0.01em", color: isActive ? style.hoverText : "#1a1a1a" }}>
+                {cat.name}
+              </p>
+              {isActive && (
+                <span style={{ fontSize: "10px", color: style.hoverText, opacity: 0.7, letterSpacing: "0.15em", fontFamily: "'Poppins', sans-serif" }}>
+                  ✓
+                </span>
+              )}
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

@@ -15,7 +15,8 @@ interface Occasion {
 interface Props {
   activeOccasion: string | null;
   onOccasionClick: (slug: string | null) => void;
-  excludeCategorySlug?: string; // hide this category from CategoryLinks strip
+  excludeCategorySlug?: string;
+  activeCategorySlug?: string; // show this as selected in CategoryLinks strip
 }
 
 function OccasionFilterCard({
@@ -104,7 +105,7 @@ function OccasionFilterCard({
   );
 }
 
-export default function OccasionFilterSection({ activeOccasion, onOccasionClick, excludeCategorySlug }: Props) {
+export default function OccasionFilterSection({ activeOccasion, onOccasionClick, excludeCategorySlug, activeCategorySlug }: Props) {
   const [occasions, setOccasions] = useState<Occasion[]>([]);
 
   useEffect(() => {
@@ -162,7 +163,7 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick,
         </div>
 
         {/* Category links — same as homepage, right below occasion cards */}
-        <CategoryLinks excludeSlug={excludeCategorySlug} />
+        <CategoryLinks excludeSlug={excludeCategorySlug} activeSlug={activeCategorySlug} />
 
         {/* Active filter pill */}
         {activeOccasion && (

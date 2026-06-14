@@ -276,7 +276,7 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
       <OccasionFilterSection
         activeOccasion={activeOccasion}
         onOccasionClick={setActiveOccasion}
-        excludeCategorySlug=""
+        activeCategorySlug="heels"
       />
 
       {/* ── Filter + Grid ─────────────────────────────────────────────── */}
