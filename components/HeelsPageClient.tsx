@@ -7,6 +7,72 @@ import { HeelProduct } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
 import OccasionFilterSection from "./OccasionFilterSection";
 
+// ── Why Choose Section (reads settings from DB) ───────────────────────
+const WHY_DEFAULTS = {
+  heading: "Why Choose",
+  headingItalic: "Classie?",
+  card1Icon: "✨", card1Title: "Designed to Transform", card1Desc: "Interchangeable clip-ons let one heel match every look.",
+  card2Icon: "👠", card2Title: "Made for Everyday Wear", card2Desc: "Comfort-first designs made for real movement, all day long.",
+  card3Icon: "♻️", card3Title: "Style That Lasts",       card3Desc: "Premium materials. Reusable clip-ons worn again and again.",
+  footerText: "Discover our curated collections designed to move seamlessly from everyday wear to special occasions.",
+};
+
+function WhyChooseSection() {
+  const [cfg, setCfg] = useState(WHY_DEFAULTS);
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["heels_why_heading","heels_why_heading_italic","heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc","heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc","heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc","heels_why_footer_text"])
+      .then(({ data }) => {
+        if (!data?.length) return;
+        const m: Record<string,string> = {};
+        data.forEach(({key,value}) => { m[key]=value; });
+        setCfg({
+          heading:       m.heels_why_heading       ?? WHY_DEFAULTS.heading,
+          headingItalic: m.heels_why_heading_italic ?? WHY_DEFAULTS.headingItalic,
+          card1Icon:  m.heels_why_card1_icon  ?? WHY_DEFAULTS.card1Icon,
+          card1Title: m.heels_why_card1_title ?? WHY_DEFAULTS.card1Title,
+          card1Desc:  m.heels_why_card1_desc  ?? WHY_DEFAULTS.card1Desc,
+          card2Icon:  m.heels_why_card2_icon  ?? WHY_DEFAULTS.card2Icon,
+          card2Title: m.heels_why_card2_title ?? WHY_DEFAULTS.card2Title,
+          card2Desc:  m.heels_why_card2_desc  ?? WHY_DEFAULTS.card2Desc,
+          card3Icon:  m.heels_why_card3_icon  ?? WHY_DEFAULTS.card3Icon,
+          card3Title: m.heels_why_card3_title ?? WHY_DEFAULTS.card3Title,
+          card3Desc:  m.heels_why_card3_desc  ?? WHY_DEFAULTS.card3Desc,
+          footerText: m.heels_why_footer_text ?? WHY_DEFAULTS.footerText,
+        });
+      });
+  }, []);
+
+  const cards = [
+    { icon: cfg.card1Icon, title: cfg.card1Title, desc: cfg.card1Desc },
+    { icon: cfg.card2Icon, title: cfg.card2Title, desc: cfg.card2Desc },
+    { icon: cfg.card3Icon, title: cfg.card3Title, desc: cfg.card3Desc },
+  ];
+
+  return (
+    <section className="py-16 px-6 text-center" style={{ background: "#ffffff" }}>
+      <h2 className="font-serif text-[2.4rem] font-light text-[#1a1a1a] mb-10">
+        {cfg.heading} <em className="italic text-[#3B5373]">{cfg.headingItalic}</em>
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[860px] mx-auto mb-10">
+        {cards.map((item, i) => (
+          <div key={i} className="bg-[#f5f5f5] px-8 py-10 text-center">
+            <div className="text-4xl mb-4">{item.icon}</div>
+            <p className="text-sm font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.title}</p>
+            <p className="text-xs text-gray-500 leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.desc}</p>
+          </div>
+        ))}
+      </div>
+      {cfg.footerText && (
+        <p className="text-sm text-gray-500 leading-loose max-w-[680px] mx-auto" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          {cfg.footerText}
+        </p>
+      )}
+    </section>
+  );
+}
+
 // ── Hero component (reads settings from DB) ───────────────────────────
 function HeelsHero({ productCount, heelTypeCount }: { productCount: number; heelTypeCount: number }) {
   const [bgType, setBgType] = useState<"none"|"image"|"video"|"slider">("none");
@@ -422,38 +488,8 @@ export default function HeelsPageClient({ initialProducts }: { initialProducts: 
         </div>
       </section>
 
-      {/* ── Why Choose Classie ───────────────────────────────────────── */}
-      <section className="py-16 px-6 text-center" style={{ background: "#ffffff" }}>
-        <h2 className="font-serif text-[2.4rem] font-light text-[#1a1a1a] mb-10">
-          Why Choose <em className="italic text-[#3B5373]">Classie?</em>
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[860px] mx-auto mb-10">
-          {[
-            { icon: "✨", title: "Designed to Transform", desc: "Interchangeable clip-ons let one heel match every look." },
-            { icon: "👠", title: "Made for Everyday Wear", desc: "Comfort-first designs made for real movement, all day long." },
-            { icon: "♻️", title: "Style That Lasts", desc: "Premium materials. Reusable clip-ons worn again and again." },
-          ].map((item) => (
-            <div key={item.title} className="bg-[#f5f5f5] px-8 py-10 text-center">
-              <div className="text-4xl mb-4">{item.icon}</div>
-              <p className="text-sm font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                {item.title}
-              </p>
-              <p className="text-xs text-gray-500 leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                {item.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-        <p className="text-sm text-gray-500 leading-loose max-w-[680px] mx-auto" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          Discover our curated collections designed to move seamlessly from everyday wear to special occasions.
-          Explore{" "}
-          <Link href="/shop/heels" className="text-[#3B5373] font-medium underline">Heels</Link>,
-          shop{" "}
-          <Link href="/shop/clips" className="text-[#3B5373] font-medium underline">Rhinestone Clip-ons</Link>,
-          or browse our{" "}
-          <Link href="/shop/bow" className="text-[#3B5373] font-medium underline">Bloom &amp; Bow Collection</Link>.
-        </p>
-      </section>
+      {/* ── Why Choose Classie (admin-controlled) ───────────────────── */}
+      <WhyChooseSection />
     </>
   );
 }

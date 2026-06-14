@@ -376,6 +376,20 @@ export default function AdminPage() {
   const [heelsHeroStat3Val, setHeelsHeroStat3Val] = useState("Free");
   const [heelsHeroStat3Label, setHeelsHeroStat3Label] = useState("Shipping ₹999+");
   const [heelsHeroSaving, setHeelsHeroSaving] = useState(false);
+  // Why Choose section
+  const [whyHeading, setWhyHeading] = useState("Why Choose");
+  const [whyHeadingItalic, setWhyHeadingItalic] = useState("Classie?");
+  const [whyCard1Icon, setWhyCard1Icon] = useState("✨");
+  const [whyCard1Title, setWhyCard1Title] = useState("Designed to Transform");
+  const [whyCard1Desc, setWhyCard1Desc] = useState("Interchangeable clip-ons let one heel match every look.");
+  const [whyCard2Icon, setWhyCard2Icon] = useState("👠");
+  const [whyCard2Title, setWhyCard2Title] = useState("Made for Everyday Wear");
+  const [whyCard2Desc, setWhyCard2Desc] = useState("Comfort-first designs made for real movement, all day long.");
+  const [whyCard3Icon, setWhyCard3Icon] = useState("♻️");
+  const [whyCard3Title, setWhyCard3Title] = useState("Style That Lasts");
+  const [whyCard3Desc, setWhyCard3Desc] = useState("Premium materials. Reusable clip-ons worn again and again.");
+  const [whyFooterText, setWhyFooterText] = useState("Discover our curated collections designed to move seamlessly from everyday wear to special occasions.");
+  const [whySaving, setWhySaving] = useState(false);
 
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -624,7 +638,7 @@ export default function AdminPage() {
     try {
       const [{ data }, { data: settings }] = await Promise.all([
         supabase.from("products").select("*").eq("category", "heels").order("created_at", { ascending: false }),
-        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle","heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label","heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label"]),
+        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle","heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label","heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label","heels_why_heading","heels_why_heading_italic","heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc","heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc","heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc","heels_why_footer_text"]),
       ]);
       if (data) setHeelsPageProducts(data as DbProduct[]);
       const m: Record<string,string> = {};
@@ -649,6 +663,18 @@ export default function AdminPage() {
       if (m.heels_hero_stat2_label) setHeelsHeroStat2Label(m.heels_hero_stat2_label);
       if (m.heels_hero_stat3_val) setHeelsHeroStat3Val(m.heels_hero_stat3_val);
       if (m.heels_hero_stat3_label) setHeelsHeroStat3Label(m.heels_hero_stat3_label);
+      if (m.heels_why_heading) setWhyHeading(m.heels_why_heading);
+      if (m.heels_why_heading_italic) setWhyHeadingItalic(m.heels_why_heading_italic);
+      if (m.heels_why_card1_icon) setWhyCard1Icon(m.heels_why_card1_icon);
+      if (m.heels_why_card1_title) setWhyCard1Title(m.heels_why_card1_title);
+      if (m.heels_why_card1_desc) setWhyCard1Desc(m.heels_why_card1_desc);
+      if (m.heels_why_card2_icon) setWhyCard2Icon(m.heels_why_card2_icon);
+      if (m.heels_why_card2_title) setWhyCard2Title(m.heels_why_card2_title);
+      if (m.heels_why_card2_desc) setWhyCard2Desc(m.heels_why_card2_desc);
+      if (m.heels_why_card3_icon) setWhyCard3Icon(m.heels_why_card3_icon);
+      if (m.heels_why_card3_title) setWhyCard3Title(m.heels_why_card3_title);
+      if (m.heels_why_card3_desc) setWhyCard3Desc(m.heels_why_card3_desc);
+      if (m.heels_why_footer_text) setWhyFooterText(m.heels_why_footer_text);
     } catch { /* ignore */ }
     finally { setHeelsPageLoading(false); }
   }, []);
@@ -678,6 +704,31 @@ export default function AdminPage() {
       }
     } catch { /* ignore */ }
     finally { setHeelsHeroSaving(false); }
+  };
+
+  const saveWhySection = async () => {
+    setWhySaving(true);
+    try {
+      const pairs = [
+        { key: "heels_why_heading",        value: whyHeading },
+        { key: "heels_why_heading_italic",  value: whyHeadingItalic },
+        { key: "heels_why_card1_icon",      value: whyCard1Icon },
+        { key: "heels_why_card1_title",     value: whyCard1Title },
+        { key: "heels_why_card1_desc",      value: whyCard1Desc },
+        { key: "heels_why_card2_icon",      value: whyCard2Icon },
+        { key: "heels_why_card2_title",     value: whyCard2Title },
+        { key: "heels_why_card2_desc",      value: whyCard2Desc },
+        { key: "heels_why_card3_icon",      value: whyCard3Icon },
+        { key: "heels_why_card3_title",     value: whyCard3Title },
+        { key: "heels_why_card3_desc",      value: whyCard3Desc },
+        { key: "heels_why_footer_text",     value: whyFooterText },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } catch { /* ignore */ }
+    finally { setWhySaving(false); }
   };
 
   const saveHeelsFilterTypes = async (types: string[]) => {
@@ -2261,6 +2312,64 @@ export default function AdminPage() {
                         className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
                         <Save className="w-4 h-4"/>
                         {heelsHeroSaving ? "Saving…" : "Save Hero Settings"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── Why Choose Section ──────────────────────────── */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">"Why Choose" Section</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Page ke neeche 3 cards wala section — heading, emoji, title, description sab editable.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                      {/* Heading */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Heading (normal text)</p>
+                          <input type="text" value={whyHeading} onChange={e=>setWhyHeading(e.target.value)}
+                            className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Heading (italic/colored part)</p>
+                          <input type="text" value={whyHeadingItalic} onChange={e=>setWhyHeadingItalic(e.target.value)}
+                            className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+
+                      {/* 3 Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[
+                          { icon: whyCard1Icon, setIcon: setWhyCard1Icon, title: whyCard1Title, setTitle: setWhyCard1Title, desc: whyCard1Desc, setDesc: setWhyCard1Desc, n: 1 },
+                          { icon: whyCard2Icon, setIcon: setWhyCard2Icon, title: whyCard2Title, setTitle: setWhyCard2Title, desc: whyCard2Desc, setDesc: setWhyCard2Desc, n: 2 },
+                          { icon: whyCard3Icon, setIcon: setWhyCard3Icon, title: whyCard3Title, setTitle: setWhyCard3Title, desc: whyCard3Desc, setDesc: setWhyCard3Desc, n: 3 },
+                        ].map(c => (
+                          <div key={c.n} className="border border-gray-100 rounded-xl p-4 space-y-2.5">
+                            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Card {c.n}</p>
+                            <div className="flex gap-2">
+                              <input type="text" value={c.icon} onChange={e=>c.setIcon(e.target.value)}
+                                placeholder="emoji" className="w-16 border border-gray-200 text-lg px-2 py-1.5 text-center focus:outline-none focus:border-[#3B5373] rounded"/>
+                              <input type="text" value={c.title} onChange={e=>c.setTitle(e.target.value)}
+                                placeholder="Card Title" className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                            </div>
+                            <textarea rows={2} value={c.desc} onChange={e=>c.setDesc(e.target.value)}
+                              placeholder="Card description..."
+                              className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded resize-none"/>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Footer text */}
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1">Footer text (below cards)</p>
+                        <textarea rows={2} value={whyFooterText} onChange={e=>setWhyFooterText(e.target.value)}
+                          className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg resize-none"/>
+                      </div>
+
+                      <button onClick={saveWhySection} disabled={whySaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>
+                        {whySaving ? "Saving…" : "Save Why Choose Section"}
                       </button>
                     </div>
                   </div>
