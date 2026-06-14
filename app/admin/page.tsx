@@ -658,7 +658,7 @@ export default function AdminPage() {
   const fetchSubscribers = useCallback(async () => {
     setSubsLoading(true);
     try {
-      const { data, error } = await supabase.from("newsletter_subscribers").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("newsletter_subscribers").select("*").order("id", { ascending: false });
       if (!error && data) setSubscribers(data as NewsletterSubscriber[]);
     } catch { /* ignore */ }
     finally { setSubsLoading(false); }
