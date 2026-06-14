@@ -61,16 +61,15 @@ export default function StyleInspoSection() {
           <p className="text-[#9ca3af] text-xs tracking-wide font-light">{cfg.subtext}</p>
         </div>
 
-        {/* Grid */}
-        <div className="grid gap-1"
-          style={{ gridTemplateColumns: `repeat(${Math.min(images.length, 6)}, 1fr)` }}>
+        {/* Grid — 3 cols on mobile, up to 6 on desktop */}
+        <div className={`grid gap-1 grid-cols-3 ${images.length >= 4 ? "md:grid-cols-4" : ""} ${images.length >= 5 ? "md:grid-cols-5" : ""} ${images.length >= 6 ? "md:grid-cols-6" : ""}`}>
           {images.map((item, i) => (
             <a key={i} href={item.link_url || "#"} target="_blank" rel="noopener noreferrer"
               className="group relative overflow-hidden bg-[#c8d6e5]" style={{ aspectRatio: "1 / 1" }}>
               {item.image_url && (
                 <Image src={item.image_url} alt="Style Inspo" fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 768px) 50vw, 16vw" />
+                  sizes="(max-width: 768px) 33vw, 16vw" />
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
                 <Instagram className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
