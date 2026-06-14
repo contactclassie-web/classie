@@ -1343,6 +1343,7 @@ export default function AdminPage() {
             const firstTab: TabId = id === "dashboard" ? "dashboard" :
               id === "orders" ? "orders" :
               id === "settings" ? "settings" :
+              id === "footer" ? "footer" :
               id === "messages" ? "messages" :
               (SECTION_SUBTABS[id][0]?.id ?? "dashboard");
             return (
