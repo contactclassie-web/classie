@@ -247,10 +247,7 @@ export default async function HomePage() {
       {/* ══ 6. PHILOSOPHY ═════════════════════════════════════════════════ */}
       <PhilosophySection />
 
-      {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
-      <NewsletterSection />
-
-      {/* ══ STYLE INSPO / INSTAGRAM ═══════════════════════════════════════ */}
+      {/* ══ 7. STYLE INSPO / INSTAGRAM ════════════════════════════════════ */}
       <section className="py-20 bg-white border-t border-gray-100 px-6 md:px-20">
         <div>
           <div className="text-center mb-12">
@@ -305,6 +302,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
+      <NewsletterSection />
     </>
   );
 }
