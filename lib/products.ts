@@ -207,7 +207,7 @@ export async function getFeaturedProductsFromDB(): Promise<Product[]> {
   }
 }
 
-export async function getTabProductsFromDB(tab: 'latest' | 'bestseller'): Promise<Product[]> {
+export async function getTabProductsFromDB(tab: 'latest' | 'bestseller' | 'sale'): Promise<Product[]> {
   try {
     const { data, error } = await supabase
       .from('products')

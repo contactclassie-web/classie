@@ -20,11 +20,12 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   // ── Fetch live data from Supabase ──────────────────────────────────────
-  const [allProducts, featuredProducts, latestTabProducts, bestsellerTabProducts] = await Promise.all([
+  const [allProducts, featuredProducts, latestTabProducts, bestsellerTabProducts, saleTabProducts] = await Promise.all([
     getProductsFromDB({ active: true }),
     getFeaturedProductsFromDB(),
     getTabProductsFromDB("latest"),
     getTabProductsFromDB("bestseller"),
+    getTabProductsFromDB("sale"),
   ]);
 
   const latestProducts =
@@ -35,9 +36,9 @@ export default async function HomePage() {
       : featuredProducts.length > 0
       ? featuredProducts.slice(0, 4)
       : allProducts.slice(0, 4);
-  const saleProducts = allProducts.filter(
-    (p) => p.comparePrice && p.comparePrice > p.price
-  ).slice(0, 4);
+  const saleProducts = saleTabProducts.length > 0
+    ? saleTabProducts
+    : allProducts.filter((p) => p.comparePrice && p.comparePrice > p.price).slice(0, 4);
 
   // ── Supabase client ────────────────────────────────────────────────────
   const { createClient } = await import("@supabase/supabase-js");

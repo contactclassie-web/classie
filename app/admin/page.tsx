@@ -440,10 +440,11 @@ export default function AdminPage() {
   // Featured Picks
   const [latestProducts, setLatestProducts] = useState<DbProduct[]>([]);
   const [bestSellerProducts, setBestSellerProducts] = useState<DbProduct[]>([]);
+  const [saleProducts, setSaleProducts] = useState<DbProduct[]>([]);
   const [allActiveProducts, setAllActiveProducts] = useState<DbProduct[]>([]);
   const [featuredPicksModal, setFeaturedPicksModal] = useState<{
     open: boolean;
-    tab: 'latest' | 'bestseller';
+    tab: 'latest' | 'bestseller' | 'sale';
     selectedIds: string[];
     search: string;
     saving: boolean;
@@ -596,13 +597,15 @@ export default function AdminPage() {
   }, []);
 
   const fetchFeaturedPicks = useCallback(async () => {
-    const [{ data: latest }, { data: best }, { data: all }] = await Promise.all([
+    const [{ data: latest }, { data: best }, { data: sale }, { data: all }] = await Promise.all([
       supabase.from('products').select('*').eq('featured_tab', 'latest').eq('active', true),
       supabase.from('products').select('*').eq('featured_tab', 'bestseller').eq('active', true),
+      supabase.from('products').select('*').eq('featured_tab', 'sale').eq('active', true),
       supabase.from('products').select('*').eq('active', true).order('title'),
     ]);
     if (latest) setLatestProducts(latest as DbProduct[]);
     if (best) setBestSellerProducts(best as DbProduct[]);
+    if (sale) setSaleProducts(sale as DbProduct[]);
     if (all) setAllActiveProducts(all as DbProduct[]);
   }, []);
 
@@ -2286,6 +2289,50 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* On Sale Panel */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-lg overflow-hidden col-span-2 md:col-span-1">
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-red-500" />
+                      <h2 className="font-semibold text-gray-700 text-sm">On Sale</h2>
+                      <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">{saleProducts.length}</span>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2 min-h-[200px]">
+                    {saleProducts.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-8">No products assigned yet.</p>
+                    ) : (
+                      saleProducts.map((p) => (
+                        <div key={p.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 group">
+                          {p.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.image} alt={p.title} className="w-10 h-10 object-cover rounded flex-shrink-0" />
+                          ) : (
+                            <div className="w-10 h-10 rounded bg-gray-100 flex-shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-gray-800 truncate">{p.title}</p>
+                            <p className="text-[11px] text-gray-400">₹{p.price.toLocaleString('en-IN')}</p>
+                          </div>
+                          <button onClick={async () => {
+                            await supabase.from('products').update({ featured_tab: null }).eq('id', p.id);
+                            setSaleProducts(prev => prev.filter(x => x.id !== p.id));
+                          }} className="p-1 rounded hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100" title="Remove">
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="px-4 pb-4">
+                    <button onClick={() => setFeaturedPicksModal({ open: true, tab: 'sale', selectedIds: saleProducts.map(p => p.id!), search: '', saving: false })}
+                      className="w-full py-2 border border-red-300 text-red-500 text-xs font-medium rounded-lg hover:bg-red-50 transition-colors">
+                      Manage On Sale
+                    </button>
+                  </div>
+                </div>
+
               </div>
             </div>
           )}
@@ -3600,7 +3647,7 @@ export default function AdminPage() {
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <div>
                 <h2 className="font-semibold text-gray-800">
-                  {featuredPicksModal.tab === 'latest' ? 'Manage Latest Styles' : 'Manage Best Sellers'}
+                  {featuredPicksModal.tab === 'latest' ? 'Manage Latest Styles' : featuredPicksModal.tab === 'bestseller' ? 'Manage Best Sellers' : 'Manage On Sale'}
                 </h2>
                 <p className="text-xs text-gray-400 mt-0.5">{featuredPicksModal.selectedIds.length} selected</p>
               </div>
@@ -3647,7 +3694,7 @@ export default function AdminPage() {
                       </div>
                       {p.featured_tab && p.featured_tab !== featuredPicksModal.tab && (
                         <span className="text-[10px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full flex-shrink-0">
-                          {p.featured_tab === 'latest' ? 'Latest' : 'Best Seller'}
+                          {p.featured_tab === 'latest' ? 'Latest' : p.featured_tab === 'bestseller' ? 'Best Seller' : 'On Sale'}
                         </span>
                       )}
                     </label>
@@ -3662,7 +3709,7 @@ export default function AdminPage() {
                   setFeaturedPicksModal(m => ({ ...m, saving: true }));
                   const { tab: picksTab, selectedIds } = featuredPicksModal;
                   // Products that were in this tab before
-                  const wasInTab = (picksTab === 'latest' ? latestProducts : bestSellerProducts).map(p => p.id!);
+                  const wasInTab = (picksTab === 'latest' ? latestProducts : picksTab === 'bestseller' ? bestSellerProducts : saleProducts).map(p => p.id!);
                   // Assign selected ones
                   for (const id of selectedIds) {
                     await supabase.from('products').update({ featured_tab: picksTab }).eq('id', id);
