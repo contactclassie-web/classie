@@ -18,15 +18,17 @@ const WHY_DEFAULTS = {
 };
 
 function WhyChooseSection() {
+  const [visible, setVisible] = useState(true);
   const [cfg, setCfg] = useState(WHY_DEFAULTS);
 
   useEffect(() => {
     supabase.from("site_settings").select("key,value")
-      .in("key", ["heels_why_heading","heels_why_heading_italic","heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc","heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc","heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc","heels_why_footer_text"])
+      .in("key", ["heels_why_visible","heels_why_heading","heels_why_heading_italic","heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc","heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc","heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc","heels_why_footer_text"])
       .then(({ data }) => {
         if (!data?.length) return;
         const m: Record<string,string> = {};
         data.forEach(({key,value}) => { m[key]=value; });
+        if (m.heels_why_visible !== undefined) setVisible(m.heels_why_visible !== "false");
         setCfg({
           heading:       m.heels_why_heading       ?? WHY_DEFAULTS.heading,
           headingItalic: m.heels_why_heading_italic ?? WHY_DEFAULTS.headingItalic,
@@ -49,6 +51,8 @@ function WhyChooseSection() {
     { icon: cfg.card2Icon, title: cfg.card2Title, desc: cfg.card2Desc },
     { icon: cfg.card3Icon, title: cfg.card3Title, desc: cfg.card3Desc },
   ];
+
+  if (!visible) return null;
 
   return (
     <section className="py-16 px-6 text-center" style={{ background: "#ffffff" }}>

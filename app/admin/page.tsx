@@ -389,6 +389,7 @@ export default function AdminPage() {
   const [whyCard3Title, setWhyCard3Title] = useState("Style That Lasts");
   const [whyCard3Desc, setWhyCard3Desc] = useState("Premium materials. Reusable clip-ons worn again and again.");
   const [whyFooterText, setWhyFooterText] = useState("Discover our curated collections designed to move seamlessly from everyday wear to special occasions.");
+  const [whyVisible, setWhyVisible] = useState(true);
   const [whySaving, setWhySaving] = useState(false);
 
 
@@ -638,7 +639,7 @@ export default function AdminPage() {
     try {
       const [{ data }, { data: settings }] = await Promise.all([
         supabase.from("products").select("*").eq("category", "heels").order("created_at", { ascending: false }),
-        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle","heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label","heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label","heels_why_heading","heels_why_heading_italic","heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc","heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc","heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc","heels_why_footer_text"]),
+        supabase.from("site_settings").select("key,value").in("key", ["heels_filter_heel_types","heels_hero_bg_type","heels_hero_bg_url","heels_hero_slides","heels_hero_text_pos","heels_hero_eyebrow","heels_hero_title","heels_hero_subtitle","heels_hero_show_stats","heels_hero_stat1_val","heels_hero_stat1_label","heels_hero_stat2_val","heels_hero_stat2_label","heels_hero_stat3_val","heels_hero_stat3_label","heels_why_heading","heels_why_heading_italic","heels_why_card1_icon","heels_why_card1_title","heels_why_card1_desc","heels_why_card2_icon","heels_why_card2_title","heels_why_card2_desc","heels_why_card3_icon","heels_why_card3_title","heels_why_card3_desc","heels_why_footer_text","heels_why_visible"]),
       ]);
       if (data) setHeelsPageProducts(data as DbProduct[]);
       const m: Record<string,string> = {};
@@ -675,6 +676,7 @@ export default function AdminPage() {
       if (m.heels_why_card3_title) setWhyCard3Title(m.heels_why_card3_title);
       if (m.heels_why_card3_desc) setWhyCard3Desc(m.heels_why_card3_desc);
       if (m.heels_why_footer_text) setWhyFooterText(m.heels_why_footer_text);
+      if (m.heels_why_visible !== undefined) setWhyVisible(m.heels_why_visible !== "false");
     } catch { /* ignore */ }
     finally { setHeelsPageLoading(false); }
   }, []);
@@ -722,6 +724,7 @@ export default function AdminPage() {
         { key: "heels_why_card3_title",     value: whyCard3Title },
         { key: "heels_why_card3_desc",      value: whyCard3Desc },
         { key: "heels_why_footer_text",     value: whyFooterText },
+        { key: "heels_why_visible",         value: whyVisible ? "true" : "false" },
       ];
       for (const p of pairs) {
         await supabase.from("site_settings").delete().eq("key", p.key);
@@ -2318,11 +2321,20 @@ export default function AdminPage() {
 
                   {/* ── Why Choose Section ──────────────────────────── */}
                   <div>
-                    <div className="mb-4">
-                      <h2 className="text-base font-semibold text-gray-800">"Why Choose" Section</h2>
-                      <p className="text-xs text-gray-400 mt-0.5">Page ke neeche 3 cards wala section — heading, emoji, title, description sab editable.</p>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">"Why Choose" Section</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">Page ke neeche 3 cards wala section — toggle ON/OFF ya edit karo</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-gray-400">{whyVisible ? "Visible" : "Hidden"}</span>
+                        <button onClick={()=>setWhyVisible(v=>!v)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${whyVisible?"bg-[#3B5373]":"bg-gray-200"}`}>
+                          <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${whyVisible?"translate-x-6":"translate-x-1"}`}/>
+                        </button>
+                      </div>
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5 ${!whyVisible?"opacity-50 pointer-events-none":""}`}>
                       {/* Heading */}
                       <div className="grid grid-cols-2 gap-3">
                         <div>
