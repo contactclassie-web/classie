@@ -282,8 +282,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band";
-type MainSection = "dashboard" | "homepage" | "catalog" | "orders" | "settings" | "footer" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -297,6 +297,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "products":       "catalog",
   "collections":    "catalog",
   "categories":     "catalog",
+  "heels-page":     "heels",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -320,6 +321,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "collections", label: "Collections" },
     { id: "categories",  label: "Categories" },
   ],
+  heels:    [{ id: "heels-page", label: "Heels Page" }],
   orders:   [],
   settings: [],
   footer:   [],
@@ -351,6 +353,13 @@ export default function AdminPage() {
     open: false, mode: "add", data: EMPTY_PRODUCT,
   });
   const [productSaving, setProductSaving] = useState(false);
+
+  // ── Heels Page state ──────────────────────────────────────────────────
+  const [heelsPageProducts, setHeelsPageProducts] = useState<DbProduct[]>([]);
+  const [heelsPageLoading, setHeelsPageLoading] = useState(false);
+  const [heelsFilterTypes, setHeelsFilterTypes] = useState<string[]>([]);
+  const [newFilterType, setNewFilterType] = useState("");
+  const [heelsFilterSaving, setHeelsFilterSaving] = useState(false);
 
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -594,6 +603,31 @@ export default function AdminPage() {
     finally { setProductsLoading(false); }
   }, []);
 
+  const fetchHeelsPage = useCallback(async () => {
+    setHeelsPageLoading(true);
+    try {
+      const { data } = await supabase.from("products").select("*").eq("category", "heels").order("created_at", { ascending: false });
+      if (data) setHeelsPageProducts(data as DbProduct[]);
+      const { data: s } = await supabase.from("site_settings").select("value").eq("key", "heels_filter_heel_types").maybeSingle();
+      if (s?.value) { try { setHeelsFilterTypes(JSON.parse(s.value)); } catch { setHeelsFilterTypes([]); } }
+      else if (data) {
+        const types = new Set<string>();
+        (data as DbProduct[]).forEach((p) => { if (p.heel_type) types.add(p.heel_type); });
+        setHeelsFilterTypes(Array.from(types).sort());
+      }
+    } catch { /* ignore */ }
+    finally { setHeelsPageLoading(false); }
+  }, []);
+
+  const saveHeelsFilterTypes = async (types: string[]) => {
+    setHeelsFilterSaving(true);
+    try {
+      await supabase.from("site_settings").delete().eq("key", "heels_filter_heel_types");
+      await supabase.from("site_settings").insert({ key: "heels_filter_heel_types", value: JSON.stringify(types) });
+    } catch { /* ignore */ }
+    finally { setHeelsFilterSaving(false); }
+  };
+
   const fetchSlides = useCallback(async () => {
     setSlidesLoading(true);
     try {
@@ -832,6 +866,7 @@ export default function AdminPage() {
     if (tab === "footer") { fetchSettings(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "collections") fetchCollections();
+    if (tab === "heels-page") fetchHeelsPage();
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
@@ -1321,6 +1356,7 @@ export default function AdminPage() {
     { id: "dashboard", label: "Dashboard",  icon: LayoutDashboard },
     { id: "homepage",  label: "Homepage",   icon: Home },
     { id: "catalog",   label: "Catalog",    icon: ImageIcon, badge: dbProducts.length },
+    { id: "heels",     label: "Heels Page", icon: Layers },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -1375,14 +1411,6 @@ export default function AdminPage() {
             );
           })}
 
-          {/* Heels Page — standalone link */}
-          <a
-            href="/admin/heels"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-left text-white/65 hover:text-white hover:bg-white/10"
-          >
-            <Layers className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1">Heels Page</span>
-          </a>
         </nav>
 
         {/* Sign Out */}
@@ -1408,6 +1436,7 @@ export default function AdminPage() {
               {mainSection === "dashboard" ? "Dashboard" :
                mainSection === "homepage" ? "Homepage" :
                mainSection === "catalog" ? "Catalog" :
+               mainSection === "heels" ? "Heels Page" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -2045,6 +2074,100 @@ export default function AdminPage() {
           {/* ══════════════════════════════════════
               COLLECTIONS TAB
           ══════════════════════════════════════ */}
+          {/* ── HEELS PAGE TAB ───────────────────────────────── */}
+          {tab === "heels-page" && (
+            <div className="space-y-8">
+              {heelsPageLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading…</div> : (
+                <>
+                  {/* Products table */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">Heels on Page</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">{heelsPageProducts.filter(p=>p.active).length} showing · {heelsPageProducts.filter(p=>!p.active).length} hidden · Toggle to show/hide on live site</p>
+                      </div>
+                      <a href="/shop/heels" target="_blank" className="text-xs text-[#3B5373] border border-[#3B5373] px-3 py-1.5 hover:bg-[#3B5373] hover:text-white transition-colors">
+                        View Live Page →
+                      </a>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-gray-100 bg-gray-50">
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium">Product</th>
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium hidden md:table-cell">Heel Type</th>
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium hidden md:table-cell">Tags</th>
+                            <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium">Price</th>
+                            <th className="px-4 py-3 text-center text-[10px] tracking-widest uppercase text-gray-400 font-medium w-28">Show on Page</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {heelsPageProducts.map((p, i) => (
+                            <tr key={p.id} className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${i%2===0?"":"bg-gray-50/30"}`}>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-3">
+                                  {p.image && <img src={p.image} alt={p.title} className="w-11 h-11 object-cover object-top rounded flex-shrink-0" />}
+                                  <div>
+                                    <p className="font-medium text-gray-800 text-sm">{p.title}</p>
+                                    {p.featured_tab && <span className={`text-[9px] tracking-wider uppercase px-1.5 py-0.5 rounded mt-0.5 inline-block ${p.featured_tab==="latest"?"bg-[#e8f0fe] text-blue-600":p.featured_tab==="bestseller"?"bg-[#fef3c7] text-yellow-700":"bg-[#fee2e2] text-red-600"}`}>{p.featured_tab}</span>}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-xs text-gray-500 hidden md:table-cell">{p.heel_type ?? <span className="text-gray-300">—</span>}</td>
+                              <td className="px-4 py-3 hidden md:table-cell">
+                                <div className="flex flex-wrap gap-1">
+                                  {(p.tags??[]).map((t:string)=><span key={t} className="text-[9px] tracking-wider uppercase bg-[#f0ecff] text-[#3B5373] px-1.5 py-0.5 rounded">{t}</span>)}
+                                  {(!p.tags||p.tags.length===0)&&<span className="text-gray-300 text-xs">—</span>}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-700">₹{p.price?.toLocaleString("en-IN")}</td>
+                              <td className="px-4 py-3 text-center">
+                                <button onClick={async()=>{await supabase.from("products").update({active:!p.active}).eq("id",p.id);setHeelsPageProducts(prev=>prev.map(x=>x.id===p.id?{...x,active:!x.active}:x));}}
+                                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${p.active?"bg-[#3B5373]":"bg-gray-200"}`}>
+                                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${p.active?"translate-x-6":"translate-x-1"}`}/>
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {heelsPageProducts.length===0&&<div className="p-10 text-center text-gray-400 text-sm">No heels found. Add from Catalog → Products (category = heels).</div>}
+                    </div>
+                  </div>
+
+                  {/* Filter types */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Filter Sidebar — Heel Types</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Heels page ke filter sidebar mein yeh options dikhte hain. Add/remove karo.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                      <div className="flex flex-wrap gap-2 min-h-[36px]">
+                        {heelsFilterTypes.map(ht=>(
+                          <span key={ht} className="inline-flex items-center gap-1.5 bg-[#f0ecff] text-[#3B5373] text-xs font-medium px-3 py-1.5 rounded-full">
+                            {ht}
+                            <button onClick={async()=>{const u=heelsFilterTypes.filter(x=>x!==ht);setHeelsFilterTypes(u);await saveHeelsFilterTypes(u);}} className="text-[#3B5373]/60 hover:text-red-500 transition-colors text-sm leading-none">×</button>
+                          </span>
+                        ))}
+                        {heelsFilterTypes.length===0&&<p className="text-xs text-gray-300">No filter types yet.</p>}
+                      </div>
+                      <div className="flex gap-2">
+                        <input type="text" value={newFilterType} onChange={e=>setNewFilterType(e.target.value)}
+                          onKeyDown={async e=>{if(e.key==="Enter"&&newFilterType.trim()){const u=[...heelsFilterTypes,newFilterType.trim()];setHeelsFilterTypes(u);setNewFilterType("");await saveHeelsFilterTypes(u);}}}
+                          placeholder="e.g. Wedge Heel, Platform…" className="flex-1 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        <button onClick={async()=>{if(!newFilterType.trim())return;const u=[...heelsFilterTypes,newFilterType.trim()];setHeelsFilterTypes(u);setNewFilterType("");await saveHeelsFilterTypes(u);}}
+                          disabled={heelsFilterSaving||!newFilterType.trim()} className="px-4 py-2 bg-[#3B5373] text-white text-sm font-medium hover:bg-[#2d3f4f] rounded-lg disabled:opacity-50 transition-colors">
+                          {heelsFilterSaving?"Saving…":"Add"}
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-gray-400">Enter dabao ya Add karo — live filter sidebar turant update hoti hai.</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {tab === "collections" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-3">
