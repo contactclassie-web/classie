@@ -283,7 +283,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 interface FooterLinkItem { text: string; url: string; }
 
 type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page";
-type MainSection = "dashboard" | "homepage" | "catalog" | "orders" | "settings" | "footer" | "messages";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -297,7 +297,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "products":       "catalog",
   "collections":    "catalog",
   "categories":     "catalog",
-  "heels-page":     "catalog",
+  "heels-page":     "heels",
   "orders":         "orders",
   "settings":       "settings",
   "footer":         "footer",
@@ -317,9 +317,11 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   ],
   catalog: [
     { id: "products",    label: "Products" },
-    { id: "heels-page",  label: "Heels Page" },
     { id: "collections", label: "Collections" },
     { id: "categories",  label: "Categories" },
+  ],
+  heels:    [
+    { id: "heels-page", label: "Heels Page" },
   ],
   orders:   [],
   settings: [],
@@ -1356,6 +1358,7 @@ export default function AdminPage() {
     { id: "dashboard", label: "Dashboard",  icon: LayoutDashboard },
     { id: "homepage",  label: "Homepage",   icon: Home },
     { id: "catalog",   label: "Catalog",    icon: ImageIcon, badge: dbProducts.length },
+    { id: "heels",     label: "Heels Page", icon: Layers },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
