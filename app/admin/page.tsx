@@ -1374,18 +1374,16 @@ export default function AdminPage() {
               </button>
             );
           })}
-        </nav>
 
-        {/* Heels Page quick link */}
-        <div className="px-3 pt-2">
+          {/* Heels Page — standalone link */}
           <a
             href="/admin/heels"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-left text-white/65 hover:text-white hover:bg-white/10"
           >
-            <Layers className="w-4 h-4" />
-            Heels Page
+            <Layers className="w-4 h-4 flex-shrink-0" />
+            <span className="flex-1">Heels Page</span>
           </a>
-        </div>
+        </nav>
 
         {/* Sign Out */}
         <div className="px-3 py-4 border-t border-white/10">
