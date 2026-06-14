@@ -8,6 +8,7 @@ import HeroImageSlider from "@/components/HeroImageSlider";
 import HeroSection from "@/components/HeroSection";
 import TrustBand from "@/components/TrustBand";
 import CategoryLinks from "@/components/CategoryLinks";
+import PhilosophySection from "@/components/PhilosophySection";
 import {
   Product,
   CURATED_COLLECTIONS,
@@ -243,96 +244,8 @@ export default async function HomePage() {
       {/* ══ 5. FEATURED PICKS ═════════════════════════════════════════════ */}
       <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} saleProducts={saleProducts} />
 
-      {/* ══ 6. PHILOSOPHY — Image + Dark text layout ══════════════════════ */}
-      <section className="grid grid-cols-1 md:grid-cols-2" style={{ minHeight: "82vh" }}>
-        {/* Left: image */}
-        <div className="relative overflow-hidden" style={{ minHeight: "400px" }}>
-          {philImageUrl ? (
-            <Image
-              src={philImageUrl}
-              alt="Classie Philosophy"
-              fill
-              className="object-cover object-center"
-              sizes="50vw"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-[#F9F9F9] flex items-center justify-center">
-              <div
-                className="text-center"
-                style={{ fontFamily: "var(--font-cormorant)", color: "rgba(59,83,115,0.12)", fontSize: "120px", fontWeight: 300 }}
-              >
-                C
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right: dark content */}
-        <div className="bg-[#1a1a1a] flex flex-col justify-center px-6 md:px-20 py-20">
-          {/* Eyebrow */}
-          <div className="flex items-center gap-4 mb-7">
-            <div className="w-8 h-px bg-[rgba(59,83,115,0.6)]" />
-            <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[rgba(59,83,115,0.8)]">
-              {philEyebrow}
-            </span>
-          </div>
-
-          {/* Heading */}
-          <h2 className="font-serif text-[clamp(36px,4vw,64px)] font-light leading-[1.05] text-white mb-8">
-            {philHeadline}
-          </h2>
-
-          {/* Body */}
-          <p className="font-sans text-sm font-light leading-[1.85] text-white/50 mb-12 max-w-[420px] tracking-[0.03em]">
-            {philBody}
-          </p>
-
-          {/* Feature rows */}
-          <div className="space-y-8 mb-12">
-            <div className="flex items-start gap-5">
-              <span className="text-[#3B5373] text-lg mt-0.5 flex-shrink-0">✦</span>
-              <div>
-                <div className="font-sans text-[11px] font-light tracking-[0.24em] uppercase text-white/80 mb-1.5">
-                  Comfort-First Design
-                </div>
-                <div className="font-sans text-xs font-light text-white/40 leading-[1.7]">
-                  Engineered for all-day wear without sacrificing elegance.
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-5">
-              <span className="text-[#3B5373] text-lg mt-0.5 flex-shrink-0">⬡</span>
-              <div>
-                <div className="font-sans text-[11px] font-light tracking-[0.24em] uppercase text-white/80 mb-1.5">
-                  Premium Quality
-                </div>
-                <div className="font-sans text-xs font-light text-white/40 leading-[1.7]">
-                  Curated materials, careful craftsmanship in every pair.
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-5">
-              <span className="text-[#3B5373] text-lg mt-0.5 flex-shrink-0">↩</span>
-              <div>
-                <div className="font-sans text-[11px] font-light tracking-[0.24em] uppercase text-white/80 mb-1.5">
-                  Free Exchange
-                </div>
-                <div className="font-sans text-xs font-light text-white/40 leading-[1.7]">
-                  Not the right fit? Exchange hassle-free, always.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <Link
-            href={philCtaUrl}
-            className="inline-flex items-center gap-3 border border-[rgba(59,83,115,0.5)] text-white px-10 py-4 text-[10px] font-light tracking-[0.28em] uppercase hover:bg-[#3B5373] hover:border-[#3B5373] transition-all duration-300 self-start"
-          >
-            {philCtaText} →
-          </Link>
-        </div>
-      </section>
+      {/* ══ 6. PHILOSOPHY ═════════════════════════════════════════════════ */}
+      <PhilosophySection />
 
       {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
       <NewsletterSection />

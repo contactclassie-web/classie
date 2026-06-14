@@ -88,6 +88,9 @@ interface SiteSettings {
   philosophy_body: string;
   philosophy_cta_text: string;
   philosophy_cta_url: string;
+  phil_f1_title: string; phil_f1_desc: string;
+  phil_f2_title: string; phil_f2_desc: string;
+  phil_f3_title: string; phil_f3_desc: string;
   philosophy_image_url: string;
   // Hero section
   hero_eyebrow: string;
@@ -343,6 +346,9 @@ export default function AdminPage() {
     philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
     philosophy_cta_text: "Our Story",
     philosophy_cta_url: "/about",
+    phil_f1_title: "Comfort-First Design",  phil_f1_desc: "Engineered for all-day wear without sacrificing elegance.",
+    phil_f2_title: "Premium Quality",        phil_f2_desc: "Curated materials, careful craftsmanship in every pair.",
+    phil_f3_title: "Free Exchange",          phil_f3_desc: "Not the right fit? Exchange hassle-free, always.",
     philosophy_image_url: "",
     hero_eyebrow: "New Collection 2025",
     hero_heading_line1: "Step Into",
@@ -532,6 +538,9 @@ export default function AdminPage() {
           philosophy_body: "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way.",
           philosophy_cta_text: "Our Story",
           philosophy_cta_url: "/about",
+          phil_f1_title: "Comfort-First Design",  phil_f1_desc: "Engineered for all-day wear without sacrificing elegance.",
+          phil_f2_title: "Premium Quality",        phil_f2_desc: "Curated materials, careful craftsmanship in every pair.",
+          phil_f3_title: "Free Exchange",          phil_f3_desc: "Not the right fit? Exchange hassle-free, always.",
           philosophy_image_url: "",
           hero_eyebrow: "New Collection 2025",
           hero_heading_line1: "Step Into",
@@ -984,6 +993,9 @@ export default function AdminPage() {
         { key: "philosophy_cta_text",  value: siteSettings.philosophy_cta_text },
         { key: "philosophy_cta_url",   value: siteSettings.philosophy_cta_url },
         { key: "philosophy_image_url", value: siteSettings.philosophy_image_url },
+        { key: "phil_f1_title", value: siteSettings.phil_f1_title }, { key: "phil_f1_desc", value: siteSettings.phil_f1_desc },
+        { key: "phil_f2_title", value: siteSettings.phil_f2_title }, { key: "phil_f2_desc", value: siteSettings.phil_f2_desc },
+        { key: "phil_f3_title", value: siteSettings.phil_f3_title }, { key: "phil_f3_desc", value: siteSettings.phil_f3_desc },
       ];
       await upsertSettings(rows);
     } catch { /* ignore */ }
@@ -2665,6 +2677,25 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
+                {/* Feature Items */}
+                <div className="border-t border-gray-100 pt-4 space-y-4">
+                  <p className={labelCls + " text-sm font-semibold text-gray-700"}>3 Feature Points</p>
+                  {([
+                    { tKey: "phil_f1_title" as const, dKey: "phil_f1_desc" as const, num: "1" },
+                    { tKey: "phil_f2_title" as const, dKey: "phil_f2_desc" as const, num: "2" },
+                    { tKey: "phil_f3_title" as const, dKey: "phil_f3_desc" as const, num: "3" },
+                  ]).map(({ tKey, dKey, num }) => (
+                    <div key={num} className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-xl">
+                      <div><label className={labelCls}>Feature {num} Title</label>
+                        <input type="text" value={siteSettings[tKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [tKey]: e.target.value }))} />
+                      </div>
+                      <div><label className={labelCls}>Feature {num} Description</label>
+                        <input type="text" value={siteSettings[dKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [dKey]: e.target.value }))} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
                 <button
                   onClick={savePhilosophy} disabled={settingsSaving}
                   className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60"
