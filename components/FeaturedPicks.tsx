@@ -72,7 +72,7 @@ function getCardColors(product: Product): [string, string] {
 
 function ProductCard({ product, isNew }: { product: Product; isNew?: boolean }) {
   const router = useRouter();
-  const hasDiscount = product.comparePrice && product.comparePrice > product.price;
+  const hasDiscount = product.comparePrice > 0 && product.comparePrice > product.price;
   const discountPct = hasDiscount ? Math.round((1 - product.price / product.comparePrice) * 100) : 0;
   const [c1, c2] = getCardColors(product);
 
