@@ -19,7 +19,7 @@ const rightLinks = [
 
 const NAV_LINK_CLS = "text-[11px] font-normal text-[#1a1a1a] hover:text-[#3B5373] transition-colors tracking-[0.14em] uppercase relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[1px] after:bg-[#3B5373] hover:after:w-full after:transition-all after:duration-300";
 
-interface Category { name: string; slug: string; display_order: number; }
+interface Category { name: string; slug: string; display_order: number; image_url?: string; description?: string; }
 
 export default function Navbar() {
   const { count } = useCart();
@@ -40,7 +40,7 @@ export default function Navbar() {
       .then(({ data }) => { if (data?.value) setLogoUrl(data.value); });
 
     // Load categories from DB
-    supabase.from("site_categories").select("name,slug,display_order")
+    supabase.from("site_categories").select("name,slug,display_order,image_url,description")
       .eq("active", true).order("display_order")
       .then(({ data }) => { if (data) setCategories(data); });
   }, []);
@@ -67,24 +67,60 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Collections dropdown (all categories from DB) */}
+            {/* Collections mega-menu */}
             {dropdownLinks.length > 0 && (
               <div className="relative group">
                 <button className={`${NAV_LINK_CLS} flex items-center gap-1 bg-transparent border-none cursor-pointer`}>
                   Collections
-                  <svg className="w-3 h-3 mt-[1px] transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 mt-[1px] transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
                   </svg>
                 </button>
-                {/* Dropdown panel */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white border border-gray-100 shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[160px]">
-                  <div className="py-2">
+                {/* Premium mega-menu panel */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-white border border-gray-100 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50"
+                  style={{ width: `${Math.max(dropdownLinks.length * 180, 380)}px`, borderTop: "2px solid #3B5373" }}>
+                  {/* Top accent line */}
+                  <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${dropdownLinks.length}, 1fr)` }}>
                     {dropdownLinks.map((cat) => (
                       <Link key={cat.slug} href={`/shop/${cat.slug}`}
-                        className="block px-5 py-2.5 text-[11px] tracking-[0.14em] uppercase text-[#1a1a1a] hover:text-[#3B5373] hover:bg-[#f8f7ff] transition-colors whitespace-nowrap">
-                        {cat.name}
+                        className="group/card relative flex flex-col overflow-hidden border-r border-gray-50 last:border-r-0 hover:bg-[#faf9ff] transition-all duration-300">
+                        {/* Category image */}
+                        <div className="relative overflow-hidden" style={{ height: "140px", backgroundColor: "#f8f7ff" }}>
+                          {cat.image_url ? (
+                            <Image src={cat.image_url} alt={cat.name} fill
+                              className="object-cover transition-transform duration-500 group-hover/card:scale-105"
+                              sizes="200px" />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-4xl opacity-20">✦</span>
+                            </div>
+                          )}
+                          {/* Overlay on hover */}
+                          <div className="absolute inset-0 bg-[#3B5373] opacity-0 group-hover/card:opacity-10 transition-opacity duration-300" />
+                        </div>
+                        {/* Text */}
+                        <div className="px-4 py-4">
+                          <p className="text-[11px] tracking-[0.18em] uppercase font-medium text-[#1a1a1a] group-hover/card:text-[#3B5373] transition-colors">
+                            {cat.name}
+                          </p>
+                          {cat.description && (
+                            <p className="text-[10px] text-gray-400 mt-1 leading-relaxed tracking-wide line-clamp-2">
+                              {cat.description}
+                            </p>
+                          )}
+                          <p className="text-[9px] tracking-[0.2em] uppercase text-[#3B5373] mt-2 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex items-center gap-1">
+                            Shop now <span>→</span>
+                          </p>
+                        </div>
                       </Link>
                     ))}
+                  </div>
+                  {/* Bottom bar */}
+                  <div className="px-5 py-3 bg-[#faf9ff] border-t border-gray-100 flex items-center justify-between">
+                    <p className="text-[9px] tracking-[0.2em] uppercase text-gray-400">All Collections</p>
+                    <Link href="/collections" className="text-[9px] tracking-[0.2em] uppercase text-[#3B5373] hover:underline">
+                      View All →
+                    </Link>
                   </div>
                 </div>
               </div>
