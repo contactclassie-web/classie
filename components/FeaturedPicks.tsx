@@ -211,9 +211,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
           <h2 className="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] font-bold leading-[1.1] text-[#1a1a1a]">
             {fps.heading} <em className="italic font-light text-[#3B5373]">{fps.headingItalic}</em>
           </h2>
-          <Link href="/shop" className="hidden md:flex items-center gap-1.5 text-[11px] tracking-[0.15em] uppercase text-[#3B5373] hover:text-[#2a3d55] transition-colors font-medium border-b border-[#3B5373] pb-0.5">
-            View All <span>→</span>
-          </Link>
+
         </div>
 
         {/* Tabs */}
@@ -240,7 +238,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
 
         {/* CTA */}
         <div className="text-center mt-10">
-          <Link href="/shop"
+          <Link href="/collections"
             className="inline-block bg-[#3B5373] text-white px-14 py-3.5 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-[#2d3f4f] transition-colors">
             Explore All Styles
           </Link>
