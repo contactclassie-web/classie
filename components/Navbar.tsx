@@ -6,28 +6,12 @@ import { ShoppingBag, Menu, X, Search, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "./CartContext";
 import AnnouncementBar from "./AnnouncementBar";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
-const sb = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-// Left nav links
+// Static nav links (non-category)
 const leftLinks = [
-  { label: "Heels",       href: "/shop/heels" },
-  { label: "Clip-ons",    href: "/shop/clips" },
   { label: "Style Ideas", href: "/style-ideas" },
 ];
-
-// Collections dropdown items
-const collectionsDropdown = [
-  { label: "Heels",           href: "/shop/heels" },
-  { label: "Clip-ons",        href: "/shop/clips" },
-  { label: "Bow Collection",  href: "/shop/bow" },
-];
-
-// Right nav links
 const rightLinks = [
   { label: "Hot Deals", href: "/hot-deals" },
   { label: "About",     href: "/about" },
@@ -35,11 +19,14 @@ const rightLinks = [
 
 const NAV_LINK_CLS = "text-[11px] font-normal text-[#1a1a1a] hover:text-[#3B5373] transition-colors tracking-[0.14em] uppercase relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[1px] after:bg-[#3B5373] hover:after:w-full after:transition-all after:duration-300";
 
+interface Category { name: string; slug: string; display_order: number; }
+
 export default function Navbar() {
   const { count } = useCart();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logoUrl, setLogoUrl]   = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -48,9 +35,19 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    sb.from("site_settings").select("value").eq("key", "logo_image_url").single()
+    // Load logo
+    supabase.from("site_settings").select("value").eq("key", "logo_image_url").single()
       .then(({ data }) => { if (data?.value) setLogoUrl(data.value); });
+
+    // Load categories from DB
+    supabase.from("site_categories").select("name,slug,display_order")
+      .eq("active", true).order("display_order")
+      .then(({ data }) => { if (data) setCategories(data); });
   }, []);
+
+  // First 2 categories shown as direct links, rest in Collections dropdown
+  const directLinks = categories.slice(0, 2);
+  const dropdownLinks = categories; // all categories in Collections dropdown
 
   return (
     <header className={`sticky top-0 z-50 bg-white transition-all duration-300 ${scrolled ? "border-b border-gray-100 shadow-sm" : "border-b border-gray-100"}`}>
@@ -61,31 +58,42 @@ export default function Navbar() {
       <div className="hidden lg:block" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 40px" }}>
         <div className="flex items-center justify-between" style={{ height: "68px" }}>
 
-          {/* Left links */}
+          {/* Left links: direct category links + Collections dropdown + Style Ideas */}
           <div className="flex items-center gap-8">
+            {/* Direct category links (first 2 from DB) */}
+            {directLinks.map((cat) => (
+              <Link key={cat.slug} href={`/shop/${cat.slug}`} className={NAV_LINK_CLS}>
+                {cat.name}
+              </Link>
+            ))}
+
+            {/* Collections dropdown (all categories from DB) */}
+            {dropdownLinks.length > 0 && (
+              <div className="relative group">
+                <button className={`${NAV_LINK_CLS} flex items-center gap-1 bg-transparent border-none cursor-pointer`}>
+                  Collections
+                  <svg className="w-3 h-3 mt-[1px] transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </button>
+                {/* Dropdown panel */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white border border-gray-100 shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[160px]">
+                  <div className="py-2">
+                    {dropdownLinks.map((cat) => (
+                      <Link key={cat.slug} href={`/shop/${cat.slug}`}
+                        className="block px-5 py-2.5 text-[11px] tracking-[0.14em] uppercase text-[#1a1a1a] hover:text-[#3B5373] hover:bg-[#f8f7ff] transition-colors whitespace-nowrap">
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Static left links */}
             {leftLinks.map((l) => (
               <Link key={l.href} href={l.href} className={NAV_LINK_CLS}>{l.label}</Link>
             ))}
-            {/* Collections dropdown */}
-            <div className="relative group">
-              <button className={`${NAV_LINK_CLS} flex items-center gap-1 bg-transparent border-none cursor-pointer`}>
-                Collections
-                <svg className="w-3 h-3 mt-[1px] transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </button>
-              {/* Dropdown */}
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white border border-gray-100 shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[160px]">
-                <div className="py-2">
-                  {collectionsDropdown.map((item) => (
-                    <Link key={item.href} href={item.href}
-                      className="block px-5 py-2.5 text-[11px] tracking-[0.14em] uppercase text-[#1a1a1a] hover:text-[#3B5373] hover:bg-[#f8f7ff] transition-colors whitespace-nowrap">
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Center logo */}
@@ -159,25 +167,29 @@ export default function Navbar() {
           <button onClick={() => setOpen(false)} className="text-[#1a1a1a]"><X className="w-5 h-5" /></button>
         </div>
         <nav className="flex flex-col px-6 py-4">
-          {leftLinks.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
+          {/* Direct category links */}
+          {directLinks.map((cat) => (
+            <Link key={cat.slug} href={`/shop/${cat.slug}`} onClick={() => setOpen(false)}
               className="py-4 text-sm font-light text-[#1a1a1a] border-b border-gray-50 tracking-[0.15em] uppercase hover:text-[#3B5373] transition-colors">
-              {l.label}
+              {cat.name}
             </Link>
           ))}
-          {/* Collections in mobile */}
-          <div className="py-4 border-b border-gray-50">
-            <p className="text-sm font-light text-[#1a1a1a] tracking-[0.15em] uppercase mb-2">Collections</p>
-            <div className="flex flex-col pl-3 gap-1">
-              {collectionsDropdown.map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
-                  className="py-1.5 text-xs font-light text-gray-500 tracking-[0.12em] uppercase hover:text-[#3B5373] transition-colors">
-                  — {item.label}
-                </Link>
-              ))}
+          {/* Collections section in mobile */}
+          {dropdownLinks.length > 0 && (
+            <div className="py-4 border-b border-gray-50">
+              <p className="text-sm font-light text-[#1a1a1a] tracking-[0.15em] uppercase mb-2">Collections</p>
+              <div className="flex flex-col pl-3 gap-1">
+                {dropdownLinks.map((cat) => (
+                  <Link key={cat.slug} href={`/shop/${cat.slug}`} onClick={() => setOpen(false)}
+                    className="py-1.5 text-xs font-light text-gray-500 tracking-[0.12em] uppercase hover:text-[#3B5373] transition-colors">
+                    — {cat.name}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-          {rightLinks.map((l) => (
+          )}
+          {/* Static links */}
+          {[...leftLinks, ...rightLinks].map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
               className="py-4 text-sm font-light text-[#1a1a1a] border-b border-gray-50 last:border-0 tracking-[0.15em] uppercase hover:text-[#3B5373] transition-colors">
               {l.label}
