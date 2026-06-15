@@ -17,8 +17,14 @@ const sb = createClient(
 const leftLinks = [
   { label: "Heels",       href: "/shop/heels" },
   { label: "Clip-ons",    href: "/shop/clips" },
-  { label: "Collections", href: "/collections" },
   { label: "Style Ideas", href: "/style-ideas" },
+];
+
+// Collections dropdown items
+const collectionsDropdown = [
+  { label: "Heels",           href: "/shop/heels" },
+  { label: "Clip-ons",        href: "/shop/clips" },
+  { label: "Bow Collection",  href: "/shop/bow" },
 ];
 
 // Right nav links
@@ -60,6 +66,26 @@ export default function Navbar() {
             {leftLinks.map((l) => (
               <Link key={l.href} href={l.href} className={NAV_LINK_CLS}>{l.label}</Link>
             ))}
+            {/* Collections dropdown */}
+            <div className="relative group">
+              <button className={`${NAV_LINK_CLS} flex items-center gap-1 bg-transparent border-none cursor-pointer`}>
+                Collections
+                <svg className="w-3 h-3 mt-[1px] transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+              {/* Dropdown */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white border border-gray-100 shadow-lg rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[160px]">
+                <div className="py-2">
+                  {collectionsDropdown.map((item) => (
+                    <Link key={item.href} href={item.href}
+                      className="block px-5 py-2.5 text-[11px] tracking-[0.14em] uppercase text-[#1a1a1a] hover:text-[#3B5373] hover:bg-[#f8f7ff] transition-colors whitespace-nowrap">
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Center logo */}
@@ -133,7 +159,25 @@ export default function Navbar() {
           <button onClick={() => setOpen(false)} className="text-[#1a1a1a]"><X className="w-5 h-5" /></button>
         </div>
         <nav className="flex flex-col px-6 py-4">
-          {[...leftLinks, ...rightLinks].map((l) => (
+          {leftLinks.map((l) => (
+            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
+              className="py-4 text-sm font-light text-[#1a1a1a] border-b border-gray-50 tracking-[0.15em] uppercase hover:text-[#3B5373] transition-colors">
+              {l.label}
+            </Link>
+          ))}
+          {/* Collections in mobile */}
+          <div className="py-4 border-b border-gray-50">
+            <p className="text-sm font-light text-[#1a1a1a] tracking-[0.15em] uppercase mb-2">Collections</p>
+            <div className="flex flex-col pl-3 gap-1">
+              {collectionsDropdown.map((item) => (
+                <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
+                  className="py-1.5 text-xs font-light text-gray-500 tracking-[0.12em] uppercase hover:text-[#3B5373] transition-colors">
+                  — {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+          {rightLinks.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
               className="py-4 text-sm font-light text-[#1a1a1a] border-b border-gray-50 last:border-0 tracking-[0.15em] uppercase hover:text-[#3B5373] transition-colors">
               {l.label}
