@@ -473,7 +473,9 @@ export default function AdminPage() {
 
   // ── Collections Page state ────────────────────────────────────────────────
   const [collHeroEyebrow,    setCollHeroEyebrow]    = useState("Summer Edit 2025");
-  const [collHeroTitle,      setCollHeroTitle]      = useState("Explore");
+  const [collHeroLine1,      setCollHeroLine1]      = useState("Explore");
+  const [collHeroLine2,      setCollHeroLine2]      = useState("our");
+  const [collHeroLine3,      setCollHeroLine3]      = useState("Collection");
   const [collHeroTagline,    setCollHeroTagline]    = useState("One heel. Endless looks.");
   const [collHeroSub,        setCollHeroSub]        = useState("India's first interchangeable heel brand — where a single shoe becomes four different styles with our signature clip-on collection.");
   const [collHeroImage,      setCollHeroImage]      = useState("");
@@ -483,6 +485,10 @@ export default function AdminPage() {
   const [collStat2Label,     setCollStat2Label]     = useState("Collections");
   const [collStat3Val,       setCollStat3Val]       = useState("₹399+");
   const [collStat3Label,     setCollStat3Label]     = useState("Starting At");
+  const [collBadgeLabel,     setCollBadgeLabel]     = useState("New Arrivals");
+  const [collBadgeSub,       setCollBadgeSub]       = useState("Styles this season");
+  const [collCtaText,        setCollCtaText]        = useState("Explore All Styles →");
+  const [collCta2Text,       setCollCta2Text]       = useState("Style Guide");
   const [collStrip1Title,    setCollStrip1Title]    = useState("Designed to Transform");
   const [collStrip1Desc,     setCollStrip1Desc]     = useState("Interchangeable clip-ons that let one heel match every look.");
   const [collStrip2Title,    setCollStrip2Title]    = useState("Made for Everyday Wear");
@@ -999,33 +1005,43 @@ export default function AdminPage() {
   // ── Collections Page fetch/save ──────────────────────────────────────────
   const fetchCollectionsPage = useCallback(async () => {
     try {
-      const keys = ["coll_hero_eyebrow","coll_hero_title","coll_hero_tagline","coll_hero_sub","coll_hero_image",
+      const keys = [
+        "coll_hero_eyebrow","coll_hero_line1","coll_hero_line2","coll_hero_line3",
+        "coll_hero_tagline","coll_hero_sub","coll_hero_image",
         "coll_stat1_val","coll_stat1_label","coll_stat2_val","coll_stat2_label","coll_stat3_val","coll_stat3_label",
+        "coll_badge_label","coll_badge_sub","coll_cta_text","coll_cta2_text",
         "coll_strip1_title","coll_strip1_desc","coll_strip2_title","coll_strip2_desc","coll_strip3_title","coll_strip3_desc",
-        "coll_testimonial_text","coll_testimonial_author","coll_section_label"];
+        "coll_testimonial_text","coll_testimonial_author","coll_section_label",
+      ];
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: {key:string;value:string}) => { m[r.key] = r.value; });
-      if (m.coll_hero_eyebrow)        setCollHeroEyebrow(m.coll_hero_eyebrow);
-      if (m.coll_hero_title)          setCollHeroTitle(m.coll_hero_title);
-      if (m.coll_hero_tagline)        setCollHeroTagline(m.coll_hero_tagline);
-      if (m.coll_hero_sub)            setCollHeroSub(m.coll_hero_sub);
-      if (m.coll_hero_image !== undefined) setCollHeroImage(m.coll_hero_image);
-      if (m.coll_stat1_val)           setCollStat1Val(m.coll_stat1_val);
-      if (m.coll_stat1_label)         setCollStat1Label(m.coll_stat1_label);
-      if (m.coll_stat2_val)           setCollStat2Val(m.coll_stat2_val);
-      if (m.coll_stat2_label)         setCollStat2Label(m.coll_stat2_label);
-      if (m.coll_stat3_val)           setCollStat3Val(m.coll_stat3_val);
-      if (m.coll_stat3_label)         setCollStat3Label(m.coll_stat3_label);
-      if (m.coll_strip1_title)        setCollStrip1Title(m.coll_strip1_title);
-      if (m.coll_strip1_desc)         setCollStrip1Desc(m.coll_strip1_desc);
-      if (m.coll_strip2_title)        setCollStrip2Title(m.coll_strip2_title);
-      if (m.coll_strip2_desc)         setCollStrip2Desc(m.coll_strip2_desc);
-      if (m.coll_strip3_title)        setCollStrip3Title(m.coll_strip3_title);
-      if (m.coll_strip3_desc)         setCollStrip3Desc(m.coll_strip3_desc);
-      if (m.coll_testimonial_text)    setCollTestText(m.coll_testimonial_text);
-      if (m.coll_testimonial_author)  setCollTestAuthor(m.coll_testimonial_author);
-      if (m.coll_section_label)       setCollSectionLabel(m.coll_section_label);
+      if (m.coll_hero_eyebrow !== undefined)   setCollHeroEyebrow(m.coll_hero_eyebrow);
+      if (m.coll_hero_line1 !== undefined)     setCollHeroLine1(m.coll_hero_line1);
+      if (m.coll_hero_line2 !== undefined)     setCollHeroLine2(m.coll_hero_line2);
+      if (m.coll_hero_line3 !== undefined)     setCollHeroLine3(m.coll_hero_line3);
+      if (m.coll_hero_tagline !== undefined)   setCollHeroTagline(m.coll_hero_tagline);
+      if (m.coll_hero_sub !== undefined)       setCollHeroSub(m.coll_hero_sub);
+      if (m.coll_hero_image !== undefined)     setCollHeroImage(m.coll_hero_image);
+      if (m.coll_stat1_val !== undefined)      setCollStat1Val(m.coll_stat1_val);
+      if (m.coll_stat1_label !== undefined)    setCollStat1Label(m.coll_stat1_label);
+      if (m.coll_stat2_val !== undefined)      setCollStat2Val(m.coll_stat2_val);
+      if (m.coll_stat2_label !== undefined)    setCollStat2Label(m.coll_stat2_label);
+      if (m.coll_stat3_val !== undefined)      setCollStat3Val(m.coll_stat3_val);
+      if (m.coll_stat3_label !== undefined)    setCollStat3Label(m.coll_stat3_label);
+      if (m.coll_badge_label !== undefined)    setCollBadgeLabel(m.coll_badge_label);
+      if (m.coll_badge_sub !== undefined)      setCollBadgeSub(m.coll_badge_sub);
+      if (m.coll_cta_text !== undefined)       setCollCtaText(m.coll_cta_text);
+      if (m.coll_cta2_text !== undefined)      setCollCta2Text(m.coll_cta2_text);
+      if (m.coll_strip1_title !== undefined)   setCollStrip1Title(m.coll_strip1_title);
+      if (m.coll_strip1_desc !== undefined)    setCollStrip1Desc(m.coll_strip1_desc);
+      if (m.coll_strip2_title !== undefined)   setCollStrip2Title(m.coll_strip2_title);
+      if (m.coll_strip2_desc !== undefined)    setCollStrip2Desc(m.coll_strip2_desc);
+      if (m.coll_strip3_title !== undefined)   setCollStrip3Title(m.coll_strip3_title);
+      if (m.coll_strip3_desc !== undefined)    setCollStrip3Desc(m.coll_strip3_desc);
+      if (m.coll_testimonial_text !== undefined)   setCollTestText(m.coll_testimonial_text);
+      if (m.coll_testimonial_author !== undefined) setCollTestAuthor(m.coll_testimonial_author);
+      if (m.coll_section_label !== undefined)  setCollSectionLabel(m.coll_section_label);
     } catch { /* ignore */ }
   }, []);
 
@@ -1041,7 +1057,9 @@ export default function AdminPage() {
 
   const saveCollHero = () => saveCollSettingsBatch([
     { key: "coll_hero_eyebrow",  value: collHeroEyebrow },
-    { key: "coll_hero_title",    value: collHeroTitle },
+    { key: "coll_hero_line1",    value: collHeroLine1 },
+    { key: "coll_hero_line2",    value: collHeroLine2 },
+    { key: "coll_hero_line3",    value: collHeroLine3 },
     { key: "coll_hero_tagline",  value: collHeroTagline },
     { key: "coll_hero_sub",      value: collHeroSub },
     { key: "coll_hero_image",    value: collHeroImage },
@@ -1051,6 +1069,10 @@ export default function AdminPage() {
     { key: "coll_stat2_label",   value: collStat2Label },
     { key: "coll_stat3_val",     value: collStat3Val },
     { key: "coll_stat3_label",   value: collStat3Label },
+    { key: "coll_badge_label",   value: collBadgeLabel },
+    { key: "coll_badge_sub",     value: collBadgeSub },
+    { key: "coll_cta_text",      value: collCtaText },
+    { key: "coll_cta2_text",     value: collCta2Text },
     { key: "coll_section_label", value: collSectionLabel },
   ], setCollHeroSaving);
 
@@ -3469,6 +3491,9 @@ export default function AdminPage() {
                     <Save className="w-4 h-4"/>{collHeroSaving ? "Saving…" : "Save Hero"}
                   </button>
                 </div>
+                <p className="text-[10px] text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                  💡 <strong>Blank = Hide</strong> — koi bhi field khaali chodo toh website pe woh element nahi dikheaga.
+                </p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Eyebrow Text</label>
@@ -3476,19 +3501,42 @@ export default function AdminPage() {
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Summer Edit 2025" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Hero Title</label>
-                    <input value={collHeroTitle} onChange={e=>setCollHeroTitle(e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Explore" />
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Hero Image URL (blank = full width text)</label>
+                    <input value={collHeroImage} onChange={e=>setCollHeroImage(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="https://..." />
                   </div>
+                </div>
+                {/* Title 3 lines */}
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-2">Big Heading (3 lines — blank = skip that line)</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Line 1</label>
+                      <input value={collHeroLine1} onChange={e=>setCollHeroLine1(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Explore" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Line 2 (italic navy)</label>
+                      <input value={collHeroLine2} onChange={e=>setCollHeroLine2(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="our" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Line 3</label>
+                      <input value={collHeroLine3} onChange={e=>setCollHeroLine3(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Collection" />
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Tagline (italic)</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Tagline (italic, below heading)</label>
                     <input value={collHeroTagline} onChange={e=>setCollHeroTagline(e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="One heel. Endless looks." />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Hero Image URL</label>
-                    <input value={collHeroImage} onChange={e=>setCollHeroImage(e.target.value)}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="https://..." />
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Section Label (below filter bar)</label>
+                    <input value={collSectionLabel} onChange={e=>setCollSectionLabel(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Curated for you this season" />
                   </div>
                 </div>
                 <div>
@@ -3496,10 +3544,34 @@ export default function AdminPage() {
                   <textarea value={collHeroSub} onChange={e=>setCollHeroSub(e.target.value)} rows={2}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373] resize-none" />
                 </div>
+                {/* CTA buttons */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">CTA Button 1 Text</label>
+                    <input value={collCtaText} onChange={e=>setCollCtaText(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Explore All Styles →" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">CTA Button 2 Text</label>
+                    <input value={collCta2Text} onChange={e=>setCollCta2Text(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Style Guide" />
+                  </div>
+                </div>
+                {/* Float badge */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Section Label (below filter bar)</label>
-                  <input value={collSectionLabel} onChange={e=>setCollSectionLabel(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Curated for you this season" />
+                  <p className="text-xs font-medium text-gray-600 mb-2">Float Badge (bottom-left of image — only shows if image is set)</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Badge Label</label>
+                      <input value={collBadgeLabel} onChange={e=>setCollBadgeLabel(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="New Arrivals" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">Badge Sub text</label>
+                      <input value={collBadgeSub} onChange={e=>setCollBadgeSub(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Styles this season" />
+                    </div>
+                  </div>
                 </div>
                 {/* Stats */}
                 <div>
