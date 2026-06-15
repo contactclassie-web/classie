@@ -282,8 +282,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "orders" | "settings" | "footer" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -299,7 +299,8 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "categories":     "catalog",
   "heels-page":     "heels",
   "clips-page":     "clips-page",
-  "bow-page":       "bow-page",
+  "bow-page":           "bow-page",
+  "collections-page":   "collections-page",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -325,7 +326,8 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   ],
   heels:       [{ id: "heels-page", label: "Heels Page" }],
   "clips-page": [{ id: "clips-page", label: "Clips Page" }],
-  "bow-page":   [{ id: "bow-page",   label: "Bow Page" }],
+  "bow-page":          [{ id: "bow-page",         label: "Bow Page" }],
+  "collections-page":  [{ id: "collections-page", label: "Collections Page" }],
   orders:   [],
   settings: [],
   footer:   [],
@@ -468,6 +470,31 @@ export default function AdminPage() {
   const [bowWhyVisible, setBowWhyVisible] = useState(true);
   const [bowWhySaving, setBowWhySaving] = useState(false);
 
+
+  // ── Collections Page state ────────────────────────────────────────────────
+  const [collHeroEyebrow,    setCollHeroEyebrow]    = useState("Summer Edit 2025");
+  const [collHeroTitle,      setCollHeroTitle]      = useState("Explore");
+  const [collHeroTagline,    setCollHeroTagline]    = useState("One heel. Endless looks.");
+  const [collHeroSub,        setCollHeroSub]        = useState("India's first interchangeable heel brand — where a single shoe becomes four different styles with our signature clip-on collection.");
+  const [collHeroImage,      setCollHeroImage]      = useState("");
+  const [collStat1Val,       setCollStat1Val]       = useState("24+");
+  const [collStat1Label,     setCollStat1Label]     = useState("Styles");
+  const [collStat2Val,       setCollStat2Val]       = useState("3");
+  const [collStat2Label,     setCollStat2Label]     = useState("Collections");
+  const [collStat3Val,       setCollStat3Val]       = useState("₹399+");
+  const [collStat3Label,     setCollStat3Label]     = useState("Starting At");
+  const [collStrip1Title,    setCollStrip1Title]    = useState("Designed to Transform");
+  const [collStrip1Desc,     setCollStrip1Desc]     = useState("Interchangeable clip-ons that let one heel match every look.");
+  const [collStrip2Title,    setCollStrip2Title]    = useState("Made for Everyday Wear");
+  const [collStrip2Desc,     setCollStrip2Desc]     = useState("Comfort-focused designs made for real movement and real life.");
+  const [collStrip3Title,    setCollStrip3Title]    = useState("Style That Lasts");
+  const [collStrip3Desc,     setCollStrip3Desc]     = useState("Reusable clip-ons designed to be worn again and again.");
+  const [collTestText,       setCollTestText]       = useState("\"I bought one pair of Classie heels and three clip-on sets — it's like having ten shoes in one box. Absolute game changer.\"");
+  const [collTestAuthor,     setCollTestAuthor]     = useState("— Priya S., Mumbai");
+  const [collSectionLabel,   setCollSectionLabel]   = useState("Curated for you this season");
+  const [collHeroSaving,     setCollHeroSaving]     = useState(false);
+  const [collStripSaving,    setCollStripSaving]    = useState(false);
+  const [collTestSaving,     setCollTestSaving]     = useState(false);
 
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
@@ -969,6 +996,78 @@ export default function AdminPage() {
     finally { setBowPageLoading(false); }
   }, []);
 
+  // ── Collections Page fetch/save ──────────────────────────────────────────
+  const fetchCollectionsPage = useCallback(async () => {
+    try {
+      const keys = ["coll_hero_eyebrow","coll_hero_title","coll_hero_tagline","coll_hero_sub","coll_hero_image",
+        "coll_stat1_val","coll_stat1_label","coll_stat2_val","coll_stat2_label","coll_stat3_val","coll_stat3_label",
+        "coll_strip1_title","coll_strip1_desc","coll_strip2_title","coll_strip2_desc","coll_strip3_title","coll_strip3_desc",
+        "coll_testimonial_text","coll_testimonial_author","coll_section_label"];
+      const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
+      const m: Record<string,string> = {};
+      (data ?? []).forEach((r: {key:string;value:string}) => { m[r.key] = r.value; });
+      if (m.coll_hero_eyebrow)        setCollHeroEyebrow(m.coll_hero_eyebrow);
+      if (m.coll_hero_title)          setCollHeroTitle(m.coll_hero_title);
+      if (m.coll_hero_tagline)        setCollHeroTagline(m.coll_hero_tagline);
+      if (m.coll_hero_sub)            setCollHeroSub(m.coll_hero_sub);
+      if (m.coll_hero_image !== undefined) setCollHeroImage(m.coll_hero_image);
+      if (m.coll_stat1_val)           setCollStat1Val(m.coll_stat1_val);
+      if (m.coll_stat1_label)         setCollStat1Label(m.coll_stat1_label);
+      if (m.coll_stat2_val)           setCollStat2Val(m.coll_stat2_val);
+      if (m.coll_stat2_label)         setCollStat2Label(m.coll_stat2_label);
+      if (m.coll_stat3_val)           setCollStat3Val(m.coll_stat3_val);
+      if (m.coll_stat3_label)         setCollStat3Label(m.coll_stat3_label);
+      if (m.coll_strip1_title)        setCollStrip1Title(m.coll_strip1_title);
+      if (m.coll_strip1_desc)         setCollStrip1Desc(m.coll_strip1_desc);
+      if (m.coll_strip2_title)        setCollStrip2Title(m.coll_strip2_title);
+      if (m.coll_strip2_desc)         setCollStrip2Desc(m.coll_strip2_desc);
+      if (m.coll_strip3_title)        setCollStrip3Title(m.coll_strip3_title);
+      if (m.coll_strip3_desc)         setCollStrip3Desc(m.coll_strip3_desc);
+      if (m.coll_testimonial_text)    setCollTestText(m.coll_testimonial_text);
+      if (m.coll_testimonial_author)  setCollTestAuthor(m.coll_testimonial_author);
+      if (m.coll_section_label)       setCollSectionLabel(m.coll_section_label);
+    } catch { /* ignore */ }
+  }, []);
+
+  const saveCollSettingsBatch = async (pairs: {key:string;value:string}[], setSaving: (v:boolean)=>void) => {
+    setSaving(true);
+    try {
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } finally { setSaving(false); }
+  };
+
+  const saveCollHero = () => saveCollSettingsBatch([
+    { key: "coll_hero_eyebrow",  value: collHeroEyebrow },
+    { key: "coll_hero_title",    value: collHeroTitle },
+    { key: "coll_hero_tagline",  value: collHeroTagline },
+    { key: "coll_hero_sub",      value: collHeroSub },
+    { key: "coll_hero_image",    value: collHeroImage },
+    { key: "coll_stat1_val",     value: collStat1Val },
+    { key: "coll_stat1_label",   value: collStat1Label },
+    { key: "coll_stat2_val",     value: collStat2Val },
+    { key: "coll_stat2_label",   value: collStat2Label },
+    { key: "coll_stat3_val",     value: collStat3Val },
+    { key: "coll_stat3_label",   value: collStat3Label },
+    { key: "coll_section_label", value: collSectionLabel },
+  ], setCollHeroSaving);
+
+  const saveCollStrip = () => saveCollSettingsBatch([
+    { key: "coll_strip1_title", value: collStrip1Title },
+    { key: "coll_strip1_desc",  value: collStrip1Desc },
+    { key: "coll_strip2_title", value: collStrip2Title },
+    { key: "coll_strip2_desc",  value: collStrip2Desc },
+    { key: "coll_strip3_title", value: collStrip3Title },
+    { key: "coll_strip3_desc",  value: collStrip3Desc },
+  ], setCollStripSaving);
+
+  const saveCollTest = () => saveCollSettingsBatch([
+    { key: "coll_testimonial_text",   value: collTestText },
+    { key: "coll_testimonial_author", value: collTestAuthor },
+  ], setCollTestSaving);
+
   const saveBowHero = async () => {
     setBowHeroSaving(true);
     try {
@@ -1272,13 +1371,14 @@ export default function AdminPage() {
     if (tab === "heels-page") fetchHeelsPage();
     if (tab === "clips-page") fetchClipsPage();
     if (tab === "bow-page") fetchBowPage();
+    if (tab === "collections-page") fetchCollectionsPage();
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -1763,7 +1863,8 @@ export default function AdminPage() {
     { id: "catalog",   label: "Catalog",    icon: ImageIcon, badge: dbProducts.length },
     { id: "heels",       label: "Heels Page",  icon: Layers },
     { id: "clips-page", label: "Clips Page",  icon: Sparkles },
-    { id: "bow-page",   label: "Bow Page",    icon: Sparkles },
+    { id: "bow-page",          label: "Bow Page",         icon: Sparkles },
+    { id: "collections-page", label: "Collections Page", icon: Grid3x3 },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -1798,6 +1899,7 @@ export default function AdminPage() {
               id === "messages" ? "messages" :
               id === "clips-page" ? "clips-page" :
               id === "bow-page" ? "bow-page" :
+              id === "collections-page" ? "collections-page" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -1848,6 +1950,7 @@ export default function AdminPage() {
                mainSection === "heels" ? "Heels Page" :
                mainSection === "clips-page" ? "Clips Page" :
                mainSection === "bow-page" ? "Bow Page" :
+               mainSection === "collections-page" ? "Collections Page" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -3345,6 +3448,135 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              COLLECTIONS PAGE TAB
+          ══════════════════════════════════════ */}
+          {tab === "collections-page" && (
+            <div className="space-y-8">
+
+              {/* ── Hero Section ─────────────────────────────────── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <div className="flex items-center justify-between mb-1">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Collections page ka hero text, image aur stats.</p>
+                  </div>
+                  <button onClick={saveCollHero} disabled={collHeroSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white text-xs rounded-lg hover:bg-[#2c4159] disabled:opacity-50 transition-colors">
+                    <Save className="w-4 h-4"/>{collHeroSaving ? "Saving…" : "Save Hero"}
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Eyebrow Text</label>
+                    <input value={collHeroEyebrow} onChange={e=>setCollHeroEyebrow(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Summer Edit 2025" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Hero Title</label>
+                    <input value={collHeroTitle} onChange={e=>setCollHeroTitle(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Explore" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Tagline (italic)</label>
+                    <input value={collHeroTagline} onChange={e=>setCollHeroTagline(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="One heel. Endless looks." />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Hero Image URL</label>
+                    <input value={collHeroImage} onChange={e=>setCollHeroImage(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="https://..." />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Hero Sub Text</label>
+                  <textarea value={collHeroSub} onChange={e=>setCollHeroSub(e.target.value)} rows={2}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373] resize-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Section Label (below filter bar)</label>
+                  <input value={collSectionLabel} onChange={e=>setCollSectionLabel(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="Curated for you this season" />
+                </div>
+                {/* Stats */}
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-2">Stats Row (3 numbers)</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { val: collStat1Val, setVal: setCollStat1Val, label: collStat1Label, setLabel: setCollStat1Label, ph: "24+" },
+                      { val: collStat2Val, setVal: setCollStat2Val, label: collStat2Label, setLabel: setCollStat2Label, ph: "3" },
+                      { val: collStat3Val, setVal: setCollStat3Val, label: collStat3Label, setLabel: setCollStat3Label, ph: "₹399+" },
+                    ].map((st, i) => (
+                      <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                        <input value={st.val} onChange={e=>st.setVal(e.target.value)}
+                          className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-[#3B5373]" placeholder={st.ph} />
+                        <input value={st.label} onChange={e=>st.setLabel(e.target.value)}
+                          className="w-full border border-gray-200 rounded px-2 py-1.5 text-xs text-gray-500 focus:outline-none focus:border-[#3B5373]" placeholder="Label" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Brand Strip ──────────────────────────────────── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div className="flex items-center justify-between mb-1">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-800">Brand Strip</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">3 brand pillars — navy background section.</p>
+                  </div>
+                  <button onClick={saveCollStrip} disabled={collStripSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white text-xs rounded-lg hover:bg-[#2c4159] disabled:opacity-50 transition-colors">
+                    <Save className="w-4 h-4"/>{collStripSaving ? "Saving…" : "Save Strip"}
+                  </button>
+                </div>
+                {[
+                  { title: collStrip1Title, setTitle: setCollStrip1Title, desc: collStrip1Desc, setDesc: setCollStrip1Desc, n: 1 },
+                  { title: collStrip2Title, setTitle: setCollStrip2Title, desc: collStrip2Desc, setDesc: setCollStrip2Desc, n: 2 },
+                  { title: collStrip3Title, setTitle: setCollStrip3Title, desc: collStrip3Desc, setDesc: setCollStrip3Desc, n: 3 },
+                ].map((strip) => (
+                  <div key={strip.n} className="border border-gray-100 rounded-xl p-4 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">Pillar {strip.n} Title</label>
+                      <input value={strip.title} onChange={e=>strip.setTitle(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
+                      <input value={strip.desc} onChange={e=>strip.setDesc(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── Testimonial ───────────────────────────────────── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div className="flex items-center justify-between mb-1">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-800">Testimonial</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Customer quote section below brand strip.</p>
+                  </div>
+                  <button onClick={saveCollTest} disabled={collTestSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white text-xs rounded-lg hover:bg-[#2c4159] disabled:opacity-50 transition-colors">
+                    <Save className="w-4 h-4"/>{collTestSaving ? "Saving…" : "Save Testimonial"}
+                  </button>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Quote Text</label>
+                  <textarea value={collTestText} onChange={e=>setCollTestText(e.target.value)} rows={3}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373] resize-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Author</label>
+                  <input value={collTestAuthor} onChange={e=>setCollTestAuthor(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="— Priya S., Mumbai" />
+                </div>
+              </div>
+
             </div>
           )}
 
