@@ -3491,9 +3491,6 @@ export default function AdminPage() {
                     <Save className="w-4 h-4"/>{collHeroSaving ? "Saving…" : "Save Hero"}
                   </button>
                 </div>
-                <p className="text-[10px] text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-                  💡 <strong>Blank = Hide</strong> — koi bhi field khaali chodo toh website pe woh element nahi dikheaga.
-                </p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Eyebrow Text</label>
