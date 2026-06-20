@@ -25,8 +25,11 @@ export default function Navbar() {
   const { count } = useCart();
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [logoUrl, setLogoUrl]   = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [logoUrl, setLogoUrl]   = useState("/classie_logo.jpg");
+  const [categories, setCategories] = useState<Category[]>([
+    { name: "Heels", slug: "heels", display_order: 1, image_url: "", description: "" },
+    { name: "Clip-ons", slug: "clips", display_order: 2, image_url: "", description: "" },
+  ]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
