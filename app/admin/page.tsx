@@ -491,6 +491,7 @@ export default function AdminPage() {
   const [siOccasionsSaving, setSiOccasionsSaving] = useState(false);
   const [newSiOccasion, setNewSiOccasion] = useState("");
   const [siCardsPerRow, setSiCardsPerRow] = useState(4);
+  const [siCardsShowTag, setSiCardsShowTag] = useState(true);
   const [siCardsPerRowSaving, setSiCardsPerRowSaving] = useState(false);
 
   // Featured Look section state
@@ -1171,7 +1172,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_occasions_visible","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_occasions_visible","si_cards_per_row","si_cards_show_tag","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1193,6 +1194,7 @@ export default function AdminPage() {
       if (m.si_occasions) { try { setSiOccasions(JSON.parse(m.si_occasions)); } catch { /* ignore */ } }
       if (m.si_occasions_visible !== undefined) setSiOccasionsVisible(m.si_occasions_visible !== "false");
       if (m.si_cards_per_row) setSiCardsPerRow(parseInt(m.si_cards_per_row) || 4);
+      if (m.si_cards_show_tag !== undefined) setSiCardsShowTag(m.si_cards_show_tag !== "false");
       if (m.si_featured_visible !== undefined) setSiFeaturedVisible(m.si_featured_visible !== "false");
       if (m.si_reels_visible !== undefined) setSiReelsVisible(m.si_reels_visible !== "false");
       if (m.si_reels_heading)  setSiReelsHeading(m.si_reels_heading);
@@ -1234,6 +1236,8 @@ export default function AdminPage() {
   const saveSiCardsPerRow = async (n: number) => {
     setSiCardsPerRowSaving(true);
     try {
+      await supabase.from("site_settings").delete().eq("key", "si_cards_show_tag");
+      await supabase.from("site_settings").insert({ key: "si_cards_show_tag", value: siCardsShowTag ? "true" : "false" });
       await supabase.from("site_settings").delete().eq("key", "si_cards_per_row");
       await supabase.from("site_settings").insert({ key: "si_cards_per_row", value: String(n) });
       await revalidateSite();
@@ -4050,7 +4054,7 @@ export default function AdminPage() {
                       <h2 className="text-base font-semibold text-gray-800">Cards per Row</h2>
                       <p className="text-xs text-gray-400 mt-0.5">1 row mein kitni cards dikhengi? (Desktop)</p>
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
                       <div className="flex gap-2 flex-wrap">
                         {[2,3,4,5,6].map(n=>(
                           <button key={n} onClick={async()=>{setSiCardsPerRow(n);await saveSiCardsPerRow(n);}}
@@ -4059,6 +4063,26 @@ export default function AdminPage() {
                           </button>
                         ))}
                         {siCardsPerRowSaving && <span className="text-xs text-gray-400 self-center">Saving…</span>}
+                      </div>
+                      {/* Tag visibility toggle */}
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Occasion Tag on Cards</p>
+                          <p className="text-[10px] text-gray-400 mt-0.5">Card pe "DATE NIGHT", "CASUAL" waala label</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400">{siCardsShowTag ? "Visible" : "Hidden"}</span>
+                          <button onClick={async () => {
+                            const next = !siCardsShowTag;
+                            setSiCardsShowTag(next);
+                            await supabase.from("site_settings").delete().eq("key","si_cards_show_tag");
+                            await supabase.from("site_settings").insert({key:"si_cards_show_tag", value: next ? "true" : "false"});
+                            await revalidateSite();
+                          }}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${siCardsShowTag ? "bg-[#3B5373]" : "bg-gray-200"}`}>
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${siCardsShowTag ? "translate-x-6" : "translate-x-1"}`}/>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

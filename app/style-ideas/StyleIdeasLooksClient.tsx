@@ -19,9 +19,10 @@ interface Props {
   looks: LookCard[];
   occasions: string[];
   cardsPerRow: number;
+  showTag?: boolean;
 }
 
-export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow }: Props) {
+export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, showTag = true }: Props) {
   const [activeTab, setActiveTab] = useState("All Looks");
 
   const filtered = activeTab === "All Looks"
@@ -64,7 +65,7 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow }:
         ) : (
           <div className={`grid gap-5 ${colClass}`}>
             {filtered.map((look) => (
-              <LookCard key={look.id} look={look} />
+              <LookCard key={look.id} look={look} showTag={showTag} />
             ))}
           </div>
         )}
@@ -73,7 +74,7 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow }:
   );
 }
 
-function LookCard({ look }: { look: LookCard }) {
+function LookCard({ look, showTag = true }: { look: LookCard; showTag?: boolean }) {
   const [hovered, setHovered] = useState(false);
   const href = look.link_url || "/shop/heels";
 
@@ -106,7 +107,7 @@ function LookCard({ look }: { look: LookCard }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
         {/* Occasion tag */}
-        {look.tag && (
+        {showTag && look.tag && (
           <span className="absolute top-3 left-3 text-[9px] tracking-[0.2em] uppercase bg-[#3B5373] text-white px-2.5 py-1">
             {look.tag}
           </span>
