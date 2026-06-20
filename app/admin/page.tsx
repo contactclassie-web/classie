@@ -4147,60 +4147,38 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Products (max 3)</label>
-                      <span className="text-[10px] text-gray-400">{siFeaturedProducts.length}/3 selected</span>
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Products — Select up to 3</label>
+                      <span className="text-[10px] text-[#3B5373] font-medium">{siFeaturedProducts.length}/3</span>
                     </div>
-                    {/* Selected products */}
-                    {siFeaturedProducts.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {siFeaturedProducts.map(id => {
-                          const p = allProductsForCategoryModal.find(x => x.id === id);
-                          if (!p) return null;
-                          return (
-                            <div key={id} className="flex items-center gap-2 bg-[#f4f2ff] border border-[#3B5373]/20 rounded-lg px-2 py-1.5">
-                              {p.image && <img src={p.image} alt={p.title} className="w-7 h-7 object-cover rounded"/>}
-                              <span className="text-xs font-medium text-gray-700 max-w-[100px] truncate">{p.title}</span>
-                              <span className="text-[10px] text-gray-400">₹{p.price}</span>
-                              <button onClick={()=>setSiFeaturedProducts(prev=>prev.filter(x=>x!==id))} className="text-gray-300 hover:text-red-400 ml-1 text-xs">✕</button>
+                    <div className="max-h-56 overflow-y-auto rounded-xl border border-gray-100 divide-y divide-gray-50">
+                      {allProductsForCategoryModal.map(p => {
+                        const selected = siFeaturedProducts.includes(p.id!);
+                        const disabled = !selected && siFeaturedProducts.length >= 3;
+                        return (
+                          <button key={p.id} type="button" disabled={disabled}
+                            onClick={()=> selected
+                              ? setSiFeaturedProducts(prev => prev.filter(x => x !== p.id))
+                              : setSiFeaturedProducts(prev => [...prev, p.id!])
+                            }
+                            className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors
+                              ${selected ? "bg-[#f0edff] border-l-4 border-[#3B5373]" : "hover:bg-gray-50"}
+                              ${disabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}`}>
+                            {p.image && <img src={p.image} alt={p.title} className="w-9 h-9 object-cover rounded flex-shrink-0"/>}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-gray-800 truncate">{p.title}</p>
+                              <p className="text-[10px] text-gray-400">₹{p.price}</p>
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                    {/* Search + pick from list */}
-                    {siFeaturedProducts.length < 3 && (
-                      <div>
-                        <input
-                          type="text"
-                          value={siFeaturedSearch}
-                          onChange={e=>setSiFeaturedSearch(e.target.value)}
-                          placeholder="Search products to add..."
-                          className="w-full border border-gray-200 text-xs px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg mb-1"
-                        />
-                        <div className="max-h-44 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
-                          {allProductsForCategoryModal
-                            .filter(p => !siFeaturedProducts.includes(p.id!) &&
-                              (siFeaturedSearch === "" || p.title.toLowerCase().includes(siFeaturedSearch.toLowerCase())))
-                            .slice(0,20)
-                            .map(p => (
-                              <button key={p.id} type="button"
-                                onClick={()=>{ setSiFeaturedProducts(prev=>[...prev, p.id!]); setSiFeaturedSearch(""); }}
-                                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 text-left transition-colors">
-                                {p.image && <img src={p.image} alt={p.title} className="w-8 h-8 object-cover rounded flex-shrink-0"/>}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-medium text-gray-700 truncate">{p.title}</p>
-                                  <p className="text-[10px] text-gray-400">₹{p.price} · {p.category}</p>
-                                </div>
-                                <Plus className="w-3.5 h-3.5 text-[#3B5373] flex-shrink-0"/>
-                              </button>
-                            ))}
-                          {allProductsForCategoryModal.filter(p => !siFeaturedProducts.includes(p.id!) &&
-                            (siFeaturedSearch === "" || p.title.toLowerCase().includes(siFeaturedSearch.toLowerCase()))).length === 0 && (
-                            <p className="text-xs text-gray-300 text-center py-3">No products found</p>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all
+                              ${selected ? "bg-[#3B5373] border-[#3B5373]" : "border-gray-300"}`}>
+                              {selected && <span className="text-white text-[10px]">✓</span>}
+                            </div>
+                          </button>
+                        );
+                      })}
+                      {allProductsForCategoryModal.length === 0 && (
+                        <p className="text-xs text-gray-300 text-center py-6">Loading products…</p>
+                      )}
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
