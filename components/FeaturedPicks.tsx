@@ -70,7 +70,7 @@ function getCardColors(product: Product): [string, string] {
   return ["#8A9AAA", "#6A7A8A"]; // default slate
 }
 
-function ProductCard({ product, isNew }: { product: Product; isNew?: boolean }) {
+function ProductCard({ product, isNew, cardStyle }: { product: Product; isNew?: boolean; cardStyle?: { aspectRatio?: string; borderRadius?: string; height?: number } }) {
   const router = useRouter();
   const hasDiscount = product.comparePrice > 0 && product.comparePrice > product.price;
   const discountPct = hasDiscount ? Math.round((1 - product.price / product.comparePrice) * 100) : 0;
@@ -79,7 +79,7 @@ function ProductCard({ product, isNew }: { product: Product; isNew?: boolean }) 
   return (
     <div className="group cursor-pointer" onClick={() => router.push(`/products/${product.slug}`)}>
       {/* Card */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: "3/4", background: `linear-gradient(145deg, ${c1}, ${c2})` }}>
+      <div className={`relative overflow-hidden ${cardStyle?.borderRadius || ""}`} style={{ aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "3/4"), height: cardStyle?.height ? `${cardStyle.height}px` : undefined, background: `linear-gradient(145deg, ${c1}, ${c2})` }}>
         {/* Product image */}
         {product.image && (
           <Image src={product.image} alt={product.title} fill
@@ -161,11 +161,16 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
   const [advMobile,  setAdvMobile]  = useState(2);
   const [advDesktop, setAdvDesktop] = useState(4);
   const [advGap,     setAdvGap]     = useState(12);
+  const [advAspect,  setAdvAspect]  = useState("4/5");
+  const [advRadius,  setAdvRadius]  = useState("sharp");
+  const [advCardH,   setAdvCardH]   = useState(0);
+
+  const radiusMap: Record<string,string> = { sharp: "", slight: "rounded", rounded: "rounded-xl", pill: "rounded-3xl" };
 
   useEffect(() => {
     // Fetch adv grid settings
     supabase.from("site_settings").select("key,value")
-      .in("key", ["adv_picks_mobile","adv_picks_desktop","adv_picks_gap"])
+      .in("key", ["adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_picks_aspect","adv_picks_radius","adv_picks_card_h"])
       .then(({ data }) => {
         if (!data) return;
         const m: Record<string,string> = {};
@@ -173,6 +178,9 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
         if (m.adv_picks_mobile)  setAdvMobile(parseInt(m.adv_picks_mobile) || 2);
         if (m.adv_picks_desktop) setAdvDesktop(parseInt(m.adv_picks_desktop) || 4);
         if (m.adv_picks_gap)     setAdvGap(parseInt(m.adv_picks_gap) || 12);
+        if (m.adv_picks_aspect)  setAdvAspect(m.adv_picks_aspect);
+        if (m.adv_picks_radius)  setAdvRadius(m.adv_picks_radius);
+        if (m.adv_picks_card_h)  setAdvCardH(parseInt(m.adv_picks_card_h) || 0);
       });
 
     // Fetch settings
@@ -250,7 +258,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
           style={{ gap: advGap + "px" }}
         >
           {products.map((product, idx) => (
-            <ProductCard key={product.slug} product={product} isNew={activeTab === "latest" && idx === 0} />
+            <ProductCard key={product.slug} product={product} isNew={activeTab === "latest" && idx === 0} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />
           ))}
         </div>
 

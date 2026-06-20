@@ -25,10 +25,15 @@ function ShopContent() {
   const [advMobile,  setAdvMobile]  = useState(2);
   const [advDesktop, setAdvDesktop] = useState(4);
   const [advGap,     setAdvGap]     = useState(16);
+  const [advAspect,  setAdvAspect]  = useState("4/5");
+  const [advRadius,  setAdvRadius]  = useState("sharp");
+  const [advCardH,   setAdvCardH]   = useState(0);
+
+  const radiusMap: Record<string,string> = { sharp: "", slight: "rounded", rounded: "rounded-xl", pill: "rounded-3xl" };
 
   useEffect(() => {
     supabase.from("site_settings").select("key,value")
-      .in("key", ["adv_shop_mobile","adv_shop_desktop","adv_shop_gap"])
+      .in("key", ["adv_shop_mobile","adv_shop_desktop","adv_shop_gap","adv_shop_aspect","adv_shop_radius","adv_shop_card_h"])
       .then(({ data }) => {
         if (!data) return;
         const m: Record<string,string> = {};
@@ -36,6 +41,9 @@ function ShopContent() {
         if (m.adv_shop_mobile)  setAdvMobile(parseInt(m.adv_shop_mobile) || 2);
         if (m.adv_shop_desktop) setAdvDesktop(parseInt(m.adv_shop_desktop) || 4);
         if (m.adv_shop_gap)     setAdvGap(parseInt(m.adv_shop_gap) || 16);
+        if (m.adv_shop_aspect)  setAdvAspect(m.adv_shop_aspect);
+        if (m.adv_shop_radius)  setAdvRadius(m.adv_shop_radius);
+        if (m.adv_shop_card_h)  setAdvCardH(parseInt(m.adv_shop_card_h) || 0);
       });
   }, []);
 
@@ -113,7 +121,7 @@ function ShopContent() {
           style={{ gap: advGap + "px" }}
         >
           {filtered.map((p) => (
-            <ProductCard key={p.slug} product={p} />
+            <ProductCard key={p.slug} product={p} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />
           ))}
         </div>
       )}

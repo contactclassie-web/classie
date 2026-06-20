@@ -206,7 +206,7 @@ function CategoryHero({
 }
 
 // ── Product card ──────────────────────────────────────────────────────
-function CategoryProductCard({ product }: { product: HeelProduct }) {
+function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; cardStyle?: { aspectRatio?: string; borderRadius?: string; height?: number } }) {
   const discount =
     product.comparePrice > product.price
       ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
@@ -214,7 +214,7 @@ function CategoryProductCard({ product }: { product: HeelProduct }) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
-      <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
+      <div className={`relative overflow-hidden ${cardStyle?.borderRadius || ""}`} style={{ aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "3/4"), height: cardStyle?.height ? `${cardStyle.height}px` : undefined }}>
         <Image
           src={product.image}
           alt={product.title}
@@ -304,6 +304,11 @@ export default function ShopCategoryPageClient({
   const [advMobile,  setAdvMobile]  = useState(2);
   const [advDesktop, setAdvDesktop] = useState(4);
   const [advGap,     setAdvGap]     = useState(12);
+  const [advAspect,  setAdvAspect]  = useState("3/4");
+  const [advRadius,  setAdvRadius]  = useState("sharp");
+  const [advCardH,   setAdvCardH]   = useState(0);
+
+  const radiusMap: Record<string,string> = { sharp: "", slight: "rounded", rounded: "rounded-xl", pill: "rounded-3xl" };
 
   // Load filter types from DB settings
   const [filterTypes, setFilterTypes] = useState<string[]>(() => {
@@ -323,7 +328,7 @@ export default function ShopCategoryPageClient({
 
   useEffect(() => {
     supabase.from("site_settings").select("key,value")
-      .in("key", ["adv_coll_mobile","adv_coll_desktop","adv_coll_gap"])
+      .in("key", ["adv_coll_mobile","adv_coll_desktop","adv_coll_gap","adv_coll_aspect","adv_coll_radius","adv_coll_card_h"])
       .then(({ data }) => {
         if (!data) return;
         const m: Record<string,string> = {};
@@ -331,6 +336,9 @@ export default function ShopCategoryPageClient({
         if (m.adv_coll_mobile)  setAdvMobile(parseInt(m.adv_coll_mobile) || 2);
         if (m.adv_coll_desktop) setAdvDesktop(parseInt(m.adv_coll_desktop) || 4);
         if (m.adv_coll_gap)     setAdvGap(parseInt(m.adv_coll_gap) || 12);
+        if (m.adv_coll_aspect)  setAdvAspect(m.adv_coll_aspect);
+        if (m.adv_coll_radius)  setAdvRadius(m.adv_coll_radius);
+        if (m.adv_coll_card_h)  setAdvCardH(parseInt(m.adv_coll_card_h) || 0);
       });
 
     supabase
@@ -514,7 +522,7 @@ export default function ShopCategoryPageClient({
                   style={{ gap: advGap + "px" }}
                 >
                   {filtered.map((product) => (
-                    <CategoryProductCard key={product.slug} product={product} />
+                    <CategoryProductCard key={product.slug} product={product} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />
                   ))}
                 </div>
               )}

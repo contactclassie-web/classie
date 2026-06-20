@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/products";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, cardStyle }: { product: Product; cardStyle?: { aspectRatio?: string; borderRadius?: string; height?: number } }) {
   const discount =
     product.comparePrice > product.price
       ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
@@ -14,8 +14,11 @@ export default function ProductCard({ product }: { product: Product }) {
     <Link href={`/products/${product.slug}`} className="group block">
       {/* ── Image container — 4:5 editorial ratio */}
       <div
-        className="relative overflow-hidden bg-[#faf8f6]"
-        style={{ aspectRatio: "4/5" }}
+        className={`relative overflow-hidden bg-[#faf8f6] ${cardStyle?.borderRadius || ""}`}
+        style={{
+          aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "4/5"),
+          height: cardStyle?.height ? `${cardStyle.height}px` : undefined,
+        }}
       >
         <Image
           src={product.image}

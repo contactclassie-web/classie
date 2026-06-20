@@ -559,6 +559,21 @@ export default function AdminPage() {
   const [advRelatedMobile, setAdvRelatedMobile] = useState(2);
   const [advRelatedDesktop,setAdvRelatedDesktop]= useState(4);
   const [advRelatedGap,    setAdvRelatedGap]    = useState(16);
+  const [advShopAspect,    setAdvShopAspect]    = useState("4/5");
+  const [advShopRadius,    setAdvShopRadius]    = useState("sharp");
+  const [advShopCardH,     setAdvShopCardH]     = useState(0);
+  const [advCollAspect,    setAdvCollAspect]    = useState("4/5");
+  const [advCollRadius,    setAdvCollRadius]    = useState("sharp");
+  const [advCollCardH,     setAdvCollCardH]     = useState(0);
+  const [advPicksAspect,   setAdvPicksAspect]   = useState("4/5");
+  const [advPicksRadius,   setAdvPicksRadius]   = useState("sharp");
+  const [advPicksCardH,    setAdvPicksCardH]    = useState(0);
+  const [advInspoAspect,   setAdvInspoAspect]   = useState("none");
+  const [advInspoRadius,   setAdvInspoRadius]   = useState("sharp");
+  const [advInspoCardH,    setAdvInspoCardH]    = useState(0);
+  const [advRelatedAspect, setAdvRelatedAspect] = useState("4/5");
+  const [advRelatedRadius, setAdvRelatedRadius] = useState("sharp");
+  const [advRelatedCardH,  setAdvRelatedCardH]  = useState(0);
   const [advSaving,        setAdvSaving]        = useState(false);
 
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
@@ -1681,7 +1696,7 @@ export default function AdminPage() {
   }, []);
 
   const fetchAdvSettings = useCallback(async () => {
-    const keys = ["adv_shop_mobile","adv_shop_desktop","adv_shop_gap","adv_coll_mobile","adv_coll_desktop","adv_coll_gap","adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_inspo_desktop","adv_inspo_gap","adv_related_mobile","adv_related_desktop","adv_related_gap"];
+    const keys = ["adv_shop_mobile","adv_shop_desktop","adv_shop_gap","adv_coll_mobile","adv_coll_desktop","adv_coll_gap","adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_inspo_desktop","adv_inspo_gap","adv_related_mobile","adv_related_desktop","adv_related_gap","adv_shop_aspect","adv_shop_radius","adv_shop_card_h","adv_coll_aspect","adv_coll_radius","adv_coll_card_h","adv_picks_aspect","adv_picks_radius","adv_picks_card_h","adv_inspo_aspect","adv_inspo_radius","adv_inspo_card_h","adv_related_aspect","adv_related_radius","adv_related_card_h"];
     const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
     const m: Record<string,string> = {};
     (data ?? []).forEach((r: {key:string;value:string}) => { m[r.key] = r.value; });
@@ -1699,16 +1714,31 @@ export default function AdminPage() {
     if (m.adv_related_mobile) setAdvRelatedMobile(parseInt(m.adv_related_mobile)||2);
     if (m.adv_related_desktop)setAdvRelatedDesktop(parseInt(m.adv_related_desktop)||4);
     if (m.adv_related_gap)    setAdvRelatedGap(parseInt(m.adv_related_gap)||16);
+    if (m.adv_shop_aspect)    setAdvShopAspect(m.adv_shop_aspect);
+    if (m.adv_shop_radius)    setAdvShopRadius(m.adv_shop_radius);
+    if (m.adv_shop_card_h)    setAdvShopCardH(parseInt(m.adv_shop_card_h)||0);
+    if (m.adv_coll_aspect)    setAdvCollAspect(m.adv_coll_aspect);
+    if (m.adv_coll_radius)    setAdvCollRadius(m.adv_coll_radius);
+    if (m.adv_coll_card_h)    setAdvCollCardH(parseInt(m.adv_coll_card_h)||0);
+    if (m.adv_picks_aspect)   setAdvPicksAspect(m.adv_picks_aspect);
+    if (m.adv_picks_radius)   setAdvPicksRadius(m.adv_picks_radius);
+    if (m.adv_picks_card_h)   setAdvPicksCardH(parseInt(m.adv_picks_card_h)||0);
+    if (m.adv_inspo_aspect)   setAdvInspoAspect(m.adv_inspo_aspect);
+    if (m.adv_inspo_radius)   setAdvInspoRadius(m.adv_inspo_radius);
+    if (m.adv_inspo_card_h)   setAdvInspoCardH(parseInt(m.adv_inspo_card_h)||0);
+    if (m.adv_related_aspect) setAdvRelatedAspect(m.adv_related_aspect);
+    if (m.adv_related_radius) setAdvRelatedRadius(m.adv_related_radius);
+    if (m.adv_related_card_h) setAdvRelatedCardH(parseInt(m.adv_related_card_h)||0);
   }, []);
 
   const saveAdvSection = async (section: string) => {
     setAdvSaving(true);
     let pairs: {key:string;value:string}[] = [];
-    if (section==="shop")    pairs = [{key:"adv_shop_mobile",value:String(advShopMobile)},{key:"adv_shop_desktop",value:String(advShopDesktop)},{key:"adv_shop_gap",value:String(advShopGap)}];
-    if (section==="coll")    pairs = [{key:"adv_coll_mobile",value:String(advCollMobile)},{key:"adv_coll_desktop",value:String(advCollDesktop)},{key:"adv_coll_gap",value:String(advCollGap)}];
-    if (section==="picks")   pairs = [{key:"adv_picks_mobile",value:String(advPicksMobile)},{key:"adv_picks_desktop",value:String(advPicksDesktop)},{key:"adv_picks_gap",value:String(advPicksGap)}];
-    if (section==="inspo")   pairs = [{key:"adv_inspo_desktop",value:String(advInspoDesktop)},{key:"adv_inspo_gap",value:String(advInspoGap)}];
-    if (section==="related") pairs = [{key:"adv_related_mobile",value:String(advRelatedMobile)},{key:"adv_related_desktop",value:String(advRelatedDesktop)},{key:"adv_related_gap",value:String(advRelatedGap)}];
+    if (section==="shop")    pairs = [{key:"adv_shop_mobile",value:String(advShopMobile)},{key:"adv_shop_desktop",value:String(advShopDesktop)},{key:"adv_shop_gap",value:String(advShopGap)},{key:"adv_shop_aspect",value:advShopAspect},{key:"adv_shop_radius",value:advShopRadius},{key:"adv_shop_card_h",value:String(advShopCardH)}];
+    if (section==="coll")    pairs = [{key:"adv_coll_mobile",value:String(advCollMobile)},{key:"adv_coll_desktop",value:String(advCollDesktop)},{key:"adv_coll_gap",value:String(advCollGap)},{key:"adv_coll_aspect",value:advCollAspect},{key:"adv_coll_radius",value:advCollRadius},{key:"adv_coll_card_h",value:String(advCollCardH)}];
+    if (section==="picks")   pairs = [{key:"adv_picks_mobile",value:String(advPicksMobile)},{key:"adv_picks_desktop",value:String(advPicksDesktop)},{key:"adv_picks_gap",value:String(advPicksGap)},{key:"adv_picks_aspect",value:advPicksAspect},{key:"adv_picks_radius",value:advPicksRadius},{key:"adv_picks_card_h",value:String(advPicksCardH)}];
+    if (section==="inspo")   pairs = [{key:"adv_inspo_desktop",value:String(advInspoDesktop)},{key:"adv_inspo_gap",value:String(advInspoGap)},{key:"adv_inspo_aspect",value:advInspoAspect},{key:"adv_inspo_radius",value:advInspoRadius},{key:"adv_inspo_card_h",value:String(advInspoCardH)}];
+    if (section==="related") pairs = [{key:"adv_related_mobile",value:String(advRelatedMobile)},{key:"adv_related_desktop",value:String(advRelatedDesktop)},{key:"adv_related_gap",value:String(advRelatedGap)},{key:"adv_related_aspect",value:advRelatedAspect},{key:"adv_related_radius",value:advRelatedRadius},{key:"adv_related_card_h",value:String(advRelatedCardH)}];
     for (const p of pairs) {
       await supabase.from("site_settings").delete().eq("key",p.key);
       await supabase.from("site_settings").insert(p);
@@ -4657,6 +4687,9 @@ export default function AdminPage() {
               mobile={advShopMobile} setMobile={setAdvShopMobile}
               desktop={advShopDesktop} setDesktop={setAdvShopDesktop}
               gap={advShopGap} setGap={setAdvShopGap}
+              aspect={advShopAspect} setAspect={setAdvShopAspect}
+              radius={advShopRadius} setRadius={setAdvShopRadius}
+              cardH={advShopCardH} setCardH={setAdvShopCardH}
               saving={advSaving} onSave={() => saveAdvSection("shop")}
             />
           )}
@@ -4668,6 +4701,9 @@ export default function AdminPage() {
               mobile={advCollMobile} setMobile={setAdvCollMobile}
               desktop={advCollDesktop} setDesktop={setAdvCollDesktop}
               gap={advCollGap} setGap={setAdvCollGap}
+              aspect={advCollAspect} setAspect={setAdvCollAspect}
+              radius={advCollRadius} setRadius={setAdvCollRadius}
+              cardH={advCollCardH} setCardH={setAdvCollCardH}
               saving={advSaving} onSave={() => saveAdvSection("coll")}
             />
           )}
@@ -4679,6 +4715,9 @@ export default function AdminPage() {
               mobile={advPicksMobile} setMobile={setAdvPicksMobile}
               desktop={advPicksDesktop} setDesktop={setAdvPicksDesktop}
               gap={advPicksGap} setGap={setAdvPicksGap}
+              aspect={advPicksAspect} setAspect={setAdvPicksAspect}
+              radius={advPicksRadius} setRadius={setAdvPicksRadius}
+              cardH={advPicksCardH} setCardH={setAdvPicksCardH}
               saving={advSaving} onSave={() => saveAdvSection("picks")}
             />
           )}
@@ -4689,6 +4728,9 @@ export default function AdminPage() {
               section="inspo"
               desktop={advInspoDesktop} setDesktop={setAdvInspoDesktop}
               gap={advInspoGap} setGap={setAdvInspoGap}
+              aspect={advInspoAspect} setAspect={setAdvInspoAspect}
+              radius={advInspoRadius} setRadius={setAdvInspoRadius}
+              cardH={advInspoCardH} setCardH={setAdvInspoCardH}
               saving={advSaving} onSave={() => saveAdvSection("inspo")}
               noMobile
             />
@@ -4701,6 +4743,9 @@ export default function AdminPage() {
               mobile={advRelatedMobile} setMobile={setAdvRelatedMobile}
               desktop={advRelatedDesktop} setDesktop={setAdvRelatedDesktop}
               gap={advRelatedGap} setGap={setAdvRelatedGap}
+              aspect={advRelatedAspect} setAspect={setAdvRelatedAspect}
+              radius={advRelatedRadius} setRadius={setAdvRelatedRadius}
+              cardH={advRelatedCardH} setCardH={setAdvRelatedCardH}
               saving={advSaving} onSave={() => saveAdvSection("related")}
             />
           )}
@@ -7094,13 +7139,16 @@ export default function AdminPage() {
 
 // ── AdvGridPanel ──────────────────────────────────────────────────────────────
 
-function AdvGridPanel({ title, desc, section, mobile, setMobile, desktop, setDesktop, gap, setGap, saving, onSave, noMobile }: {
+function AdvGridPanel({ title, desc, section, mobile, setMobile, desktop, setDesktop, gap, setGap, saving, onSave, noMobile, aspect, setAspect, radius, setRadius, cardH, setCardH }: {
   title: string; desc: string; section: string;
   mobile?: number; setMobile?: (n: number) => void;
   desktop: number; setDesktop: (n: number) => void;
   gap: number; setGap: (n: number) => void;
   saving: boolean; onSave: () => void;
   noMobile?: boolean;
+  aspect?: string; setAspect?: (v: string) => void;
+  radius?: string; setRadius?: (v: string) => void;
+  cardH?: number; setCardH?: (v: number) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -7139,6 +7187,38 @@ function AdvGridPanel({ title, desc, section, mobile, setMobile, desktop, setDes
             className="w-32 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg" />
           <p className="text-[10px] text-gray-300 mt-1">Current default shown</p>
         </div>
+        {/* Aspect Ratio */}
+        {setAspect && (
+          <div>
+            <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Aspect Ratio</p>
+            <div className="flex flex-wrap gap-2">
+              {[["none","Free"],["4/5","4:5"],["3/4","3:4"],["9/16","9:16"],["1/1","1:1"],["16/9","16:9"]].map(([val,label])=>(
+                <button key={val} type="button" onClick={()=>setAspect(val)}
+                  className={`px-3 py-1.5 text-xs font-medium border rounded-lg transition-colors ${aspect===val?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>{label}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* Border Radius */}
+        {setRadius && (
+          <div>
+            <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Border Radius</p>
+            <div className="flex gap-2">
+              {[["sharp","Sharp"],["slight","Slight"],["rounded","Rounded"],["pill","Pill"]].map(([val,label])=>(
+                <button key={val} type="button" onClick={()=>setRadius(val)}
+                  className={`px-3 py-1.5 text-xs font-medium border rounded-lg transition-colors ${radius===val?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>{label}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* Card Height */}
+        {setCardH !== undefined && (
+          <div>
+            <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Card Height (px) <span className="normal-case text-gray-300">— 0 = aspect ratio se auto</span></p>
+            <input type="number" min={0} max={900} value={cardH} onChange={e=>setCardH(parseInt(e.target.value)||0)}
+              className="w-32 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+          </div>
+        )}
         <button onClick={onSave} disabled={saving}
           className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
           <span>{saving ? "Saving…" : "Save Settings"}</span>
