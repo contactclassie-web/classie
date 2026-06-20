@@ -282,8 +282,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "orders" | "settings" | "footer" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -301,6 +301,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "clips-page":     "clips-page",
   "bow-page":           "bow-page",
   "collections-page":   "collections-page",
+  "style-ideas-page":   "style-ideas-page",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -328,6 +329,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   "clips-page": [{ id: "clips-page", label: "Clips Page" }],
   "bow-page":          [{ id: "bow-page",         label: "Bow Page" }],
   "collections-page":  [{ id: "collections-page", label: "Collections Page" }],
+  "style-ideas-page":  [{ id: "style-ideas-page", label: "Style Ideas Page" }],
   orders:   [],
   settings: [],
   footer:   [],
@@ -455,6 +457,25 @@ export default function AdminPage() {
   const [bowHeroStat3Val, setBowHeroStat3Val] = useState("Free");
   const [bowHeroStat3Label, setBowHeroStat3Label] = useState("Shipping ₹999+");
   const [bowHeroSaving, setBowHeroSaving] = useState(false);
+
+  // ── Style Ideas Page state ─────────────────────────────────────────────
+  const [siPageLoading, setSiPageLoading] = useState(false);
+  const [siHeroBgType, setSiHeroBgType] = useState<"none"|"image"|"video"|"slider">("none");
+  const [siHeroBgUrl, setSiHeroBgUrl] = useState("");
+  const [siHeroSlides, setSiHeroSlides] = useState<string[]>([]);
+  const [siHeroTextPos, setSiHeroTextPos] = useState<"left"|"center"|"right">("center");
+  const [siHeroEyebrow, setSiHeroEyebrow] = useState("Lookbook 2024");
+  const [siHeroTitle, setSiHeroTitle] = useState("One Pair.");
+  const [siHeroTitleItalic, setSiHeroTitleItalic] = useState("Every Occasion.");
+  const [siHeroSubtitle, setSiHeroSubtitle] = useState("Style ideas, outfit inspo, and the looks our team is loving right now.");
+  const [siHeroShowStats, setSiHeroShowStats] = useState(false);
+  const [siHeroStat1Val, setSiHeroStat1Val] = useState("");
+  const [siHeroStat1Label, setSiHeroStat1Label] = useState("Looks");
+  const [siHeroStat2Val, setSiHeroStat2Val] = useState("");
+  const [siHeroStat2Label, setSiHeroStat2Label] = useState("Styles");
+  const [siHeroStat3Val, setSiHeroStat3Val] = useState("Free");
+  const [siHeroStat3Label, setSiHeroStat3Label] = useState("Shipping ₹999+");
+  const [siHeroSaving, setSiHeroSaving] = useState(false);
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
   const [bowWhyCard1Icon, setBowWhyCard1Icon] = useState("🎀");
@@ -1090,6 +1111,61 @@ export default function AdminPage() {
     { key: "coll_testimonial_author", value: collTestAuthor },
   ], setCollTestSaving);
 
+  // ── Style Ideas Page fetch + save ─────────────────────────────────────
+  const fetchStyleIdeasPage = useCallback(async () => {
+    setSiPageLoading(true);
+    try {
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label"];
+      const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
+      const m: Record<string,string> = {};
+      (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+      if (m.si_hero_bg_type) setSiHeroBgType(m.si_hero_bg_type as "none"|"image"|"video"|"slider");
+      if (m.si_hero_bg_url) setSiHeroBgUrl(m.si_hero_bg_url);
+      if (m.si_hero_slides) { try { setSiHeroSlides(JSON.parse(m.si_hero_slides)); } catch { setSiHeroSlides([]); } }
+      if (m.si_hero_text_pos) setSiHeroTextPos(m.si_hero_text_pos as "left"|"center"|"right");
+      if (m.si_hero_eyebrow) setSiHeroEyebrow(m.si_hero_eyebrow);
+      if (m.si_hero_title) setSiHeroTitle(m.si_hero_title);
+      if (m.si_hero_title_italic) setSiHeroTitleItalic(m.si_hero_title_italic);
+      if (m.si_hero_subtitle) setSiHeroSubtitle(m.si_hero_subtitle);
+      if (m.si_hero_show_stats !== undefined) setSiHeroShowStats(m.si_hero_show_stats === "true");
+      if (m.si_hero_stat1_val) setSiHeroStat1Val(m.si_hero_stat1_val);
+      if (m.si_hero_stat1_label) setSiHeroStat1Label(m.si_hero_stat1_label);
+      if (m.si_hero_stat2_val) setSiHeroStat2Val(m.si_hero_stat2_val);
+      if (m.si_hero_stat2_label) setSiHeroStat2Label(m.si_hero_stat2_label);
+      if (m.si_hero_stat3_val) setSiHeroStat3Val(m.si_hero_stat3_val);
+      if (m.si_hero_stat3_label) setSiHeroStat3Label(m.si_hero_stat3_label);
+    } catch { /* ignore */ }
+    finally { setSiPageLoading(false); }
+  }, []);
+
+  const saveStyleIdeasHero = async () => {
+    setSiHeroSaving(true);
+    try {
+      const pairs = [
+        { key: "si_hero_bg_type",      value: siHeroBgType },
+        { key: "si_hero_bg_url",       value: siHeroBgUrl },
+        { key: "si_hero_slides",       value: JSON.stringify(siHeroSlides) },
+        { key: "si_hero_text_pos",     value: siHeroTextPos },
+        { key: "si_hero_eyebrow",      value: siHeroEyebrow },
+        { key: "si_hero_title",        value: siHeroTitle },
+        { key: "si_hero_title_italic", value: siHeroTitleItalic },
+        { key: "si_hero_subtitle",     value: siHeroSubtitle },
+        { key: "si_hero_show_stats",   value: siHeroShowStats ? "true" : "false" },
+        { key: "si_hero_stat1_val",    value: siHeroStat1Val },
+        { key: "si_hero_stat1_label",  value: siHeroStat1Label },
+        { key: "si_hero_stat2_val",    value: siHeroStat2Val },
+        { key: "si_hero_stat2_label",  value: siHeroStat2Label },
+        { key: "si_hero_stat3_val",    value: siHeroStat3Val },
+        { key: "si_hero_stat3_label",  value: siHeroStat3Label },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+    } catch { /* ignore */ }
+    finally { setSiHeroSaving(false); }
+  };
+
   const saveBowHero = async () => {
     setBowHeroSaving(true);
     try {
@@ -1394,13 +1470,14 @@ export default function AdminPage() {
     if (tab === "clips-page") fetchClipsPage();
     if (tab === "bow-page") fetchBowPage();
     if (tab === "collections-page") fetchCollectionsPage();
+    if (tab === "style-ideas-page") fetchStyleIdeasPage();
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -1887,6 +1964,7 @@ export default function AdminPage() {
     { id: "clips-page", label: "Clips Page",  icon: Sparkles },
     { id: "bow-page",          label: "Bow Page",         icon: Sparkles },
     { id: "collections-page", label: "Collections Page", icon: Grid3x3 },
+    { id: "style-ideas-page", label: "Style Ideas Page", icon: Camera },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -1922,6 +2000,7 @@ export default function AdminPage() {
               id === "clips-page" ? "clips-page" :
               id === "bow-page" ? "bow-page" :
               id === "collections-page" ? "collections-page" :
+              id === "style-ideas-page" ? "style-ideas-page" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -1973,6 +2052,7 @@ export default function AdminPage() {
                mainSection === "clips-page" ? "Clips Page" :
                mainSection === "bow-page" ? "Bow Page" :
                mainSection === "collections-page" ? "Collections Page" :
+               mainSection === "style-ideas-page" ? "Style Ideas Page" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -3646,6 +3726,121 @@ export default function AdminPage() {
                 </div>
               </div>
 
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              STYLE IDEAS PAGE TAB
+          ══════════════════════════════════════ */}
+          {tab === "style-ideas-page" && (
+            <div className="space-y-8">
+              {siPageLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading…</div> : (
+                <>
+                  {/* Hero Settings */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Style Ideas page hero background aur text set karo.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                      {/* Background Type */}
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Background Type</label>
+                        <div className="flex gap-2 flex-wrap">
+                          {(["none","image","video","slider"] as const).map(t => (
+                            <button key={t} onClick={() => setSiHeroBgType(t)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${siHeroBgType===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {t === "none" ? "Plain Color" : t === "slider" ? "Image Slider" : t === "image" ? "Single Image" : "Video"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {(siHeroBgType === "image" || siHeroBgType === "video") && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">
+                            {siHeroBgType === "image" ? "Image URL" : "Video URL (mp4 or YouTube)"}
+                          </label>
+                          <input type="text" value={siHeroBgUrl} onChange={e => setSiHeroBgUrl(e.target.value)}
+                            placeholder={siHeroBgType==="image" ? "https://cdn.example.com/image.jpg" : "https://...mp4 or YouTube URL"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          {siHeroBgUrl && siHeroBgType==="image" && (
+                            <img src={siHeroBgUrl} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                          )}
+                        </div>
+                      )}
+                      {siHeroBgType === "slider" && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Slider Images (one per line)</label>
+                          <textarea rows={4} value={siHeroSlides.join("\n")} onChange={e => setSiHeroSlides(e.target.value.split("\n").map(x=>x.trim()).filter(Boolean))}
+                            placeholder={"https://image1.jpg\nhttps://image2.jpg"}
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg font-mono"/>
+                        </div>
+                      )}
+                      {/* Hero Text */}
+                      <div className="space-y-3">
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block">Hero Text</label>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Eyebrow</p>
+                          <input type="text" value={siHeroEyebrow} onChange={e => setSiHeroEyebrow(e.target.value)} placeholder="Lookbook 2024" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Main Title (normal)</p>
+                          <input type="text" value={siHeroTitle} onChange={e => setSiHeroTitle(e.target.value)} placeholder="One Pair." className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Main Title (italic/colored line)</p>
+                          <input type="text" value={siHeroTitleItalic} onChange={e => setSiHeroTitleItalic(e.target.value)} placeholder="Every Occasion." className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Subtitle</p>
+                          <input type="text" value={siHeroSubtitle} onChange={e => setSiHeroSubtitle(e.target.value)} placeholder="Style ideas, outfit inspo, and the looks our team is loving." className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+                      {/* Text Position */}
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Text Position</label>
+                        <div className="flex gap-2">
+                          {(["left","center","right"] as const).map(pos => (
+                            <button key={pos} onClick={() => setSiHeroTextPos(pos)}
+                              className={`px-4 py-1.5 text-xs font-medium border rounded-full transition-colors capitalize ${siHeroTextPos===pos?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                              {pos === "left" ? "⬅ Left" : pos === "right" ? "Right ➡" : "⬛ Center"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Stats Bar */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Stats Bar</label>
+                          <button onClick={() => setSiHeroShowStats(v => !v)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${siHeroShowStats?"bg-[#3B5373]":"bg-gray-200"}`}>
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${siHeroShowStats?"translate-x-6":"translate-x-1"}`}/>
+                          </button>
+                        </div>
+                        {siHeroShowStats && (
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { val: siHeroStat1Val, setVal: setSiHeroStat1Val, label: siHeroStat1Label, setLabel: setSiHeroStat1Label, ph: "4", lph: "Looks" },
+                              { val: siHeroStat2Val, setVal: setSiHeroStat2Val, label: siHeroStat2Label, setLabel: setSiHeroStat2Label, ph: "12+", lph: "Styles" },
+                              { val: siHeroStat3Val, setVal: setSiHeroStat3Val, label: siHeroStat3Label, setLabel: setSiHeroStat3Label, ph: "Free", lph: "Shipping ₹999+" },
+                            ].map((s, i) => (
+                              <div key={i} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                                <p className="text-[10px] text-gray-400 font-medium">Stat {i+1}</p>
+                                <input type="text" value={s.val} onChange={e=>s.setVal(e.target.value)} placeholder={s.ph} className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                                <input type="text" value={s.label} onChange={e=>s.setLabel(e.target.value)} placeholder={s.lph} className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <button onClick={saveStyleIdeasHero} disabled={siHeroSaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>{siHeroSaving ? "Saving…" : "Save Hero Settings"}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
