@@ -11,7 +11,7 @@ type FeaturedLookData = {
   cta1Text: string; cta1Url: string; cta2Text: string; cta2Url: string;
 };
 
-type ReelsData = { heading:string; subtitle:string; cols:number; cards:{title:string;tag:string;media_url:string;media_type:"image"|"video"}[] };
+type ReelsData = { heading:string; subtitle:string; cols:number; cardH:number; gap:number; cards:{title:string;tag:string;media_url:string;media_type:"image"|"video"}[] };
 
 function StyleReels({ reels: r }: { reels: ReelsData }) {
   const colClass: Record<number,string> = { 3:"grid-cols-3", 4:"grid-cols-2 sm:grid-cols-4", 5:"grid-cols-2 sm:grid-cols-5", 6:"grid-cols-2 sm:grid-cols-6" };
@@ -24,9 +24,9 @@ function StyleReels({ reels: r }: { reels: ReelsData }) {
             {r.subtitle && <p className="text-xs text-gray-400 tracking-wide">{r.subtitle}</p>}
           </div>
         )}
-        <div className={`grid gap-3 ${colClass[r.cols] || "grid-cols-2 sm:grid-cols-4"}`}>
+        <div className={`grid ${colClass[r.cols] || "grid-cols-2 sm:grid-cols-4"}`} style={{ gap: `${r.gap}px` }}>
           {r.cards.map((card, i) => (
-            <div key={i} className="relative aspect-[9/16] bg-[#1a1a1a] overflow-hidden rounded-sm group">
+            <div key={i} className="relative bg-[#1a1a1a] overflow-hidden rounded-sm group" style={{ height: `${r.cardH}px` }}>
               {card.media_type === "video" && card.media_url
                 ? <video src={card.media_url} muted loop playsInline className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
                 : card.media_url
@@ -227,6 +227,8 @@ export default async function StyleIdeasPage() {
     heading:  cfg["si_reels_heading"]  || '"Because Your Style Never Stays the Same."',
     subtitle: cfg["si_reels_subtitle"] || "Watch how real women are styling their Classie heels",
     cols:     parseInt(cfg["si_reels_cols"] || "4") || 4,
+    cardH:    parseInt(cfg["si_reels_card_h"] || "480") || 480,
+    gap:      parseInt(cfg["si_reels_gap"] || "12") || 12,
     cards:    (() => { try { return JSON.parse(cfg["si_reels_cards"] || "[]"); } catch { return []; } })() as {title:string;tag:string;media_url:string;media_type:"image"|"video"}[],
   };
 

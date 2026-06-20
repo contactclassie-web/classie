@@ -512,6 +512,8 @@ export default function AdminPage() {
   const [siReelsSubtitle,  setSiReelsSubtitle]  = useState('Watch how real women are styling their Classie heels');
   const [siReelsCols,      setSiReelsCols]      = useState(4);
   const [siReelsCards,     setSiReelsCards]     = useState<{title:string;tag:string;media_url:string;media_type:"image"|"video"}[]>([]);
+  const [siReelsCardH,     setSiReelsCardH]     = useState(480); // card height px
+  const [siReelsGap,       setSiReelsGap]       = useState(12);  // gap px
   const [siReelsSaving,    setSiReelsSaving]    = useState(false);
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
@@ -1164,7 +1166,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards"];
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_gap"];;
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1191,6 +1193,8 @@ export default function AdminPage() {
       if (m.si_reels_subtitle) setSiReelsSubtitle(m.si_reels_subtitle);
       if (m.si_reels_cols)     setSiReelsCols(parseInt(m.si_reels_cols) || 4);
       if (m.si_reels_cards)    { try { setSiReelsCards(JSON.parse(m.si_reels_cards)); } catch { /* ignore */ } }
+      if (m.si_reels_card_h)   setSiReelsCardH(parseInt(m.si_reels_card_h) || 480);
+      if (m.si_reels_gap)      setSiReelsGap(parseInt(m.si_reels_gap) || 12);
       if (m.si_featured_label) setSiFeaturedLabel(m.si_featured_label);
       if (m.si_featured_heading) setSiFeaturedHeading(m.si_featured_heading);
       if (m.si_featured_desc) setSiFeaturedDesc(m.si_featured_desc);
@@ -1258,6 +1262,8 @@ export default function AdminPage() {
         { key: "si_reels_heading",  value: siReelsHeading },
         { key: "si_reels_subtitle", value: siReelsSubtitle },
         { key: "si_reels_cols",     value: String(siReelsCols) },
+        { key: "si_reels_card_h",   value: String(siReelsCardH) },
+        { key: "si_reels_gap",      value: String(siReelsGap) },
         { key: "si_reels_cards",    value: JSON.stringify(siReelsCards) },
       ];
       for (const p of pairs) {
@@ -4277,6 +4283,22 @@ export default function AdminPage() {
                         {n}
                       </button>
                     ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1">Card Height (px)</p>
+                    <input type="number" min={100} max={900} value={siReelsCardH}
+                      onChange={e => setSiReelsCardH(parseInt(e.target.value) || 480)}
+                      className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                    <p className="text-[10px] text-gray-300 mt-1">Default: 480</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1">Gap between Cards (px)</p>
+                    <input type="number" min={0} max={60} value={siReelsGap}
+                      onChange={e => setSiReelsGap(parseInt(e.target.value) || 12)}
+                      className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                    <p className="text-[10px] text-gray-300 mt-1">Default: 12</p>
                   </div>
                 </div>
               </div>
