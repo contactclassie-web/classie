@@ -1743,6 +1743,7 @@ export default function AdminPage() {
     const keys = rows.map((r) => r.key);
     await supabase.from("site_settings").delete().in("key", keys);
     await supabase.from("site_settings").insert(rows);
+    await revalidateSite(); // ← instant page cache clear after every save
   };
 
   const saveAnnouncements = async () => {
