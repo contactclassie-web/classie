@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { products } from "@/lib/products";
 import StyleIdeasHero from "./StyleIdeasHero";
 
-export const revalidate = 60;
+export const revalidate = 0; // Always fresh — admin changes reflect instantly
 
 export const metadata: Metadata = {
   title: "Style Ideas | Classie",
