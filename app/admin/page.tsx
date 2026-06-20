@@ -286,8 +286,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "orders" | "settings" | "footer" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -308,6 +308,12 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "style-ideas-page":     "style-ideas-page",
   "style-ideas-featured": "style-ideas-page",
   "style-ideas-reels":    "style-ideas-page",
+
+  "adv-shop":    "advanced-settings",
+  "adv-coll":    "advanced-settings",
+  "adv-picks":   "advanced-settings",
+  "adv-inspo":   "advanced-settings",
+  "adv-related": "advanced-settings",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -339,6 +345,13 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "style-ideas-page",     label: "Style Ideas" },
     { id: "style-ideas-featured", label: "Featured Look" },
     { id: "style-ideas-reels",    label: "Style Reels" },
+  ],
+  "advanced-settings": [
+    { id: "adv-shop",    label: "Shop Grid" },
+    { id: "adv-coll",    label: "Collections Grid" },
+    { id: "adv-picks",   label: "Featured Picks" },
+    { id: "adv-inspo",   label: "Style Inspo" },
+    { id: "adv-related", label: "Related Products" },
   ],
   orders:   [],
   settings: [],
@@ -494,6 +507,13 @@ export default function AdminPage() {
   const [siCardsShowTag, setSiCardsShowTag] = useState(true);
   const [siLooksHeading, setSiLooksHeading] = useState("Shop the Look");
   const [siLooksHeadingSaving, setSiLooksHeadingSaving] = useState(false);
+  // Look Cards advanced controls
+  const [siLooksMobile, setSiLooksMobile] = useState(2);
+  const [siLooksGap, setSiLooksGap] = useState(16);
+  const [siLooksAspect, setSiLooksAspect] = useState("3/4");
+  const [siLooksRadius, setSiLooksRadius] = useState("sharp");
+  const [siLooksCardH, setSiLooksCardH] = useState(0); // 0 = auto (aspect controls)
+  const [siLooksAdvSaving, setSiLooksAdvSaving] = useState(false);
   const [siCardsPerRowSaving, setSiCardsPerRowSaving] = useState(false);
 
   // Featured Look section state
@@ -523,6 +543,24 @@ export default function AdminPage() {
   const [siReelsRadius,    setSiReelsRadius]    = useState("sharp"); // sharp|slight|rounded|pill
   const [siReelsMobileCols,setSiReelsMobileCols] = useState(2);
   const [siReelsSaving,    setSiReelsSaving]    = useState(false);
+
+  // ── Advanced Settings state ───────────────────────────────────────────────
+  const [advShopMobile,    setAdvShopMobile]    = useState(2);
+  const [advShopDesktop,   setAdvShopDesktop]   = useState(4);
+  const [advShopGap,       setAdvShopGap]       = useState(16);
+  const [advCollMobile,    setAdvCollMobile]    = useState(2);
+  const [advCollDesktop,   setAdvCollDesktop]   = useState(4);
+  const [advCollGap,       setAdvCollGap]       = useState(12);
+  const [advPicksMobile,   setAdvPicksMobile]   = useState(2);
+  const [advPicksDesktop,  setAdvPicksDesktop]  = useState(4);
+  const [advPicksGap,      setAdvPicksGap]      = useState(12);
+  const [advInspoDesktop,  setAdvInspoDesktop]  = useState(4);
+  const [advInspoGap,      setAdvInspoGap]      = useState(4);
+  const [advRelatedMobile, setAdvRelatedMobile] = useState(2);
+  const [advRelatedDesktop,setAdvRelatedDesktop]= useState(4);
+  const [advRelatedGap,    setAdvRelatedGap]    = useState(16);
+  const [advSaving,        setAdvSaving]        = useState(false);
+
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
   const [bowWhyCard1Icon, setBowWhyCard1Icon] = useState("🎀");
@@ -1174,7 +1212,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_occasions_visible","si_cards_per_row","si_cards_show_tag","si_looks_heading","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_occasions_visible","si_cards_per_row","si_cards_show_tag","si_looks_heading","si_looks_mobile","si_looks_gap","si_looks_aspect","si_looks_radius","si_looks_card_h","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1198,6 +1236,11 @@ export default function AdminPage() {
       if (m.si_cards_per_row) setSiCardsPerRow(parseInt(m.si_cards_per_row) || 4);
       if (m.si_cards_show_tag !== undefined) setSiCardsShowTag(m.si_cards_show_tag !== "false");
       if (m.si_looks_heading !== undefined) setSiLooksHeading(m.si_looks_heading);
+      if (m.si_looks_mobile)  setSiLooksMobile(parseInt(m.si_looks_mobile)||2);
+      if (m.si_looks_gap)     setSiLooksGap(parseInt(m.si_looks_gap)||16);
+      if (m.si_looks_aspect)  setSiLooksAspect(m.si_looks_aspect);
+      if (m.si_looks_radius)  setSiLooksRadius(m.si_looks_radius);
+      if (m.si_looks_card_h)  setSiLooksCardH(parseInt(m.si_looks_card_h)||0);
       if (m.si_featured_visible !== undefined) setSiFeaturedVisible(m.si_featured_visible !== "false");
       if (m.si_reels_visible !== undefined) setSiReelsVisible(m.si_reels_visible !== "false");
       if (m.si_reels_heading)  setSiReelsHeading(m.si_reels_heading);
@@ -1234,6 +1277,23 @@ export default function AdminPage() {
       await revalidateSite();
     } catch { /* ignore */ }
     finally { setSiOccasionsSaving(false); }
+  };
+
+  const saveSiLooksAdv = async () => {
+    setSiLooksAdvSaving(true);
+    const pairs = [
+      { key: "si_looks_mobile",  value: String(siLooksMobile) },
+      { key: "si_looks_gap",     value: String(siLooksGap) },
+      { key: "si_looks_aspect",  value: siLooksAspect },
+      { key: "si_looks_radius",  value: siLooksRadius },
+      { key: "si_looks_card_h",  value: String(siLooksCardH) },
+    ];
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key", p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setSiLooksAdvSaving(false);
   };
 
   const saveSiLooksHeading = async (val: string) => {
@@ -1620,6 +1680,43 @@ export default function AdminPage() {
     finally { setStyleInspoLoading(false); }
   }, []);
 
+  const fetchAdvSettings = useCallback(async () => {
+    const keys = ["adv_shop_mobile","adv_shop_desktop","adv_shop_gap","adv_coll_mobile","adv_coll_desktop","adv_coll_gap","adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_inspo_desktop","adv_inspo_gap","adv_related_mobile","adv_related_desktop","adv_related_gap"];
+    const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
+    const m: Record<string,string> = {};
+    (data ?? []).forEach((r: {key:string;value:string}) => { m[r.key] = r.value; });
+    if (m.adv_shop_mobile)    setAdvShopMobile(parseInt(m.adv_shop_mobile)||2);
+    if (m.adv_shop_desktop)   setAdvShopDesktop(parseInt(m.adv_shop_desktop)||4);
+    if (m.adv_shop_gap)       setAdvShopGap(parseInt(m.adv_shop_gap)||16);
+    if (m.adv_coll_mobile)    setAdvCollMobile(parseInt(m.adv_coll_mobile)||2);
+    if (m.adv_coll_desktop)   setAdvCollDesktop(parseInt(m.adv_coll_desktop)||4);
+    if (m.adv_coll_gap)       setAdvCollGap(parseInt(m.adv_coll_gap)||12);
+    if (m.adv_picks_mobile)   setAdvPicksMobile(parseInt(m.adv_picks_mobile)||2);
+    if (m.adv_picks_desktop)  setAdvPicksDesktop(parseInt(m.adv_picks_desktop)||4);
+    if (m.adv_picks_gap)      setAdvPicksGap(parseInt(m.adv_picks_gap)||12);
+    if (m.adv_inspo_desktop)  setAdvInspoDesktop(parseInt(m.adv_inspo_desktop)||4);
+    if (m.adv_inspo_gap)      setAdvInspoGap(parseInt(m.adv_inspo_gap)||4);
+    if (m.adv_related_mobile) setAdvRelatedMobile(parseInt(m.adv_related_mobile)||2);
+    if (m.adv_related_desktop)setAdvRelatedDesktop(parseInt(m.adv_related_desktop)||4);
+    if (m.adv_related_gap)    setAdvRelatedGap(parseInt(m.adv_related_gap)||16);
+  }, []);
+
+  const saveAdvSection = async (section: string) => {
+    setAdvSaving(true);
+    let pairs: {key:string;value:string}[] = [];
+    if (section==="shop")    pairs = [{key:"adv_shop_mobile",value:String(advShopMobile)},{key:"adv_shop_desktop",value:String(advShopDesktop)},{key:"adv_shop_gap",value:String(advShopGap)}];
+    if (section==="coll")    pairs = [{key:"adv_coll_mobile",value:String(advCollMobile)},{key:"adv_coll_desktop",value:String(advCollDesktop)},{key:"adv_coll_gap",value:String(advCollGap)}];
+    if (section==="picks")   pairs = [{key:"adv_picks_mobile",value:String(advPicksMobile)},{key:"adv_picks_desktop",value:String(advPicksDesktop)},{key:"adv_picks_gap",value:String(advPicksGap)}];
+    if (section==="inspo")   pairs = [{key:"adv_inspo_desktop",value:String(advInspoDesktop)},{key:"adv_inspo_gap",value:String(advInspoGap)}];
+    if (section==="related") pairs = [{key:"adv_related_mobile",value:String(advRelatedMobile)},{key:"adv_related_desktop",value:String(advRelatedDesktop)},{key:"adv_related_gap",value:String(advRelatedGap)}];
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key",p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setAdvSaving(false);
+  };
+
   // Load data when authenticated
   useEffect(() => {
     if (!authed) return;
@@ -1644,12 +1741,14 @@ export default function AdminPage() {
     if (tab === "style-ideas-featured") { fetchStyleIdeasPage(); fetchAllProducts(); }
     if (tab === "style-ideas-reels") fetchStyleIdeasPage();
 
+    if (["adv-shop","adv-coll","adv-picks","adv-inspo","adv-related"].includes(tab)) fetchAdvSettings();
+
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -2143,7 +2242,8 @@ export default function AdminPage() {
     { id: "clips-page", label: "Clips Page",  icon: Sparkles },
     { id: "bow-page",          label: "Bow Page",         icon: Sparkles },
     { id: "collections-page", label: "Collections Page", icon: Grid3x3 },
-    { id: "style-ideas-page", label: "Style Ideas Page", icon: Camera },
+    { id: "style-ideas-page",   label: "Style Ideas Page", icon: Camera },
+    { id: "advanced-settings",  label: "Advanced Settings", icon: Settings },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -4112,6 +4212,59 @@ export default function AdminPage() {
                           </button>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* ── Look Cards Advanced Controls ───────────────── */}
+                  <div>
+                    <div className="mb-3">
+                      <h2 className="text-base font-semibold text-gray-800">Look Cards — Advanced</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Card ka size, shape, spacing, mobile columns</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">Mobile Columns</p>
+                          <div className="flex gap-2">
+                            {[1,2,3].map(n=>(
+                              <button key={n} type="button" onClick={()=>setSiLooksMobile(n)}
+                                className={`w-10 h-10 text-sm font-semibold border rounded-lg transition-colors ${siLooksMobile===n?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>{n}</button>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">Gap (px)</p>
+                          <input type="number" min={0} max={60} value={siLooksGap} onChange={e=>setSiLooksGap(parseInt(e.target.value)||0)}
+                            className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">Aspect Ratio</p>
+                        <div className="flex flex-wrap gap-2">
+                          {[["none","Free"],["3/4","3:4"],["4/5","4:5"],["9/16","9:16"],["1/1","1:1"],["16/9","16:9"]].map(([val,label])=>(
+                            <button key={val} type="button" onClick={()=>setSiLooksAspect(val)}
+                              className={`px-3 py-1.5 text-xs font-medium border rounded-lg transition-colors ${siLooksAspect===val?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>{label}</button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">Border Radius</p>
+                        <div className="flex gap-2">
+                          {[["sharp","Sharp ◼"],["slight","Slight ▪"],["rounded","Rounded ◻"],["pill","Pill ⬜"]].map(([val,label])=>(
+                            <button key={val} type="button" onClick={()=>setSiLooksRadius(val)}
+                              className={`px-3 py-1.5 text-xs font-medium border rounded-lg transition-colors ${siLooksRadius===val?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>{label}</button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">Card Height (px) <span className="text-gray-300">— 0 = aspect ratio se auto</span></p>
+                        <input type="number" min={0} max={900} value={siLooksCardH} onChange={e=>setSiLooksCardH(parseInt(e.target.value)||0)}
+                          className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                      </div>
+                      <button onClick={saveSiLooksAdv} disabled={siLooksAdvSaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                        <Save className="w-4 h-4"/>{siLooksAdvSaving?"Saving…":"Save Advanced Settings"}
+                      </button>
                     </div>
                   </div>
 

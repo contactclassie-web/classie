@@ -21,21 +21,24 @@ interface Props {
   cardsPerRow: number;
   showTag?: boolean;
   heading?: string;
+  mobileCols?: number;
+  gap?: number;
+  aspect?: string;
+  radius?: string;
+  cardH?: number;
 }
 
-export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, showTag = true, heading = "Shop the Look" }: Props) {
+export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, showTag = true, heading = "Shop the Look", mobileCols = 2, gap = 16, aspect = "3/4", radius = "sharp", cardH = 0 }: Props) {
   const [activeTab, setActiveTab] = useState("All Looks");
 
   const filtered = activeTab === "All Looks"
     ? looks
     : looks.filter(l => l.tag === activeTab);
 
-  const colClass =
-    cardsPerRow === 2 ? "grid-cols-1 sm:grid-cols-2" :
-    cardsPerRow === 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" :
-    cardsPerRow === 5 ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" :
-    cardsPerRow === 6 ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6" :
-    "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"; // default 4
+  const mobileColMap: Record<number,string> = { 1:"grid-cols-1", 2:"grid-cols-2", 3:"grid-cols-3" };
+  const desktopColMap: Record<number,string> = { 2:"lg:grid-cols-2", 3:"lg:grid-cols-3", 4:"lg:grid-cols-4", 5:"lg:grid-cols-5", 6:"lg:grid-cols-6" };
+  const colClass = `${mobileColMap[mobileCols]||"grid-cols-2"} ${desktopColMap[cardsPerRow]||"lg:grid-cols-4"}`;
+  const radiusMap: Record<string,string> = { sharp:"rounded-none", slight:"rounded", rounded:"rounded-xl", pill:"rounded-3xl" };
 
   return (
     <section className="py-12 bg-white">
@@ -69,9 +72,9 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, s
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-[#888] text-sm">No looks in this category yet.</div>
         ) : (
-          <div className={`grid gap-5 ${colClass}`}>
+          <div className={`grid ${colClass}`} style={{ gap: `${gap}px` }}>
             {filtered.map((look) => (
-              <LookCard key={look.id} look={look} showTag={showTag} />
+              <LookCard key={look.id} look={look} showTag={showTag} aspect={aspect} radius={radiusMap[radius]||"rounded-none"} cardH={cardH} />
             ))}
           </div>
         )}
@@ -80,7 +83,7 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, s
   );
 }
 
-function LookCard({ look, showTag = true }: { look: LookCard; showTag?: boolean }) {
+function LookCard({ look, showTag = true, aspect = "3/4", radius = "rounded-none", cardH = 0 }: { look: LookCard; showTag?: boolean; aspect?: string; radius?: string; cardH?: number }) {
   const [hovered, setHovered] = useState(false);
   const href = look.link_url || "/shop/heels";
 
@@ -91,7 +94,8 @@ function LookCard({ look, showTag = true }: { look: LookCard; showTag?: boolean 
       onMouseLeave={() => setHovered(false)}
     >
       {/* Media */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#f5f5f5]">
+      <div className={`relative overflow-hidden bg-[#f5f5f5] ${radius}`}
+        style={{ aspectRatio: cardH > 0 ? undefined : aspect, height: cardH > 0 ? `${cardH}px` : undefined }}>
         {look.media_type === "video" ? (
           <video
             src={look.image_url}
