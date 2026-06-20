@@ -287,7 +287,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 interface FooterLinkItem { text: string; url: string; }
 
 type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "orders" | "settings" | "footer" | "messages";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -306,7 +306,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "bow-page":           "bow-page",
   "collections-page":   "collections-page",
   "style-ideas-page":     "style-ideas-page",
-  "style-ideas-featured": "style-ideas-featured",
+  "style-ideas-featured": "style-ideas-page",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -334,8 +334,10 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   "clips-page": [{ id: "clips-page", label: "Clips Page" }],
   "bow-page":          [{ id: "bow-page",         label: "Bow Page" }],
   "collections-page":  [{ id: "collections-page", label: "Collections Page" }],
-  "style-ideas-page":     [{ id: "style-ideas-page",     label: "Style Ideas Page" }],
-  "style-ideas-featured": [{ id: "style-ideas-featured", label: "Featured Look" }],
+  "style-ideas-page": [
+    { id: "style-ideas-page",     label: "Style Ideas" },
+    { id: "style-ideas-featured", label: "Featured Look" },
+  ],
   orders:   [],
   settings: [],
   footer:   [],
@@ -2063,8 +2065,7 @@ export default function AdminPage() {
     { id: "clips-page", label: "Clips Page",  icon: Sparkles },
     { id: "bow-page",          label: "Bow Page",         icon: Sparkles },
     { id: "collections-page", label: "Collections Page", icon: Grid3x3 },
-    { id: "style-ideas-page",     label: "Style Ideas Page",  icon: Camera },
-    { id: "style-ideas-featured", label: "Featured Look",      icon: Star },
+    { id: "style-ideas-page", label: "Style Ideas Page", icon: Camera },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -2101,7 +2102,6 @@ export default function AdminPage() {
               id === "bow-page" ? "bow-page" :
               id === "collections-page" ? "collections-page" :
               id === "style-ideas-page" ? "style-ideas-page" :
-              id === "style-ideas-featured" ? "style-ideas-featured" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -2154,7 +2154,6 @@ export default function AdminPage() {
                mainSection === "bow-page" ? "Bow Page" :
                mainSection === "collections-page" ? "Collections Page" :
                mainSection === "style-ideas-page" ? "Style Ideas Page" :
-               mainSection === "style-ideas-featured" ? "Featured Look" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -4084,20 +4083,6 @@ export default function AdminPage() {
                         </div>
                       </div>
                     )}
-                  </div>
-
-                  {/* ── Featured Look → separate sidebar section ── */}
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h2 className="text-base font-semibold text-gray-800">Featured Look (Editor&apos;s Pick)</h2>
-                        <p className="text-xs text-gray-400 mt-0.5">Sidebar mein &quot;Featured Look&quot; section mein manage karo.</p>
-                      </div>
-                      <button onClick={()=>setTab("style-ideas-featured")}
-                        className="px-4 py-2 text-xs font-medium text-[#3B5373] border border-[#3B5373] rounded-lg hover:bg-[#3B5373] hover:text-white transition-colors">
-                        Go to Featured Look →
-                      </button>
-                    </div>
                   </div>
                 </>
               )}
