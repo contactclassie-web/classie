@@ -25,7 +25,7 @@ export default function Navbar() {
   const { count } = useCart();
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [logoUrl, setLogoUrl]   = useState("/classie_logo.jpg");
+  const [logoUrl, setLogoUrl]   = useState("https://res.cloudinary.com/dbzt3soyi/image/upload/v1780757501/unnamed_5_nzzrwl.jpg");
   const [categories, setCategories] = useState<Category[]>([
     { name: "Heels", slug: "heels", display_order: 1, image_url: "", description: "" },
     { name: "Clip-ons", slug: "clips", display_order: 2, image_url: "", description: "" },
