@@ -487,6 +487,7 @@ export default function AdminPage() {
   const [siHeroStat3Label, setSiHeroStat3Label] = useState("Shipping ₹999+");
   const [siHeroSaving, setSiHeroSaving] = useState(false);
   const [siOccasions, setSiOccasions] = useState<string[]>(["All Looks","Date Night","Work & Play","Festive","Casual","Wedding"]);
+  const [siOccasionsVisible, setSiOccasionsVisible] = useState(true);
   const [siOccasionsSaving, setSiOccasionsSaving] = useState(false);
   const [newSiOccasion, setNewSiOccasion] = useState("");
   const [siCardsPerRow, setSiCardsPerRow] = useState(4);
@@ -1170,7 +1171,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_occasions_visible","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1190,6 +1191,7 @@ export default function AdminPage() {
       if (m.si_hero_stat3_val) setSiHeroStat3Val(m.si_hero_stat3_val);
       if (m.si_hero_stat3_label) setSiHeroStat3Label(m.si_hero_stat3_label);
       if (m.si_occasions) { try { setSiOccasions(JSON.parse(m.si_occasions)); } catch { /* ignore */ } }
+      if (m.si_occasions_visible !== undefined) setSiOccasionsVisible(m.si_occasions_visible !== "false");
       if (m.si_cards_per_row) setSiCardsPerRow(parseInt(m.si_cards_per_row) || 4);
       if (m.si_featured_visible !== undefined) setSiFeaturedVisible(m.si_featured_visible !== "false");
       if (m.si_reels_visible !== undefined) setSiReelsVisible(m.si_reels_visible !== "false");
@@ -1222,6 +1224,8 @@ export default function AdminPage() {
     try {
       await supabase.from("site_settings").delete().eq("key", "si_occasions");
       await supabase.from("site_settings").insert({ key: "si_occasions", value: JSON.stringify(list) });
+      await supabase.from("site_settings").delete().eq("key", "si_occasions_visible");
+      await supabase.from("site_settings").insert({ key: "si_occasions_visible", value: siOccasionsVisible ? "true" : "false" });
       await revalidateSite();
     } catch { /* ignore */ }
     finally { setSiOccasionsSaving(false); }
@@ -4002,9 +4006,18 @@ export default function AdminPage() {
 
                   {/* ── Occasions / Filter Tabs ─────────────────────── */}
                   <div>
-                    <div className="mb-4">
-                      <h2 className="text-base font-semibold text-gray-800">Occasions / Filter Tabs</h2>
-                      <p className="text-xs text-gray-400 mt-0.5">Style Ideas page pe filter tabs — add/remove occasions.</p>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">Occasions / Filter Tabs</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">Style Ideas page pe filter tabs — add/remove occasions.</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-gray-400">{siOccasionsVisible ? "Visible" : "Hidden"}</span>
+                        <button onClick={async () => { setSiOccasionsVisible(v => !v); }} 
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${siOccasionsVisible ? "bg-[#3B5373]" : "bg-gray-200"}`}>
+                          <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${siOccasionsVisible ? "translate-x-6" : "translate-x-1"}`}/>
+                        </button>
+                      </div>
                     </div>
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
                       <div className="flex flex-wrap gap-2 min-h-[36px]">
