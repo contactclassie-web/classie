@@ -17,8 +17,20 @@ const IG_DEFAULTS: IgSettings = {
 export default function StyleInspoSection() {
   const [images, setImages] = useState<IgImage[]>([]);
   const [cfg, setCfg] = useState<IgSettings>(IG_DEFAULTS);
+  const [advDesktop, setAdvDesktop] = useState(4);
+  const [advGap,     setAdvGap]     = useState(4);
 
   useEffect(() => {
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["adv_inspo_desktop","adv_inspo_gap"])
+      .then(({ data }) => {
+        if (!data) return;
+        const m: Record<string,string> = {};
+        data.forEach(({ key, value }) => { m[key] = value; });
+        if (m.adv_inspo_desktop) setAdvDesktop(parseInt(m.adv_inspo_desktop) || 4);
+        if (m.adv_inspo_gap)     setAdvGap(parseInt(m.adv_inspo_gap) || 4);
+      });
+
     supabase.from("instagram_images").select("*").eq("active", true)
       .order("display_order", { ascending: true }).limit(6)
       .then(({ data }) => { if (data && data.length > 0) setImages(data as IgImage[]); });
@@ -61,8 +73,8 @@ export default function StyleInspoSection() {
           <p className="text-[#9ca3af] text-xs tracking-wide font-light">{cfg.subtext}</p>
         </div>
 
-        {/* Grid — 3 cols on mobile, up to 6 on desktop */}
-        <div className={`grid gap-1 grid-cols-3 ${images.length >= 4 ? "md:grid-cols-4" : ""} ${images.length >= 5 ? "md:grid-cols-5" : ""} ${images.length >= 6 ? "md:grid-cols-6" : ""}`}>
+        {/* Grid — 3 cols on mobile, configurable on desktop */}
+        <div className={`grid grid-cols-3 md:grid-cols-${advDesktop}`} style={{ gap: advGap + "px" }}>
           {images.map((item, i) => (
             <a key={i} href={item.link_url || "#"} target="_blank" rel="noopener noreferrer"
               className="group relative overflow-hidden bg-[#c8d6e5]" style={{ aspectRatio: "1 / 1" }}>

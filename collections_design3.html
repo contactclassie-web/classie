@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classie — Collections</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #3B5373;
+  --dark: #1c2c3e;
+  --darkest: #0d1b2a;
+  --lavender: #f8f7ff;
+  --lavender2: #ece9f8;
+  --text: #1a1a1a;
+  --muted: #8a8a9a;
+  --border: #eceaf5;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Poppins', sans-serif; background: #fff; color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+/* ════════════════════════════════════════
+   HERO
+════════════════════════════════════════ */
+.hero {
+  position: relative;
+  min-height: 92vh;
+  background: linear-gradient(145deg, var(--navy) 0%, #2a3f58 40%, var(--dark) 75%, var(--darkest) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-align: center;
+  padding: 80px 40px 100px;
+}
+
+/* Decorative circles */
+.hero-circle1, .hero-circle2, .hero-circle3 {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-circle1 {
+  width: 700px; height: 700px;
+  border: 1px solid rgba(255,255,255,0.04);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.hero-circle2 {
+  width: 500px; height: 500px;
+  border: 1px solid rgba(255,255,255,0.06);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.hero-circle3 {
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(168,159,212,0.08) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+/* Glow blob */
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse, rgba(168,159,212,0.12) 0%, transparent 65%);
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Star decorations */
+.hero-star1, .hero-star2 {
+  position: absolute;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.12);
+  pointer-events: none;
+}
+.hero-star1 { top: 28%; left: 12%; }
+.hero-star2 { bottom: 28%; right: 10%; }
+
+.hero-inner { position: relative; z-index: 2; max-width: 780px; }
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 9.5px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 36px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  display: block;
+  width: 28px; height: 1px;
+  background: rgba(255,255,255,0.18);
+}
+
+.hero h1 {
+  font-family: 'Cormorant Garant', serif;
+  font-size: clamp(56px, 8vw, 96px);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.02;
+  margin-bottom: 28px;
+  letter-spacing: -0.01em;
+}
+.hero h1 .italic {
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(255,255,255,0.55);
+}
+.hero h1 .accent { color: rgba(200,192,238,0.9); }
+
+.hero-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.38);
+  letter-spacing: 0.06em;
+  line-height: 1.9;
+  margin-bottom: 52px;
+  font-weight: 300;
+}
+
+.hero-cats {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 72px;
+}
+.hero-cat {
+  padding: 11px 26px;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.5);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+}
+.hero-cat:hover { border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+.hero-cat.active { background: #fff; border-color: #fff; color: var(--navy); font-weight: 500; }
+
+/* Stats row */
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(8px);
+  max-width: 440px;
+  margin: 0 auto;
+}
+.hstat {
+  flex: 1;
+  padding: 18px 24px;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.hstat:last-child { border-right: none; }
+.hstat-val {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.85);
+  line-height: 1;
+  margin-bottom: 5px;
+}
+.hstat-label {
+  font-size: 8px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
+
+/* Scroll indicator */
+.hero-scroll {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+  opacity: 0.3;
+}
+.hero-scroll span {
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, #fff, transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.1); }
+}
+
+/* ════════════════════════════════════════
+   FILTER BAR
+════════════════════════════════════════ */
+.filter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 30px rgba(59,83,115,0.06);
+}
+.filter-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 62px;
+}
+.tabs { display: flex; gap: 0; }
+.tab {
+  position: relative;
+  padding: 0 26px;
+  height: 62px;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c0bdd0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.28s;
+  background: none; border-top: none; border-left: none; border-right: none;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--navy); }
+.tab.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 500; }
+.tab-count {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 8px;
+  opacity: 0.45;
+  font-weight: 400;
+}
+
+.filter-right { display: flex; align-items: center; gap: 20px; }
+.filter-count {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #d8d5e8;
+}
+
+.sort-wrap { position: relative; }
+.sort-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 20px;
+  font-size: 9.5px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #7a788a;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  cursor: pointer; background: none;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.25s;
+}
+.sort-btn:hover { border-color: var(--navy); color: var(--navy); }
+.sort-icon { flex-shrink: 0; }
+.chevron { transition: transform 0.25s; }
+.chevron.open { transform: rotate(180deg); }
+
+.sort-drop {
+  position: absolute; right: 0; top: calc(100% + 8px);
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 48px rgba(59,83,115,0.11);
+  min-width: 210px;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 600;
+  opacity: 0; visibility: hidden;
+  transform: translateY(-6px);
+  transition: all 0.22s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.sort-drop.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.sort-opt {
+  display: block; padding: 13px 22px;
+  font-size: 9.5px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #5a5870; cursor: pointer;
+  border: none; background: none; width: 100%; text-align: left;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.15s;
+}
+.sort-opt:hover { background: var(--lavender); color: var(--navy); }
+.sort-opt.active { color: var(--navy); background: var(--lavender); font-weight: 500; }
+
+/* ════════════════════════════════════════
+   CONTENT
+════════════════════════════════════════ */
+.content {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 56px 64px 120px;
+}
+
+/* Active category banner */
+.cat-banner {
+  display: flex; align-items: center; gap: 20px;
+  padding: 20px 28px;
+  background: var(--lavender);
+  border: 1px solid var(--lavender2);
+  border-left: 3px solid var(--navy);
+  margin-bottom: 44px;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.cat-banner-img { width: 56px; height: 56px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+.cat-banner-tag { font-size: 8.5px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--navy); margin-bottom: 4px; opacity: 0.7; }
+.cat-banner-name { font-family: 'Cormorant Garant', serif; font-size: 24px; font-weight: 400; color: var(--text); }
+.cat-banner-desc { font-size: 10.5px; color: var(--muted); margin-top: 2px; font-weight: 300; }
+
+/* ════════════════════════════════════════
+   GRID
+════════════════════════════════════════ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 36px 24px;
+}
+
+/* ════════════════════════════════════════
+   CARD
+════════════════════════════════════════ */
+.card { display: block; text-decoration: none; cursor: pointer; }
+
+.card-img-wrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #f4f2f9;
+  margin-bottom: 18px;
+}
+.card-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.card:hover .card-img { transform: scale(1.07); }
+
+.card-overlay {
+  position: absolute; inset: 0;
+  background: rgba(13,27,42,0);
+  transition: background 0.4s ease;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 24px;
+}
+.card:hover .card-overlay { background: rgba(13,27,42,0.24); }
+
+.card-cta {
+  padding: 12px 34px;
+  background: #fff;
+  color: var(--text);
+  font-size: 8.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  transform: translateY(16px);
+  opacity: 0;
+  transition: all 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+  white-space: nowrap;
+  letter-spacing: 0.2em;
+}
+.card:hover .card-cta { transform: translateY(0); opacity: 1; }
+
+/* Wishlist */
+.card-wish {
+  position: absolute; top: 14px; right: 14px;
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: all 0.3s;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.card:hover .card-wish { opacity: 1; transform: scale(1); }
+.card-wish svg { color: var(--navy); }
+
+/* Badge */
+.badge {
+  position: absolute; top: 14px; left: 14px;
+  padding: 4px 10px;
+  font-size: 7.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-family: 'Poppins', sans-serif; font-weight: 500;
+  border-radius: 2px;
+}
+.badge-sale { background: var(--navy); color: #fff; }
+.badge-new { background: #fff; color: var(--navy); border: 1px solid var(--lavender2); }
+
+/* Info */
+.card-cat {
+  font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: #c8c5d8; margin-bottom: 7px;
+}
+.card-title {
+  font-family: 'Cormorant Garant', serif;
+  font-size: 19px; font-weight: 400;
+  color: var(--text); line-height: 1.3;
+  margin-bottom: 10px;
+  transition: color 0.22s;
+}
+.card:hover .card-title { color: var(--navy); }
+
+.card-prices { display: flex; align-items: center; gap: 10px; }
+.price { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.compare { font-size: 11px; color: #ccc; text-decoration: line-through; }
+
+/* ════════════════════════════════════════
+   FOOTER CTA
+════════════════════════════════════════ */
+.load-wrap {
+  text-align: center;
+  margin-top: 72px;
+  padding-top: 56px;
+  border-top: 1px solid #f0eef8;
+}
+.load-sub { font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: #d0cde0; margin-bottom: 24px; }
+.load-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 15px 44px;
+  border: 1px solid var(--navy);
+  color: var(--navy);
+  font-size: 9.5px; letter-spacing: 0.24em; text-transform: uppercase;
+  cursor: pointer; background: none;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.32s;
+}
+.load-btn:hover { background: var(--navy); color: #fff; }
+.load-btn svg { transition: transform 0.3s; }
+.load-btn:hover svg { transform: translateX(4px); }
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .hero { min-height: 80vh; padding: 60px 24px 80px; }
+  .hero h1 { font-size: 48px; }
+  .hero-stats { flex-wrap: wrap; }
+  .filter-inner { padding: 0 24px; }
+  .tabs { overflow-x: auto; }
+  .tab { padding: 0 16px; font-size: 9px; }
+  .content { padding: 36px 24px 80px; }
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 20px 14px; }
+  .filter-count { display: none; }
+  .hero-scroll { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ HERO ════════ -->
+<section class="hero">
+  <div class="hero-circle1"></div>
+  <div class="hero-circle2"></div>
+  <div class="hero-circle3"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-star1">✦ ✦ ✦</div>
+  <div class="hero-star2">✦ ✦ ✦</div>
+
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Classie Collections 2025</p>
+
+    <h1>
+      Explore<br>
+      <span class="italic">our</span>
+      <span class="accent"> Collection</span>
+    </h1>
+
+    <p class="hero-sub">Curated styles for every occasion —<br>from everyday elegance to statement evenings.</p>
+
+    <div class="hero-cats">
+      <button class="hero-cat active" onclick="heroFilter(this)">All Styles</button>
+      <button class="hero-cat" onclick="heroFilter(this)">Heels</button>
+      <button class="hero-cat" onclick="heroFilter(this)">Clip-ons</button>
+      <button class="hero-cat" onclick="heroFilter(this)">Bow Collection</button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="hstat-val">24</div>
+        <div class="hstat-label">Styles</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">3</div>
+        <div class="hstat-label">Collections</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">₹399+</div>
+        <div class="hstat-label">Starting</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ════════ FILTER BAR ════════ -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this)">All<span class="tab-count">24</span></button>
+      <button class="tab" onclick="switchTab(this)">Heels<span class="tab-count">12</span></button>
+      <button class="tab" onclick="switchTab(this)">Clip-ons<span class="tab-count">8</span></button>
+      <button class="tab" onclick="switchTab(this)">Bow Collection<span class="tab-count">4</span></button>
+    </div>
+    <div class="filter-right">
+      <span class="filter-count">Showing 24 products</span>
+      <div class="sort-wrap">
+        <button class="sort-btn" id="sortBtn" onclick="toggleSort(event)">
+          <svg class="sort-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/>
+            <line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/>
+          </svg>
+          <span id="sortLabel">Newest First</span>
+          <svg class="chevron sort-icon" id="chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+        <div class="sort-drop" id="sortDrop">
+          <button class="sort-opt active" onclick="selectSort(this)">Newest First</button>
+          <button class="sort-opt" onclick="selectSort(this)">Price: Low → High</button>
+          <button class="sort-opt" onclick="selectSort(this)">Price: High → Low</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ CONTENT ════════ -->
+<div class="content">
+  <div class="grid">
+
+    <!-- Card 1 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=480&h=640&fit=crop&q=85" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <span class="badge badge-sale">−15%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Clessia Wine Block Heel</h3>
+      <div class="card-prices"><span class="price">₹1,699</span><span class="compare">₹1,999</span></div>
+    </a>
+
+    <!-- Card 2 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=480&h=640&fit=crop&q=85" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Radiance Nude Stiletto</h3>
+      <div class="card-prices"><span class="price">₹2,199</span></div>
+    </a>
+
+    <!-- Card 3 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1596703263926-eb0762ee17e4?w=480&h=640&fit=crop&q=85" alt="Clip-on">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <span class="badge badge-sale">−10%</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Crystal Rhinestone Charm</h3>
+      <div class="card-prices"><span class="price">₹449</span><span class="compare">₹499</span></div>
+    </a>
+
+    <!-- Card 4 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1591348278863-a8fb3887e2aa?w=480&h=640&fit=crop&q=85" alt="Bow">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Satin Swirl Bow — Blush</h3>
+      <div class="card-prices"><span class="price">₹399</span></div>
+    </a>
+
+    <!-- Card 5 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=480&h=640&fit=crop&q=85" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <span class="badge badge-sale">−20%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Crovia Chocolate Slingback</h3>
+      <div class="card-prices"><span class="price">₹1,499</span><span class="compare">₹1,899</span></div>
+    </a>
+
+    <!-- Card 6 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=480&h=640&fit=crop&q=85" alt="Clip-on">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Pearl Drop Statement Clip</h3>
+      <div class="card-prices"><span class="price">₹549</span></div>
+    </a>
+
+    <!-- Card 7 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1604671801908-6f0c6a092c05?w=480&h=640&fit=crop&q=85" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <span class="badge badge-sale">−12%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Lumina Black Strappy Heel</h3>
+      <div class="card-prices"><span class="price">₹1,849</span><span class="compare">₹2,099</span></div>
+    </a>
+
+    <!-- Card 8 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=480&h=640&fit=crop&q=85" alt="Bow">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <div class="card-wish">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Faux Bow Velvet — Midnight</h3>
+      <div class="card-prices"><span class="price">₹349</span></div>
+    </a>
+
+  </div>
+
+  <!-- Load More -->
+  <div class="load-wrap">
+    <p class="load-sub">Showing 8 of 24 products</p>
+    <button class="load-btn">
+      Load More
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+function heroFilter(el) {
+  document.querySelectorAll('.hero-cat').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+function toggleSort(e) {
+  e.stopPropagation();
+  const drop = document.getElementById('sortDrop');
+  const chev = document.getElementById('chevron');
+  const isOpen = drop.classList.contains('open');
+  drop.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+function selectSort(el) {
+  document.querySelectorAll('.sort-opt').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sortLabel').textContent = el.textContent;
+  document.getElementById('sortDrop').classList.remove('open');
+  document.getElementById('chevron').classList.remove('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('sortDrop').classList.remove('open');
+  document.getElementById('chevron').classList.remove('open');
+});
+</script>
+</body>
+</html>

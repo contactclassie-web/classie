@@ -2332,6 +2332,7 @@ export default function AdminPage() {
                mainSection === "bow-page" ? "Bow Page" :
                mainSection === "collections-page" ? "Collections Page" :
                mainSection === "style-ideas-page" ? "Style Ideas Page" :
+               mainSection === "advanced-settings" ? "Advanced Settings" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -4643,6 +4644,65 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              ADVANCED SETTINGS TABS
+          ══════════════════════════════════════ */}
+          {tab === "adv-shop" && (
+            <AdvGridPanel
+              title="Shop Grid (/shop page)"
+              desc="Product grid on the main shop page"
+              section="shop"
+              mobile={advShopMobile} setMobile={setAdvShopMobile}
+              desktop={advShopDesktop} setDesktop={setAdvShopDesktop}
+              gap={advShopGap} setGap={setAdvShopGap}
+              saving={advSaving} onSave={() => saveAdvSection("shop")}
+            />
+          )}
+          {tab === "adv-coll" && (
+            <AdvGridPanel
+              title="Collections Grid (/shop/heels etc.)"
+              desc="Product grid on collection/category pages"
+              section="coll"
+              mobile={advCollMobile} setMobile={setAdvCollMobile}
+              desktop={advCollDesktop} setDesktop={setAdvCollDesktop}
+              gap={advCollGap} setGap={setAdvCollGap}
+              saving={advSaving} onSave={() => saveAdvSection("coll")}
+            />
+          )}
+          {tab === "adv-picks" && (
+            <AdvGridPanel
+              title="Featured Picks Grid (Homepage)"
+              desc="Product grid in the Featured Picks section"
+              section="picks"
+              mobile={advPicksMobile} setMobile={setAdvPicksMobile}
+              desktop={advPicksDesktop} setDesktop={setAdvPicksDesktop}
+              gap={advPicksGap} setGap={setAdvPicksGap}
+              saving={advSaving} onSave={() => saveAdvSection("picks")}
+            />
+          )}
+          {tab === "adv-inspo" && (
+            <AdvGridPanel
+              title="Style Inspo Grid (Homepage)"
+              desc="The style inspo photo grid on homepage"
+              section="inspo"
+              desktop={advInspoDesktop} setDesktop={setAdvInspoDesktop}
+              gap={advInspoGap} setGap={setAdvInspoGap}
+              saving={advSaving} onSave={() => saveAdvSection("inspo")}
+              noMobile
+            />
+          )}
+          {tab === "adv-related" && (
+            <AdvGridPanel
+              title="Related Products Grid (Product Page)"
+              desc="Related products grid on individual product pages"
+              section="related"
+              mobile={advRelatedMobile} setMobile={setAdvRelatedMobile}
+              desktop={advRelatedDesktop} setDesktop={setAdvRelatedDesktop}
+              gap={advRelatedGap} setGap={setAdvRelatedGap}
+              saving={advSaving} onSave={() => saveAdvSection("related")}
+            />
           )}
 
           {/* ══════════════════════════════════════
@@ -7028,6 +7088,63 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── AdvGridPanel ──────────────────────────────────────────────────────────────
+
+function AdvGridPanel({ title, desc, section, mobile, setMobile, desktop, setDesktop, gap, setGap, saving, onSave, noMobile }: {
+  title: string; desc: string; section: string;
+  mobile?: number; setMobile?: (n: number) => void;
+  desktop: number; setDesktop: (n: number) => void;
+  gap: number; setGap: (n: number) => void;
+  saving: boolean; onSave: () => void;
+  noMobile?: boolean;
+}) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+        <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+      </div>
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+        {!noMobile && (
+          <div>
+            <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Mobile Columns</p>
+            <div className="flex gap-2">
+              {[1,2,3].map(n => (
+                <button key={n} type="button" onClick={() => setMobile?.(n)}
+                  className={`w-12 h-12 text-sm font-semibold border rounded-xl transition-colors ${mobile === n ? "bg-[#3B5373] text-white border-[#3B5373]" : "border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <div>
+          <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Desktop Columns</p>
+          <div className="flex gap-2">
+            {[2,3,4,5,6].map(n => (
+              <button key={n} type="button" onClick={() => setDesktop(n)}
+                className={`w-12 h-12 text-sm font-semibold border rounded-xl transition-colors ${desktop === n ? "bg-[#3B5373] text-white border-[#3B5373]" : "border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Gap (px)</p>
+          <input type="number" min={0} max={60} value={gap} onChange={e => setGap(parseInt(e.target.value) || 0)}
+            className="w-32 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg" />
+          <p className="text-[10px] text-gray-300 mt-1">Current default shown</p>
+        </div>
+        <button onClick={onSave} disabled={saving}
+          className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+          <span>{saving ? "Saving…" : "Save Settings"}</span>
+        </button>
+      </div>
+      <p className="text-[11px] text-gray-300">Section: {section}</p>
     </div>
   );
 }

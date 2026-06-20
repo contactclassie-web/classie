@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classie — Collections</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', sans-serif; background: #fff; color: #1a1a1a; }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, #3B5373 0%, #2a3d52 55%, #1c2c3e 100%);
+    overflow: hidden;
+    padding: 90px 60px 80px;
+    text-align: center;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 380px; height: 380px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+  .hero-eyebrow {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 68px;
+    font-weight: 300;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 em { font-style: italic; font-weight: 300; color: rgba(255,255,255,0.75); }
+  .hero-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.05em;
+    max-width: 400px;
+    margin: 0 auto 36px;
+    line-height: 1.8;
+  }
+  .hero-cats {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-cat {
+    padding: 9px 22px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    transition: all 0.3s;
+    background: transparent;
+    font-family: 'Poppins', sans-serif;
+  }
+  .hero-cat:hover, .hero-cat.active {
+    background: #fff;
+    color: #3B5373;
+    border-color: #fff;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #fff;
+    border-bottom: 1px solid #f0eef8;
+    box-shadow: 0 2px 12px rgba(59,83,115,0.06);
+  }
+  .filter-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+  }
+  .tabs { display: flex; gap: 0; }
+  .tab {
+    padding: 0 22px;
+    height: 58px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #aaa;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'Poppins', sans-serif;
+    white-space: nowrap;
+  }
+  .tab:hover { color: #3B5373; }
+  .tab.active { color: #3B5373; border-bottom-color: #3B5373; font-weight: 500; }
+  .tab sup { font-size: 8px; margin-left: 3px; color: inherit; opacity: 0.6; }
+
+  .sort-wrap { position: relative; }
+  .sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #777;
+    border: 1px solid #e5e5e5;
+    cursor: pointer;
+    background: none;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.2s;
+  }
+  .sort-btn:hover { border-color: #3B5373; color: #3B5373; }
+  .sort-icon { width: 14px; height: 14px; }
+  .chevron { transition: transform 0.2s; }
+  .sort-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    background: #fff;
+    border: 1px solid #ece9f6;
+    box-shadow: 0 8px 30px rgba(59,83,115,0.12);
+    min-width: 190px;
+    z-index: 200;
+  }
+  .sort-option {
+    display: block;
+    padding: 12px 18px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+  }
+  .sort-option:hover { background: #f8f7ff; color: #3B5373; }
+  .sort-option.active { color: #3B5373; background: #f8f7ff; }
+
+  /* ── MAIN CONTENT ── */
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+  }
+
+  /* ── CATEGORY BANNER ── */
+  .cat-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    background: #faf9ff;
+    border: 1px solid #ece9f6;
+    margin-bottom: 36px;
+  }
+  .cat-banner-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 2px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .cat-banner-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #3B5373;
+    margin-bottom: 3px;
+  }
+  .cat-banner-name {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: #1a1a1a;
+  }
+  .cat-banner-desc {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 2px;
+  }
+
+  /* ── PRODUCT GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px 20px;
+  }
+
+  /* ── PRODUCT CARD ── */
+  .card { display: block; text-decoration: none; cursor: pointer; }
+  .card-img-wrap {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: #f8f7f5;
+    border-radius: 1px;
+    margin-bottom: 14px;
+  }
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: block;
+  }
+  .card:hover .card-img { transform: scale(1.06); }
+
+  /* Overlay */
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(26,26,26,0);
+    transition: background 0.35s;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 20px;
+  }
+  .card:hover .card-overlay { background: rgba(26,26,26,0.22); }
+  .card-cta {
+    padding: 10px 28px;
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    transform: translateY(12px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    white-space: nowrap;
+  }
+  .card:hover .card-cta { transform: translateY(0); opacity: 1; }
+
+  /* Badge */
+  .badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 3px 8px;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    border-radius: 2px;
+  }
+  .badge-sale { background: #3B5373; color: #fff; }
+  .badge-new  { background: #f8f7ff; color: #3B5373; border: 1px solid #d0c9f0; }
+
+  /* Card info */
+  .card-cat {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 5px;
+  }
+  .card-title {
+    font-family: 'Cormorant Garant', serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: #1a1a1a;
+    line-height: 1.35;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+  .card:hover .card-title { color: #3B5373; }
+  .card-prices {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-price {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+  .card-compare {
+    font-size: 11px;
+    color: #ccc;
+    text-decoration: line-through;
+  }
+
+  /* ── RESULT COUNT ── */
+  .result-count {
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #ccc;
+    margin-top: 56px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #f8f7ff; }
+  ::-webkit-scrollbar-thumb { background: #c5beed; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <p class="hero-eyebrow">Classie × All Collections</p>
+  <h1>Explore <em>our</em><br>Collection</h1>
+  <p class="hero-sub">Curated styles for every occasion — from everyday elegance to statement evenings.</p>
+  <div class="hero-cats">
+    <button class="hero-cat">Heels</button>
+    <button class="hero-cat">Clip-ons</button>
+    <button class="hero-cat">Bow Collection</button>
+  </div>
+</section>
+
+<!-- ── FILTER BAR ── -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="tabs">
+      <button class="tab active">All <sup>24</sup></button>
+      <button class="tab">Heels <sup>12</sup></button>
+      <button class="tab">Clip-ons <sup>8</sup></button>
+      <button class="tab">Bow Collection <sup>4</sup></button>
+    </div>
+    <div class="sort-wrap">
+      <button class="sort-btn" onclick="toggleSort()">
+        <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16H3M21 12H8M21 8H13"/></svg>
+        Newest First
+        <svg class="chevron sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="sort-dropdown" id="sortMenu" style="display:none;">
+        <button class="sort-option active">Newest First</button>
+        <button class="sort-option">Price: Low → High</button>
+        <button class="sort-option">Price: High → Low</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENT ── -->
+<div class="content">
+  <!-- Product Grid -->
+  <div class="grid">
+
+    <!-- Card 1 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=533&fit=crop" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">-15%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Clessia Wine Block Heel</h3>
+      <div class="card-prices">
+        <span class="card-price">₹1,699</span>
+        <span class="card-compare">₹1,999</span>
+      </div>
+    </a>
+
+    <!-- Card 2 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&h=533&fit=crop" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Radiance Nude Stiletto</h3>
+      <div class="card-prices">
+        <span class="card-price">₹2,199</span>
+      </div>
+    </a>
+
+    <!-- Card 3 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=533&fit=crop" alt="Clip-on">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">-10%</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Crystal Rhinestone Charm</h3>
+      <div class="card-prices">
+        <span class="card-price">₹449</span>
+        <span class="card-compare">₹499</span>
+      </div>
+    </a>
+
+    <!-- Card 4 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1596703263926-eb0762ee17e4?w=400&h=533&fit=crop" alt="Bow">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Satin Swirl Bow — Blush</h3>
+      <div class="card-prices">
+        <span class="card-price">₹399</span>
+      </div>
+    </a>
+
+    <!-- Card 5 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=400&h=533&fit=crop" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">-20%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Crovia Chocolate Slingback</h3>
+      <div class="card-prices">
+        <span class="card-price">₹1,499</span>
+        <span class="card-compare">₹1,899</span>
+      </div>
+    </a>
+
+    <!-- Card 6 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&h=533&fit=crop" alt="Clip-on">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Pearl Drop Statement Clip</h3>
+      <div class="card-prices">
+        <span class="card-price">₹549</span>
+      </div>
+    </a>
+
+    <!-- Card 7 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1604671801908-6f0c6a092c05?w=400&h=533&fit=crop" alt="Heel">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">-12%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Lumina Black Strappy Heel</h3>
+      <div class="card-prices">
+        <span class="card-price">₹1,849</span>
+        <span class="card-compare">₹2,099</span>
+      </div>
+    </a>
+
+    <!-- Card 8 -->
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1591348278863-a8fb3887e2aa?w=400&h=533&fit=crop" alt="Bow">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Faux Bow Velvet — Midnight</h3>
+      <div class="card-prices">
+        <span class="card-price">₹349</span>
+      </div>
+    </a>
+
+  </div>
+
+  <p class="result-count">Showing 8 of 24 products</p>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  // Hero category buttons
+  document.querySelectorAll('.hero-cat').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.hero-cat').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Sort toggle
+  function toggleSort() {
+    const menu = document.getElementById('sortMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  }
+  document.querySelectorAll('.sort-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      document.querySelector('.sort-btn').childNodes[2].textContent = ' ' + opt.textContent + ' ';
+      document.getElementById('sortMenu').style.display = 'none';
+    });
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.sort-wrap')) document.getElementById('sortMenu').style.display = 'none';
+  });
+</script>
+</body>
+</html>

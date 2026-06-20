@@ -158,8 +158,23 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
   const [latestProducts, setLatestProducts]   = useState<Product[]>(_l ?? []);
   const [bestSellers,    setBestSellers]       = useState<Product[]>(_b ?? []);
   const [saleProducts,   setSaleProducts]      = useState<Product[]>(_s ?? []);
+  const [advMobile,  setAdvMobile]  = useState(2);
+  const [advDesktop, setAdvDesktop] = useState(4);
+  const [advGap,     setAdvGap]     = useState(12);
 
   useEffect(() => {
+    // Fetch adv grid settings
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["adv_picks_mobile","adv_picks_desktop","adv_picks_gap"])
+      .then(({ data }) => {
+        if (!data) return;
+        const m: Record<string,string> = {};
+        data.forEach(({ key, value }) => { m[key] = value; });
+        if (m.adv_picks_mobile)  setAdvMobile(parseInt(m.adv_picks_mobile) || 2);
+        if (m.adv_picks_desktop) setAdvDesktop(parseInt(m.adv_picks_desktop) || 4);
+        if (m.adv_picks_gap)     setAdvGap(parseInt(m.adv_picks_gap) || 12);
+      });
+
     // Fetch settings
     supabase.from("site_settings").select("key,value")
       .in("key", ["fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active","fp_eyebrow","fp_heading","fp_heading_italic"])
@@ -230,7 +245,10 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div
+          className={`grid grid-cols-${advMobile} md:grid-cols-${advDesktop}`}
+          style={{ gap: advGap + "px" }}
+        >
           {products.map((product, idx) => (
             <ProductCard key={product.slug} product={product} isNew={activeTab === "latest" && idx === 0} />
           ))}

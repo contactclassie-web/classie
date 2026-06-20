@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collections — Classie ✦</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#3B5373;
+  --navy-deep:#1e2e3d;
+  --navy-mid:#2c4159;
+  --lavender:#f8f7ff;
+  --lavender2:#ece9f8;
+  --cream:#faf9f7;
+  --cream2:#f4f2ee;
+  --champagne:#e8e0d5;
+  --text:#1a1a1a;
+  --text-mid:#4a4a5a;
+  --muted:#8a8a9a;
+  --border:#eceaf5;
+  --serif:'Cormorant Garant',Georgia,serif;
+  --sans:'Poppins',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:#fff;color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ══════ ANNOUNCEMENT BAR ══════ */
+.ann-bar{
+  background:var(--navy);color:#fff;
+  text-align:center;padding:10px 20px;
+  font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase;font-weight:400;
+}
+
+/* ══════ NAV — white like homepage ══════ */
+nav{
+  position:sticky;top:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 56px;height:68px;
+  background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(59,83,115,0.08);
+}
+.nav-logo{font-family:var(--serif);font-size:20px;letter-spacing:0.2em;color:var(--navy);text-decoration:none;font-weight:500}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-mid);text-decoration:none;transition:color 0.2s}
+.nav-links a:hover,.nav-links a.active{color:var(--navy)}
+.nav-actions{display:flex;gap:20px;align-items:center}
+.nav-icon{width:18px;height:18px;stroke:var(--text-mid);fill:none;stroke-width:1.5;cursor:pointer;opacity:0.7;transition:opacity 0.2s}
+.nav-icon:hover{opacity:1;stroke:var(--navy)}
+.cart-wrap{position:relative}
+.cart-dot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--navy);border-radius:50%;border:1.5px solid #fff}
+
+/* ══════ HERO — white bg, split layout like homepage ══════ */
+.hero{
+  min-height:90vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  background:#fff;
+  position:relative;overflow:hidden;
+}
+.hero-left{
+  padding:80px 64px 80px 56px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;z-index:1;
+}
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:13px;
+  font-size:9.5px;letter-spacing:0.38em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:28px;
+}
+.hero-kicker::before{content:'';width:28px;height:1px;background:var(--champagne)}
+.hero h1{
+  font-family:var(--serif);
+  font-size:clamp(52px,5.8vw,84px);
+  font-weight:400;color:var(--text);
+  line-height:1.0;letter-spacing:-0.01em;
+  margin-bottom:16px;
+}
+.hero h1 em{font-style:italic;color:var(--navy)}
+/* tagline */
+.hero-tagline{
+  font-family:var(--serif);font-size:15px;font-style:italic;
+  color:var(--muted);margin-bottom:22px;letter-spacing:0.02em;
+}
+.hero-sub{
+  font-size:12px;color:var(--text-mid);
+  line-height:1.9;max-width:380px;font-weight:300;margin-bottom:36px;
+}
+/* stat row under sub text */
+.hero-stats-row{
+  display:flex;gap:0;margin-bottom:40px;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:18px 0;
+}
+.hstat{flex:1;padding-right:24px;border-right:1px solid var(--border)}
+.hstat:last-child{border-right:none;padding-right:0;padding-left:24px}
+.hstat:not(:first-child):not(:last-child){padding:0 24px}
+.hstat-val{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--navy);line-height:1;margin-bottom:4px}
+.hstat-label{font-size:8.5px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted)}
+/* category pills */
+.hero-cats{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:40px}
+.hero-cat{
+  padding:9px 20px;border-radius:100px;
+  border:1.5px solid var(--border);
+  font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--muted);cursor:pointer;background:transparent;
+  font-family:var(--sans);transition:all 0.25s;
+}
+.hero-cat:hover{border-color:var(--navy);color:var(--navy)}
+.hero-cat.active{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:500}
+.hero-cta-row{display:flex;gap:14px;align-items:center}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 34px;background:var(--navy);color:#fff;
+  font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+  font-weight:500;text-decoration:none;font-family:var(--sans);
+  border-radius:2px;transition:all 0.3s;border:none;cursor:pointer;
+}
+.btn-primary:hover{background:var(--navy-mid);gap:16px}
+.btn-ghost{
+  padding:13px 26px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+  border:1.5px solid var(--border);color:var(--muted);
+  background:transparent;cursor:pointer;font-family:var(--sans);
+  border-radius:2px;transition:all 0.25s;
+}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy)}
+
+/* hero right image */
+.hero-right{position:relative;overflow:hidden;background:var(--cream2)}
+.hero-right img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform 10s ease;
+}
+.hero-right:hover img{transform:scale(1.03)}
+/* floating badge — white card */
+.hero-badge{
+  position:absolute;bottom:40px;left:-20px;
+  background:#fff;padding:20px 24px;
+  box-shadow:0 8px 40px rgba(59,83,115,0.14);
+  border-radius:2px;z-index:2;min-width:160px;
+  border-left:3px solid var(--navy);
+}
+.badge-label{font-size:8.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.badge-val{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--navy);line-height:1;margin-bottom:3px}
+.badge-sub{font-size:10.5px;color:var(--text-mid);font-weight:300}
+
+/* ══════ FILTER BAR ══════ */
+.filter-bar{
+  position:sticky;top:68px;z-index:900;
+  background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 2px 16px rgba(59,83,115,0.05);
+}
+.filter-inner{
+  max-width:1400px;margin:0 auto;
+  padding:0 56px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;
+}
+.tabs{display:flex}
+.tab{
+  display:flex;align-items:center;gap:8px;
+  padding:0 22px;height:60px;
+  font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--muted);
+  border-bottom:2px solid transparent;
+  cursor:pointer;transition:all 0.25s;
+  background:none;border-top:none;border-left:none;border-right:none;
+  font-family:var(--sans);white-space:nowrap;
+}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:500}
+.tab-ct{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:20px;height:18px;padding:0 5px;
+  background:#f0eef8;color:#9a97b0;
+  font-size:8.5px;border-radius:10px;font-weight:500;transition:all 0.25s;
+}
+.tab.active .tab-ct{background:var(--navy);color:#fff}
+.filter-right{display:flex;align-items:center;gap:18px}
+.filter-count{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.sort-wrap{position:relative}
+.sort-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 18px;
+  font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--text-mid);border:1px solid var(--border);border-radius:100px;
+  cursor:pointer;background:none;font-family:var(--sans);transition:all 0.25s;
+}
+.sort-btn:hover{border-color:var(--navy);color:var(--navy)}
+.sort-drop{
+  position:absolute;right:0;top:calc(100% + 8px);
+  background:#fff;border:1px solid var(--border);
+  box-shadow:0 16px 48px rgba(59,83,115,0.1);
+  min-width:210px;border-radius:10px;overflow:hidden;z-index:1000;
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:all 0.22s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.sort-drop.open{opacity:1;visibility:visible;transform:translateY(0)}
+.sort-opt{
+  display:block;padding:12px 20px;
+  font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--text-mid);cursor:pointer;border:none;background:none;
+  width:100%;text-align:left;font-family:var(--sans);transition:all 0.15s;
+}
+.sort-opt:hover{background:var(--lavender);color:var(--navy)}
+.sort-opt.active{color:var(--navy);background:var(--lavender);font-weight:500}
+
+/* ══════ PRODUCTS SECTION ══════ */
+.content{max-width:1400px;margin:0 auto;padding:56px 56px 100px}
+.section-label{
+  font-size:9.5px;letter-spacing:0.24em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:40px;
+  display:flex;align-items:center;gap:18px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--champagne)}
+
+/* ══════ GRID ══════ */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px 20px}
+.product-card.hidden{display:none}
+
+/* ══════ CARD ══════ */
+.card{
+  display:block;text-decoration:none;cursor:pointer;
+  background:#fff;border-radius:4px;overflow:hidden;
+  box-shadow:0 1px 8px rgba(59,83,115,0.06);
+  transition:box-shadow 0.35s,transform 0.35s;
+}
+.card:hover{box-shadow:0 12px 40px rgba(59,83,115,0.12);transform:translateY(-5px)}
+.card-img-wrap{position:relative;overflow:hidden;aspect-ratio:3/4}
+.card-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94)}
+.card:hover .card-img{transform:scale(1.06)}
+/* navy gradient overlay */
+.card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(59,83,115,0.8) 0%,rgba(59,83,115,0.04) 45%,transparent 100%);
+  opacity:0;transition:opacity 0.35s;
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;
+}
+.card:hover .card-overlay{opacity:1}
+.card-cta{
+  padding:10px 26px;background:#fff;color:var(--navy);
+  font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
+  font-weight:600;font-family:var(--sans);border-radius:2px;
+  transform:translateY(12px);transition:transform 0.3s 0.05s;
+  border:none;cursor:pointer;white-space:nowrap;
+}
+.card:hover .card-cta{transform:translateY(0)}
+/* wishlist */
+.card-wish{
+  position:absolute;top:12px;right:12px;
+  width:32px;height:32px;border-radius:50%;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  opacity:0;transform:scale(0.85);transition:all 0.25s;cursor:pointer;
+}
+.card:hover .card-wish{opacity:1;transform:scale(1)}
+.card-wish svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:1.8;transition:stroke 0.2s}
+.card-wish:hover svg{stroke:#c0392b}
+/* badge */
+.badge{
+  position:absolute;top:12px;left:12px;
+  padding:4px 9px;font-size:8px;letter-spacing:0.14em;
+  text-transform:uppercase;font-family:var(--sans);font-weight:600;border-radius:2px;
+}
+.badge-sale{background:var(--navy);color:#fff}
+.badge-new{background:#fff;color:var(--navy);border:1px solid var(--lavender2)}
+/* card info */
+.card-info{padding:16px 18px 20px}
+.card-cat{font-size:8.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.card-title{
+  font-family:var(--serif);font-size:18px;font-weight:400;
+  color:var(--text);line-height:1.3;margin-bottom:10px;transition:color 0.2s;
+}
+.card:hover .card-title{color:var(--navy)}
+.card-prices{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.price{font-size:13px;font-weight:500;color:var(--text)}
+.compare{font-size:11px;color:#ccc;text-decoration:line-through}
+.disc{font-size:9px;font-weight:600;color:var(--navy);background:rgba(59,83,115,0.08);padding:2px 7px;border-radius:10px}
+
+/* ══════ BRAND STRIP ══════ */
+.brand-strip{background:var(--navy);padding:52px 56px}
+.brand-strip-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:40px}
+.strip-item{text-align:center;flex:1}
+.strip-icon{width:36px;height:36px;margin:0 auto 14px;stroke:rgba(255,255,255,0.5);fill:none;stroke-width:1.2}
+.strip-title{font-family:var(--serif);font-size:18px;color:#fff;margin-bottom:8px;font-weight:400}
+.strip-desc{font-size:11px;color:rgba(255,255,255,0.42);line-height:1.8;font-weight:300}
+.strip-div{width:1px;height:60px;background:rgba(255,255,255,0.1);flex-shrink:0}
+
+/* ══════ TESTIMONIAL ══════ */
+.testimonial{background:var(--cream);padding:80px 56px;text-align:center;border-top:1px solid var(--champagne)}
+.t-inner{max-width:560px;margin:0 auto}
+.t-quote{font-family:var(--serif);font-size:60px;color:var(--champagne);line-height:0.5;margin-bottom:20px}
+.t-stars{color:var(--navy);font-size:14px;letter-spacing:3px;margin-bottom:20px}
+.t-text{font-family:var(--serif);font-size:21px;font-style:italic;color:var(--text);line-height:1.55;margin-bottom:16px;font-weight:400}
+.t-author{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}
+
+/* ══════ NEWSLETTER ══════ */
+.newsletter-section{background:var(--navy);padding:72px 56px;text-align:center}
+.nl-eyebrow{font-size:9px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:16px}
+.nl-title{font-family:var(--serif);font-size:36px;font-weight:400;color:#fff;margin-bottom:10px}
+.nl-title em{font-style:italic;color:rgba(200,210,225,0.85)}
+.nl-sub{font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:32px;font-weight:300}
+.nl-form{display:flex;max-width:420px;margin:0 auto}
+.nl-input{
+  flex:1;padding:14px 18px;background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:12px;
+  font-family:var(--sans);outline:none;border-radius:2px 0 0 2px;
+}
+.nl-input::placeholder{color:rgba(255,255,255,0.35)}
+.nl-btn{
+  padding:14px 20px;background:#fff;color:var(--navy);border:none;
+  font-size:10px;letter-spacing:0.14em;text-transform:uppercase;
+  cursor:pointer;font-family:var(--sans);font-weight:600;
+  border-radius:0 2px 2px 0;transition:background 0.2s;white-space:nowrap;
+}
+.nl-btn:hover{background:var(--lavender)}
+
+/* ══════ FOOTER ══════ */
+footer{background:var(--navy-deep);padding:60px 56px 32px;color:#fff}
+.footer-inner{max-width:1400px;margin:0 auto}
+.footer-top{
+  display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;
+  gap:40px;padding-bottom:44px;
+  border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:28px;
+}
+.footer-logo{font-family:var(--serif);font-size:18px;letter-spacing:0.18em;color:#fff;margin-bottom:12px;display:block;font-weight:500}
+.footer-logo span{color:rgba(168,184,200,0.8)}
+.footer-desc{font-size:11.5px;color:rgba(255,255,255,0.35);line-height:1.9;font-weight:300;margin-bottom:22px;max-width:220px}
+.footer-col-title{font-size:8.5px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color 0.2s;font-weight:300}
+.footer-links a:hover{color:#fff}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:10px;color:rgba(255,255,255,0.2)}
+.footer-socials{display:flex;gap:16px}
+.social-icon{width:16px;height:16px;stroke:rgba(255,255,255,0.3);fill:none;stroke-width:1.5;cursor:pointer;transition:stroke 0.2s}
+.social-icon:hover{stroke:#fff}
+
+/* ══════ RESPONSIVE ══════ */
+@media(max-width:1100px){
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .brand-strip-inner{flex-wrap:wrap;justify-content:center}
+  .strip-div{display:none}
+  .footer-top{grid-template-columns:1fr 1fr;gap:28px}
+}
+@media(max-width:768px){
+  nav,.filter-inner,.content,.brand-strip,.testimonial,.newsletter-section,footer{padding-left:20px;padding-right:20px}
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero-left{padding:56px 20px 48px}
+  .hero h1{font-size:46px}
+  .hero-stats-row{flex-wrap:wrap;gap:16px}
+  .hstat{border-right:none;padding:0}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tab{padding:0 14px;font-size:9px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:16px 12px}
+  .footer-top{grid-template-columns:1fr;gap:24px}
+  .footer-bottom{flex-direction:column;gap:14px}
+  .filter-count{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="ann-bar">✦ Free Shipping on orders above ₹999 &nbsp;|&nbsp; India's first interchangeable heel brand ✦</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">✦ CLASSIE</a>
+  <ul class="nav-links">
+    <li><a href="#">Heels</a></li>
+    <li><a href="#">Clip-ons</a></li>
+    <li><a href="#" class="active">Collections</a></li>
+    <li><a href="#">Style Ideas</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+  <div class="nav-actions">
+    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <div class="cart-wrap">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="cart-dot"></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-kicker">Summer Edit 2025</p>
+    <h1>Explore<br><em>our</em><br>Collection</h1>
+    <p class="hero-tagline">One heel. Endless looks.</p>
+    <p class="hero-sub">India's first interchangeable heel brand — where a single shoe becomes four different styles with our signature clip-on collection.</p>
+    <!-- Stats row like homepage -->
+    <div class="hero-stats-row">
+      <div class="hstat"><div class="hstat-val">24+</div><div class="hstat-label">Styles</div></div>
+      <div class="hstat"><div class="hstat-val">3</div><div class="hstat-label">Collections</div></div>
+      <div class="hstat"><div class="hstat-val">₹399+</div><div class="hstat-label">Starting At</div></div>
+    </div>
+    <div class="hero-cats">
+      <button class="hero-cat active" onclick="heroFilter(this,'all')">All Products</button>
+      <button class="hero-cat" onclick="heroFilter(this,'heels')">Heels</button>
+      <button class="hero-cat" onclick="heroFilter(this,'clip-ons')">Clip-ons</button>
+      <button class="hero-cat" onclick="heroFilter(this,'bow')">Bow Collection</button>
+    </div>
+    <div class="hero-cta-row">
+      <a href="#products" class="btn-primary">Explore All Styles →</a>
+      <button class="btn-ghost">Style Guide</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=900&h=900&fit=crop&q=85" alt="Classie Collections">
+    <div class="hero-badge">
+      <p class="badge-label">New Arrivals</p>
+      <p class="badge-val">24+</p>
+      <p class="badge-sub">Styles this season</p>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar" id="products">
+  <div class="filter-inner">
+    <div class="tabs">
+      <button class="tab active" onclick="filterTab(this,'all')">All<span class="tab-ct">8</span></button>
+      <button class="tab" onclick="filterTab(this,'heels')">Heels<span class="tab-ct">4</span></button>
+      <button class="tab" onclick="filterTab(this,'clip-ons')">Clip-ons<span class="tab-ct">2</span></button>
+      <button class="tab" onclick="filterTab(this,'bow')">Bow Collection<span class="tab-ct">2</span></button>
+    </div>
+    <div class="filter-right">
+      <span class="filter-count" id="fc">8 Products</span>
+      <div class="sort-wrap">
+        <button class="sort-btn" onclick="toggleSort(event)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/>
+          </svg>
+          <span id="sortLabel">Newest First</span>
+          <svg id="chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform .25s"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="sort-drop" id="sortDrop">
+          <button class="sort-opt active" onclick="selectSort(this)">Newest First</button>
+          <button class="sort-opt" onclick="selectSort(this)">Price: Low → High</button>
+          <button class="sort-opt" onclick="selectSort(this)">Price: High → Low</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="content">
+  <p class="section-label">Curated for you this season</p>
+  <div class="grid">
+
+    <a href="#" class="card product-card" data-cat="heels">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="badge badge-sale">−15%</span>
+      </div>
+      <div class="card-info"><p class="card-cat">Heels</p><h3 class="card-title">Clessia Wine Block Heel</h3><div class="card-prices"><span class="price">₹1,699</span><span class="compare">₹1,999</span><span class="disc">−15%</span></div></div>
+    </a>
+
+    <a href="#" class="card product-card" data-cat="heels">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <div class="card-info"><p class="card-cat">Heels</p><h3 class="card-title">Radiance Nude Stiletto</h3><div class="card-prices"><span class="price">₹2,199</span></div></div>
+    </a>
+
+    <a href="#" class="card product-card" data-cat="heels">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="badge badge-sale">−20%</span>
+      </div>
+      <div class="card-info"><p class="card-cat">Heels</p><h3 class="card-title">Crovia Chocolate Slingback</h3><div class="card-prices"><span class="price">₹1,499</span><span class="compare">₹1,899</span><span class="disc">−20%</span></div></div>
+    </a>
+
+    <a href="#" class="card product-card" data-cat="heels">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1604671801908-6f0c6a092c05?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="badge badge-sale">−12%</span>
+      </div>
+      <div class="card-info"><p class="card-cat">Heels</p><h3 class="card-title">Lumina Black Strappy Heel</h3><div class="card-prices"><span class="price">₹1,849</span><span class="compare">₹2,099</span><span class="disc">−12%</span></div></div>
+    </a>
+
+    <a href="#" class="card product-card" data-cat="clip-ons">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1596703263926-eb0762ee17e4?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="badge badge-sale">−10%</span>
+      </div>
+      <div class="card-info"><p class="card-cat">Clip-ons</p><h3 class="card-title">Crystal Rhinestone Charm</h3><div class="card-prices"><span class="price">₹449</span><span class="compare">₹499</span><span class="disc">−10%</span></div></div>
+    </a>
+
+    <a href="#" class="card product-card" data-cat="clip-ons">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <div class="card-info"><p class="card-cat">Clip-ons</p><h3 class="card-title">Pearl Drop Statement Clip</h3><div class="card-prices"><span class="price">₹549</span></div></div>
+    </a>
+
+    <a href="#" class="card product-card" data-cat="bow">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1591348278863-a8fb3887e2aa?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      </div>
+      <div class="card-info"><p class="card-cat">Bow Collection</p><h3 class="card-title">Satin Swirl Bow — Blush</h3><div class="card-prices"><span class="price">₹399</span></div></div>
+    </a>
+
+    <a href="#" class="card product-card" data-cat="bow">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=480&h=640&fit=crop&q=85" alt="">
+        <div class="card-overlay"><button class="card-cta">View Product</button></div>
+        <div class="card-wish"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <div class="card-info"><p class="card-cat">Bow Collection</p><h3 class="card-title">Faux Bow Velvet — Midnight</h3><div class="card-prices"><span class="price">₹349</span></div></div>
+    </a>
+
+  </div>
+</div>
+
+<!-- BRAND STRIP -->
+<div class="brand-strip">
+  <div class="brand-strip-inner">
+    <div class="strip-item">
+      <svg class="strip-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <p class="strip-title">Designed to Transform</p>
+      <p class="strip-desc">Interchangeable clip-ons that let one heel match every look.</p>
+    </div>
+    <div class="strip-div"></div>
+    <div class="strip-item">
+      <svg class="strip-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <p class="strip-title">Made for Everyday Wear</p>
+      <p class="strip-desc">Comfort-focused designs made for real movement and real life.</p>
+    </div>
+    <div class="strip-div"></div>
+    <div class="strip-item">
+      <svg class="strip-icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <p class="strip-title">Style That Lasts</p>
+      <p class="strip-desc">Reusable clip-ons designed to be worn again and again.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIAL -->
+<div class="testimonial">
+  <div class="t-inner">
+    <div class="t-quote">"</div>
+    <div class="t-stars">★★★★★</div>
+    <p class="t-text">"I bought one pair of Classie heels and three clip-on sets — it's like having ten shoes in one box. Absolute game changer."</p>
+    <p class="t-author">— Priya S., Mumbai</p>
+  </div>
+</div>
+
+<!-- NEWSLETTER -->
+<div class="newsletter-section">
+  <p class="nl-eyebrow">Stay in the loop</p>
+  <h2 class="nl-title">Get <em>early access</em> to new styles</h2>
+  <p class="nl-sub">New arrivals, exclusive offers, and style inspiration — straight to your inbox.</p>
+  <div class="nl-form">
+    <input class="nl-input" type="email" placeholder="Your email address">
+    <button class="nl-btn">Subscribe</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <span class="footer-logo">✦ CLASSIE<span></span></span>
+        <p class="footer-desc">India's first interchangeable heel brand — where style meets versatility.</p>
+      </div>
+      <div>
+        <p class="footer-col-title">Shop</p>
+        <ul class="footer-links">
+          <li><a href="#">Heels</a></li><li><a href="#">Clip-ons</a></li>
+          <li><a href="#">Bow Collection</a></li><li><a href="#">Hot Deals</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Company</p>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li><li><a href="#">Style Ideas</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Support</p>
+        <ul class="footer-links">
+          <li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li>
+          <li><a href="#">FAQ</a></li><li><a href="#">Track Order</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Legal</p>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li>
+          <li><a href="#">Refund Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Classie. All rights reserved.</p>
+      <div class="footer-socials">
+        <svg class="social-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <svg class="social-icon" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        <svg class="social-icon" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function filterTab(el,cat){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');doFilter(cat);
+}
+function heroFilter(el,cat){
+  document.querySelectorAll('.hero-cat').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('products').scrollIntoView({behavior:'smooth'});
+  doFilter(cat);
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.remove('active');
+    const txt=t.textContent.replace(/\d+/g,'').trim().toLowerCase();
+    if((cat==='all'&&txt==='all')||(cat!=='all'&&txt===cat.replace('-',' ')))t.classList.add('active');
+  });
+}
+function doFilter(cat){
+  let n=0;
+  document.querySelectorAll('.product-card').forEach(c=>{
+    const show=cat==='all'||c.dataset.cat===cat;
+    c.classList.toggle('hidden',!show);if(show)n++;
+  });
+  document.getElementById('fc').textContent=n+' Products';
+}
+function toggleSort(e){
+  e.stopPropagation();
+  const d=document.getElementById('sortDrop'),c=document.getElementById('chevron');
+  d.classList.toggle('open');c.style.transform=d.classList.contains('open')?'rotate(180deg)':'';
+}
+function selectSort(el){
+  document.querySelectorAll('.sort-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sortLabel').textContent=el.textContent;
+  document.getElementById('sortDrop').classList.remove('open');
+  document.getElementById('chevron').style.transform='';
+}
+document.addEventListener('click',()=>{
+  document.getElementById('sortDrop').classList.remove('open');
+  document.getElementById('chevron').style.transform='';
+});
+</script>
+</body>
+</html>

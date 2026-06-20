@@ -301,6 +301,10 @@ export default function ShopCategoryPageClient({
   const [maxPrice, setMaxPrice] = useState<number>(9999);
   const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "newest">("default");
 
+  const [advMobile,  setAdvMobile]  = useState(2);
+  const [advDesktop, setAdvDesktop] = useState(4);
+  const [advGap,     setAdvGap]     = useState(12);
+
   // Load filter types from DB settings
   const [filterTypes, setFilterTypes] = useState<string[]>(() => {
     // Fallback: try to parse from initialSettings
@@ -318,6 +322,17 @@ export default function ShopCategoryPageClient({
   });
 
   useEffect(() => {
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["adv_coll_mobile","adv_coll_desktop","adv_coll_gap"])
+      .then(({ data }) => {
+        if (!data) return;
+        const m: Record<string,string> = {};
+        data.forEach(({ key, value }) => { m[key] = value; });
+        if (m.adv_coll_mobile)  setAdvMobile(parseInt(m.adv_coll_mobile) || 2);
+        if (m.adv_coll_desktop) setAdvDesktop(parseInt(m.adv_coll_desktop) || 4);
+        if (m.adv_coll_gap)     setAdvGap(parseInt(m.adv_coll_gap) || 12);
+      });
+
     supabase
       .from("site_settings")
       .select("value")
@@ -494,7 +509,10 @@ export default function ShopCategoryPageClient({
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                <div
+                  className={`grid grid-cols-${advMobile} md:grid-cols-${advDesktop}`}
+                  style={{ gap: advGap + "px" }}
+                >
                   {filtered.map((product) => (
                     <CategoryProductCard key={product.slug} product={product} />
                   ))}

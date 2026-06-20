@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classie Collections — Design 2: Warm Luxury</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#faf8f5;color:#1a1a1a;-webkit-font-smoothing:antialiased}
+
+/* ── HERO ── */
+.hero{
+  background:#faf8f5;
+  padding:0;
+  display:grid;
+  grid-template-columns:1.1fr 0.9fr;
+  min-height:500px;
+  border-bottom:1px solid #ede8e0;
+}
+.hero-left{
+  padding:80px 60px 80px 80px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  border-right:1px solid #ede8e0;
+}
+.hero-eyebrow{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:9px;
+  letter-spacing:0.35em;
+  text-transform:uppercase;
+  color:#b5a99a;
+  margin-bottom:32px;
+}
+.eyebrow-dot{
+  width:5px;height:5px;
+  border-radius:50%;
+  background:#3B5373;
+  flex-shrink:0;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:64px;
+  font-weight:400;
+  color:#1a1a1a;
+  line-height:1.08;
+  margin-bottom:22px;
+}
+.hero h1 em{
+  font-style:italic;
+  color:#3B5373;
+}
+.hero-sub{
+  font-size:12px;
+  color:#a09080;
+  line-height:1.9;
+  max-width:340px;
+  margin-bottom:48px;
+  font-weight:300;
+}
+.hero-cats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.hero-cat{
+  padding:10px 22px;
+  font-size:9px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  border-radius:100px;
+  border:1px solid #ddd8d0;
+  color:#8a8070;
+  cursor:pointer;
+  transition:all 0.3s;
+  background:transparent;
+  font-family:'Inter',sans-serif;
+}
+.hero-cat:hover,.hero-cat.active{
+  background:#3B5373;
+  border-color:#3B5373;
+  color:#fff;
+}
+.hero-right{
+  position:relative;
+  overflow:hidden;
+}
+.hero-right img{
+  width:100%;height:100%;
+  object-fit:cover;
+}
+/* Stats strip */
+.hero-stats{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  background:rgba(250,248,245,0.92);
+  backdrop-filter:blur(8px);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-top:1px solid #ede8e0;
+}
+.stat{
+  padding:16px 20px;
+  text-align:center;
+  border-right:1px solid #ede8e0;
+}
+.stat:last-child{border-right:none}
+.stat-val{
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  font-weight:500;
+  color:#3B5373;
+  line-height:1;
+  margin-bottom:4px;
+}
+.stat-label{
+  font-size:8px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:#b5a99a;
+}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  position:sticky;top:0;z-index:200;
+  background:#faf8f5;
+  border-bottom:1px solid #ede8e0;
+}
+.filter-inner{
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 80px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:62px;
+}
+.pills{display:flex;gap:8px}
+.pill{
+  padding:7px 18px;
+  font-size:9px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  border-radius:100px;
+  border:1px solid #ddd8d0;
+  color:#9a9080;
+  cursor:pointer;
+  transition:all 0.25s;
+  background:transparent;
+  font-family:'Inter',sans-serif;
+  white-space:nowrap;
+}
+.pill:hover{border-color:#3B5373;color:#3B5373}
+.pill.active{background:#3B5373;border-color:#3B5373;color:#fff}
+.pill sup{font-size:7.5px;margin-left:3px;opacity:0.7}
+
+.filter-right{display:flex;align-items:center;gap:20px}
+.result-txt{
+  font-size:9px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:#c5bdb0;
+}
+.sort-wrap{position:relative}
+.sort-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 18px;
+  font-size:9px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:#7a7060;
+  border:1px solid #ddd8d0;
+  border-radius:100px;
+  cursor:pointer;background:none;
+  font-family:'Inter',sans-serif;
+  transition:all 0.2s;
+}
+.sort-btn:hover{border-color:#3B5373;color:#3B5373}
+.sort-drop{
+  position:absolute;right:0;
+  top:calc(100% + 8px);
+  background:#faf8f5;
+  border:1px solid #ddd8d0;
+  box-shadow:0 16px 48px rgba(59,83,115,0.1);
+  min-width:200px;
+  border-radius:8px;
+  overflow:hidden;
+  z-index:300;
+  display:none;
+}
+.sort-drop.open{display:block}
+.sort-opt{
+  display:block;padding:13px 20px;
+  font-size:9px;letter-spacing:0.15em;text-transform:uppercase;
+  color:#6a6050;cursor:pointer;transition:all 0.15s;
+  border:none;background:none;width:100%;text-align:left;
+  font-family:'Inter',sans-serif;
+}
+.sort-opt:hover{background:#f0ece5;color:#3B5373}
+.sort-opt.active{color:#3B5373;background:#eeeaf8}
+
+/* ── CONTENT ── */
+.content{
+  max-width:1280px;
+  margin:0 auto;
+  padding:52px 80px 100px;
+}
+
+/* ── GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:32px 24px;
+}
+
+/* ── CARD ── */
+.card{display:block;text-decoration:none;cursor:pointer}
+.card-img-wrap{
+  position:relative;
+  aspect-ratio:3/4;
+  overflow:hidden;
+  background:#f0ece5;
+  margin-bottom:16px;
+  border-radius:2px;
+}
+.card-img{
+  width:100%;height:100%;
+  object-fit:cover;
+  transition:transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+  display:block;
+}
+.card:hover .card-img{transform:scale(1.06)}
+
+.card-overlay{
+  position:absolute;inset:0;
+  background:rgba(26,20,15,0);
+  transition:background 0.4s;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:20px;
+}
+.card:hover .card-overlay{background:rgba(26,20,15,0.2)}
+
+.card-cta{
+  padding:11px 28px;
+  background:rgba(250,248,245,0.95);
+  color:#1a1a1a;
+  font-size:8.5px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;
+  font-weight:500;
+  transform:translateY(12px);
+  opacity:0;
+  transition:all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);
+  border-radius:1px;
+  white-space:nowrap;
+}
+.card:hover .card-cta{transform:translateY(0);opacity:1}
+
+.badge{
+  position:absolute;top:14px;left:14px;
+  padding:4px 10px;
+  font-size:8px;letter-spacing:0.15em;text-transform:uppercase;
+  font-family:'Inter',sans-serif;font-weight:500;
+  border-radius:2px;
+}
+.badge-sale{background:#3B5373;color:#fff}
+.badge-new{background:#faf8f5;color:#3B5373;border:1px solid #c8c0e8}
+
+.card-cat{
+  font-size:8.5px;letter-spacing:0.2em;text-transform:uppercase;
+  color:#c0b8a8;margin-bottom:6px;
+}
+.card-title{
+  font-family:'Playfair Display',serif;
+  font-size:17px;font-weight:400;
+  color:#1a1a1a;line-height:1.35;margin-bottom:10px;
+  transition:color 0.2s;
+}
+.card:hover .card-title{color:#3B5373}
+.card-prices{display:flex;align-items:center;gap:9px}
+.price{font-size:13px;font-weight:500;color:#1a1a1a}
+.compare{font-size:11px;color:#c5bdb0;text-decoration:line-through}
+
+/* ── BOTTOM CTA ── */
+.bottom-cta{
+  text-align:center;
+  margin-top:64px;
+  padding-top:64px;
+  border-top:1px solid #ede8e0;
+}
+.bottom-cta p{
+  font-family:'Playfair Display',serif;
+  font-size:28px;
+  font-weight:400;
+  color:#1a1a1a;
+  margin-bottom:8px;
+}
+.bottom-cta p em{font-style:italic;color:#3B5373}
+.bottom-cta span{
+  font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+  color:#b5a99a;
+}
+.load-more{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:28px;
+  padding:14px 40px;
+  border:1px solid #3B5373;
+  color:#3B5373;
+  font-size:9.5px;
+  letter-spacing:0.22em;text-transform:uppercase;
+  cursor:pointer;background:none;
+  font-family:'Inter',sans-serif;
+  transition:all 0.3s;
+}
+.load-more:hover{background:#3B5373;color:#fff}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-left{padding:60px 32px}
+  .hero h1{font-size:44px}
+  .filter-inner{padding:0 24px}
+  .content{padding:36px 24px 80px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:20px 14px}
+  .pills{gap:6px}
+  .pill{padding:6px 14px;font-size:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow"><span class="eyebrow-dot"></span>All Collections</p>
+    <h1>Explore<br><em>our</em><br>Collection</h1>
+    <p class="hero-sub">Curated styles for every occasion — from everyday elegance to statement evenings.</p>
+    <div class="hero-cats">
+      <button class="hero-cat active">All Styles</button>
+      <button class="hero-cat">Heels</button>
+      <button class="hero-cat">Clip-ons</button>
+      <button class="hero-cat">Bow Collection</button>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=700&h=500&fit=crop&q=80" alt="">
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-val">24</div><div class="stat-label">Styles</div></div>
+      <div class="stat"><div class="stat-val">3</div><div class="stat-label">Collections</div></div>
+      <div class="stat"><div class="stat-val">₹399+</div><div class="stat-label">Starting From</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="pills">
+      <button class="pill active">All<sup>24</sup></button>
+      <button class="pill">Heels<sup>12</sup></button>
+      <button class="pill">Clip-ons<sup>8</sup></button>
+      <button class="pill">Bow Collection<sup>4</sup></button>
+    </div>
+    <div class="filter-right">
+      <p class="result-txt">24 Products</p>
+      <div class="sort-wrap">
+        <button class="sort-btn" id="sortBtn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/></svg>
+          <span id="sortLabel">Newest First</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="sort-drop" id="sortDrop">
+          <button class="sort-opt active">Newest First</button>
+          <button class="sort-opt">Price: Low → High</button>
+          <button class="sort-opt">Price: High → Low</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+  <div class="grid">
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−15%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Clessia Wine Block Heel</h3>
+      <div class="card-prices"><span class="price">₹1,699</span><span class="compare">₹1,999</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Radiance Nude Stiletto</h3>
+      <div class="card-prices"><span class="price">₹2,199</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1596703263926-eb0762ee17e4?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−10%</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Crystal Rhinestone Charm</h3>
+      <div class="card-prices"><span class="price">₹449</span><span class="compare">₹499</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1591348278863-a8fb3887e2aa?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Satin Swirl Bow — Blush</h3>
+      <div class="card-prices"><span class="price">₹399</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−20%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Crovia Chocolate Slingback</h3>
+      <div class="card-prices"><span class="price">₹1,499</span><span class="compare">₹1,899</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Pearl Drop Statement Clip</h3>
+      <div class="card-prices"><span class="price">₹549</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1604671801908-6f0c6a092c05?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−12%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Lumina Black Strappy Heel</h3>
+      <div class="card-prices"><span class="price">₹1,849</span><span class="compare">₹2,099</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Faux Bow Velvet — Midnight</h3>
+      <div class="card-prices"><span class="price">₹349</span></div>
+    </a>
+
+  </div>
+
+  <!-- Bottom CTA -->
+  <div class="bottom-cta">
+    <p>Discover <em>more</em> styles</p>
+    <span>Showing 8 of 24 products</span><br>
+    <button class="load-more">Load More Products →</button>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+document.querySelectorAll('.hero-cat').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.hero-cat').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+document.getElementById('sortBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('sortDrop').classList.toggle('open');
+});
+document.querySelectorAll('.sort-opt').forEach(o=>{
+  o.addEventListener('click',()=>{
+    document.querySelectorAll('.sort-opt').forEach(x=>x.classList.remove('active'));
+    o.classList.add('active');
+    document.getElementById('sortLabel').textContent=o.textContent;
+    document.getElementById('sortDrop').classList.remove('open');
+  });
+});
+document.addEventListener('click',()=>document.getElementById('sortDrop').classList.remove('open'));
+</script>
+</body>
+</html>

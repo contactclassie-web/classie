@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classie Collections — Design 1: Dark Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',sans-serif;background:#fff;color:#1a1a1a;-webkit-font-smoothing:antialiased}
+
+/* ── HERO ── */
+.hero{
+  position:relative;
+  background:#0f1a28;
+  min-height:520px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+}
+.hero-left{
+  padding:80px 60px 80px 80px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  position:relative;
+  z-index:2;
+}
+.hero-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-size:9px;
+  letter-spacing:0.4em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.35);
+  margin-bottom:28px;
+}
+.hero-tag::before{
+  content:'';
+  display:block;
+  width:32px;
+  height:1px;
+  background:rgba(255,255,255,0.2);
+}
+.hero h1{
+  font-family:'Cormorant Garant',serif;
+  font-size:72px;
+  font-weight:300;
+  color:#fff;
+  line-height:1.05;
+  margin-bottom:24px;
+}
+.hero h1 em{
+  font-style:italic;
+  color:#a89fd4;
+}
+.hero-sub{
+  font-size:11px;
+  color:rgba(255,255,255,0.4);
+  line-height:1.9;
+  max-width:320px;
+  margin-bottom:44px;
+  letter-spacing:0.03em;
+}
+.hero-btns{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.hero-btn{
+  padding:10px 24px;
+  font-size:9px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.6);
+  cursor:pointer;
+  transition:all 0.3s;
+  background:transparent;
+  font-family:'Poppins',sans-serif;
+}
+.hero-btn:hover,.hero-btn.active{
+  background:#3B5373;
+  border-color:#3B5373;
+  color:#fff;
+}
+.hero-right{
+  position:relative;
+  overflow:hidden;
+}
+.hero-right img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0.5;
+  filter:grayscale(20%);
+}
+.hero-right::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to right,#0f1a28 0%,transparent 40%);
+}
+/* Decorative line */
+.hero-line{
+  position:absolute;
+  bottom:40px;
+  left:80px;
+  font-size:9px;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.15);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  z-index:2;
+}
+.hero-line::after{
+  content:'';
+  display:block;
+  width:60px;
+  height:1px;
+  background:rgba(255,255,255,0.1);
+}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  position:sticky;
+  top:0;
+  z-index:200;
+  background:#fff;
+  border-bottom:1px solid #eceaf5;
+  box-shadow:0 2px 20px rgba(59,83,115,0.07);
+}
+.filter-inner{
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:60px;
+}
+.tabs{display:flex}
+.tab{
+  padding:0 24px;
+  height:60px;
+  font-size:9.5px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:#b0afc0;
+  border-bottom:2px solid transparent;
+  cursor:pointer;
+  transition:all 0.25s;
+  background:none;
+  border-top:none;border-left:none;border-right:none;
+  font-family:'Poppins',sans-serif;
+  white-space:nowrap;
+}
+.tab:hover{color:#3B5373}
+.tab.active{color:#3B5373;border-bottom-color:#3B5373;font-weight:500}
+.tab span{
+  margin-left:5px;
+  font-size:8px;
+  opacity:0.5;
+}
+
+.filter-right{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.result-info{
+  font-size:9px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:#d0cedf;
+}
+.sort-wrap{position:relative}
+.sort-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 18px;
+  font-size:9.5px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:#666;
+  border:1px solid #e8e5f5;
+  cursor:pointer;
+  background:none;
+  font-family:'Poppins',sans-serif;
+  transition:all 0.2s;
+}
+.sort-btn:hover{border-color:#3B5373;color:#3B5373}
+.sort-drop{
+  position:absolute;
+  right:0;
+  top:calc(100% + 6px);
+  background:#fff;
+  border:1px solid #eceaf5;
+  box-shadow:0 12px 40px rgba(59,83,115,0.12);
+  min-width:200px;
+  z-index:300;
+  display:none;
+}
+.sort-drop.open{display:block}
+.sort-opt{
+  display:block;
+  padding:13px 20px;
+  font-size:9.5px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:#555;
+  cursor:pointer;
+  transition:all 0.15s;
+  border:none;background:none;width:100%;text-align:left;
+  font-family:'Poppins',sans-serif;
+}
+.sort-opt:hover{background:#f8f7ff;color:#3B5373}
+.sort-opt.active{color:#3B5373;background:#f8f7ff}
+
+/* ── CONTENT ── */
+.content{
+  max-width:1280px;
+  margin:0 auto;
+  padding:52px 60px 100px;
+}
+
+/* ── GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:28px 22px;
+}
+
+/* ── CARD ── */
+.card{display:block;text-decoration:none;cursor:pointer}
+.card-img-wrap{
+  position:relative;
+  aspect-ratio:3/4;
+  overflow:hidden;
+  background:#f4f2f9;
+  margin-bottom:16px;
+}
+.card-img{
+  width:100%;height:100%;
+  object-fit:cover;
+  transition:transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+  display:block;
+}
+.card:hover .card-img{transform:scale(1.07)}
+
+.card-overlay{
+  position:absolute;inset:0;
+  background:rgba(15,26,40,0);
+  transition:background 0.4s;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:22px;
+}
+.card:hover .card-overlay{background:rgba(15,26,40,0.28)}
+.card-cta{
+  padding:11px 32px;
+  background:#fff;
+  color:#0f1a28;
+  font-size:8.5px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  font-family:'Poppins',sans-serif;
+  font-weight:500;
+  transform:translateY(14px);
+  opacity:0;
+  transition:all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  box-shadow:0 6px 24px rgba(0,0,0,0.18);
+  white-space:nowrap;
+}
+.card:hover .card-cta{transform:translateY(0);opacity:1}
+
+.badge{
+  position:absolute;
+  top:14px;left:14px;
+  padding:4px 9px;
+  font-size:8px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  font-family:'Poppins',sans-serif;
+  font-weight:500;
+}
+.badge-sale{background:#3B5373;color:#fff}
+.badge-new{background:#fff;color:#3B5373;border:1px solid #c8c0e8}
+
+.card-cat{
+  font-size:8.5px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:#c0bdd4;
+  margin-bottom:6px;
+}
+.card-title{
+  font-family:'Cormorant Garant',serif;
+  font-size:18px;
+  font-weight:400;
+  color:#1a1a1a;
+  line-height:1.3;
+  margin-bottom:9px;
+  transition:color 0.2s;
+}
+.card:hover .card-title{color:#3B5373}
+.card-prices{display:flex;align-items:center;gap:9px}
+.price{font-size:13px;font-weight:500;color:#1a1a1a}
+.compare{font-size:11px;color:#ccc;text-decoration:line-through}
+
+/* ── PAGINATION ── */
+.pagination{
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;margin-top:64px;
+}
+.page-btn{
+  width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;
+  font-family:'Poppins',sans-serif;
+  cursor:pointer;
+  border:1px solid #eceaf5;
+  background:none;
+  color:#999;
+  transition:all 0.2s;
+}
+.page-btn:hover,.page-btn.active{
+  background:#3B5373;
+  border-color:#3B5373;
+  color:#fff;
+}
+.page-dots{
+  font-size:11px;color:#ccc;
+  display:flex;align-items:center;padding:0 4px;
+}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-left{padding:60px 32px}
+  .hero h1{font-size:48px}
+  .filter-inner{padding:0 24px}
+  .content{padding:36px 24px 80px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:20px 16px}
+  .tab{padding:0 14px;font-size:9px}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-tag">All Collections</p>
+    <h1>Explore<br><em>our</em><br>Collection</h1>
+    <p class="hero-sub">Curated styles for every occasion — from everyday elegance to statement evenings.</p>
+    <div class="hero-btns">
+      <button class="hero-btn active">All Styles</button>
+      <button class="hero-btn">Heels</button>
+      <button class="hero-btn">Clip-ons</button>
+      <button class="hero-btn">Bow Collection</button>
+    </div>
+    <p class="hero-line">24 Styles Available</p>
+  </div>
+  <div class="hero-right">
+    <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&h=520&fit=crop" alt="">
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="tabs">
+      <button class="tab active">All<span>24</span></button>
+      <button class="tab">Heels<span>12</span></button>
+      <button class="tab">Clip-ons<span>8</span></button>
+      <button class="tab">Bow Collection<span>4</span></button>
+    </div>
+    <div class="filter-right">
+      <p class="result-info">24 Products</p>
+      <div class="sort-wrap">
+        <button class="sort-btn" id="sortBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+          <span id="sortLabel">Newest First</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="sort-drop" id="sortDrop">
+          <button class="sort-opt active">Newest First</button>
+          <button class="sort-opt">Price: Low → High</button>
+          <button class="sort-opt">Price: High → Low</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+  <div class="grid">
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−15%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Clessia Wine Block Heel</h3>
+      <div class="card-prices"><span class="price">₹1,699</span><span class="compare">₹1,999</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Radiance Nude Stiletto</h3>
+      <div class="card-prices"><span class="price">₹2,199</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1596703263926-eb0762ee17e4?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−10%</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Crystal Rhinestone Charm</h3>
+      <div class="card-prices"><span class="price">₹449</span><span class="compare">₹499</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1591348278863-a8fb3887e2aa?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Satin Swirl Bow — Blush</h3>
+      <div class="card-prices"><span class="price">₹399</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1512374382149-233c42b6a83b?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−20%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Crovia Chocolate Slingback</h3>
+      <div class="card-prices"><span class="price">₹1,499</span><span class="compare">₹1,899</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <p class="card-cat">Clip-ons</p>
+      <h3 class="card-title">Pearl Drop Statement Clip</h3>
+      <div class="card-prices"><span class="price">₹549</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1604671801908-6f0c6a092c05?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+        <span class="badge badge-sale">−12%</span>
+      </div>
+      <p class="card-cat">Heels</p>
+      <h3 class="card-title">Lumina Black Strappy Heel</h3>
+      <div class="card-prices"><span class="price">₹1,849</span><span class="compare">₹2,099</span></div>
+    </a>
+
+    <a href="#" class="card">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=400&h=533&fit=crop&q=80" alt="">
+        <div class="card-overlay"><span class="card-cta">View Product</span></div>
+      </div>
+      <p class="card-cat">Bow Collection</p>
+      <h3 class="card-title">Faux Bow Velvet — Midnight</h3>
+      <div class="card-prices"><span class="price">₹349</span></div>
+    </a>
+
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <span class="page-dots">···</span>
+    <button class="page-btn">8</button>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+  });
+});
+document.querySelectorAll('.hero-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.hero-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+document.getElementById('sortBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('sortDrop').classList.toggle('open');
+});
+document.querySelectorAll('.sort-opt').forEach(o=>{
+  o.addEventListener('click',()=>{
+    document.querySelectorAll('.sort-opt').forEach(x=>x.classList.remove('active'));
+    o.classList.add('active');
+    document.getElementById('sortLabel').textContent=o.textContent;
+    document.getElementById('sortDrop').classList.remove('open');
+  });
+});
+document.addEventListener('click',()=>document.getElementById('sortDrop').classList.remove('open'));
+</script>
+</body>
+</html>

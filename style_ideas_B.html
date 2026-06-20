@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Style Ideas — Design B: Editorial Full Width</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --navy: #3B5373; --cream: #faf8f6; --warm: #f5f1eb; --tan: #c9b99a; --gray: #888; --black: #1a1a1a; }
+  body { font-family: 'Jost', sans-serif; background: #fff; color: var(--black); }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; border-bottom: 1px solid #e8e8e8; position: sticky; top: 0; background: #fff; z-index: 100; }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 18px; letter-spacing: 0.4em; font-weight: 400; }
+  .nav-links { display: flex; gap: 32px; font-size: 13px; letter-spacing: 0.05em; }
+  .nav-links a { text-decoration: none; color: var(--black); }
+  .nav-links a.active { color: var(--navy); }
+
+  /* HERO — FULL BLEED */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 85vh;
+    overflow: hidden;
+  }
+  .hero-left {
+    background: var(--warm);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 80px 60px;
+    position: relative;
+  }
+  .hero-left .eyebrow { font-size: 10px; letter-spacing: 0.55em; text-transform: uppercase; color: var(--navy); margin-bottom: 24px; }
+  .hero-left h1 { font-family: 'Cormorant Garamond', serif; font-size: 72px; font-weight: 300; line-height: 1.05; margin-bottom: 24px; }
+  .hero-left h1 em { font-style: italic; display: block; color: var(--navy); }
+  .hero-left p { font-size: 14px; color: var(--gray); line-height: 1.75; max-width: 380px; margin-bottom: 36px; }
+  .hero-left .scroll-hint { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray); display: flex; align-items: center; gap: 12px; }
+  .hero-left .scroll-hint::after { content: ''; width: 40px; height: 1px; background: var(--gray); }
+  .hero-right { position: relative; overflow: hidden; }
+  .hero-right .img-placeholder { height: 100%; background: linear-gradient(160deg, #e8e0d4 0%, #c9b99a 100%); display: flex; align-items: center; justify-content: center; color: #a08060; font-size: 14px; letter-spacing: 0.1em; }
+  .hero-badge { position: absolute; bottom: 40px; right: 40px; background: var(--navy); color: #fff; padding: 16px 24px; }
+  .hero-badge .badge-label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 4px; opacity: 0.7; }
+  .hero-badge .badge-val { font-family: 'Cormorant Garamond', serif; font-size: 24px; }
+
+  .btn-navy { display: inline-block; background: var(--navy); color: #fff; padding: 14px 36px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; font-family: 'Jost', sans-serif; }
+  .btn-outline { display: inline-block; border: 1.5px solid var(--navy); color: var(--navy); padding: 13px 36px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; margin-left: 12px; }
+
+  /* DIVIDER */
+  .divider { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 40px 48px; }
+  .divider-line { flex: 1; height: 1px; background: #e0ddd8; }
+  .divider-text { font-size: 11px; letter-spacing: 0.4em; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
+
+  /* EDITORIAL LOOKS — ALTERNATING */
+  .look-section { display: grid; grid-template-columns: 1fr 1fr; min-height: 70vh; }
+  .look-section.reverse { direction: rtl; }
+  .look-section.reverse > * { direction: ltr; }
+
+  .look-img { position: relative; overflow: hidden; }
+  .look-img .img-placeholder { height: 100%; min-height: 560px; }
+  .look-number { position: absolute; top: 40px; left: 40px; font-family: 'Cormorant Garamond', serif; font-size: 100px; font-weight: 300; color: rgba(255,255,255,0.15); line-height: 1; }
+  .look-tag { position: absolute; top: 40px; right: 40px; background: var(--navy); color: #fff; font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; padding: 6px 14px; }
+
+  .look-content { background: var(--cream); display: flex; flex-direction: column; justify-content: center; padding: 72px 64px; }
+  .look-content.white { background: #fff; }
+  .look-num-label { font-size: 10px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--navy); margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+  .look-num-label::before { content: ''; width: 32px; height: 1px; background: var(--navy); }
+  .look-content h2 { font-family: 'Cormorant Garamond', serif; font-size: 44px; font-weight: 300; line-height: 1.15; margin-bottom: 20px; }
+  .look-content p { font-size: 14px; color: var(--gray); line-height: 1.8; margin-bottom: 36px; max-width: 400px; }
+
+  /* Products */
+  .look-products { display: flex; flex-direction: column; gap: 0; margin-bottom: 36px; }
+  .lp-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-top: 1px solid #e0ddd8; }
+  .lp-row:last-child { border-bottom: 1px solid #e0ddd8; }
+  .lp-img { width: 44px; height: 44px; border-radius: 50%; background: #e8e4de; overflow: hidden; flex-shrink: 0; }
+  .lp-info { flex: 1; }
+  .lp-name { font-size: 13px; font-weight: 400; margin-bottom: 2px; }
+  .lp-price { font-size: 12px; color: var(--gray); }
+  .lp-add { width: 32px; height: 32px; border: 1px solid #ddd; background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; color: var(--navy); }
+
+  /* STAGGERED 3-UP */
+  .stagger-section { padding: 80px 48px; background: #fff; }
+  .stagger-header { text-align: center; margin-bottom: 56px; }
+  .stagger-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300; margin-bottom: 10px; }
+  .stagger-header p { font-size: 13px; color: var(--gray); }
+  .stagger-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: end; }
+  .sc { cursor: pointer; }
+  .sc-img { background: #e8e4de; overflow: hidden; }
+  .sc:nth-child(1) .sc-img { height: 400px; }
+  .sc:nth-child(2) .sc-img { height: 520px; }
+  .sc:nth-child(3) .sc-img { height: 360px; }
+  .sc-img .img-placeholder { height: 100%; }
+  .sc-info { padding: 16px 0 8px; }
+  .sc-info .tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--navy); margin-bottom: 8px; }
+  .sc-info h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; margin-bottom: 6px; }
+  .sc-info p { font-size: 12px; color: var(--gray); }
+  .sc-info a { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--navy); text-decoration: none; margin-top: 10px; display: inline-block; }
+  .sc-info a:hover { text-decoration: underline; }
+
+  /* INSTAGRAM STRIP */
+  .ig-section { padding: 72px 48px; background: var(--warm); text-align: center; }
+  .ig-section h2 { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 300; margin-bottom: 6px; }
+  .ig-section p { font-size: 13px; color: var(--gray); margin-bottom: 40px; }
+  .ig-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 32px; }
+  .ig-item { aspect-ratio: 1; background: #ddd9d0; overflow: hidden; cursor: pointer; position: relative; }
+  .ig-overlay { position: absolute; inset: 0; background: rgba(59,83,115,0.7); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+  .ig-item:hover .ig-overlay { opacity: 1; }
+  .ig-overlay svg { width: 28px; height: 28px; fill: #fff; }
+
+  /* CTA FINAL */
+  .cta-final { background: var(--navy); padding: 80px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .cta-final-left h2 { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; color: #fff; line-height: 1.1; margin-bottom: 16px; }
+  .cta-final-left p { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.75; }
+  .cta-final-right { display: flex; flex-direction: column; gap: 14px; }
+  .cta-btn { padding: 16px 28px; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; text-align: center; font-family: 'Jost', sans-serif; }
+  .cta-btn.white { background: #fff; color: var(--navy); }
+  .cta-btn.outline { border: 1.5px solid rgba(255,255,255,0.5); color: #fff; }
+
+  /* FOOTER */
+  footer { background: var(--navy); padding: 48px; color: rgba(255,255,255,0.75); font-size: 12px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 40px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .footer-brand .logo { color: #fff; display: block; margin-bottom: 14px; }
+  footer h4 { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; margin-bottom: 14px; }
+  footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  footer ul a { text-decoration: none; color: rgba(255,255,255,0.65); font-size: 13px; }
+
+  /* Img placeholders */
+  .img-placeholder { background: linear-gradient(135deg, #e8e4de 0%, #d4ccc4 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #a8a098; font-size: 12px; letter-spacing: 0.05em; }
+  .img-dark { background: linear-gradient(135deg, #3a3a3a 0%, #1a1a1a 100%); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">✦ C L A S S I E</div>
+  <div class="nav-links">
+    <a href="#">Heels</a>
+    <a href="#">Clip-ons</a>
+    <a href="#" class="active">Style Ideas</a>
+    <a href="#">Hot Deals</a>
+    <a href="#">Contact Us</a>
+    <a href="#">About Us</a>
+  </div>
+</nav>
+
+<!-- FULL BLEED HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <p class="eyebrow">Style Ideas — Lookbook</p>
+    <h1>Your Heel.<br><em>Your Story.</em></h1>
+    <p>Real looks, real women. See how Classie fits every chapter of your day — from first coffee to last dance.</p>
+    <div style="display:flex;gap:12px;margin-bottom:48px;">
+      <a href="#" class="btn-navy">Explore Looks</a>
+      <a href="#" class="btn-outline">Shop All</a>
+    </div>
+    <div class="scroll-hint">Scroll to explore</div>
+  </div>
+  <div class="hero-right">
+    <div class="img-placeholder" style="height:100%">Hero Image</div>
+    <div class="hero-badge">
+      <div class="badge-label">Featured</div>
+      <div class="badge-val">The Date Edit</div>
+    </div>
+  </div>
+</div>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-text">Curated Looks</div>
+  <div class="divider-line"></div>
+</div>
+
+<!-- LOOK 01 -->
+<div class="look-section">
+  <div class="look-img">
+    <div class="img-placeholder" style="min-height:560px;height:100%">Look 01 — Lifestyle Photo</div>
+    <div class="look-number">01</div>
+    <div class="look-tag">Date Night</div>
+  </div>
+  <div class="look-content">
+    <p class="look-num-label">Look One</p>
+    <h2>The Date<br>Night Look</h2>
+    <p>Pair our Modiva heels with a satin midi dress. Add crystal clip-ons for an instant runway moment that lasts all evening.</p>
+    <div class="look-products">
+      <div class="lp-row">
+        <div class="lp-img"><div class="img-placeholder" style="height:44px"></div></div>
+        <div class="lp-info"><div class="lp-name">Modiva Slingback Heel</div><div class="lp-price">₹2,499</div></div>
+        <button class="lp-add">+</button>
+      </div>
+      <div class="lp-row">
+        <div class="lp-img"><div class="img-placeholder" style="height:44px"></div></div>
+        <div class="lp-info"><div class="lp-name">Radiance Heart Crystal Clip Pair</div><div class="lp-price">₹849</div></div>
+        <button class="lp-add">+</button>
+      </div>
+      <div class="lp-row">
+        <div class="lp-img"><div class="img-placeholder" style="height:44px"></div></div>
+        <div class="lp-info"><div class="lp-name">FauxBow — Black</div><div class="lp-price">₹499</div></div>
+        <button class="lp-add">+</button>
+      </div>
+    </div>
+    <a href="#" class="btn-navy">Shop This Look</a>
+  </div>
+</div>
+
+<!-- LOOK 02 — REVERSED -->
+<div class="look-section reverse">
+  <div class="look-img">
+    <div class="img-placeholder img-dark" style="min-height:560px;height:100%;background:linear-gradient(135deg,#c5bdb0,#e0d8ce)">Look 02 — Lifestyle Photo</div>
+    <div class="look-number">02</div>
+    <div class="look-tag">Work & Play</div>
+  </div>
+  <div class="look-content white">
+    <p class="look-num-label">Look Two</p>
+    <h2>Office to<br>After-Hours</h2>
+    <p>The Gloss Belle block heel pairs beautifully with tailored trousers. Swap clip-ons for your evening out — same heels, new personality.</p>
+    <div class="look-products">
+      <div class="lp-row">
+        <div class="lp-img"><div class="img-placeholder" style="height:44px"></div></div>
+        <div class="lp-info"><div class="lp-name">Gloss Belle Block Heel</div><div class="lp-price">₹2,199</div></div>
+        <button class="lp-add">+</button>
+      </div>
+      <div class="lp-row">
+        <div class="lp-img"><div class="img-placeholder" style="height:44px"></div></div>
+        <div class="lp-info"><div class="lp-name">Starlight Crystal Clip Pair</div><div class="lp-price">₹799</div></div>
+        <button class="lp-add">+</button>
+      </div>
+    </div>
+    <a href="#" class="btn-navy">Shop This Look</a>
+  </div>
+</div>
+
+<!-- LOOK 03 -->
+<div class="look-section">
+  <div class="look-img">
+    <div class="img-placeholder" style="min-height:560px;height:100%;background:linear-gradient(135deg,#d4c8bc,#bfb0a4)">Look 03 — Lifestyle Photo</div>
+    <div class="look-number">03</div>
+    <div class="look-tag">Festive</div>
+  </div>
+  <div class="look-content">
+    <p class="look-num-label">Look Three</p>
+    <h2>The Festive<br>Glow-Up</h2>
+    <p>Go bold with the Clessia Wine heel. Stack Crystal Starburst and Radiance Crown clips for maximum shimmer at weddings and festivals.</p>
+    <div class="look-products">
+      <div class="lp-row">
+        <div class="lp-img"><div class="img-placeholder" style="height:44px"></div></div>
+        <div class="lp-info"><div class="lp-name">Clessia Wine Heel</div><div class="lp-price">₹2,699</div></div>
+        <button class="lp-add">+</button>
+      </div>
+      <div class="lp-row">
+        <div class="lp-img"><div class="img-placeholder" style="height:44px"></div></div>
+        <div class="lp-info"><div class="lp-name">Crystal Starburst Clip Pair</div><div class="lp-price">₹899</div></div>
+        <button class="lp-add">+</button>
+      </div>
+    </div>
+    <a href="#" class="btn-navy">Shop This Look</a>
+  </div>
+</div>
+
+<!-- STAGGERED 3-UP -->
+<div class="stagger-section">
+  <div class="stagger-header">
+    <h2>More Ways to Wear It</h2>
+    <p>Everyday looks from our community — tagged @_classie_in</p>
+  </div>
+  <div class="stagger-grid">
+    <div class="sc">
+      <div class="sc-img"><div class="img-placeholder" style="height:400px">Community Photo</div></div>
+      <div class="sc-info">
+        <p class="tag">Casual</p>
+        <h3>Sunday Brunch</h3>
+        <p>Crovia brown + pearl clip for effortless weekends.</p>
+        <a href="#">Shop the Look →</a>
+      </div>
+    </div>
+    <div class="sc">
+      <div class="sc-img"><div class="img-placeholder" style="height:520px">Community Photo</div></div>
+      <div class="sc-info">
+        <p class="tag">Wedding</p>
+        <h3>Wedding-Ready</h3>
+        <p>Statement details that complement, not overpower.</p>
+        <a href="#">Shop the Look →</a>
+      </div>
+    </div>
+    <div class="sc">
+      <div class="sc-img"><div class="img-placeholder" style="height:360px">Community Photo</div></div>
+      <div class="sc-info">
+        <p class="tag">Evening</p>
+        <h3>Rooftop Ready</h3>
+        <p>From dinner table to dance floor — no outfit change needed.</p>
+        <a href="#">Shop the Look →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INSTAGRAM STRIP -->
+<div class="ig-section">
+  <h2>As Seen on Instagram</h2>
+  <p>Tag @_classie_in — you might be in the next lookbook</p>
+  <div class="ig-grid">
+    <div class="ig-item"><div class="img-placeholder" style="height:100%"></div><div class="ig-overlay"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z"/></svg></div></div>
+    <div class="ig-item" style="background:#d4ccc4"><div class="img-placeholder" style="height:100%"></div><div class="ig-overlay"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/></svg></div></div>
+    <div class="ig-item" style="background:#e0d8ce"><div class="img-placeholder" style="height:100%"></div><div class="ig-overlay"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg></div></div>
+    <div class="ig-item" style="background:#ccc4bc"><div class="img-placeholder" style="height:100%"></div><div class="ig-overlay"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg></div></div>
+    <div class="ig-item" style="background:#bfb8b0"><div class="img-placeholder" style="height:100%"></div><div class="ig-overlay"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg></div></div>
+  </div>
+  <a href="#" style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:var(--navy);text-decoration:none;border-bottom:1px solid var(--navy);padding-bottom:2px;">Follow @_classie_in</a>
+</div>
+
+<!-- CTA FINAL -->
+<div class="cta-final">
+  <div class="cta-final-left">
+    <h2>Ready to<br>Build Your Look?</h2>
+    <p>Start with the heels. Add clip-ons. Change the vibe in seconds — without changing your shoes.</p>
+  </div>
+  <div class="cta-final-right">
+    <a href="#" class="cta-btn white">Shop Heels</a>
+    <a href="#" class="cta-btn outline">Shop Clip-ons</a>
+    <a href="#" class="cta-btn outline">View All Collections</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="logo">✦ C L A S S I E</span>
+    <p>Sign up for sales, new arrivals, and more</p>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <input type="email" placeholder="Enter your email" style="flex:1;padding:10px 14px;font-size:13px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;outline:none;" />
+      <button style="background:#fff;color:var(--navy);padding:10px 16px;font-size:12px;border:none;cursor:pointer;font-weight:500;">Sign Up</button>
+    </div>
+  </div>
+  <div><h4>About Us</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Style Ideas</a></li><li><a href="#">Contact</a></li></ul></div>
+  <div><h4>Resource</h4><ul><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Discounts</a></li></ul></div>
+  <div><h4>Information</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Refund Policy</a></li></ul></div>
+  <div><h4>Help</h4><ul><li><a href="#">FAQ</a></li><li><a href="#">Track Order</a></li><li><a href="#">Support</a></li></ul></div>
+</footer>
+
+</body>
+</html>

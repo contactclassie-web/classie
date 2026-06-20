@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBag, Check, ChevronRight, Truck, RefreshCw, Shield, Star } from "lucide-react";
 import { Product } from "@/lib/products";
 import { useCart } from "@/components/CartContext";
 import ProductCard from "@/components/ProductCard";
+import { supabase } from "@/lib/supabase";
 
 const SPECS: Record<string, string[][]> = {
   heels: [
@@ -30,6 +31,22 @@ export default function ProductDetailClient({ product, related }: { product: Pro
   const { addToCart } = useCart();
   const [selected, setSelected] = useState(product.variants.options[0] ?? "");
   const [added, setAdded] = useState(false);
+  const [advMobile,  setAdvMobile]  = useState(2);
+  const [advDesktop, setAdvDesktop] = useState(4);
+  const [advGap,     setAdvGap]     = useState(16);
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["adv_related_mobile","adv_related_desktop","adv_related_gap"])
+      .then(({ data }) => {
+        if (!data) return;
+        const m: Record<string,string> = {};
+        data.forEach(({ key, value }) => { m[key] = value; });
+        if (m.adv_related_mobile)  setAdvMobile(parseInt(m.adv_related_mobile) || 2);
+        if (m.adv_related_desktop) setAdvDesktop(parseInt(m.adv_related_desktop) || 4);
+        if (m.adv_related_gap)     setAdvGap(parseInt(m.adv_related_gap) || 16);
+      });
+  }, []);
 
   const discount = Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100);
   const specs = SPECS[product.category] ?? [];
@@ -231,7 +248,10 @@ export default function ProductDetailClient({ product, related }: { product: Pro
         {related.length > 0 && (
           <div className="mt-20 border-t border-classie-border pt-14">
             <h2 className="font-serif text-2xl md:text-3xl text-classie-black mb-8">You May Also Like</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+            <div
+              className={`grid grid-cols-${advMobile} sm:grid-cols-${advDesktop} md:grid-cols-${advDesktop}`}
+              style={{ gap: advGap + "px" }}
+            >
               {related.map((p) => <ProductCard key={p.slug} product={p} />)}
             </div>
           </div>

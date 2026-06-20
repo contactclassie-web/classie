@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/lib/products";
 import { SlidersHorizontal, X } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const SORT_OPTIONS = [
   { value: "default", label: "Default" },
@@ -21,6 +22,22 @@ function ShopContent() {
   const [category, setCategory] = useState(categoryParam);
   const [sort, setSort] = useState("default");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [advMobile,  setAdvMobile]  = useState(2);
+  const [advDesktop, setAdvDesktop] = useState(4);
+  const [advGap,     setAdvGap]     = useState(16);
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["adv_shop_mobile","adv_shop_desktop","adv_shop_gap"])
+      .then(({ data }) => {
+        if (!data) return;
+        const m: Record<string,string> = {};
+        data.forEach(({ key, value }) => { m[key] = value; });
+        if (m.adv_shop_mobile)  setAdvMobile(parseInt(m.adv_shop_mobile) || 2);
+        if (m.adv_shop_desktop) setAdvDesktop(parseInt(m.adv_shop_desktop) || 4);
+        if (m.adv_shop_gap)     setAdvGap(parseInt(m.adv_shop_gap) || 16);
+      });
+  }, []);
 
   useEffect(() => {
     setCategory(searchParams.get("category") || "all");
@@ -91,7 +108,10 @@ function ShopContent() {
           <p className="text-classie-gray text-lg">No products found.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+        <div
+          className={`grid grid-cols-${advMobile} sm:grid-cols-${advDesktop} md:grid-cols-${advDesktop}`}
+          style={{ gap: advGap + "px" }}
+        >
           {filtered.map((p) => (
             <ProductCard key={p.slug} product={p} />
           ))}

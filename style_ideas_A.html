@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Style Ideas — Design A: Magazine Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --navy: #3B5373; --cream: #faf8f6; --tan: #c9b99a; --gray: #888; --black: #1a1a1a; }
+  body { font-family: 'Jost', sans-serif; background: #fff; color: var(--black); }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; border-bottom: 1px solid #e8e8e8; }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 18px; letter-spacing: 0.4em; font-weight: 400; }
+  .nav-links { display: flex; gap: 32px; font-size: 13px; letter-spacing: 0.05em; }
+  .nav-links a { text-decoration: none; color: var(--black); }
+  .nav-links a.active { color: var(--navy); border-bottom: 1.5px solid var(--navy); padding-bottom: 2px; }
+
+  /* HERO STRIP */
+  .hero-strip {
+    background: var(--cream);
+    padding: 72px 48px 60px;
+    text-align: center;
+    border-bottom: 1px solid #e8e4de;
+  }
+  .hero-strip .eyebrow { font-size: 10px; letter-spacing: 0.55em; text-transform: uppercase; color: var(--gray); margin-bottom: 16px; }
+  .hero-strip h1 { font-family: 'Cormorant Garamond', serif; font-size: 60px; font-weight: 300; line-height: 1.1; margin-bottom: 16px; }
+  .hero-strip h1 em { font-style: italic; color: var(--navy); }
+  .hero-strip p { font-size: 14px; color: var(--gray); max-width: 440px; margin: 0 auto; line-height: 1.7; }
+
+  /* OCCASION TABS */
+  .tabs { display: flex; justify-content: center; gap: 8px; padding: 28px 48px; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+  .tab { padding: 8px 20px; border: 1px solid #ddd; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border-radius: 0; background: #fff; transition: all 0.2s; }
+  .tab.active, .tab:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  /* GRID SECTION */
+  .grid-section { padding: 60px 48px; }
+  .grid-section h2 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; letter-spacing: 0.02em; margin-bottom: 36px; text-align: center; }
+
+  .looks-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+  .look-card { position: relative; cursor: pointer; }
+  .look-card-img { position: relative; overflow: hidden; aspect-ratio: 3/4; background: #f5f3f0; }
+  .look-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+  .look-card:hover .look-card-img img { transform: scale(1.04); }
+
+  /* Overlay on hover */
+  .look-overlay {
+    position: absolute; inset: 0; background: rgba(59,83,115,0.82);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s; padding: 24px;
+  }
+  .look-card:hover .look-overlay { opacity: 1; }
+  .look-overlay .products { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .look-overlay .product-chip { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.12); padding: 8px 12px; border-radius: 2px; }
+  .look-overlay .product-chip .dot { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+  .look-overlay .product-chip span { font-size: 11px; color: #fff; }
+  .look-overlay .shop-btn { margin-top: 16px; background: #fff; color: var(--navy); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; padding: 10px 24px; border: none; cursor: pointer; font-family: 'Jost', sans-serif; font-weight: 500; width: 100%; }
+
+  /* Occasion tag */
+  .occasion-tag {
+    position: absolute; top: 14px; left: 14px;
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    background: var(--navy); color: #fff; padding: 5px 10px;
+  }
+
+  .look-card-info { padding: 16px 4px 8px; }
+  .look-card-info .look-num { font-size: 10px; letter-spacing: 0.3em; color: var(--gray); text-transform: uppercase; margin-bottom: 6px; }
+  .look-card-info h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+  .look-card-info p { font-size: 12px; color: var(--gray); line-height: 1.6; }
+
+  /* FEATURED LOOK (wide) */
+  .featured-section { background: var(--cream); padding: 72px 48px; }
+  .featured-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1100px; margin: 0 auto; }
+  .featured-label { font-size: 10px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--navy); margin-bottom: 20px; }
+  .featured-inner h2 { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; line-height: 1.15; margin-bottom: 16px; }
+  .featured-inner p { font-size: 14px; color: var(--gray); line-height: 1.75; margin-bottom: 32px; }
+  .featured-products { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+  .fp-item { display: flex; align-items: center; gap: 14px; padding-bottom: 14px; border-bottom: 1px solid #e0ddd8; }
+  .fp-img { width: 52px; height: 52px; border-radius: 50%; background: #e8e4de; flex-shrink: 0; overflow: hidden; }
+  .fp-img img { width: 100%; height: 100%; object-fit: cover; }
+  .fp-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .fp-price { font-size: 12px; color: var(--gray); }
+  .featured-img { position: relative; aspect-ratio: 4/5; overflow: hidden; }
+  .featured-img img { width: 100%; height: 100%; object-fit: cover; }
+  .featured-badge { position: absolute; bottom: 20px; left: 20px; background: var(--navy); color: #fff; padding: 10px 18px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .btn-navy { display: inline-block; background: var(--navy); color: #fff; padding: 13px 32px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; font-family: 'Jost', sans-serif; }
+  .btn-outline { display: inline-block; border: 1.5px solid var(--navy); color: var(--navy); padding: 12px 32px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; margin-left: 12px; }
+
+  /* VIDEO ROW */
+  .video-section { padding: 72px 48px; }
+  .video-section h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; text-align: center; margin-bottom: 8px; }
+  .video-section .sub { text-align: center; font-size: 13px; color: var(--gray); margin-bottom: 48px; }
+  .video-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .video-card { cursor: pointer; }
+  .video-thumb { aspect-ratio: 9/16; background: #1a1a1a; position: relative; overflow: hidden; border-radius: 2px; }
+  .video-thumb .play-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .play-icon svg { width: 44px; height: 44px; fill: rgba(255,255,255,0.85); }
+  .video-gradient { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding: 20px 14px 14px; }
+  .video-caption { font-size: 12px; color: #fff; font-weight: 500; margin-bottom: 3px; }
+  .video-tag { font-size: 10px; color: rgba(255,255,255,0.7); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* CTA */
+  .cta-section { background: var(--navy); padding: 72px 48px; text-align: center; color: #fff; }
+  .cta-section h2 { font-family: 'Cormorant Garamond', serif; font-size: 44px; font-weight: 300; margin-bottom: 12px; }
+  .cta-section p { font-size: 14px; color: rgba(255,255,255,0.65); margin-bottom: 32px; }
+  .btn-white { display: inline-block; background: #fff; color: var(--navy); padding: 13px 32px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; margin: 0 8px; font-family: 'Jost', sans-serif; font-weight: 500; }
+  .btn-white-outline { display: inline-block; border: 1.5px solid rgba(255,255,255,0.6); color: #fff; padding: 12px 32px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; margin: 0 8px; }
+
+  /* FOOTER */
+  footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.1); padding: 48px; color: rgba(255,255,255,0.75); font-size: 12px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 40px; }
+  .footer-brand .logo { color: #fff; display: block; margin-bottom: 12px; }
+  footer h4 { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; margin-bottom: 14px; }
+  footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  footer ul a { text-decoration: none; color: rgba(255,255,255,0.65); font-size: 13px; }
+
+  /* Image placeholders */
+  .img-placeholder { background: linear-gradient(135deg, #e8e4de 0%, #d4ccc4 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #999; font-size: 11px; }
+  .img-dark { background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">✦ C L A S S I E</div>
+  <div class="nav-links">
+    <a href="#">Heels</a>
+    <a href="#">Clip-ons</a>
+    <a href="#" class="active">Style Ideas</a>
+    <a href="#">Hot Deals</a>
+    <a href="#">Contact Us</a>
+    <a href="#">About Us</a>
+  </div>
+</nav>
+
+<!-- HERO STRIP -->
+<div class="hero-strip">
+  <p class="eyebrow">Lookbook 2024</p>
+  <h1>One Pair.<br><em>Every Occasion.</em></h1>
+  <p>Style ideas, outfit inspo, and the looks our team is loving right now. Mix, match, and make it Classie.</p>
+</div>
+
+<!-- OCCASION TABS -->
+<div class="tabs">
+  <div class="tab active">All Looks</div>
+  <div class="tab">Date Night</div>
+  <div class="tab">Work & Play</div>
+  <div class="tab">Festive</div>
+  <div class="tab">Casual</div>
+  <div class="tab">Wedding</div>
+</div>
+
+<!-- 4-CARD LOOK GRID -->
+<div class="grid-section">
+  <h2>Shop the Look</h2>
+  <div class="looks-grid">
+
+    <div class="look-card">
+      <div class="look-card-img">
+        <div class="img-placeholder" style="height:100%">Look Photo</div>
+        <span class="occasion-tag">Date Night</span>
+        <div class="look-overlay">
+          <div class="products">
+            <div class="product-chip"><div class="dot"></div><span>Modiva Heels</span></div>
+            <div class="product-chip"><div class="dot"></div><span>Crystal Clip-On Pair</span></div>
+            <div class="product-chip"><div class="dot"></div><span>FauxBow Black</span></div>
+          </div>
+          <button class="shop-btn">Shop This Look →</button>
+        </div>
+      </div>
+      <div class="look-card-info">
+        <p class="look-num">Look 01</p>
+        <h3>The Date Night Look</h3>
+        <p>Satin midi dress, crystal clips, instant runway.</p>
+      </div>
+    </div>
+
+    <div class="look-card">
+      <div class="look-card-img">
+        <div class="img-placeholder" style="height:100%">Look Photo</div>
+        <span class="occasion-tag">Work & Play</span>
+        <div class="look-overlay">
+          <div class="products">
+            <div class="product-chip"><div class="dot"></div><span>Gloss Belle Block Heel</span></div>
+            <div class="product-chip"><div class="dot"></div><span>Starlight Crystal Clip</span></div>
+          </div>
+          <button class="shop-btn">Shop This Look →</button>
+        </div>
+      </div>
+      <div class="look-card-info">
+        <p class="look-num">Look 02</p>
+        <h3>Office to After-Hours</h3>
+        <p>Same heels, new personality — done in seconds.</p>
+      </div>
+    </div>
+
+    <div class="look-card">
+      <div class="look-card-img">
+        <div class="img-placeholder" style="height:100%">Look Photo</div>
+        <span class="occasion-tag">Festive</span>
+        <div class="look-overlay">
+          <div class="products">
+            <div class="product-chip"><div class="dot"></div><span>Clessia Wine Heel</span></div>
+            <div class="product-chip"><div class="dot"></div><span>Crystal Starburst Clip</span></div>
+            <div class="product-chip"><div class="dot"></div><span>Radiance Crown Clip</span></div>
+          </div>
+          <button class="shop-btn">Shop This Look →</button>
+        </div>
+      </div>
+      <div class="look-card-info">
+        <p class="look-num">Look 03</p>
+        <h3>The Festive Glow-Up</h3>
+        <p>Maximum shimmer for weddings and receptions.</p>
+      </div>
+    </div>
+
+    <div class="look-card">
+      <div class="look-card-img">
+        <div class="img-placeholder" style="height:100%">Look Photo</div>
+        <span class="occasion-tag">Casual</span>
+        <div class="look-overlay">
+          <div class="products">
+            <div class="product-chip"><div class="dot"></div><span>Crovia Block Heel</span></div>
+            <div class="product-chip"><div class="dot"></div><span>Pearl Bloom Clip</span></div>
+          </div>
+          <button class="shop-btn">Shop This Look →</button>
+        </div>
+      </div>
+      <div class="look-card-info">
+        <p class="look-num">Look 04</p>
+        <h3>Everyday Effortless</h3>
+        <p>From brunch to grocery — your new daily staple.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FEATURED LOOK (Full Width) -->
+<div class="featured-section">
+  <div class="featured-inner">
+    <div>
+      <p class="featured-label">Editor's Pick</p>
+      <h2>The Look<br>Everyone's<br>Asking About</h2>
+      <p>Our bestselling Modiva heel paired with the Radiance Heart Crystal Clip — worn at brunches, weddings, and rooftop parties across the country.</p>
+      <div class="featured-products">
+        <div class="fp-item">
+          <div class="fp-img"><div class="img-placeholder" style="height:100%"></div></div>
+          <div><div class="fp-name">Modiva Slingback Heel</div><div class="fp-price">₹2,499</div></div>
+        </div>
+        <div class="fp-item">
+          <div class="fp-img"><div class="img-placeholder" style="height:100%"></div></div>
+          <div><div class="fp-name">Radiance Heart Crystal Clip Pair</div><div class="fp-price">₹849</div></div>
+        </div>
+      </div>
+      <a href="#" class="btn-navy">Shop This Look</a>
+      <a href="#" class="btn-outline">View All Heels</a>
+    </div>
+    <div class="featured-img">
+      <div class="img-placeholder" style="height:100%;aspect-ratio:4/5">Featured Look</div>
+      <div class="featured-badge">Editor's Pick</div>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO STYLE SECTION -->
+<div class="video-section">
+  <h2>"Because Your Style<br>Never Stays the Same."</h2>
+  <p class="sub">Watch how real women are styling their Classie heels</p>
+  <div class="video-grid">
+    <div class="video-card">
+      <div class="video-thumb">
+        <div class="img-placeholder img-dark" style="height:100%"></div>
+        <div class="play-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="video-gradient">
+          <div class="video-caption">Festive, but effortless</div>
+          <div class="video-tag">Wedding Season</div>
+        </div>
+      </div>
+    </div>
+    <div class="video-card">
+      <div class="video-thumb">
+        <div class="img-placeholder img-dark" style="height:100%"></div>
+        <div class="play-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="video-gradient">
+          <div class="video-caption">Every day, elevated</div>
+          <div class="video-tag">Daily Style</div>
+        </div>
+      </div>
+    </div>
+    <div class="video-card">
+      <div class="video-thumb">
+        <div class="img-placeholder img-dark" style="height:100%"></div>
+        <div class="play-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="video-gradient">
+          <div class="video-caption">Desk to dance floor</div>
+          <div class="video-tag">Work & Play</div>
+        </div>
+      </div>
+    </div>
+    <div class="video-card">
+      <div class="video-thumb">
+        <div class="img-placeholder img-dark" style="height:100%"></div>
+        <div class="play-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="video-gradient">
+          <div class="video-caption">Wedding-ready, your way</div>
+          <div class="video-tag">Festive</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Create Your Look</h2>
+  <p>Tag us @_classie_in for a chance to be featured in our next lookbook.</p>
+  <a href="#" class="btn-white">Shop Heels</a>
+  <a href="#" class="btn-white-outline">Shop Clip-ons</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="logo">✦ C L A S S I E</span>
+    <p>Sign up for sales, new arrivals, and more</p>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <input type="email" placeholder="Enter your email" style="flex:1;padding:10px 14px;font-size:13px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;outline:none;" />
+      <button style="background:#fff;color:var(--navy);padding:10px 16px;font-size:12px;border:none;cursor:pointer;font-weight:500;">Sign Up</button>
+    </div>
+  </div>
+  <div>
+    <h4>About Us</h4>
+    <ul><li><a href="#">About Us</a></li><li><a href="#">Style Ideas</a></li><li><a href="#">Contact</a></li></ul>
+  </div>
+  <div>
+    <h4>Resource</h4>
+    <ul><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Discounts</a></li></ul>
+  </div>
+  <div>
+    <h4>Information</h4>
+    <ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Refund Policy</a></li></ul>
+  </div>
+  <div>
+    <h4>Help</h4>
+    <ul><li><a href="#">FAQ</a></li><li><a href="#">Track Order</a></li><li><a href="#">Support</a></li></ul>
+  </div>
+</footer>
+
+</body>
+</html>
