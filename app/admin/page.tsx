@@ -227,6 +227,9 @@ interface StyleInspo {
   tag: string;
   display_order: number;
   active: boolean;
+  description?: string;
+  media_type?: string;  // "image" | "video"
+  look_number?: number;
 }
 
 const EMPTY_TESTIMONIAL: Testimonial = {
@@ -239,6 +242,7 @@ const EMPTY_INSTAGRAM: InstagramImage = {
 
 const EMPTY_STYLE_INSPO: StyleInspo = {
   title: "", image_url: "", link_url: "", tag: "", display_order: 0, active: true,
+  description: "", media_type: "image", look_number: 0,
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -476,6 +480,11 @@ export default function AdminPage() {
   const [siHeroStat3Val, setSiHeroStat3Val] = useState("Free");
   const [siHeroStat3Label, setSiHeroStat3Label] = useState("Shipping ₹999+");
   const [siHeroSaving, setSiHeroSaving] = useState(false);
+  const [siOccasions, setSiOccasions] = useState<string[]>(["All Looks","Date Night","Work & Play","Festive","Casual","Wedding"]);
+  const [siOccasionsSaving, setSiOccasionsSaving] = useState(false);
+  const [newSiOccasion, setNewSiOccasion] = useState("");
+  const [siCardsPerRow, setSiCardsPerRow] = useState(4);
+  const [siCardsPerRowSaving, setSiCardsPerRowSaving] = useState(false);
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
   const [bowWhyCard1Icon, setBowWhyCard1Icon] = useState("🎀");
@@ -1127,7 +1136,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label"];
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row"];
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1146,9 +1155,31 @@ export default function AdminPage() {
       if (m.si_hero_stat2_label) setSiHeroStat2Label(m.si_hero_stat2_label);
       if (m.si_hero_stat3_val) setSiHeroStat3Val(m.si_hero_stat3_val);
       if (m.si_hero_stat3_label) setSiHeroStat3Label(m.si_hero_stat3_label);
+      if (m.si_occasions) { try { setSiOccasions(JSON.parse(m.si_occasions)); } catch { /* ignore */ } }
+      if (m.si_cards_per_row) setSiCardsPerRow(parseInt(m.si_cards_per_row) || 4);
     } catch { /* ignore */ }
     finally { setSiPageLoading(false); }
   }, []);
+
+  const saveSiOccasions = async (list: string[]) => {
+    setSiOccasionsSaving(true);
+    try {
+      await supabase.from("site_settings").delete().eq("key", "si_occasions");
+      await supabase.from("site_settings").insert({ key: "si_occasions", value: JSON.stringify(list) });
+      await revalidateSite();
+    } catch { /* ignore */ }
+    finally { setSiOccasionsSaving(false); }
+  };
+
+  const saveSiCardsPerRow = async (n: number) => {
+    setSiCardsPerRowSaving(true);
+    try {
+      await supabase.from("site_settings").delete().eq("key", "si_cards_per_row");
+      await supabase.from("site_settings").insert({ key: "si_cards_per_row", value: String(n) });
+      await revalidateSite();
+    } catch { /* ignore */ }
+    finally { setSiCardsPerRowSaving(false); }
+  };
 
   const saveStyleIdeasHero = async () => {
     setSiHeroSaving(true);
@@ -1484,7 +1515,7 @@ export default function AdminPage() {
     if (tab === "clips-page") fetchClipsPage();
     if (tab === "bow-page") fetchBowPage();
     if (tab === "collections-page") fetchCollectionsPage();
-    if (tab === "style-ideas-page") fetchStyleIdeasPage();
+    if (tab === "style-ideas-page") { fetchStyleIdeasPage(); fetchStyleInspos(); }
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
@@ -3854,6 +3885,150 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
+
+                  {/* ── Occasions / Filter Tabs ─────────────────────── */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Occasions / Filter Tabs</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Style Ideas page pe filter tabs — add/remove occasions.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                      <div className="flex flex-wrap gap-2 min-h-[36px]">
+                        {siOccasions.map((occ, i) => (
+                          <span key={i} className="inline-flex items-center gap-1.5 bg-[#f0ecff] text-[#3B5373] text-xs font-medium px-3 py-1.5 rounded-full">
+                            {occ}
+                            {occ !== "All Looks" && (
+                              <button onClick={async () => { const u = siOccasions.filter((_,j)=>j!==i); setSiOccasions(u); await saveSiOccasions(u); }} className="text-[#3B5373]/60 hover:text-red-500 transition-colors text-sm leading-none">×</button>
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <input type="text" value={newSiOccasion} onChange={e=>setNewSiOccasion(e.target.value)}
+                          onKeyDown={async e=>{if(e.key==="Enter"&&newSiOccasion.trim()){const u=[...siOccasions,newSiOccasion.trim()];setSiOccasions(u);setNewSiOccasion("");await saveSiOccasions(u);}}}
+                          placeholder="e.g. Wedding, Party, Brunch…"
+                          className="flex-1 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        <button onClick={async()=>{if(!newSiOccasion.trim())return;const u=[...siOccasions,newSiOccasion.trim()];setSiOccasions(u);setNewSiOccasion("");await saveSiOccasions(u);}}
+                          disabled={siOccasionsSaving||!newSiOccasion.trim()}
+                          className="px-4 py-2 bg-[#3B5373] text-white text-sm font-medium hover:bg-[#2d3f4f] rounded-lg disabled:opacity-50 transition-colors">
+                          {siOccasionsSaving ? "Saving…" : "Add"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Cards per Row ──────────────────────────────── */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">Cards per Row</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">1 row mein kitni cards dikhengi? (Desktop)</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <div className="flex gap-2 flex-wrap">
+                        {[2,3,4,5,6].map(n=>(
+                          <button key={n} onClick={async()=>{setSiCardsPerRow(n);await saveSiCardsPerRow(n);}}
+                            className={`w-12 h-12 text-sm font-semibold border rounded-xl transition-colors ${siCardsPerRow===n?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                            {n}
+                          </button>
+                        ))}
+                        {siCardsPerRowSaving && <span className="text-xs text-gray-400 self-center">Saving…</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Look Cards CRUD ────────────────────────────── */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">Look Cards</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">{styleInspos.filter(s=>s.active).length} active · {styleInspos.length} total</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={fetchStyleInspos} disabled={styleInspoLoading} className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg">
+                          <RefreshCw className="w-3 h-3"/>Refresh
+                        </button>
+                        <button onClick={()=>setStyleInspoModal({open:true,mode:"add",data:{...EMPTY_STYLE_INSPO}})}
+                          className="flex items-center gap-1.5 px-4 py-2 bg-[#3B5373] text-white text-xs font-medium rounded-lg hover:bg-[#2d3f4f]">
+                          <Plus className="w-3.5 h-3.5"/>Add Look
+                        </button>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                      {styleInspoLoading ? (
+                        <div className="p-10 text-center text-gray-400 text-sm">Loading…</div>
+                      ) : styleInspos.length === 0 ? (
+                        <div className="p-10 text-center">
+                          <Camera className="w-8 h-8 text-gray-200 mx-auto mb-3"/>
+                          <p className="text-sm text-gray-400">No looks yet. Add your first look!</p>
+                        </div>
+                      ) : (
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-100 bg-gray-50">
+                              <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium">Look</th>
+                              <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium hidden md:table-cell">Occasion</th>
+                              <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-gray-400 font-medium hidden md:table-cell">Media</th>
+                              <th className="px-4 py-3 text-center text-[10px] tracking-widest uppercase text-gray-400 font-medium w-20">Active</th>
+                              <th className="px-4 py-3 w-20"/>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {styleInspos.map((inspo,i)=>(
+                              <tr key={inspo.id} className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${i%2===0?"":"bg-gray-50/30"}`}>
+                                <td className="px-4 py-3">
+                                  <div className="flex items-center gap-3">
+                                    {inspo.image_url && (
+                                      inspo.media_type === "video"
+                                        ? <div className="w-11 h-11 bg-gray-900 rounded flex items-center justify-center flex-shrink-0"><span className="text-white text-xs">▶</span></div>
+                                        : <img src={inspo.image_url} alt={inspo.title} className="w-11 h-11 object-cover object-top rounded flex-shrink-0"/>
+                                    )}
+                                    <div>
+                                      <p className="font-medium text-gray-800 text-sm">{inspo.title}</p>
+                                      {inspo.description && <p className="text-xs text-gray-400 truncate max-w-[180px]">{inspo.description}</p>}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 hidden md:table-cell">
+                                  {inspo.tag ? <span className="text-[10px] tracking-wider uppercase bg-[#f0ecff] text-[#3B5373] px-2 py-1 rounded-full">{inspo.tag}</span> : <span className="text-gray-300 text-xs">—</span>}
+                                </td>
+                                <td className="px-4 py-3 hidden md:table-cell">
+                                  <span className={`text-[10px] tracking-wider uppercase px-2 py-1 rounded-full ${inspo.media_type==="video"?"bg-orange-50 text-orange-600":"bg-blue-50 text-blue-600"}`}>
+                                    {inspo.media_type==="video"?"📹 Video":"🖼 Image"}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <button onClick={async()=>{await supabase.from("style_inspo").update({active:!inspo.active}).eq("id",inspo.id);setStyleInspos(prev=>prev.map(x=>x.id===inspo.id?{...x,active:!x.active}:x));}}
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${inspo.active?"bg-[#3B5373]":"bg-gray-200"}`}>
+                                    <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${inspo.active?"translate-x-6":"translate-x-1"}`}/>
+                                  </button>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="flex gap-1 justify-end">
+                                    <button onClick={()=>setStyleInspoModal({open:true,mode:"edit",data:{...inspo}})} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600"><Pencil className="w-3.5 h-3.5"/></button>
+                                    <button onClick={()=>setDeleteStyleInspoConfirm(inspo.id!)} className="p-1.5 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-500"><Trash2 className="w-3.5 h-3.5"/></button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+
+                    {/* Delete confirm */}
+                    {deleteStyleInspoConfirm && (
+                      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+                          <p className="font-semibold text-gray-800 mb-2">Delete this look?</p>
+                          <p className="text-sm text-gray-500 mb-5">This cannot be undone.</p>
+                          <div className="flex gap-3">
+                            <button onClick={()=>setDeleteStyleInspoConfirm(null)} className="flex-1 px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
+                            <button onClick={async()=>{await supabase.from("style_inspo").delete().eq("id",deleteStyleInspoConfirm);setDeleteStyleInspoConfirm(null);await fetchStyleInspos();await revalidateSite();}} className="flex-1 px-4 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
             </div>
@@ -6144,44 +6319,78 @@ export default function AdminPage() {
       ══════════════════════════════════════════════════ */}
       {styleInspoModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-800">{styleInspoModal.mode === "add" ? "Add Style Inspo" : "Edit Style Inspo"}</h2>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+              <h2 className="font-semibold text-gray-800">{styleInspoModal.mode === "add" ? "Add Look Card" : "Edit Look Card"}</h2>
               <button onClick={() => setStyleInspoModal(m => ({ ...m, open: false }))} className="p-2 rounded-lg hover:bg-gray-100">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
             <div className="p-5 space-y-4">
+              {/* Title */}
               <div>
-                <label className={labelCls}>Title</label>
+                <label className={labelCls}>Look Title</label>
                 <input className={inputCls} value={styleInspoModal.data.title}
-                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, title: e.target.value } }))} placeholder="e.g. Date Night Look" />
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, title: e.target.value } }))} placeholder="e.g. The Date Night Look" />
               </div>
+              {/* Description */}
               <div>
-                <label className={labelCls}>Image URL *</label>
+                <label className={labelCls}>Description</label>
+                <textarea rows={2} className={`${inputCls} resize-none`} value={styleInspoModal.data.description || ""}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, description: e.target.value } }))} placeholder="Short description of this look..." />
+              </div>
+              {/* Occasion */}
+              <div>
+                <label className={labelCls}>Occasion (Filter Tab)</label>
+                <select className={inputCls} value={styleInspoModal.data.tag}
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, tag: e.target.value } }))}>
+                  <option value="">— Select Occasion —</option>
+                  {siOccasions.filter(o=>o!=="All Looks").map(o=>(
+                    <option key={o} value={o}>{o}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Media Type */}
+              <div>
+                <label className={labelCls}>Media Type</label>
+                <div className="flex gap-2">
+                  {(["image","video"] as const).map(t=>(
+                    <button key={t} type="button" onClick={()=>setStyleInspoModal(m=>({...m,data:{...m.data,media_type:t}}))}
+                      className={`px-4 py-2 text-xs font-medium border rounded-lg capitalize transition-colors ${styleInspoModal.data.media_type===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                      {t==="image"?"🖼 Image":"📹 Video"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Media URL */}
+              <div>
+                <label className={labelCls}>{styleInspoModal.data.media_type==="video"?"Video URL (mp4)":"Image URL"}</label>
                 <input className={inputCls} value={styleInspoModal.data.image_url}
-                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, image_url: e.target.value } }))} placeholder="https://..." />
+                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, image_url: e.target.value } }))}
+                  placeholder={styleInspoModal.data.media_type==="video"?"https://...mp4":"https://...jpg"} />
+                {styleInspoModal.data.image_url && styleInspoModal.data.media_type==="image" && (
+                  <img src={styleInspoModal.data.image_url} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                )}
               </div>
-              <div>
-                <label className={labelCls}>Link URL</label>
-                <input className={inputCls} value={styleInspoModal.data.link_url}
-                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, link_url: e.target.value } }))} placeholder="/shop/..." />
+              {/* Look Number + Order */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>Look Number</label>
+                  <input type="number" className={inputCls} value={styleInspoModal.data.look_number || 0}
+                    onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, look_number: parseInt(e.target.value)||0 } }))} placeholder="1" />
+                </div>
+                <div>
+                  <label className={labelCls}>Display Order</label>
+                  <input type="number" className={inputCls} value={styleInspoModal.data.display_order}
+                    onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, display_order: parseInt(e.target.value)||0 } }))} />
+                </div>
               </div>
-              <div>
-                <label className={labelCls}>Tag Label</label>
-                <input className={inputCls} value={styleInspoModal.data.tag}
-                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, tag: e.target.value } }))} placeholder="e.g. NEW, TRENDING" />
-              </div>
-              <div>
-                <label className={labelCls}>Display Order</label>
-                <input type="number" className={inputCls} value={styleInspoModal.data.display_order}
-                  onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, display_order: parseInt(e.target.value) || 0 } }))} />
-              </div>
+              {/* Active */}
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={styleInspoModal.data.active}
                   onChange={e => setStyleInspoModal(m => ({ ...m, data: { ...m.data, active: e.target.checked } }))}
                   className="w-4 h-4 accent-[#3B5373]" />
-                <span className="text-sm text-gray-600">Active</span>
+                <span className="text-sm text-gray-600">Active (show on website)</span>
               </label>
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
@@ -6190,17 +6399,19 @@ export default function AdminPage() {
                 setStyleInspoSaving(true);
                 try {
                   const d = styleInspoModal.data;
+                  const payload = { title: d.title, image_url: d.image_url, link_url: d.link_url || "", tag: d.tag, display_order: d.display_order, active: d.active, description: d.description || "", media_type: d.media_type || "image", look_number: d.look_number || 0 };
                   if (styleInspoModal.mode === "add") {
-                    await supabase.from("style_inspo").insert([{ ...d }]);
+                    await supabase.from("style_inspo").insert([payload]);
                   } else {
-                    await supabase.from("style_inspo").update({ ...d }).eq("id", d.id!);
+                    await supabase.from("style_inspo").update(payload).eq("id", d.id!);
                   }
                   await fetchStyleInspos();
+                  await revalidateSite();
                   setStyleInspoModal(m => ({ ...m, open: false }));
                 } catch { /* ignore */ }
                 finally { setStyleInspoSaving(false); }
               }} className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
-                {styleInspoSaving ? "Saving…" : "Save"}
+                {styleInspoSaving ? "Saving…" : "Save Look"}
               </button>
             </div>
           </div>
