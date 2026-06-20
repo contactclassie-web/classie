@@ -7,7 +7,7 @@ import StyleIdeasLooksClient from "./StyleIdeasLooksClient";
 type FeaturedLookData = {
   label: string; heading: string; desc: string;
   image: string; mediaType: "image"|"video";
-  products: {name:string;price:string;image_url:string;link_url:string}[];
+  products: {id:string;title:string;price:number;image:string;slug:string}[];
   cta1Text: string; cta1Url: string; cta2Text: string; cta2Url: string;
 };
 
@@ -28,16 +28,16 @@ function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
             {f.products.length > 0 && (
               <div className="flex flex-col mb-8">
                 {f.products.map((p, i) => (
-                  <Link key={i} href={p.link_url || "#"} className="flex items-center gap-4 py-4 border-b border-[#e0ddd8] group hover:bg-white hover:px-2 transition-all">
+                  <Link key={i} href={p.slug ? `/products/${p.slug}` : "#"} className="flex items-center gap-4 py-4 border-b border-[#e0ddd8] group hover:bg-white hover:px-2 transition-all">
                     <div className="w-12 h-12 rounded-full bg-[#e8e4de] overflow-hidden flex-shrink-0">
-                      {p.image_url
+                      {p.image
                         // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover object-top"/>
+                        ? <img src={p.image} alt={p.title} className="w-full h-full object-cover object-top"/>
                         : null}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-[#1a1a1a] group-hover:text-[#3B5373] transition-colors">{p.name}</p>
-                      <p className="text-xs text-[#888]">{p.price}</p>
+                      <p className="text-sm font-medium text-[#1a1a1a] group-hover:text-[#3B5373] transition-colors">{p.title}</p>
+                      <p className="text-xs text-[#888]">₹{p.price}</p>
                     </div>
                     <span className="text-[#3B5373] opacity-0 group-hover:opacity-100 text-xs transition-opacity">→</span>
                   </Link>
@@ -148,15 +148,26 @@ export default async function StyleIdeasPage() {
     display_order: Number(r.display_order || 0),
   }));
 
-  // Featured Look
+  // Featured Look — product IDs → join with products table
   const featuredVisible = cfg["si_featured_visible"] !== "false";
+  const featuredProductIds: string[] = (() => { try { return JSON.parse(cfg["si_featured_products"] || "[]"); } catch { return []; } })();
+  let featuredProductRows: {id:string;title:string;price:number;image:string;slug:string}[] = [];
+  if (featuredProductIds.length > 0) {
+    const { data: pRows } = await sb.from("products").select("id,title,price,image,slug").in("id", featuredProductIds);
+    // preserve the admin-selected order
+    const pMap = new Map((pRows ?? []).map((p: Record<string,unknown>) => [String(p.id), p]));
+    featuredProductRows = featuredProductIds.map(id => {
+      const p = pMap.get(id);
+      return p ? { id: String(p.id), title: String(p.title||""), price: Number(p.price||0), image: String(p.image||""), slug: String(p.slug||"") } : null;
+    }).filter(Boolean) as typeof featuredProductRows;
+  }
   const featured = {
     label:     cfg["si_featured_label"] || "EDITOR'S PICK",
     heading:   cfg["si_featured_heading"] || "The Look Everyone's Asking About",
     desc:      cfg["si_featured_desc"] || "",
     image:     cfg["si_featured_image"] || "",
     mediaType: (cfg["si_featured_media_type"] || "image") as "image"|"video",
-    products:  (() => { try { return JSON.parse(cfg["si_featured_products"] || "[]"); } catch { return []; } })() as {name:string;price:string;image_url:string;link_url:string}[],
+    products:  featuredProductRows,
     cta1Text:  cfg["si_featured_cta1_text"] || "Shop This Look",
     cta1Url:   cfg["si_featured_cta1_url"] || "/shop/heels",
     cta2Text:  cfg["si_featured_cta2_text"] || "View All Heels",

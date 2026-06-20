@@ -497,7 +497,8 @@ export default function AdminPage() {
   const [siFeaturedDesc, setSiFeaturedDesc] = useState("Our bestselling heel paired with our top clip-ons — worn at brunches, weddings, and rooftop parties across the country.");
   const [siFeaturedImage, setSiFeaturedImage] = useState("");
   const [siFeaturedMediaType, setSiFeaturedMediaType] = useState<"image"|"video">("image");
-  const [siFeaturedProducts, setSiFeaturedProducts] = useState<{name:string;price:string;image_url:string;link_url:string}[]>([]);
+  const [siFeaturedProducts, setSiFeaturedProducts] = useState<string[]>([]); // array of product IDs
+  const [siFeaturedSearch, setSiFeaturedSearch] = useState("");
   const [siFeaturedCta1Text, setSiFeaturedCta1Text] = useState("SHOP THIS LOOK");
   const [siFeaturedCta1Url, setSiFeaturedCta1Url] = useState("/shop/heels");
   const [siFeaturedCta2Text, setSiFeaturedCta2Text] = useState("VIEW ALL HEELS");
@@ -1181,7 +1182,7 @@ export default function AdminPage() {
       if (m.si_featured_desc) setSiFeaturedDesc(m.si_featured_desc);
       if (m.si_featured_image) setSiFeaturedImage(m.si_featured_image);
       if (m.si_featured_media_type) setSiFeaturedMediaType(m.si_featured_media_type as "image"|"video");
-      if (m.si_featured_products) { try { setSiFeaturedProducts(JSON.parse(m.si_featured_products)); } catch { /* ignore */ } }
+      if (m.si_featured_products) { try { const p = JSON.parse(m.si_featured_products); setSiFeaturedProducts(Array.isArray(p) ? p : []); } catch { /* ignore */ } }
       if (m.si_featured_cta1_text) setSiFeaturedCta1Text(m.si_featured_cta1_text);
       if (m.si_featured_cta1_url) setSiFeaturedCta1Url(m.si_featured_cta1_url);
       if (m.si_featured_cta2_text) setSiFeaturedCta2Text(m.si_featured_cta2_text);
@@ -1570,7 +1571,7 @@ export default function AdminPage() {
     if (tab === "bow-page") fetchBowPage();
     if (tab === "collections-page") fetchCollectionsPage();
     if (tab === "style-ideas-page") { fetchStyleIdeasPage(); fetchStyleInspos(); }
-    if (tab === "style-ideas-featured") fetchStyleIdeasPage();
+    if (tab === "style-ideas-featured") { fetchStyleIdeasPage(); fetchAllProducts(); }
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
@@ -1754,6 +1755,12 @@ export default function AdminPage() {
     setCategoryModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
 
   // ── Category Products actions ─────────────────────────────────────────────
+
+  const fetchAllProducts = useCallback(async () => {
+    if (allProductsForCategoryModal.length > 0) return; // already loaded
+    const { data } = await supabase.from('products').select('*').eq('active', true).order('title');
+    setAllProductsForCategoryModal((data as DbProduct[]) ?? []);
+  }, [allProductsForCategoryModal.length]);
 
   const openManageCategoryProducts = async (c: SiteCategory) => {
     // Load all active products
@@ -4141,30 +4148,59 @@ export default function AdminPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Products (max 3)</label>
-                      {siFeaturedProducts.length < 3 && (
-                        <button onClick={()=>setSiFeaturedProducts(p=>[...p,{name:"",price:"",image_url:"",link_url:""}])}
-                          className="text-xs text-[#3B5373] flex items-center gap-1 hover:underline">
-                          <Plus className="w-3 h-3"/>Add Product
-                        </button>
-                      )}
+                      <span className="text-[10px] text-gray-400">{siFeaturedProducts.length}/3 selected</span>
                     </div>
-                    <div className="space-y-3">
-                      {siFeaturedProducts.map((prod,i)=>(
-                        <div key={i} className="border border-gray-100 rounded-xl p-3 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <p className="text-[10px] font-medium text-gray-400 uppercase">Product {i+1}</p>
-                            <button onClick={()=>setSiFeaturedProducts(p=>p.filter((_,j)=>j!==i))} className="text-gray-300 hover:text-red-400 text-xs">✕ Remove</button>
-                          </div>
-                          <input type="text" value={prod.name} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],name:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product Name" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" value={prod.price} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],price:e.target.value};setSiFeaturedProducts(u);}} placeholder="₹2,499" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
-                            <input type="text" value={prod.link_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],link_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="/products/slug" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
-                          </div>
-                          <input type="text" value={prod.image_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],image_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product image URL" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                    {/* Selected products */}
+                    {siFeaturedProducts.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {siFeaturedProducts.map(id => {
+                          const p = allProductsForCategoryModal.find(x => x.id === id);
+                          if (!p) return null;
+                          return (
+                            <div key={id} className="flex items-center gap-2 bg-[#f4f2ff] border border-[#3B5373]/20 rounded-lg px-2 py-1.5">
+                              {p.image && <img src={p.image} alt={p.title} className="w-7 h-7 object-cover rounded"/>}
+                              <span className="text-xs font-medium text-gray-700 max-w-[100px] truncate">{p.title}</span>
+                              <span className="text-[10px] text-gray-400">₹{p.price}</span>
+                              <button onClick={()=>setSiFeaturedProducts(prev=>prev.filter(x=>x!==id))} className="text-gray-300 hover:text-red-400 ml-1 text-xs">✕</button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {/* Search + pick from list */}
+                    {siFeaturedProducts.length < 3 && (
+                      <div>
+                        <input
+                          type="text"
+                          value={siFeaturedSearch}
+                          onChange={e=>setSiFeaturedSearch(e.target.value)}
+                          placeholder="Search products to add..."
+                          className="w-full border border-gray-200 text-xs px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg mb-1"
+                        />
+                        <div className="max-h-44 overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
+                          {allProductsForCategoryModal
+                            .filter(p => !siFeaturedProducts.includes(p.id!) &&
+                              (siFeaturedSearch === "" || p.title.toLowerCase().includes(siFeaturedSearch.toLowerCase())))
+                            .slice(0,20)
+                            .map(p => (
+                              <button key={p.id} type="button"
+                                onClick={()=>{ setSiFeaturedProducts(prev=>[...prev, p.id!]); setSiFeaturedSearch(""); }}
+                                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 text-left transition-colors">
+                                {p.image && <img src={p.image} alt={p.title} className="w-8 h-8 object-cover rounded flex-shrink-0"/>}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-medium text-gray-700 truncate">{p.title}</p>
+                                  <p className="text-[10px] text-gray-400">₹{p.price} · {p.category}</p>
+                                </div>
+                                <Plus className="w-3.5 h-3.5 text-[#3B5373] flex-shrink-0"/>
+                              </button>
+                            ))}
+                          {allProductsForCategoryModal.filter(p => !siFeaturedProducts.includes(p.id!) &&
+                            (siFeaturedSearch === "" || p.title.toLowerCase().includes(siFeaturedSearch.toLowerCase()))).length === 0 && (
+                            <p className="text-xs text-gray-300 text-center py-3">No products found</p>
+                          )}
                         </div>
-                      ))}
-                      {siFeaturedProducts.length===0 && <p className="text-xs text-gray-300 text-center py-4">No products added. Click &quot;Add Product&quot; above.</p>}
-                    </div>
+                      </div>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
