@@ -1066,6 +1066,17 @@ export default function AdminPage() {
     } catch { /* ignore */ }
   }, []);
 
+  // ── Revalidate all pages after any admin save ────────────────────────────
+  const revalidateSite = async () => {
+    try {
+      await fetch("/api/revalidate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: "classie-revalidate-2024" }),
+      });
+    } catch { /* silent fail — page will still update on next visit */ }
+  };
+
   const saveCollSettingsBatch = async (pairs: {key:string;value:string}[], setSaving: (v:boolean)=>void) => {
     setSaving(true);
     try {
@@ -1073,6 +1084,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } finally { setSaving(false); }
   };
 
@@ -1162,6 +1174,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setSiHeroSaving(false); }
   };
@@ -1189,6 +1202,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setBowHeroSaving(false); }
   };
