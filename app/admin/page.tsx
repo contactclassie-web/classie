@@ -492,6 +492,8 @@ export default function AdminPage() {
   const [newSiOccasion, setNewSiOccasion] = useState("");
   const [siCardsPerRow, setSiCardsPerRow] = useState(4);
   const [siCardsShowTag, setSiCardsShowTag] = useState(true);
+  const [siLooksHeading, setSiLooksHeading] = useState("Shop the Look");
+  const [siLooksHeadingSaving, setSiLooksHeadingSaving] = useState(false);
   const [siCardsPerRowSaving, setSiCardsPerRowSaving] = useState(false);
 
   // Featured Look section state
@@ -1172,7 +1174,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_occasions_visible","si_cards_per_row","si_cards_show_tag","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_occasions_visible","si_cards_per_row","si_cards_show_tag","si_looks_heading","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1195,6 +1197,7 @@ export default function AdminPage() {
       if (m.si_occasions_visible !== undefined) setSiOccasionsVisible(m.si_occasions_visible !== "false");
       if (m.si_cards_per_row) setSiCardsPerRow(parseInt(m.si_cards_per_row) || 4);
       if (m.si_cards_show_tag !== undefined) setSiCardsShowTag(m.si_cards_show_tag !== "false");
+      if (m.si_looks_heading !== undefined) setSiLooksHeading(m.si_looks_heading);
       if (m.si_featured_visible !== undefined) setSiFeaturedVisible(m.si_featured_visible !== "false");
       if (m.si_reels_visible !== undefined) setSiReelsVisible(m.si_reels_visible !== "false");
       if (m.si_reels_heading)  setSiReelsHeading(m.si_reels_heading);
@@ -1231,6 +1234,14 @@ export default function AdminPage() {
       await revalidateSite();
     } catch { /* ignore */ }
     finally { setSiOccasionsSaving(false); }
+  };
+
+  const saveSiLooksHeading = async (val: string) => {
+    setSiLooksHeadingSaving(true);
+    await supabase.from("site_settings").delete().eq("key", "si_looks_heading");
+    await supabase.from("site_settings").insert({ key: "si_looks_heading", value: val });
+    await revalidateSite();
+    setSiLooksHeadingSaving(false);
   };
 
   const saveSiCardsPerRow = async (n: number) => {
@@ -4045,6 +4056,23 @@ export default function AdminPage() {
                           {siOccasionsSaving ? "Saving…" : "Add"}
                         </button>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* ── Look Cards Heading ─────────────────────────── */}
+                  <div>
+                    <div className="mb-3">
+                      <h2 className="text-base font-semibold text-gray-800">Look Cards Heading</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Cards grid ke upar ka title</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex gap-3">
+                      <input type="text" value={siLooksHeading} onChange={e => setSiLooksHeading(e.target.value)}
+                        placeholder="Shop the Look"
+                        className="flex-1 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                      <button onClick={() => saveSiLooksHeading(siLooksHeading)} disabled={siLooksHeadingSaving}
+                        className="px-4 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60 flex-shrink-0">
+                        {siLooksHeadingSaving ? "Saving…" : "Save"}
+                      </button>
                     </div>
                   </div>
 

@@ -154,7 +154,7 @@ export default async function StyleIdeasPage() {
     "si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle",
     "si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label",
     "si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label",
-    "si_occasions","si_occasions_visible","si_cards_per_row","si_cards_show_tag",
+    "si_occasions","si_occasions_visible","si_cards_per_row","si_cards_show_tag","si_looks_heading",
     "si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc",
     "si_featured_image","si_featured_media_type","si_featured_products",
     "si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url",
@@ -192,6 +192,7 @@ export default async function StyleIdeasPage() {
 
   const cardsPerRow = parseInt(cfg["si_cards_per_row"] || "4") || 4;
   const cardsShowTag = cfg["si_cards_show_tag"] !== "false";
+  const looksHeading = cfg["si_looks_heading"] || "Shop the Look";
 
   const looks = (looksData ?? []).map((r: Record<string, unknown>) => ({
     id: String(r.id),
@@ -249,7 +250,7 @@ export default async function StyleIdeasPage() {
   return (
     <>
       <StyleIdeasHero hero={hero} />
-      <StyleIdeasLooksClient looks={looks} occasions={occasionsVisible ? finalOccasions : []} cardsPerRow={cardsPerRow} showTag={cardsShowTag} />
+      <StyleIdeasLooksClient looks={looks} occasions={occasionsVisible ? finalOccasions : []} cardsPerRow={cardsPerRow} showTag={cardsShowTag} heading={looksHeading} />
       {featuredVisible && featured.heading && <FeaturedLook featured={featured} />}
       {reelsVisible && reels.cards.length > 0 && <StyleReels reels={reels} />}
 

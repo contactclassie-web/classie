@@ -20,9 +20,10 @@ interface Props {
   occasions: string[];
   cardsPerRow: number;
   showTag?: boolean;
+  heading?: string;
 }
 
-export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, showTag = true }: Props) {
+export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, showTag = true, heading = "Shop the Look" }: Props) {
   const [activeTab, setActiveTab] = useState("All Looks");
 
   const filtered = activeTab === "All Looks"
@@ -39,6 +40,11 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, s
   return (
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
+
+        {/* Section Heading */}
+        {heading && (
+          <h2 className="font-serif text-3xl md:text-4xl text-center text-[#1a1a1a] font-light mb-10">{heading}</h2>
+        )}
 
         {/* Occasion Tabs */}
         {occasions.length > 1 && (
