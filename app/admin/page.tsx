@@ -286,7 +286,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels";
 type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -307,6 +307,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "collections-page":   "collections-page",
   "style-ideas-page":     "style-ideas-page",
   "style-ideas-featured": "style-ideas-page",
+  "style-ideas-reels":    "style-ideas-page",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -337,6 +338,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   "style-ideas-page": [
     { id: "style-ideas-page",     label: "Style Ideas" },
     { id: "style-ideas-featured", label: "Featured Look" },
+    { id: "style-ideas-reels",    label: "Style Reels" },
   ],
   orders:   [],
   settings: [],
@@ -504,6 +506,13 @@ export default function AdminPage() {
   const [siFeaturedCta2Text, setSiFeaturedCta2Text] = useState("VIEW ALL HEELS");
   const [siFeaturedCta2Url, setSiFeaturedCta2Url] = useState("/shop/heels");
   const [siFeaturedSaving, setSiFeaturedSaving] = useState(false);
+  // Style Reels section
+  const [siReelsVisible,   setSiReelsVisible]   = useState(true);
+  const [siReelsHeading,   setSiReelsHeading]   = useState('"Because Your Style Never Stays the Same."');
+  const [siReelsSubtitle,  setSiReelsSubtitle]  = useState('Watch how real women are styling their Classie heels');
+  const [siReelsCols,      setSiReelsCols]      = useState(4);
+  const [siReelsCards,     setSiReelsCards]     = useState<{title:string;tag:string;media_url:string;media_type:"image"|"video"}[]>([]);
+  const [siReelsSaving,    setSiReelsSaving]    = useState(false);
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
   const [bowWhyCard1Icon, setBowWhyCard1Icon] = useState("🎀");
@@ -1155,7 +1164,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url"];
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards"];
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1177,6 +1186,11 @@ export default function AdminPage() {
       if (m.si_occasions) { try { setSiOccasions(JSON.parse(m.si_occasions)); } catch { /* ignore */ } }
       if (m.si_cards_per_row) setSiCardsPerRow(parseInt(m.si_cards_per_row) || 4);
       if (m.si_featured_visible !== undefined) setSiFeaturedVisible(m.si_featured_visible !== "false");
+      if (m.si_reels_visible !== undefined) setSiReelsVisible(m.si_reels_visible !== "false");
+      if (m.si_reels_heading)  setSiReelsHeading(m.si_reels_heading);
+      if (m.si_reels_subtitle) setSiReelsSubtitle(m.si_reels_subtitle);
+      if (m.si_reels_cols)     setSiReelsCols(parseInt(m.si_reels_cols) || 4);
+      if (m.si_reels_cards)    { try { setSiReelsCards(JSON.parse(m.si_reels_cards)); } catch { /* ignore */ } }
       if (m.si_featured_label) setSiFeaturedLabel(m.si_featured_label);
       if (m.si_featured_heading) setSiFeaturedHeading(m.si_featured_heading);
       if (m.si_featured_desc) setSiFeaturedDesc(m.si_featured_desc);
@@ -1234,6 +1248,25 @@ export default function AdminPage() {
       await revalidateSite();
     } catch { /* ignore */ }
     finally { setSiFeaturedSaving(false); }
+  };
+
+  const saveSiReels = async () => {
+    setSiReelsSaving(true);
+    try {
+      const pairs = [
+        { key: "si_reels_visible",  value: siReelsVisible ? "true" : "false" },
+        { key: "si_reels_heading",  value: siReelsHeading },
+        { key: "si_reels_subtitle", value: siReelsSubtitle },
+        { key: "si_reels_cols",     value: String(siReelsCols) },
+        { key: "si_reels_cards",    value: JSON.stringify(siReelsCards) },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+      await revalidateSite();
+    } catch { /* ignore */ }
+    finally { setSiReelsSaving(false); }
   };
 
   const saveStyleIdeasHero = async () => {
@@ -1572,6 +1605,7 @@ export default function AdminPage() {
     if (tab === "collections-page") fetchCollectionsPage();
     if (tab === "style-ideas-page") { fetchStyleIdeasPage(); fetchStyleInspos(); }
     if (tab === "style-ideas-featured") { fetchStyleIdeasPage(); fetchAllProducts(); }
+    if (tab === "style-ideas-reels") fetchStyleIdeasPage();
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
@@ -4197,6 +4231,117 @@ export default function AdminPage() {
                     <Save className="w-4 h-4"/>{siFeaturedSaving?"Saving…":"Save Featured Look"}
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              STYLE REELS TAB
+          ══════════════════════════════════════ */}
+          {tab === "style-ideas-reels" && (
+            <div className="space-y-6">
+              {/* Header toggle */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-800">Style Reels Section</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">Portrait card grid — image ya video, with title + tag overlay.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400">{siReelsVisible ? "Visible" : "Hidden"}</span>
+                  <button onClick={() => setSiReelsVisible(v => !v)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${siReelsVisible ? "bg-[#3B5373]" : "bg-gray-200"}`}>
+                    <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${siReelsVisible ? "translate-x-6" : "translate-x-1"}`}/>
+                  </button>
+                </div>
+              </div>
+
+              {/* Section text */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Section Text</h3>
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1">Heading / Quote</p>
+                  <input type="text" value={siReelsHeading} onChange={e => setSiReelsHeading(e.target.value)}
+                    className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1">Subtitle</p>
+                  <input type="text" value={siReelsSubtitle} onChange={e => setSiReelsSubtitle(e.target.value)}
+                    className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1">Columns per Row</p>
+                  <div className="flex gap-2">
+                    {[3,4,5,6].map(n => (
+                      <button key={n} type="button" onClick={() => setSiReelsCols(n)}
+                        className={`w-10 h-10 rounded-lg text-sm font-medium border transition-colors ${siReelsCols === n ? "bg-[#3B5373] text-white border-[#3B5373]" : "border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Cards */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Cards ({siReelsCards.length})</h3>
+                  <button onClick={() => setSiReelsCards(c => [...c, { title: "", tag: "", media_url: "", media_type: "video" }])}
+                    className="flex items-center gap-1 text-xs text-[#3B5373] hover:underline">
+                    <Plus className="w-3 h-3"/>Add Card
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {siReelsCards.map((card, i) => (
+                    <div key={i} className="border border-gray-100 rounded-xl p-3 space-y-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-[10px] font-semibold text-gray-400 uppercase">Card {i + 1}</p>
+                        <div className="flex items-center gap-2">
+                          {/* Move up/down */}
+                          {i > 0 && <button onClick={() => { const a=[...siReelsCards]; [a[i-1],a[i]]=[a[i],a[i-1]]; setSiReelsCards(a); }} className="text-gray-300 hover:text-gray-500 text-xs">↑</button>}
+                          {i < siReelsCards.length-1 && <button onClick={() => { const a=[...siReelsCards]; [a[i],a[i+1]]=[a[i+1],a[i]]; setSiReelsCards(a); }} className="text-gray-300 hover:text-gray-500 text-xs">↓</button>}
+                          <button onClick={() => setSiReelsCards(c => c.filter((_,j) => j !== i))} className="text-gray-300 hover:text-red-400 text-xs">✕</button>
+                        </div>
+                      </div>
+                      {/* Media type toggle */}
+                      <div className="flex gap-2">
+                        {(["image","video"] as const).map(t => (
+                          <button key={t} type="button"
+                            onClick={() => { const a=[...siReelsCards]; a[i]={...a[i], media_type:t}; setSiReelsCards(a); }}
+                            className={`px-3 py-1 text-[11px] font-medium border rounded-md transition-colors ${card.media_type===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500"}`}>
+                            {t==="image"?"🖼 Image":"📹 Video"}
+                          </button>
+                        ))}
+                      </div>
+                      {/* URL */}
+                      <input type="text" value={card.media_url}
+                        onChange={e => { const a=[...siReelsCards]; a[i]={...a[i],media_url:e.target.value}; setSiReelsCards(a); }}
+                        placeholder={card.media_type==="video" ? "https://... video URL" : "https://... image URL"}
+                        className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                      {/* Preview */}
+                      {card.media_url && card.media_type==="image" && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={card.media_url} alt="preview" className="h-16 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                      )}
+                      <div className="grid grid-cols-2 gap-2">
+                        <input type="text" value={card.title}
+                          onChange={e => { const a=[...siReelsCards]; a[i]={...a[i],title:e.target.value}; setSiReelsCards(a); }}
+                          placeholder="Caption (e.g. Festive, but effortless)"
+                          className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        <input type="text" value={card.tag}
+                          onChange={e => { const a=[...siReelsCards]; a[i]={...a[i],tag:e.target.value}; setSiReelsCards(a); }}
+                          placeholder="Tag (e.g. WEDDING SEASON)"
+                          className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                      </div>
+                    </div>
+                  ))}
+                  {siReelsCards.length === 0 && (
+                    <p className="text-xs text-gray-300 text-center py-6">No cards yet — click &quot;Add Card&quot; above</p>
+                  )}
+                </div>
+                <button onClick={saveSiReels} disabled={siReelsSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4"/>{siReelsSaving ? "Saving…" : "Save Style Reels"}
+                </button>
               </div>
             </div>
           )}

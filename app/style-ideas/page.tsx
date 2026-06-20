@@ -11,6 +11,52 @@ type FeaturedLookData = {
   cta1Text: string; cta1Url: string; cta2Text: string; cta2Url: string;
 };
 
+type ReelsData = { heading:string; subtitle:string; cols:number; cards:{title:string;tag:string;media_url:string;media_type:"image"|"video"}[] };
+
+function StyleReels({ reels: r }: { reels: ReelsData }) {
+  const colClass: Record<number,string> = { 3:"grid-cols-3", 4:"grid-cols-2 sm:grid-cols-4", 5:"grid-cols-2 sm:grid-cols-5", 6:"grid-cols-2 sm:grid-cols-6" };
+  return (
+    <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {(r.heading || r.subtitle) && (
+          <div className="text-center mb-10">
+            {r.heading && <h2 className="font-serif text-3xl md:text-4xl text-[#1a1a1a] font-light italic mb-3">{r.heading}</h2>}
+            {r.subtitle && <p className="text-xs text-gray-400 tracking-wide">{r.subtitle}</p>}
+          </div>
+        )}
+        <div className={`grid gap-3 ${colClass[r.cols] || "grid-cols-2 sm:grid-cols-4"}`}>
+          {r.cards.map((card, i) => (
+            <div key={i} className="relative aspect-[9/16] bg-[#1a1a1a] overflow-hidden rounded-sm group">
+              {card.media_type === "video" && card.media_url
+                ? <video src={card.media_url} muted loop playsInline className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
+                : card.media_url
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={card.media_url} alt={card.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
+                : <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-white/20 text-4xl">▶</span>
+                  </div>
+              }
+              {/* Play icon for video */}
+              {card.media_type === "video" && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="text-white/50 text-3xl group-hover:text-white/70 transition-colors">▶</span>
+                </div>
+              )}
+              {/* Bottom overlay */}
+              {(card.title || card.tag) && (
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+                  {card.title && <p className="text-white text-[11px] font-medium leading-tight">{card.title}</p>}
+                  {card.tag && <p className="text-white/60 text-[9px] tracking-widest uppercase mt-0.5">{card.tag}</p>}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
   return (
     <section className="py-16 bg-[#faf8f6]">
@@ -104,6 +150,7 @@ export default async function StyleIdeasPage() {
     "si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc",
     "si_featured_image","si_featured_media_type","si_featured_products",
     "si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url",
+    "si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards",
   ];
 
   const [{ data: settingsRows }, { data: looksData }] = await Promise.all([
@@ -174,11 +221,21 @@ export default async function StyleIdeasPage() {
     cta2Url:   cfg["si_featured_cta2_url"] || "/shop/heels",
   };
 
+  // Style Reels
+  const reelsVisible = cfg["si_reels_visible"] !== "false";
+  const reels = {
+    heading:  cfg["si_reels_heading"]  || '"Because Your Style Never Stays the Same."',
+    subtitle: cfg["si_reels_subtitle"] || "Watch how real women are styling their Classie heels",
+    cols:     parseInt(cfg["si_reels_cols"] || "4") || 4,
+    cards:    (() => { try { return JSON.parse(cfg["si_reels_cards"] || "[]"); } catch { return []; } })() as {title:string;tag:string;media_url:string;media_type:"image"|"video"}[],
+  };
+
   return (
     <>
       <StyleIdeasHero hero={hero} />
       <StyleIdeasLooksClient looks={looks} occasions={finalOccasions} cardsPerRow={cardsPerRow} />
       {featuredVisible && featured.heading && <FeaturedLook featured={featured} />}
+      {reelsVisible && reels.cards.length > 0 && <StyleReels reels={reels} />}
       <section className="py-14 bg-[#3B5373] text-white text-center">
         <div className="max-w-xl mx-auto px-4">
           <h2 className="font-serif text-3xl md:text-4xl mb-3">Create Your Look</h2>
