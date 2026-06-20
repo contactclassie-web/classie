@@ -236,16 +236,7 @@ export default async function StyleIdeasPage() {
       <StyleIdeasLooksClient looks={looks} occasions={finalOccasions} cardsPerRow={cardsPerRow} />
       {featuredVisible && featured.heading && <FeaturedLook featured={featured} />}
       {reelsVisible && reels.cards.length > 0 && <StyleReels reels={reels} />}
-      <section className="py-14 bg-[#3B5373] text-white text-center">
-        <div className="max-w-xl mx-auto px-4">
-          <h2 className="font-serif text-3xl md:text-4xl mb-3">Create Your Look</h2>
-          <p className="text-white/70 text-sm mb-7">Tag us @_classie_in for a chance to be featured in our next lookbook.</p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/shop/heels" className="btn-ghost-white">Shop Heels</Link>
-            <Link href="/shop/clips" className="btn-ghost-white">Shop Clip-ons</Link>
-          </div>
-        </div>
-      </section>
+
     </>
   );
 }
