@@ -485,6 +485,20 @@ export default function AdminPage() {
   const [newSiOccasion, setNewSiOccasion] = useState("");
   const [siCardsPerRow, setSiCardsPerRow] = useState(4);
   const [siCardsPerRowSaving, setSiCardsPerRowSaving] = useState(false);
+
+  // Featured Look section state
+  const [siFeaturedVisible, setSiFeaturedVisible] = useState(true);
+  const [siFeaturedLabel, setSiFeaturedLabel] = useState("EDITOR'S PICK");
+  const [siFeaturedHeading, setSiFeaturedHeading] = useState("The Look Everyone's Asking About");
+  const [siFeaturedDesc, setSiFeaturedDesc] = useState("Our bestselling heel paired with our top clip-ons — worn at brunches, weddings, and rooftop parties across the country.");
+  const [siFeaturedImage, setSiFeaturedImage] = useState("");
+  const [siFeaturedMediaType, setSiFeaturedMediaType] = useState<"image"|"video">("image");
+  const [siFeaturedProducts, setSiFeaturedProducts] = useState<{name:string;price:string;image_url:string;link_url:string}[]>([]);
+  const [siFeaturedCta1Text, setSiFeaturedCta1Text] = useState("SHOP THIS LOOK");
+  const [siFeaturedCta1Url, setSiFeaturedCta1Url] = useState("/shop/heels");
+  const [siFeaturedCta2Text, setSiFeaturedCta2Text] = useState("VIEW ALL HEELS");
+  const [siFeaturedCta2Url, setSiFeaturedCta2Url] = useState("/shop/heels");
+  const [siFeaturedSaving, setSiFeaturedSaving] = useState(false);
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
   const [bowWhyCard1Icon, setBowWhyCard1Icon] = useState("🎀");
@@ -1136,7 +1150,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row"];
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url"];
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1157,6 +1171,17 @@ export default function AdminPage() {
       if (m.si_hero_stat3_label) setSiHeroStat3Label(m.si_hero_stat3_label);
       if (m.si_occasions) { try { setSiOccasions(JSON.parse(m.si_occasions)); } catch { /* ignore */ } }
       if (m.si_cards_per_row) setSiCardsPerRow(parseInt(m.si_cards_per_row) || 4);
+      if (m.si_featured_visible !== undefined) setSiFeaturedVisible(m.si_featured_visible !== "false");
+      if (m.si_featured_label) setSiFeaturedLabel(m.si_featured_label);
+      if (m.si_featured_heading) setSiFeaturedHeading(m.si_featured_heading);
+      if (m.si_featured_desc) setSiFeaturedDesc(m.si_featured_desc);
+      if (m.si_featured_image) setSiFeaturedImage(m.si_featured_image);
+      if (m.si_featured_media_type) setSiFeaturedMediaType(m.si_featured_media_type as "image"|"video");
+      if (m.si_featured_products) { try { setSiFeaturedProducts(JSON.parse(m.si_featured_products)); } catch { /* ignore */ } }
+      if (m.si_featured_cta1_text) setSiFeaturedCta1Text(m.si_featured_cta1_text);
+      if (m.si_featured_cta1_url) setSiFeaturedCta1Url(m.si_featured_cta1_url);
+      if (m.si_featured_cta2_text) setSiFeaturedCta2Text(m.si_featured_cta2_text);
+      if (m.si_featured_cta2_url) setSiFeaturedCta2Url(m.si_featured_cta2_url);
     } catch { /* ignore */ }
     finally { setSiPageLoading(false); }
   }, []);
@@ -1179,6 +1204,31 @@ export default function AdminPage() {
       await revalidateSite();
     } catch { /* ignore */ }
     finally { setSiCardsPerRowSaving(false); }
+  };
+
+  const saveSiFeatured = async () => {
+    setSiFeaturedSaving(true);
+    try {
+      const pairs = [
+        { key: "si_featured_visible",    value: siFeaturedVisible ? "true" : "false" },
+        { key: "si_featured_label",      value: siFeaturedLabel },
+        { key: "si_featured_heading",    value: siFeaturedHeading },
+        { key: "si_featured_desc",       value: siFeaturedDesc },
+        { key: "si_featured_image",      value: siFeaturedImage },
+        { key: "si_featured_media_type", value: siFeaturedMediaType },
+        { key: "si_featured_products",   value: JSON.stringify(siFeaturedProducts) },
+        { key: "si_featured_cta1_text",  value: siFeaturedCta1Text },
+        { key: "si_featured_cta1_url",   value: siFeaturedCta1Url },
+        { key: "si_featured_cta2_text",  value: siFeaturedCta2Text },
+        { key: "si_featured_cta2_url",   value: siFeaturedCta2Url },
+      ];
+      for (const p of pairs) {
+        await supabase.from("site_settings").delete().eq("key", p.key);
+        await supabase.from("site_settings").insert(p);
+      }
+      await revalidateSite();
+    } catch { /* ignore */ }
+    finally { setSiFeaturedSaving(false); }
   };
 
   const saveStyleIdeasHero = async () => {
@@ -4028,6 +4078,106 @@ export default function AdminPage() {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* ── Featured Look (Editor's Pick) ──────────────── */}
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">Featured Look (Editor&apos;s Pick)</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">Ek featured look section — left text + right image + products list.</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs text-gray-400">{siFeaturedVisible?"Visible":"Hidden"}</span>
+                        <button onClick={()=>setSiFeaturedVisible(v=>!v)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${siFeaturedVisible?"bg-[#3B5373]":"bg-gray-200"}`}>
+                          <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${siFeaturedVisible?"translate-x-6":"translate-x-1"}`}/>
+                        </button>
+                      </div>
+                    </div>
+                    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5 ${!siFeaturedVisible?"opacity-50 pointer-events-none":""}`}>
+                      {/* Text */}
+                      <div className="grid grid-cols-1 gap-3">
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Eyebrow Label (e.g. EDITOR&apos;S PICK)</p>
+                          <input type="text" value={siFeaturedLabel} onChange={e=>setSiFeaturedLabel(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Heading</p>
+                          <input type="text" value={siFeaturedHeading} onChange={e=>setSiFeaturedHeading(e.target.value)} placeholder="The Look Everyone's Asking About" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">Description</p>
+                          <textarea rows={2} value={siFeaturedDesc} onChange={e=>setSiFeaturedDesc(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg resize-none"/>
+                        </div>
+                      </div>
+
+                      {/* Featured Image */}
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Featured Image / Video</label>
+                        <div className="flex gap-2 mb-2">
+                          {(["image","video"] as const).map(t=>(
+                            <button key={t} type="button" onClick={()=>setSiFeaturedMediaType(t)}
+                              className={`px-3 py-1.5 text-xs font-medium border rounded-lg capitalize transition-colors ${siFeaturedMediaType===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500"}`}>
+                              {t==="image"?"🖼 Image":"📹 Video"}
+                            </button>
+                          ))}
+                        </div>
+                        <input type="text" value={siFeaturedImage} onChange={e=>setSiFeaturedImage(e.target.value)} placeholder="https://..." className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        {siFeaturedImage && siFeaturedMediaType==="image" && (
+                          <img src={siFeaturedImage} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                        )}
+                      </div>
+
+                      {/* Products */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Products (max 3)</label>
+                          {siFeaturedProducts.length < 3 && (
+                            <button onClick={()=>setSiFeaturedProducts(p=>[...p,{name:"",price:"",image_url:"",link_url:""}])}
+                              className="text-xs text-[#3B5373] flex items-center gap-1 hover:underline">
+                              <Plus className="w-3 h-3"/>Add Product
+                            </button>
+                          )}
+                        </div>
+                        <div className="space-y-3">
+                          {siFeaturedProducts.map((prod,i)=>(
+                            <div key={i} className="border border-gray-100 rounded-xl p-3 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <p className="text-[10px] font-medium text-gray-400 uppercase">Product {i+1}</p>
+                                <button onClick={()=>setSiFeaturedProducts(p=>p.filter((_,j)=>j!==i))} className="text-gray-300 hover:text-red-400 text-xs">✕ Remove</button>
+                              </div>
+                              <input type="text" value={prod.name} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],name:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product Name" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                              <div className="grid grid-cols-2 gap-2">
+                                <input type="text" value={prod.price} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],price:e.target.value};setSiFeaturedProducts(u);}} placeholder="₹2,499" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                                <input type="text" value={prod.link_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],link_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="/products/slug" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                              </div>
+                              <input type="text" value={prod.image_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],image_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product image URL" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                            </div>
+                          ))}
+                          {siFeaturedProducts.length===0 && <p className="text-xs text-gray-300 text-center py-4">No products added. Click &quot;Add Product&quot; above.</p>}
+                        </div>
+                      </div>
+
+                      {/* CTAs */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">CTA Button 1 Text</p>
+                          <input type="text" value={siFeaturedCta1Text} onChange={e=>setSiFeaturedCta1Text(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          <input type="text" value={siFeaturedCta1Url} onChange={e=>setSiFeaturedCta1Url(e.target.value)} placeholder="/shop/heels" className="w-full border border-gray-200 text-sm px-3 py-2 mt-1 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-400 mb-1">CTA Button 2 Text</p>
+                          <input type="text" value={siFeaturedCta2Text} onChange={e=>setSiFeaturedCta2Text(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          <input type="text" value={siFeaturedCta2Url} onChange={e=>setSiFeaturedCta2Url(e.target.value)} placeholder="/shop/heels" className="w-full border border-gray-200 text-sm px-3 py-2 mt-1 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                        </div>
+                      </div>
+
+                      <button onClick={saveSiFeatured} disabled={siFeaturedSaving}
+                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                        <Save className="w-4 h-4"/>{siFeaturedSaving?"Saving…":"Save Featured Look"}
+                      </button>
+                    </div>
                   </div>
                 </>
               )}

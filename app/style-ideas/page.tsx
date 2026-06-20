@@ -4,6 +4,83 @@ import { createClient } from "@supabase/supabase-js";
 import StyleIdeasHero from "./StyleIdeasHero";
 import StyleIdeasLooksClient from "./StyleIdeasLooksClient";
 
+type FeaturedLookData = {
+  label: string; heading: string; desc: string;
+  image: string; mediaType: "image"|"video";
+  products: {name:string;price:string;image_url:string;link_url:string}[];
+  cta1Text: string; cta1Url: string; cta2Text: string; cta2Url: string;
+};
+
+function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
+  return (
+    <section className="py-16 bg-[#faf8f6]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left — Text */}
+          <div>
+            {f.label && (
+              <p className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373] mb-5">{f.label}</p>
+            )}
+            <h2 className="font-serif text-4xl md:text-5xl text-[#1a1a1a] font-light leading-[1.1] mb-5">{f.heading}</h2>
+            {f.desc && <p className="text-sm text-[#888] leading-relaxed mb-8 max-w-sm">{f.desc}</p>}
+
+            {/* Products */}
+            {f.products.length > 0 && (
+              <div className="flex flex-col mb-8">
+                {f.products.map((p, i) => (
+                  <Link key={i} href={p.link_url || "#"} className="flex items-center gap-4 py-4 border-b border-[#e0ddd8] group hover:bg-white hover:px-2 transition-all">
+                    <div className="w-12 h-12 rounded-full bg-[#e8e4de] overflow-hidden flex-shrink-0">
+                      {p.image_url
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover object-top"/>
+                        : null}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-[#1a1a1a] group-hover:text-[#3B5373] transition-colors">{p.name}</p>
+                      <p className="text-xs text-[#888]">{p.price}</p>
+                    </div>
+                    <span className="text-[#3B5373] opacity-0 group-hover:opacity-100 text-xs transition-opacity">→</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* CTAs */}
+            <div className="flex gap-3 flex-wrap">
+              {f.cta1Text && (
+                <Link href={f.cta1Url} className="bg-[#3B5373] text-white text-[11px] tracking-[0.2em] uppercase font-semibold px-6 py-3 hover:bg-[#2d3f4f] transition-colors">
+                  {f.cta1Text}
+                </Link>
+              )}
+              {f.cta2Text && (
+                <Link href={f.cta2Url} className="border border-[#3B5373] text-[#3B5373] text-[11px] tracking-[0.2em] uppercase font-semibold px-6 py-3 hover:bg-[#3B5373] hover:text-white transition-colors">
+                  {f.cta2Text}
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Right — Image/Video */}
+          <div className="relative aspect-[4/5] bg-[#e8e4de] overflow-hidden">
+            {f.image && f.mediaType === "video"
+              ? <video src={f.image} autoPlay muted loop playsInline className="w-full h-full object-cover object-center"/>
+              : f.image
+              // eslint-disable-next-line @next/next/no-img-element
+              ? <img src={f.image} alt={f.heading} className="w-full h-full object-cover object-center"/>
+              : <div className="w-full h-full flex items-center justify-center text-[#aaa] text-xs">Featured Look</div>
+            }
+            {f.label && (
+              <div className="absolute bottom-5 left-5 bg-[#3B5373] text-white text-[9px] tracking-[0.3em] uppercase px-3 py-2">
+                {f.label}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export const revalidate = 0;
 
 export const metadata: Metadata = {
@@ -24,6 +101,9 @@ export default async function StyleIdeasPage() {
     "si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label",
     "si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label",
     "si_occasions","si_cards_per_row",
+    "si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc",
+    "si_featured_image","si_featured_media_type","si_featured_products",
+    "si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url",
   ];
 
   const [{ data: settingsRows }, { data: looksData }] = await Promise.all([
@@ -68,10 +148,26 @@ export default async function StyleIdeasPage() {
     display_order: Number(r.display_order || 0),
   }));
 
+  // Featured Look
+  const featuredVisible = cfg["si_featured_visible"] !== "false";
+  const featured = {
+    label:     cfg["si_featured_label"] || "EDITOR'S PICK",
+    heading:   cfg["si_featured_heading"] || "The Look Everyone's Asking About",
+    desc:      cfg["si_featured_desc"] || "",
+    image:     cfg["si_featured_image"] || "",
+    mediaType: (cfg["si_featured_media_type"] || "image") as "image"|"video",
+    products:  (() => { try { return JSON.parse(cfg["si_featured_products"] || "[]"); } catch { return []; } })() as {name:string;price:string;image_url:string;link_url:string}[],
+    cta1Text:  cfg["si_featured_cta1_text"] || "Shop This Look",
+    cta1Url:   cfg["si_featured_cta1_url"] || "/shop/heels",
+    cta2Text:  cfg["si_featured_cta2_text"] || "View All Heels",
+    cta2Url:   cfg["si_featured_cta2_url"] || "/shop/heels",
+  };
+
   return (
     <>
       <StyleIdeasHero hero={hero} />
       <StyleIdeasLooksClient looks={looks} occasions={finalOccasions} cardsPerRow={cardsPerRow} />
+      {featuredVisible && featured.heading && <FeaturedLook featured={featured} />}
       <section className="py-14 bg-[#3B5373] text-white text-center">
         <div className="max-w-xl mx-auto px-4">
           <h2 className="font-serif text-3xl md:text-4xl mb-3">Create Your Look</h2>
