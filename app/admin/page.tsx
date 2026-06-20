@@ -286,8 +286,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "orders" | "settings" | "footer" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "orders" | "settings" | "footer" | "messages";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -305,7 +305,8 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "clips-page":     "clips-page",
   "bow-page":           "bow-page",
   "collections-page":   "collections-page",
-  "style-ideas-page":   "style-ideas-page",
+  "style-ideas-page":     "style-ideas-page",
+  "style-ideas-featured": "style-ideas-featured",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -333,7 +334,8 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   "clips-page": [{ id: "clips-page", label: "Clips Page" }],
   "bow-page":          [{ id: "bow-page",         label: "Bow Page" }],
   "collections-page":  [{ id: "collections-page", label: "Collections Page" }],
-  "style-ideas-page":  [{ id: "style-ideas-page", label: "Style Ideas Page" }],
+  "style-ideas-page":     [{ id: "style-ideas-page",     label: "Style Ideas Page" }],
+  "style-ideas-featured": [{ id: "style-ideas-featured", label: "Featured Look" }],
   orders:   [],
   settings: [],
   footer:   [],
@@ -1566,6 +1568,7 @@ export default function AdminPage() {
     if (tab === "bow-page") fetchBowPage();
     if (tab === "collections-page") fetchCollectionsPage();
     if (tab === "style-ideas-page") { fetchStyleIdeasPage(); fetchStyleInspos(); }
+    if (tab === "style-ideas-featured") fetchStyleIdeasPage();
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
@@ -2060,7 +2063,8 @@ export default function AdminPage() {
     { id: "clips-page", label: "Clips Page",  icon: Sparkles },
     { id: "bow-page",          label: "Bow Page",         icon: Sparkles },
     { id: "collections-page", label: "Collections Page", icon: Grid3x3 },
-    { id: "style-ideas-page", label: "Style Ideas Page", icon: Camera },
+    { id: "style-ideas-page",     label: "Style Ideas Page",  icon: Camera },
+    { id: "style-ideas-featured", label: "Featured Look",      icon: Star },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -2097,6 +2101,7 @@ export default function AdminPage() {
               id === "bow-page" ? "bow-page" :
               id === "collections-page" ? "collections-page" :
               id === "style-ideas-page" ? "style-ideas-page" :
+              id === "style-ideas-featured" ? "style-ideas-featured" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -2149,6 +2154,7 @@ export default function AdminPage() {
                mainSection === "bow-page" ? "Bow Page" :
                mainSection === "collections-page" ? "Collections Page" :
                mainSection === "style-ideas-page" ? "Style Ideas Page" :
+               mainSection === "style-ideas-featured" ? "Featured Look" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -4080,107 +4086,119 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  {/* ── Featured Look (Editor's Pick) ──────────────── */}
+                  {/* ── Featured Look → separate sidebar section ── */}
                   <div>
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h2 className="text-base font-semibold text-gray-800">Featured Look (Editor&apos;s Pick)</h2>
-                        <p className="text-xs text-gray-400 mt-0.5">Ek featured look section — left text + right image + products list.</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Sidebar mein &quot;Featured Look&quot; section mein manage karo.</p>
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-gray-400">{siFeaturedVisible?"Visible":"Hidden"}</span>
-                        <button onClick={()=>setSiFeaturedVisible(v=>!v)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${siFeaturedVisible?"bg-[#3B5373]":"bg-gray-200"}`}>
-                          <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${siFeaturedVisible?"translate-x-6":"translate-x-1"}`}/>
-                        </button>
-                      </div>
-                    </div>
-                    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5 ${!siFeaturedVisible?"opacity-50 pointer-events-none":""}`}>
-                      {/* Text */}
-                      <div className="grid grid-cols-1 gap-3">
-                        <div>
-                          <p className="text-[10px] text-gray-400 mb-1">Eyebrow Label (e.g. EDITOR&apos;S PICK)</p>
-                          <input type="text" value={siFeaturedLabel} onChange={e=>setSiFeaturedLabel(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-gray-400 mb-1">Heading</p>
-                          <input type="text" value={siFeaturedHeading} onChange={e=>setSiFeaturedHeading(e.target.value)} placeholder="The Look Everyone's Asking About" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-gray-400 mb-1">Description</p>
-                          <textarea rows={2} value={siFeaturedDesc} onChange={e=>setSiFeaturedDesc(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg resize-none"/>
-                        </div>
-                      </div>
-
-                      {/* Featured Image */}
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Featured Image / Video</label>
-                        <div className="flex gap-2 mb-2">
-                          {(["image","video"] as const).map(t=>(
-                            <button key={t} type="button" onClick={()=>setSiFeaturedMediaType(t)}
-                              className={`px-3 py-1.5 text-xs font-medium border rounded-lg capitalize transition-colors ${siFeaturedMediaType===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500"}`}>
-                              {t==="image"?"🖼 Image":"📹 Video"}
-                            </button>
-                          ))}
-                        </div>
-                        <input type="text" value={siFeaturedImage} onChange={e=>setSiFeaturedImage(e.target.value)} placeholder="https://..." className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
-                        {siFeaturedImage && siFeaturedMediaType==="image" && (
-                          <img src={siFeaturedImage} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
-                        )}
-                      </div>
-
-                      {/* Products */}
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Products (max 3)</label>
-                          {siFeaturedProducts.length < 3 && (
-                            <button onClick={()=>setSiFeaturedProducts(p=>[...p,{name:"",price:"",image_url:"",link_url:""}])}
-                              className="text-xs text-[#3B5373] flex items-center gap-1 hover:underline">
-                              <Plus className="w-3 h-3"/>Add Product
-                            </button>
-                          )}
-                        </div>
-                        <div className="space-y-3">
-                          {siFeaturedProducts.map((prod,i)=>(
-                            <div key={i} className="border border-gray-100 rounded-xl p-3 space-y-2">
-                              <div className="flex items-center justify-between">
-                                <p className="text-[10px] font-medium text-gray-400 uppercase">Product {i+1}</p>
-                                <button onClick={()=>setSiFeaturedProducts(p=>p.filter((_,j)=>j!==i))} className="text-gray-300 hover:text-red-400 text-xs">✕ Remove</button>
-                              </div>
-                              <input type="text" value={prod.name} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],name:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product Name" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
-                              <div className="grid grid-cols-2 gap-2">
-                                <input type="text" value={prod.price} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],price:e.target.value};setSiFeaturedProducts(u);}} placeholder="₹2,499" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
-                                <input type="text" value={prod.link_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],link_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="/products/slug" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
-                              </div>
-                              <input type="text" value={prod.image_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],image_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product image URL" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
-                            </div>
-                          ))}
-                          {siFeaturedProducts.length===0 && <p className="text-xs text-gray-300 text-center py-4">No products added. Click &quot;Add Product&quot; above.</p>}
-                        </div>
-                      </div>
-
-                      {/* CTAs */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-[10px] text-gray-400 mb-1">CTA Button 1 Text</p>
-                          <input type="text" value={siFeaturedCta1Text} onChange={e=>setSiFeaturedCta1Text(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
-                          <input type="text" value={siFeaturedCta1Url} onChange={e=>setSiFeaturedCta1Url(e.target.value)} placeholder="/shop/heels" className="w-full border border-gray-200 text-sm px-3 py-2 mt-1 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-gray-400 mb-1">CTA Button 2 Text</p>
-                          <input type="text" value={siFeaturedCta2Text} onChange={e=>setSiFeaturedCta2Text(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
-                          <input type="text" value={siFeaturedCta2Url} onChange={e=>setSiFeaturedCta2Url(e.target.value)} placeholder="/shop/heels" className="w-full border border-gray-200 text-sm px-3 py-2 mt-1 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
-                        </div>
-                      </div>
-
-                      <button onClick={saveSiFeatured} disabled={siFeaturedSaving}
-                        className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
-                        <Save className="w-4 h-4"/>{siFeaturedSaving?"Saving…":"Save Featured Look"}
+                      <button onClick={()=>setTab("style-ideas-featured")}
+                        className="px-4 py-2 text-xs font-medium text-[#3B5373] border border-[#3B5373] rounded-lg hover:bg-[#3B5373] hover:text-white transition-colors">
+                        Go to Featured Look →
                       </button>
                     </div>
                   </div>
                 </>
               )}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              FEATURED LOOK TAB (separate)
+          ══════════════════════════════════════ */}
+          {tab === "style-ideas-featured" && (
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-800">Featured Look (Editor&apos;s Pick)</h2>
+                    <p className="text-xs text-gray-400 mt-0.5">Style Ideas page pe ek highlighted look — left text + right image + products.</p>
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-xs text-gray-400">{siFeaturedVisible?"Visible":"Hidden"}</span>
+                    <button onClick={()=>setSiFeaturedVisible(v=>!v)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${siFeaturedVisible?"bg-[#3B5373]":"bg-gray-200"}`}>
+                      <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${siFeaturedVisible?"translate-x-6":"translate-x-1"}`}/>
+                    </button>
+                  </div>
+                </div>
+                <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5 ${!siFeaturedVisible?"opacity-50 pointer-events-none":""}`}>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1">Eyebrow Label (e.g. EDITOR&apos;S PICK)</p>
+                      <input type="text" value={siFeaturedLabel} onChange={e=>setSiFeaturedLabel(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1">Heading</p>
+                      <input type="text" value={siFeaturedHeading} onChange={e=>setSiFeaturedHeading(e.target.value)} placeholder="The Look Everyone's Asking About" className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1">Description</p>
+                      <textarea rows={2} value={siFeaturedDesc} onChange={e=>setSiFeaturedDesc(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg resize-none"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Featured Image / Video</label>
+                    <div className="flex gap-2 mb-2">
+                      {(["image","video"] as const).map(t=>(
+                        <button key={t} type="button" onClick={()=>setSiFeaturedMediaType(t)}
+                          className={`px-3 py-1.5 text-xs font-medium border rounded-lg capitalize transition-colors ${siFeaturedMediaType===t?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500"}`}>
+                          {t==="image"?"🖼 Image":"📹 Video"}
+                        </button>
+                      ))}
+                    </div>
+                    <input type="text" value={siFeaturedImage} onChange={e=>setSiFeaturedImage(e.target.value)} placeholder="https://..." className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                    {siFeaturedImage && siFeaturedMediaType==="image" && (
+                      <img src={siFeaturedImage} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Products (max 3)</label>
+                      {siFeaturedProducts.length < 3 && (
+                        <button onClick={()=>setSiFeaturedProducts(p=>[...p,{name:"",price:"",image_url:"",link_url:""}])}
+                          className="text-xs text-[#3B5373] flex items-center gap-1 hover:underline">
+                          <Plus className="w-3 h-3"/>Add Product
+                        </button>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      {siFeaturedProducts.map((prod,i)=>(
+                        <div key={i} className="border border-gray-100 rounded-xl p-3 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <p className="text-[10px] font-medium text-gray-400 uppercase">Product {i+1}</p>
+                            <button onClick={()=>setSiFeaturedProducts(p=>p.filter((_,j)=>j!==i))} className="text-gray-300 hover:text-red-400 text-xs">✕ Remove</button>
+                          </div>
+                          <input type="text" value={prod.name} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],name:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product Name" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="text" value={prod.price} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],price:e.target.value};setSiFeaturedProducts(u);}} placeholder="₹2,499" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                            <input type="text" value={prod.link_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],link_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="/products/slug" className="border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                          </div>
+                          <input type="text" value={prod.image_url} onChange={e=>{const u=[...siFeaturedProducts];u[i]={...u[i],image_url:e.target.value};setSiFeaturedProducts(u);}} placeholder="Product image URL" className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#3B5373] rounded"/>
+                        </div>
+                      ))}
+                      {siFeaturedProducts.length===0 && <p className="text-xs text-gray-300 text-center py-4">No products added. Click &quot;Add Product&quot; above.</p>}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1">CTA Button 1 Text</p>
+                      <input type="text" value={siFeaturedCta1Text} onChange={e=>setSiFeaturedCta1Text(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                      <input type="text" value={siFeaturedCta1Url} onChange={e=>setSiFeaturedCta1Url(e.target.value)} placeholder="/shop/heels" className="w-full border border-gray-200 text-sm px-3 py-2 mt-1 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1">CTA Button 2 Text</p>
+                      <input type="text" value={siFeaturedCta2Text} onChange={e=>setSiFeaturedCta2Text(e.target.value)} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                      <input type="text" value={siFeaturedCta2Url} onChange={e=>setSiFeaturedCta2Url(e.target.value)} placeholder="/shop/heels" className="w-full border border-gray-200 text-sm px-3 py-2 mt-1 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                    </div>
+                  </div>
+                  <button onClick={saveSiFeatured} disabled={siFeaturedSaving}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4"/>{siFeaturedSaving?"Saving…":"Save Featured Look"}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
