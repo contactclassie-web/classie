@@ -112,22 +112,7 @@ function LookCard({ look }: { look: LookCard }) {
           </span>
         )}
 
-        {/* Hover overlay */}
-        <div className={`absolute inset-0 bg-[#3B5373]/80 flex flex-col items-center justify-center transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}>
-          <p className="text-white/70 text-[9px] tracking-[0.3em] uppercase mb-2">
-            {look.look_number ? `Look ${String(look.look_number).padStart(2,"0")}` : ""}
-          </p>
-          <p className="text-white font-serif text-lg text-center px-4 mb-4">{look.title}</p>
-          {look.description && (
-            <p className="text-white/75 text-[11px] text-center px-5 mb-5 leading-relaxed">{look.description}</p>
-          )}
-          <Link
-            href={href}
-            className="bg-white text-[#3B5373] text-[10px] tracking-[0.2em] uppercase font-semibold px-5 py-2.5 hover:bg-[#f5f5f5] transition-colors"
-          >
-            Shop This Look →
-          </Link>
-        </div>
+        {/* Hover: image zoom only — no overlay */}
       </div>
 
       {/* Card Info */}
