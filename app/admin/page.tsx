@@ -512,9 +512,12 @@ export default function AdminPage() {
   const [siReelsSubtitle,  setSiReelsSubtitle]  = useState('Watch how real women are styling their Classie heels');
   const [siReelsCols,      setSiReelsCols]      = useState(4);
   const [siReelsCards,     setSiReelsCards]     = useState<{title:string;tag:string;media_url:string;media_type:"image"|"video"}[]>([]);
-  const [siReelsCardH,     setSiReelsCardH]     = useState(480); // card height px
-  const [siReelsCardW,     setSiReelsCardW]     = useState(0);   // card width px (0 = auto/fill)
-  const [siReelsGap,       setSiReelsGap]       = useState(12);  // gap px
+  const [siReelsCardH,     setSiReelsCardH]     = useState(480);
+  const [siReelsCardW,     setSiReelsCardW]     = useState(0);
+  const [siReelsGap,       setSiReelsGap]       = useState(12);
+  const [siReelsAspect,    setSiReelsAspect]    = useState("none"); // none|9/16|4/5|3/4|1/1|16/9
+  const [siReelsRadius,    setSiReelsRadius]    = useState("sharp"); // sharp|slight|rounded|pill
+  const [siReelsMobileCols,setSiReelsMobileCols] = useState(2);
   const [siReelsSaving,    setSiReelsSaving]    = useState(false);
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
@@ -1167,7 +1170,7 @@ export default function AdminPage() {
   const fetchStyleIdeasPage = useCallback(async () => {
     setSiPageLoading(true);
     try {
-      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap"];;;
+      const keys = ["si_hero_bg_type","si_hero_bg_url","si_hero_slides","si_hero_text_pos","si_hero_eyebrow","si_hero_title","si_hero_title_italic","si_hero_subtitle","si_hero_show_stats","si_hero_stat1_val","si_hero_stat1_label","si_hero_stat2_val","si_hero_stat2_label","si_hero_stat3_val","si_hero_stat3_label","si_occasions","si_cards_per_row","si_featured_visible","si_featured_label","si_featured_heading","si_featured_desc","si_featured_image","si_featured_media_type","si_featured_products","si_featured_cta1_text","si_featured_cta1_url","si_featured_cta2_text","si_featured_cta2_url","si_reels_visible","si_reels_heading","si_reels_subtitle","si_reels_cols","si_reels_cards","si_reels_card_h","si_reels_card_w","si_reels_gap","si_reels_aspect","si_reels_radius","si_reels_mobile_cols"];;;;
       const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
       const m: Record<string,string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
@@ -1194,9 +1197,12 @@ export default function AdminPage() {
       if (m.si_reels_subtitle) setSiReelsSubtitle(m.si_reels_subtitle);
       if (m.si_reels_cols)     setSiReelsCols(parseInt(m.si_reels_cols) || 4);
       if (m.si_reels_cards)    { try { setSiReelsCards(JSON.parse(m.si_reels_cards)); } catch { /* ignore */ } }
-      if (m.si_reels_card_h)   setSiReelsCardH(parseInt(m.si_reels_card_h) || 480);
-      if (m.si_reels_card_w)   setSiReelsCardW(parseInt(m.si_reels_card_w) || 0);
-      if (m.si_reels_gap)      setSiReelsGap(parseInt(m.si_reels_gap) || 12);
+      if (m.si_reels_card_h)     setSiReelsCardH(parseInt(m.si_reels_card_h) || 480);
+      if (m.si_reels_card_w)     setSiReelsCardW(parseInt(m.si_reels_card_w) || 0);
+      if (m.si_reels_gap)        setSiReelsGap(parseInt(m.si_reels_gap) || 12);
+      if (m.si_reels_aspect)     setSiReelsAspect(m.si_reels_aspect);
+      if (m.si_reels_radius)     setSiReelsRadius(m.si_reels_radius);
+      if (m.si_reels_mobile_cols) setSiReelsMobileCols(parseInt(m.si_reels_mobile_cols) || 2);
       if (m.si_featured_label) setSiFeaturedLabel(m.si_featured_label);
       if (m.si_featured_heading) setSiFeaturedHeading(m.si_featured_heading);
       if (m.si_featured_desc) setSiFeaturedDesc(m.si_featured_desc);
@@ -1264,9 +1270,12 @@ export default function AdminPage() {
         { key: "si_reels_heading",  value: siReelsHeading },
         { key: "si_reels_subtitle", value: siReelsSubtitle },
         { key: "si_reels_cols",     value: String(siReelsCols) },
-        { key: "si_reels_card_h",   value: String(siReelsCardH) },
-        { key: "si_reels_card_w",   value: String(siReelsCardW) },
-        { key: "si_reels_gap",      value: String(siReelsGap) },
+        { key: "si_reels_card_h",     value: String(siReelsCardH) },
+        { key: "si_reels_card_w",     value: String(siReelsCardW) },
+        { key: "si_reels_gap",        value: String(siReelsGap) },
+        { key: "si_reels_aspect",     value: siReelsAspect },
+        { key: "si_reels_radius",     value: siReelsRadius },
+        { key: "si_reels_mobile_cols",value: String(siReelsMobileCols) },
         { key: "si_reels_cards",    value: JSON.stringify(siReelsCards) },
       ];
       for (const p of pairs) {
@@ -4288,16 +4297,17 @@ export default function AdminPage() {
                     ))}
                   </div>
                 </div>
+                {/* Size controls */}
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <p className="text-[10px] text-gray-400 mb-1">Card Height (px)</p>
+                    <p className="text-[10px] text-gray-400 mb-1">Height (px)</p>
                     <input type="number" min={100} max={1000} value={siReelsCardH}
                       onChange={e => setSiReelsCardH(parseInt(e.target.value) || 480)}
                       className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
                     <p className="text-[10px] text-gray-300 mt-1">Default: 480</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-400 mb-1">Card Width (px)</p>
+                    <p className="text-[10px] text-gray-400 mb-1">Width (px)</p>
                     <input type="number" min={0} max={600} value={siReelsCardW}
                       onChange={e => setSiReelsCardW(parseInt(e.target.value) || 0)}
                       className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
@@ -4309,6 +4319,45 @@ export default function AdminPage() {
                       onChange={e => setSiReelsGap(parseInt(e.target.value) || 12)}
                       className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
                     <p className="text-[10px] text-gray-300 mt-1">Default: 12</p>
+                  </div>
+                </div>
+
+                {/* Aspect Ratio */}
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1">Aspect Ratio <span className="text-gray-300">(height se override hoga agar set hai)</span></p>
+                  <div className="flex flex-wrap gap-2">
+                    {[["none","Free"],["9/16","9:16"],["4/5","4:5"],["3/4","3:4"],["1/1","1:1"],["16/9","16:9"]].map(([val,label]) => (
+                      <button key={val} type="button" onClick={() => setSiReelsAspect(val)}
+                        className={`px-3 py-1.5 text-xs font-medium border rounded-lg transition-colors ${siReelsAspect===val?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Border Radius */}
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1">Border Radius (corners)</p>
+                  <div className="flex gap-2">
+                    {[["sharp","Sharp ◼"],["slight","Slight ▪"],["rounded","Rounded ◻"],["pill","Pill ⬜"]].map(([val,label]) => (
+                      <button key={val} type="button" onClick={() => setSiReelsRadius(val)}
+                        className={`px-3 py-1.5 text-xs font-medium border rounded-lg transition-colors ${siReelsRadius===val?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mobile Columns */}
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1">Mobile Columns (phone pe)</p>
+                  <div className="flex gap-2">
+                    {[1,2,3].map(n => (
+                      <button key={n} type="button" onClick={() => setSiReelsMobileCols(n)}
+                        className={`w-10 h-10 rounded-lg text-sm font-medium border transition-colors ${siReelsMobileCols===n?"bg-[#3B5373] text-white border-[#3B5373]":"border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                        {n}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
