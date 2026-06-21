@@ -67,7 +67,7 @@ function StyleReels({ reels: r }: { reels: ReelsData }) {
 
 function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
   return (
-    <section className="py-16 bg-[#faf8f6]">
+    <section className="py-16 bg-[#f7f7f7]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left — Text */}
@@ -83,7 +83,7 @@ function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
               <div className="flex flex-col mb-8">
                 {f.products.map((p, i) => (
                   <Link key={i} href={p.slug ? `/products/${p.slug}` : "#"} className="flex items-center gap-4 py-4 border-b border-[#e0ddd8] group hover:bg-white hover:px-2 transition-all">
-                    <div className="w-12 h-12 rounded-full bg-[#e8e4de] overflow-hidden flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-[#f7f7f7] overflow-hidden flex-shrink-0 border border-[#ece9e3]">
                       {p.image
                         // eslint-disable-next-line @next/next/no-img-element
                         ? <img src={p.image} alt={p.title} className="w-full h-full object-cover object-top"/>
@@ -115,13 +115,13 @@ function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
           </div>
 
           {/* Right — Image/Video */}
-          <div className="relative aspect-[4/5] bg-[#e8e4de] overflow-hidden">
+          <div className="relative aspect-[4/5] overflow-hidden" style={{ background: "#3B5373" }}>
             {f.image && f.mediaType === "video"
               ? <video src={f.image} autoPlay muted loop playsInline className="w-full h-full object-cover object-center"/>
               : f.image
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={f.image} alt={f.heading} className="w-full h-full object-cover object-center"/>
-              : <div className="w-full h-full flex items-center justify-center text-[#aaa] text-xs">Featured Look</div>
+              : <div className="w-full h-full flex items-center justify-center text-white text-xs tracking-widest uppercase opacity-30">Featured Look</div>
             }
             {f.label && (
               <div className="absolute bottom-5 left-5 bg-[#3B5373] text-white text-[9px] tracking-[0.3em] uppercase px-3 py-2">
