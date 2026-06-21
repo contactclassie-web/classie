@@ -194,6 +194,16 @@ interface ContactMessage {
   created_at: string;
 }
 
+interface CtSubmission {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  message: string;
+  created_at: string;
+}
+
 interface NewsletterSubscriber {
   id: string;
   email: string;
@@ -322,8 +332,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -360,6 +370,12 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "au-story":    "about-us",
   "au-features": "about-us",
   "au-founder":  "about-us",
+
+  "ct-hero":  "contact-us",
+  "ct-help":  "contact-us",
+  "ct-faq":   "contact-us",
+  "ct-info":  "contact-us",
+  "ct-inbox": "contact-us",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -410,6 +426,13 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "au-story",    label: "Our Story" },
     { id: "au-features", label: "Features" },
     { id: "au-founder",  label: "Founder" },
+  ],
+  "contact-us": [
+    { id: "ct-hero",  label: "Hero" },
+    { id: "ct-help",  label: "Quick Help" },
+    { id: "ct-faq",   label: "FAQ" },
+    { id: "ct-info",  label: "Contact Info" },
+    { id: "ct-inbox", label: "Inbox" },
   ],
   orders:   [],
   settings: [],
@@ -682,6 +705,37 @@ export default function AdminPage() {
   const [auStorySaving,   setAuStorySaving]   = useState(false);
   const [auFeatsSaving,   setAuFeatsSaving]   = useState(false);
   const [auFounderSaving, setAuFounderSaving] = useState(false);
+
+  // ── Contact Us state ──────────────────────────────────────────────────────
+  const [ctHeroImg,      setCtHeroImg]      = useState("");
+  const [ctHeading,      setCtHeading]      = useState("Contact Us");
+  const [ctSubtext,      setCtSubtext]      = useState("Your perfect look deserves the perfect heel. Whether you need help with sizing, styling, orders, or customisation — our team is here to assist you.\n\nDrop us a message and we'll get back to you within 24–48 hours.");
+  const [ctTrackText,    setCtTrackText]    = useState("Log in to check the status of your order.");
+  const [ctTrackUrl,     setCtTrackUrl]     = useState("/track");
+  const [ctReturnText,   setCtReturnText]   = useState("We make it easy to return and exchange styles.");
+  const [ctReturnUrl,    setCtReturnUrl]    = useState("/returns");
+  const [ctFaqHeading,   setCtFaqHeading]   = useState("Popular Searched Questions");
+  const [ctFaq1Q, setCtFaq1Q] = useState(""); const [ctFaq1A, setCtFaq1A] = useState("");
+  const [ctFaq2Q, setCtFaq2Q] = useState(""); const [ctFaq2A, setCtFaq2A] = useState("");
+  const [ctFaq3Q, setCtFaq3Q] = useState(""); const [ctFaq3A, setCtFaq3A] = useState("");
+  const [ctFaq4Q, setCtFaq4Q] = useState(""); const [ctFaq4A, setCtFaq4A] = useState("");
+  const [ctFaq5Q, setCtFaq5Q] = useState(""); const [ctFaq5A, setCtFaq5A] = useState("");
+  const [ctFaq6Q, setCtFaq6Q] = useState(""); const [ctFaq6A, setCtFaq6A] = useState("");
+  const [ctFaq7Q, setCtFaq7Q] = useState(""); const [ctFaq7A, setCtFaq7A] = useState("");
+  const [ctFaq8Q, setCtFaq8Q] = useState(""); const [ctFaq8A, setCtFaq8A] = useState("");
+  const [ctInfoHeading,  setCtInfoHeading]  = useState("Any other questions?");
+  const [ctInfoSub,      setCtInfoSub]      = useState("We're here to help! Contact us any time Monday–Saturday, 9 AM–9 PM.");
+  const [ctPhone,        setCtPhone]        = useState("91- 9468147781");
+  const [ctEmail,        setCtEmail]        = useState("contact.classie@gmail.com");
+  const [ctSocial,       setCtSocial]       = useState("@classsie.in");
+  const [ctHeroSaving,   setCtHeroSaving]   = useState(false);
+  const [ctHelpSaving,   setCtHelpSaving]   = useState(false);
+  const [ctFaqSaving,    setCtFaqSaving]    = useState(false);
+  const [ctInfoSaving,   setCtInfoSaving]   = useState(false);
+
+  const [ctInbox,        setCtInbox]        = useState<CtSubmission[]>([]);
+  const [ctInboxLoading, setCtInboxLoading] = useState(false);
+
   const [couponModal, setCouponModal] = useState<{ open: boolean; mode: "add" | "edit"; data: Partial<Coupon> }>({ open: false, mode: "add", data: {} });
   const [couponSaving, setCouponSaving] = useState(false);
   const [couponStats, setCouponStats] = useState<CouponUse[]>([]);
@@ -1968,6 +2022,88 @@ export default function AdminPage() {
     { key: "au_founder_img",   value: auFounderImg },
   ], setAuFounderSaving);
 
+  // ── Contact Us fetcher & savers ───────────────────────────────────────────
+  const fetchContactUs = useCallback(async () => {
+    const { data } = await supabase.from("site_settings").select("key,value").like("key", "ct_%");
+    const m: Record<string, string> = {};
+    (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+    if (m.ct_hero_img     !== undefined) setCtHeroImg(m.ct_hero_img || "");
+    if (m.ct_heading      !== undefined) setCtHeading(m.ct_heading || "Contact Us");
+    if (m.ct_subtext      !== undefined) setCtSubtext(m.ct_subtext);
+    if (m.ct_track_text   !== undefined) setCtTrackText(m.ct_track_text);
+    if (m.ct_track_url    !== undefined) setCtTrackUrl(m.ct_track_url || "/track");
+    if (m.ct_return_text  !== undefined) setCtReturnText(m.ct_return_text);
+    if (m.ct_return_url   !== undefined) setCtReturnUrl(m.ct_return_url || "/returns");
+    if (m.ct_faq_heading  !== undefined) setCtFaqHeading(m.ct_faq_heading || "Popular Searched Questions");
+    if (m.ct_faq_1_q !== undefined) setCtFaq1Q(m.ct_faq_1_q); if (m.ct_faq_1_a !== undefined) setCtFaq1A(m.ct_faq_1_a);
+    if (m.ct_faq_2_q !== undefined) setCtFaq2Q(m.ct_faq_2_q); if (m.ct_faq_2_a !== undefined) setCtFaq2A(m.ct_faq_2_a);
+    if (m.ct_faq_3_q !== undefined) setCtFaq3Q(m.ct_faq_3_q); if (m.ct_faq_3_a !== undefined) setCtFaq3A(m.ct_faq_3_a);
+    if (m.ct_faq_4_q !== undefined) setCtFaq4Q(m.ct_faq_4_q); if (m.ct_faq_4_a !== undefined) setCtFaq4A(m.ct_faq_4_a);
+    if (m.ct_faq_5_q !== undefined) setCtFaq5Q(m.ct_faq_5_q); if (m.ct_faq_5_a !== undefined) setCtFaq5A(m.ct_faq_5_a);
+    if (m.ct_faq_6_q !== undefined) setCtFaq6Q(m.ct_faq_6_q); if (m.ct_faq_6_a !== undefined) setCtFaq6A(m.ct_faq_6_a);
+    if (m.ct_faq_7_q !== undefined) setCtFaq7Q(m.ct_faq_7_q); if (m.ct_faq_7_a !== undefined) setCtFaq7A(m.ct_faq_7_a);
+    if (m.ct_faq_8_q !== undefined) setCtFaq8Q(m.ct_faq_8_q); if (m.ct_faq_8_a !== undefined) setCtFaq8A(m.ct_faq_8_a);
+    if (m.ct_info_heading !== undefined) setCtInfoHeading(m.ct_info_heading || "Any other questions?");
+    if (m.ct_info_sub     !== undefined) setCtInfoSub(m.ct_info_sub);
+    if (m.ct_phone        !== undefined) setCtPhone(m.ct_phone || "91- 9468147781");
+    if (m.ct_email        !== undefined) setCtEmail(m.ct_email || "contact.classie@gmail.com");
+    if (m.ct_social       !== undefined) setCtSocial(m.ct_social || "@classsie.in");
+  }, []);
+
+  const saveCtBatch = async (pairs: { key: string; value: string }[], setSaving: (v: boolean) => void) => {
+    setSaving(true);
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key", p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setSaving(false);
+  };
+
+  const saveCtHero = () => saveCtBatch([
+    { key: "ct_hero_img", value: ctHeroImg },
+    { key: "ct_heading",  value: ctHeading },
+    { key: "ct_subtext",  value: ctSubtext },
+  ], setCtHeroSaving);
+
+  const saveCtHelp = () => saveCtBatch([
+    { key: "ct_track_text",  value: ctTrackText },
+    { key: "ct_track_url",   value: ctTrackUrl },
+    { key: "ct_return_text", value: ctReturnText },
+    { key: "ct_return_url",  value: ctReturnUrl },
+  ], setCtHelpSaving);
+
+  const saveCtFaq = () => saveCtBatch([
+    { key: "ct_faq_heading", value: ctFaqHeading },
+    { key: "ct_faq_1_q", value: ctFaq1Q }, { key: "ct_faq_1_a", value: ctFaq1A },
+    { key: "ct_faq_2_q", value: ctFaq2Q }, { key: "ct_faq_2_a", value: ctFaq2A },
+    { key: "ct_faq_3_q", value: ctFaq3Q }, { key: "ct_faq_3_a", value: ctFaq3A },
+    { key: "ct_faq_4_q", value: ctFaq4Q }, { key: "ct_faq_4_a", value: ctFaq4A },
+    { key: "ct_faq_5_q", value: ctFaq5Q }, { key: "ct_faq_5_a", value: ctFaq5A },
+    { key: "ct_faq_6_q", value: ctFaq6Q }, { key: "ct_faq_6_a", value: ctFaq6A },
+    { key: "ct_faq_7_q", value: ctFaq7Q }, { key: "ct_faq_7_a", value: ctFaq7A },
+    { key: "ct_faq_8_q", value: ctFaq8Q }, { key: "ct_faq_8_a", value: ctFaq8A },
+  ], setCtFaqSaving);
+
+  const saveCtInfo = () => saveCtBatch([
+    { key: "ct_info_heading", value: ctInfoHeading },
+    { key: "ct_info_sub",     value: ctInfoSub },
+    { key: "ct_phone",        value: ctPhone },
+    { key: "ct_email",        value: ctEmail },
+    { key: "ct_social",       value: ctSocial },
+  ], setCtInfoSaving);
+
+  const fetchCtInbox = useCallback(async () => {
+    setCtInboxLoading(true);
+    const { data } = await supabase
+      .from("contact_submissions")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setCtInbox((data ?? []) as CtSubmission[]);
+    setCtInboxLoading(false);
+  }, []);
+
   const fetchCoupons = useCallback(async () => {
     const { data } = await supabase.from("coupons").select("*").order("display_order", { ascending: true });
     setCoupons((data ?? []) as Coupon[]);
@@ -2080,12 +2216,15 @@ export default function AdminPage() {
 
     if (["au-hero","au-banner","au-story","au-features","au-founder"].includes(tab)) fetchAboutUs();
 
+    if (["ct-hero","ct-help","ct-faq","ct-info"].includes(tab)) fetchContactUs();
+    if (tab === "ct-inbox") fetchCtInbox();
+
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -2583,6 +2722,7 @@ export default function AdminPage() {
     { id: "advanced-settings",  label: "Advanced Settings", icon: Settings },
     { id: "hot-deals",          label: "Hot Deals",         icon: Tag },
     { id: "about-us",           label: "About Us",          icon: Users },
+    { id: "contact-us",         label: "Contact Us",        icon: MessageSquare },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -2621,6 +2761,7 @@ export default function AdminPage() {
               id === "style-ideas-page" ? "style-ideas-page" :
               id === "hot-deals" ? "hd-page" :
               id === "about-us" ? "au-hero" :
+              id === "contact-us" ? "ct-hero" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -2676,6 +2817,7 @@ export default function AdminPage() {
                mainSection === "advanced-settings" ? "Advanced Settings" :
                mainSection === "hot-deals" ? "Hot Deals" :
                mainSection === "about-us" ? "About Us" :
+               mainSection === "contact-us" ? "Contact Us" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -6851,6 +6993,190 @@ export default function AdminPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════
+              CONTACT US — ct-hero TAB
+          ══════════════════════════════════════════════════ */}
+          {tab === "ct-hero" && (
+            <div className="max-w-2xl space-y-5">
+              <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+                <h2 className="font-semibold text-gray-700 text-sm">Hero Section</h2>
+                <div>
+                  <label className={labelCls}>Hero Image URL</label>
+                  <input type="text" value={ctHeroImg} onChange={e => setCtHeroImg(e.target.value)} className={inputCls} placeholder="https://... (leave blank for navy fallback)" />
+                  {ctHeroImg && <img src={ctHeroImg} alt="hero preview" className="mt-2 h-24 object-cover rounded" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />}
+                </div>
+                <div>
+                  <label className={labelCls}>Heading</label>
+                  <input type="text" value={ctHeading} onChange={e => setCtHeading(e.target.value)} className={inputCls} placeholder="Contact Us" />
+                </div>
+                <div>
+                  <label className={labelCls}>Subtext</label>
+                  <textarea rows={4} value={ctSubtext} onChange={e => setCtSubtext(e.target.value)} className={inputCls + " resize-y"} />
+                </div>
+                <button onClick={saveCtHero} disabled={ctHeroSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />{ctHeroSaving ? "Saving…" : "Save Hero"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════
+              CONTACT US — ct-help TAB
+          ══════════════════════════════════════════════════ */}
+          {tab === "ct-help" && (
+            <div className="max-w-2xl space-y-5">
+              <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+                <h2 className="font-semibold text-gray-700 text-sm">Quick Help Cards</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>Order Tracking Text</label>
+                    <input type="text" value={ctTrackText} onChange={e => setCtTrackText(e.target.value)} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Track URL</label>
+                    <input type="text" value={ctTrackUrl} onChange={e => setCtTrackUrl(e.target.value)} className={inputCls} placeholder="/track" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Return & Exchange Text</label>
+                    <input type="text" value={ctReturnText} onChange={e => setCtReturnText(e.target.value)} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Return URL</label>
+                    <input type="text" value={ctReturnUrl} onChange={e => setCtReturnUrl(e.target.value)} className={inputCls} placeholder="/returns" />
+                  </div>
+                </div>
+                <button onClick={saveCtHelp} disabled={ctHelpSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />{ctHelpSaving ? "Saving…" : "Save Quick Help"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════
+              CONTACT US — ct-faq TAB
+          ══════════════════════════════════════════════════ */}
+          {tab === "ct-faq" && (
+            <div className="max-w-2xl space-y-5">
+              <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+                <h2 className="font-semibold text-gray-700 text-sm">FAQ Accordion</h2>
+                <div>
+                  <label className={labelCls}>Section Heading</label>
+                  <input type="text" value={ctFaqHeading} onChange={e => setCtFaqHeading(e.target.value)} className={inputCls} placeholder="Popular Searched Questions" />
+                </div>
+                <p className="text-xs text-gray-400">Leave all FAQ fields blank to use hardcoded defaults on the page.</p>
+                {[
+                  [ctFaq1Q, setCtFaq1Q, ctFaq1A, setCtFaq1A],
+                  [ctFaq2Q, setCtFaq2Q, ctFaq2A, setCtFaq2A],
+                  [ctFaq3Q, setCtFaq3Q, ctFaq3A, setCtFaq3A],
+                  [ctFaq4Q, setCtFaq4Q, ctFaq4A, setCtFaq4A],
+                  [ctFaq5Q, setCtFaq5Q, ctFaq5A, setCtFaq5A],
+                  [ctFaq6Q, setCtFaq6Q, ctFaq6A, setCtFaq6A],
+                  [ctFaq7Q, setCtFaq7Q, ctFaq7A, setCtFaq7A],
+                  [ctFaq8Q, setCtFaq8Q, ctFaq8A, setCtFaq8A],
+                ].map(([q, setQ, a, setA], idx) => (
+                  <div key={idx} className="border border-gray-100 rounded-lg p-4 space-y-2">
+                    <p className="text-xs font-medium text-gray-500">FAQ {idx + 1}</p>
+                    <input type="text" value={q as string} onChange={e => (setQ as (v: string) => void)(e.target.value)} className={inputCls} placeholder={`Question ${idx + 1}`} />
+                    <textarea rows={2} value={a as string} onChange={e => (setA as (v: string) => void)(e.target.value)} className={inputCls + " resize-y"} placeholder={`Answer ${idx + 1}`} />
+                  </div>
+                ))}
+                <button onClick={saveCtFaq} disabled={ctFaqSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />{ctFaqSaving ? "Saving…" : "Save FAQ"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════
+              CONTACT US — ct-info TAB
+          ══════════════════════════════════════════════════ */}
+          {tab === "ct-info" && (
+            <div className="max-w-2xl space-y-5">
+              <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+                <h2 className="font-semibold text-gray-700 text-sm">Contact Info Section</h2>
+                <div>
+                  <label className={labelCls}>Section Heading</label>
+                  <input type="text" value={ctInfoHeading} onChange={e => setCtInfoHeading(e.target.value)} className={inputCls} placeholder="Any other questions?" />
+                </div>
+                <div>
+                  <label className={labelCls}>Subtext</label>
+                  <input type="text" value={ctInfoSub} onChange={e => setCtInfoSub(e.target.value)} className={inputCls} placeholder="We're here to help!…" />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className={labelCls}>Phone</label>
+                    <input type="text" value={ctPhone} onChange={e => setCtPhone(e.target.value)} className={inputCls} placeholder="91- 9468147781" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Email</label>
+                    <input type="text" value={ctEmail} onChange={e => setCtEmail(e.target.value)} className={inputCls} placeholder="contact.classie@gmail.com" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Social Handle</label>
+                    <input type="text" value={ctSocial} onChange={e => setCtSocial(e.target.value)} className={inputCls} placeholder="@classsie.in" />
+                  </div>
+                </div>
+                <button onClick={saveCtInfo} disabled={ctInfoSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />{ctInfoSaving ? "Saving…" : "Save Contact Info"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════
+              CONTACT US — ct-inbox TAB
+          ══════════════════════════════════════════════════ */}
+          {tab === "ct-inbox" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-gray-700">Contact Submissions</h2>
+                <button onClick={fetchCtInbox} className="flex items-center gap-2 px-3 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                  <RefreshCw className="w-3 h-3" /> Refresh
+                </button>
+              </div>
+              {ctInboxLoading ? (
+                <p className="text-sm text-gray-400">Loading…</p>
+              ) : ctInbox.length === 0 ? (
+                <p className="text-sm text-gray-400">No submissions yet.</p>
+              ) : (
+                <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-100 text-left">
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ctInbox.map((row) => (
+                        <tr key={row.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                            {new Date(row.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                          </td>
+                          <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">
+                            {row.first_name} {row.last_name}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600">{row.email}</td>
+                          <td className="px-4 py-3 text-gray-600">{row.phone || "—"}</td>
+                          <td className="px-4 py-3 text-gray-600 max-w-xs">
+                            <p className="line-clamp-2">{row.message}</p>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 
