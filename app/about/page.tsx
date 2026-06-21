@@ -1,139 +1,326 @@
 import { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-import HeroSlider from "@/components/HeroSlider";
-import { products } from "@/lib/products";
-import { getHeroSlidesFromDB } from "@/lib/slides";
+import { createClient } from "@supabase/supabase-js";
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "About Us",
-  description: "The Classie story — where comfort meets luxury, designed for the modern Indian woman.",
+  title: "About Us — CLASSIE",
+  description: "The Classie story — where fashion meets freedom, designed for the modern woman.",
 };
 
 export default async function AboutPage() {
-  const slides = await getHeroSlidesFromDB("about");
+  const sb = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  const { data } = await sb
+    .from("site_settings")
+    .select("key,value")
+    .like("key", "au_%");
+  const cfg: Record<string, string> = {};
+  (data ?? []).forEach((r: { key: string; value: string }) => {
+    cfg[r.key] = r.value;
+  });
+
+  // Config helpers with defaults
+  const c = (key: string, def: string) =>
+    cfg[key] !== undefined && cfg[key] !== "" ? cfg[key] : def;
+
+  // Hero
+  const heroHeading = c("au_hero_heading", "About CLASSIE");
+  const heroEyebrow = c("au_hero_eyebrow", "Our Story");
+  const heroText = c(
+    "au_hero_text",
+    "We've all had that moment —\n\nstanding in front of a wardrobe full of shoes, yet feeling like nothing fits the vibe.\n\nBecause the truth is, it's never about how many pairs we own. It's about having the right pair for the right moment — a wedding, a festival, a big meeting, or a brunch date.\n\nAnd too often, we end up buying a new pair just to match a single outfit."
+  );
+
+  // Banner
+  const bannerImg = c("au_banner_img", "");
+
+  // Story 1
+  const s1Heading = c("au_s1_heading", "Where It All Began — The Classic Clip-On Idea");
+  const s1Text = c(
+    "au_s1_text",
+    "Classie began with a simple thought — fashion should be yours.\n\nFlexible. Creative. Timeless.\n\nWe asked ourselves:\nWhy should one outfit need a new heel?\nWhy shouldn't your footwear change as easily as your moods?\n\nThat's when we imagined something different.\n\nWhat if one pair of heels could transform into multiple looks just by swapping an accessory?\n\nA Classie heel — designed to shift from minimal to festive, formal to playful with just one small change, using our signature clip on accessories."
+  );
+  const s1Img = c("au_s1_img", "");
+
+  // Story 2
+  const s2Heading = c("au_s2_heading", "Classic Heels — Easy to Love");
+  const s2Text = c(
+    "au_s2_text",
+    "The real challenge began when we took a closer look at the market.\n\nHeels were either beautiful but uncomfortable, or priced far beyond everyday reach.\n\nSo, we decided to create our own solution.\n\nAt Classie, we design heels that balance everything that matters — thoughtful design, lasting comfort, premium finishing, and pricing that feels fair."
+  );
+  const s2Img = c("au_s2_img", "");
+
+  // Story 3
+  const s3Heading = c("au_s3_heading", "Classie Is More Than Heels");
+  const s3Text = c(
+    "au_s3_text",
+    "Classie is more than just heels or clip-ons.\n\nIt's an idea that keeps growing.\n\nWe believe style shouldn't feel fixed or limited. It should change with your mood, your plans, and your personality.\n\nStyle it your way, with Classie."
+  );
+  const s3Img = c("au_s3_img", "");
+
+  // Features
+  const featsHeading = c("au_feats_heading", "What Makes Classie Different");
+  const feat1Icon = c("au_feat1_icon", "👠");
+  const feat1Title = c("au_feat1_title", "Handcrafted With Purpose");
+  const feat1Desc = c(
+    "au_feat1_desc",
+    "Every Classie heel and clip-on is shaped by skilled hands, with careful human detailing at every stage."
+  );
+  const feat2Icon = c("au_feat2_icon", "✨");
+  const feat2Title = c("au_feat2_title", "Premium Materials, Refined Finish");
+  const feat2Desc = c(
+    "au_feat2_desc",
+    "We choose our materials the same way you choose your outfits — with care. Our heels are finished with premium materials."
+  );
+  const feat3Icon = c("au_feat3_icon", "🎀");
+  const feat3Title = c("au_feat3_title", "Heel + Clip On");
+  const feat3Desc = c(
+    "au_feat3_desc",
+    "One thoughtfully designed heel. Interchangeable clip-ons that change the look, without changing the pair."
+  );
+
+  // Founder
+  const founderQuote = c(
+    "au_founder_quote",
+    "Classie was created to give women the freedom I always wanted — the freedom to style your look, your way. Fashion shouldn't limit you. It should move with you, match your moments, and celebrate your creativity. This is just the beginning, and I'm so grateful you're here."
+  );
+  const founderName = c("au_founder_name", "Ishika Garg");
+  const founderTitle = c("au_founder_title", "Founder, Classie");
+  const founderImg = c("au_founder_img", "");
+
+  // Helper: render multi-paragraph text
+  function renderText(text: string) {
+    return text.split("\n\n").map((para, i) => (
+      <p key={i} className="text-[15px] text-[#555] leading-relaxed whitespace-pre-line">
+        {para}
+      </p>
+    ));
+  }
+
+  // Helper: story image placeholder
+  function StoryImgPlaceholder() {
+    return (
+      <div className="w-full h-full min-h-[300px] bg-[#e8ecf1] rounded-2xl flex items-center justify-center">
+        <span className="text-4xl">👠</span>
+      </div>
+    );
+  }
+
   return (
     <>
-      {slides.length > 0 && <HeroSlider slides={slides} />}
-      {/* ── Page header ── */}
-      <div className="bg-[#faf8f6] py-12 text-center border-b border-classie-border">
-        <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-2">Our Story</p>
-        <h1 className="font-serif text-5xl md:text-6xl text-classie-black">About Classie</h1>
+      {/* ══════════════════════════════════════════
+          SECTION 1 — Hero Split
+      ══════════════════════════════════════════ */}
+      <section className="flex flex-col md:flex-row min-h-[420px]">
+        {/* Left */}
+        <div className="md:w-1/2 bg-[#f7f7f7] flex flex-col justify-center px-10 py-16 md:px-16 md:py-20">
+          <p
+            className="text-[11px] tracking-[0.4em] uppercase mb-4 font-medium"
+            style={{ color: "#3B5373" }}
+          >
+            {heroEyebrow}
+          </p>
+          <h1
+            className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight"
+            style={{ color: "#3B5373" }}
+          >
+            {heroHeading}
+          </h1>
+        </div>
+
+        {/* Right */}
+        <div className="md:w-1/2 bg-white flex flex-col justify-center px-10 py-16 md:px-16 md:py-20 space-y-5">
+          {renderText(heroText)}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          SECTION 2 — Full-width Banner
+      ══════════════════════════════════════════ */}
+      <div className="relative w-full h-[400px] overflow-hidden">
+        {bannerImg ? (
+          <Image
+            src={bannerImg}
+            alt="Classie banner"
+            fill
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+        ) : (
+          <div className="w-full h-full" style={{ background: "#3B5373" }} />
+        )}
       </div>
 
-      {/* ── Two-col: heading left, text right ── */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-start">
-            {/* Left */}
-            <div>
-              <h2 className="font-serif text-4xl md:text-5xl text-classie-black leading-tight">
-                Where Comfort
-                <br />
-                Meets
-                <br />
-                <em>Elegance</em>
-              </h2>
-              <div className="w-12 h-1 bg-[#3B5373] rounded-full mt-8" />
-            </div>
-
-            {/* Right */}
-            <div className="text-classie-gray leading-relaxed space-y-5 text-[15px]">
-              <p>
-                Classie was born from a simple belief: every woman deserves to walk with confidence,
-                without sacrificing comfort. We saw a gap in the Indian market — premium-looking heels
-                that actually felt good to wear — and decided to fill it.
-              </p>
-              <p>
-                Founded by women, for women, Classie designs each pair with meticulous attention to
-                detail. Our signature <strong className="text-classie-black">Classie Comfort Insole™</strong> means
-                you can dance at a wedding, strut into a boardroom, or stroll through a date night —
-                all in the same pair.
-              </p>
-              <p>
-                We believe luxury shouldn't be painful. Our heels are crafted from premium vegan
-                materials, thoughtfully designed to distribute weight evenly and give you the
-                confidence that comes from feeling truly comfortable in your own shoes.
-              </p>
-              <p>
-                Beyond heels, our curated accessories — satin swirls, crystal clips, gloss bows —
-                are designed to transform any look, giving you a new outfit without buying a new one.
-              </p>
-            </div>
+      {/* ══════════════════════════════════════════
+          SECTION 3 — Story 1 (text left, image right, white)
+      ══════════════════════════════════════════ */}
+      <section className="bg-white py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Text */}
+          <div className="space-y-5">
+            <h2
+              className="font-serif text-3xl md:text-4xl leading-tight"
+              style={{ color: "#3B5373" }}
+            >
+              {s1Heading}
+            </h2>
+            <div className="space-y-4">{renderText(s1Text)}</div>
+          </div>
+          {/* Image */}
+          <div className="relative h-[360px] rounded-2xl overflow-hidden">
+            {s1Img ? (
+              <Image
+                src={s1Img}
+                alt={s1Heading}
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <StoryImgPlaceholder />
+            )}
           </div>
         </div>
       </section>
 
-      {/* ── Full-width lifestyle image ── */}
-      <div className="relative h-[60vh] bg-[#2d3748] overflow-hidden">
-        <Image
-          src={products[7].image}
-          alt="Classie lifestyle"
-          fill
-          className="object-cover object-center opacity-80"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        <div className="absolute inset-0 flex items-center justify-center text-white text-center px-4">
-          <div>
-            <p className="text-[11px] tracking-[0.5em] uppercase text-white/60 mb-3">Our promise</p>
-            <h2 className="font-serif text-4xl md:text-5xl">Every Step, a Statement</h2>
+      {/* ══════════════════════════════════════════
+          SECTION 4 — Story 2 (image left, text right, #f7f7f7)
+      ══════════════════════════════════════════ */}
+      <section className="bg-[#f7f7f7] py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Image */}
+          <div className="relative h-[360px] rounded-2xl overflow-hidden order-2 md:order-1">
+            {s2Img ? (
+              <Image
+                src={s2Img}
+                alt={s2Heading}
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <StoryImgPlaceholder />
+            )}
+          </div>
+          {/* Text */}
+          <div className="space-y-5 order-1 md:order-2">
+            <h2
+              className="font-serif text-3xl md:text-4xl leading-tight"
+              style={{ color: "#3B5373" }}
+            >
+              {s2Heading}
+            </h2>
+            <div className="space-y-4">{renderText(s2Text)}</div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── Values ── */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="font-serif text-3xl md:text-4xl text-classie-black text-center mb-12">
-            What We Stand For
+      {/* ══════════════════════════════════════════
+          SECTION 5 — Story 3 (text left, image right, white)
+      ══════════════════════════════════════════ */}
+      <section className="bg-white py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Text */}
+          <div className="space-y-5">
+            <h2
+              className="font-serif text-3xl md:text-4xl leading-tight"
+              style={{ color: "#3B5373" }}
+            >
+              {s3Heading}
+            </h2>
+            <div className="space-y-4">{renderText(s3Text)}</div>
+          </div>
+          {/* Image */}
+          <div className="relative h-[360px] rounded-2xl overflow-hidden">
+            {s3Img ? (
+              <Image
+                src={s3Img}
+                alt={s3Heading}
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <StoryImgPlaceholder />
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          SECTION 6 — Features (3 cards)
+      ══════════════════════════════════════════ */}
+      <section className="bg-[#f7f7f7] py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-6 md:px-10">
+          <h2
+            className="font-serif text-3xl md:text-4xl text-center mb-12"
+            style={{ color: "#3B5373" }}
+          >
+            {featsHeading}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              {
-                title: "Comfort First",
-                body: "Every heel features our Classie Comfort Insole™ — so you look stunning without feeling the strain.",
-              },
-              {
-                title: "Vegan & Responsible",
-                body: "Premium vegan fabrics only. No animal products, no compromises on quality.",
-              },
-              {
-                title: "Made for India",
-                body: "Designed for Indian widths, Indian occasions, and Indian weather. Heels that fit your life.",
-              },
-              {
-                title: "Accessible Luxury",
-                body: "Premium design without the premium price tag. Because confidence shouldn't have a credit limit.",
-              },
-              {
-                title: "Easy Returns",
-                body: "7-day hassle-free returns and exchanges. We want you to love what you ordered.",
-              },
-              {
-                title: "Community-Driven",
-                body: "Built by women, for women. Our community's feedback shapes every new design we launch.",
-              },
-            ].map((v) => (
-              <div key={v.title} className="bg-[#faf8f6] rounded-2xl p-6">
-                <h3 className="font-serif text-xl text-classie-black mb-3">{v.title}</h3>
-                <p className="text-sm text-classie-gray leading-relaxed">{v.body}</p>
+              { icon: feat1Icon, title: feat1Title, desc: feat1Desc },
+              { icon: feat2Icon, title: feat2Title, desc: feat2Desc },
+              { icon: feat3Icon, title: feat3Title, desc: feat3Desc },
+            ].map((feat, i) => (
+              <div
+                key={i}
+                className="bg-white border border-gray-100 rounded-2xl p-8 text-center shadow-sm"
+              >
+                <div className="text-4xl mb-4">{feat.icon}</div>
+                <h3
+                  className="font-bold text-[15px] mb-3"
+                  style={{ color: "#1a1a1a" }}
+                >
+                  {feat.title}
+                </h3>
+                <p className="text-sm text-[#666] leading-relaxed">{feat.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="py-14 bg-[#3B5373] text-white text-center">
-        <div className="max-w-xl mx-auto px-4">
-          <h2 className="font-serif text-4xl mb-4">Ready to Step In?</h2>
-          <p className="text-white/70 text-sm mb-8">
-            Discover the Classie collection — heels and accessories for every occasion.
+      {/* ══════════════════════════════════════════
+          SECTION 7 — Founder Quote
+      ══════════════════════════════════════════ */}
+      <section className="bg-white py-20 md:py-28">
+        <div className="max-w-3xl mx-auto px-6 md:px-10 text-center">
+          <blockquote
+            className="font-serif text-xl md:text-2xl italic leading-relaxed mb-10"
+            style={{ color: "#3B5373" }}
+          >
+            &ldquo;{founderQuote}&rdquo;
+          </blockquote>
+
+          {founderImg ? (
+            <div className="relative w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-2 border-[#3B5373]">
+              <Image
+                src={founderImg}
+                alt={founderName}
+                fill
+                className="object-cover object-center"
+                sizes="80px"
+              />
+            </div>
+          ) : (
+            <div
+              className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-serif"
+              style={{ background: "#3B5373" }}
+            >
+              {founderName.charAt(0)}
+            </div>
+          )}
+
+          <p className="font-bold text-[15px]" style={{ color: "#1a1a1a" }}>
+            {founderName}
           </p>
-          <Link href="/shop/heels" className="btn-ghost-white">Shop Now</Link>
+          <p className="text-sm text-[#888] mt-1">{founderTitle}</p>
         </div>
       </section>
     </>

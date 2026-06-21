@@ -322,8 +322,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -354,6 +354,12 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "hd-page":    "hot-deals",
   "hd-coupons": "hot-deals",
   "hd-stats":   "hot-deals",
+
+  "au-hero":     "about-us",
+  "au-banner":   "about-us",
+  "au-story":    "about-us",
+  "au-features": "about-us",
+  "au-founder":  "about-us",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -397,6 +403,13 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "hd-page",    label: "Page Settings" },
     { id: "hd-coupons", label: "Coupons" },
     { id: "hd-stats",   label: "Usage Stats" },
+  ],
+  "about-us": [
+    { id: "au-hero",     label: "Hero" },
+    { id: "au-banner",   label: "Banner" },
+    { id: "au-story",    label: "Our Story" },
+    { id: "au-features", label: "Features" },
+    { id: "au-founder",  label: "Founder" },
   ],
   orders:   [],
   settings: [],
@@ -635,6 +648,40 @@ export default function AdminPage() {
   const [hdCardGap, setHdCardGap] = useState(28);
   const [hdPageSaving, setHdPageSaving] = useState(false);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+
+  // ── About Us state ────────────────────────────────────────────────────────
+  const [auHeroHeading,  setAuHeroHeading]  = useState("About CLASSIE");
+  const [auHeroEyebrow,  setAuHeroEyebrow]  = useState("Our Story");
+  const [auHeroText,     setAuHeroText]     = useState("We've all had that moment —\n\nstanding in front of a wardrobe full of shoes, yet feeling like nothing fits the vibe.\n\nBecause the truth is, it's never about how many pairs we own. It's about having the right pair for the right moment — a wedding, a festival, a big meeting, or a brunch date.\n\nAnd too often, we end up buying a new pair just to match a single outfit.");
+  const [auBannerImg,    setAuBannerImg]    = useState("");
+  const [auS1Heading,    setAuS1Heading]    = useState("Where It All Began — The Classic Clip-On Idea");
+  const [auS1Text,       setAuS1Text]       = useState("Classie began with a simple thought — fashion should be yours.\n\nFlexible. Creative. Timeless.\n\nWe asked ourselves:\nWhy should one outfit need a new heel?\nWhy shouldn't your footwear change as easily as your moods?\n\nThat's when we imagined something different.\n\nWhat if one pair of heels could transform into multiple looks just by swapping an accessory?\n\nA Classie heel — designed to shift from minimal to festive, formal to playful with just one small change, using our signature clip on accessories.");
+  const [auS1Img,        setAuS1Img]        = useState("");
+  const [auS2Heading,    setAuS2Heading]    = useState("Classic Heels — Easy to Love");
+  const [auS2Text,       setAuS2Text]       = useState("The real challenge began when we took a closer look at the market.\n\nHeels were either beautiful but uncomfortable, or priced far beyond everyday reach.\n\nSo, we decided to create our own solution.\n\nAt Classie, we design heels that balance everything that matters — thoughtful design, lasting comfort, premium finishing, and pricing that feels fair.");
+  const [auS2Img,        setAuS2Img]        = useState("");
+  const [auS3Heading,    setAuS3Heading]    = useState("Classie Is More Than Heels");
+  const [auS3Text,       setAuS3Text]       = useState("Classie is more than just heels or clip-ons.\n\nIt's an idea that keeps growing.\n\nWe believe style shouldn't feel fixed or limited. It should change with your mood, your plans, and your personality.\n\nStyle it your way, with Classie.");
+  const [auS3Img,        setAuS3Img]        = useState("");
+  const [auFeatsHeading, setAuFeatsHeading] = useState("What Makes Classie Different");
+  const [auFeat1Icon,    setAuFeat1Icon]    = useState("👠");
+  const [auFeat1Title,   setAuFeat1Title]   = useState("Handcrafted With Purpose");
+  const [auFeat1Desc,    setAuFeat1Desc]    = useState("Every Classie heel and clip-on is shaped by skilled hands, with careful human detailing at every stage.");
+  const [auFeat2Icon,    setAuFeat2Icon]    = useState("✨");
+  const [auFeat2Title,   setAuFeat2Title]   = useState("Premium Materials, Refined Finish");
+  const [auFeat2Desc,    setAuFeat2Desc]    = useState("We choose our materials the same way you choose your outfits — with care. Our heels are finished with premium materials.");
+  const [auFeat3Icon,    setAuFeat3Icon]    = useState("🎀");
+  const [auFeat3Title,   setAuFeat3Title]   = useState("Heel + Clip On");
+  const [auFeat3Desc,    setAuFeat3Desc]    = useState("One thoughtfully designed heel. Interchangeable clip-ons that change the look, without changing the pair.");
+  const [auFounderQuote, setAuFounderQuote] = useState("Classie was created to give women the freedom I always wanted — the freedom to style your look, your way. Fashion shouldn't limit you. It should move with you, match your moments, and celebrate your creativity. This is just the beginning, and I'm so grateful you're here.");
+  const [auFounderName,  setAuFounderName]  = useState("Ishika Garg");
+  const [auFounderTitle, setAuFounderTitle] = useState("Founder, Classie");
+  const [auFounderImg,   setAuFounderImg]   = useState("");
+  const [auHeroSaving,    setAuHeroSaving]    = useState(false);
+  const [auBannerSaving,  setAuBannerSaving]  = useState(false);
+  const [auStorySaving,   setAuStorySaving]   = useState(false);
+  const [auFeatsSaving,   setAuFeatsSaving]   = useState(false);
+  const [auFounderSaving, setAuFounderSaving] = useState(false);
   const [couponModal, setCouponModal] = useState<{ open: boolean; mode: "add" | "edit"; data: Partial<Coupon> }>({ open: false, mode: "add", data: {} });
   const [couponSaving, setCouponSaving] = useState(false);
   const [couponStats, setCouponStats] = useState<CouponUse[]>([]);
@@ -1835,6 +1882,92 @@ export default function AdminPage() {
     setHdPageSaving(false);
   };
 
+  // ── About Us fetcher & savers ─────────────────────────────────────────────
+  const fetchAboutUs = useCallback(async () => {
+    const { data } = await supabase.from("site_settings").select("key,value").like("key", "au_%");
+    const m: Record<string, string> = {};
+    (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+    if (m.au_hero_heading  !== undefined) setAuHeroHeading(m.au_hero_heading || "About CLASSIE");
+    if (m.au_hero_eyebrow  !== undefined) setAuHeroEyebrow(m.au_hero_eyebrow || "Our Story");
+    if (m.au_hero_text     !== undefined) setAuHeroText(m.au_hero_text);
+    if (m.au_banner_img    !== undefined) setAuBannerImg(m.au_banner_img || "");
+    if (m.au_s1_heading    !== undefined) setAuS1Heading(m.au_s1_heading);
+    if (m.au_s1_text       !== undefined) setAuS1Text(m.au_s1_text);
+    if (m.au_s1_img        !== undefined) setAuS1Img(m.au_s1_img || "");
+    if (m.au_s2_heading    !== undefined) setAuS2Heading(m.au_s2_heading);
+    if (m.au_s2_text       !== undefined) setAuS2Text(m.au_s2_text);
+    if (m.au_s2_img        !== undefined) setAuS2Img(m.au_s2_img || "");
+    if (m.au_s3_heading    !== undefined) setAuS3Heading(m.au_s3_heading);
+    if (m.au_s3_text       !== undefined) setAuS3Text(m.au_s3_text);
+    if (m.au_s3_img        !== undefined) setAuS3Img(m.au_s3_img || "");
+    if (m.au_feats_heading !== undefined) setAuFeatsHeading(m.au_feats_heading);
+    if (m.au_feat1_icon    !== undefined) setAuFeat1Icon(m.au_feat1_icon || "👠");
+    if (m.au_feat1_title   !== undefined) setAuFeat1Title(m.au_feat1_title);
+    if (m.au_feat1_desc    !== undefined) setAuFeat1Desc(m.au_feat1_desc);
+    if (m.au_feat2_icon    !== undefined) setAuFeat2Icon(m.au_feat2_icon || "✨");
+    if (m.au_feat2_title   !== undefined) setAuFeat2Title(m.au_feat2_title);
+    if (m.au_feat2_desc    !== undefined) setAuFeat2Desc(m.au_feat2_desc);
+    if (m.au_feat3_icon    !== undefined) setAuFeat3Icon(m.au_feat3_icon || "🎀");
+    if (m.au_feat3_title   !== undefined) setAuFeat3Title(m.au_feat3_title);
+    if (m.au_feat3_desc    !== undefined) setAuFeat3Desc(m.au_feat3_desc);
+    if (m.au_founder_quote !== undefined) setAuFounderQuote(m.au_founder_quote);
+    if (m.au_founder_name  !== undefined) setAuFounderName(m.au_founder_name || "Ishika Garg");
+    if (m.au_founder_title !== undefined) setAuFounderTitle(m.au_founder_title || "Founder, Classie");
+    if (m.au_founder_img   !== undefined) setAuFounderImg(m.au_founder_img || "");
+  }, []);
+
+  const saveAuBatch = async (pairs: { key: string; value: string }[], setSaving: (v: boolean) => void) => {
+    setSaving(true);
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key", p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setSaving(false);
+  };
+
+  const saveAuHero = () => saveAuBatch([
+    { key: "au_hero_heading", value: auHeroHeading },
+    { key: "au_hero_eyebrow", value: auHeroEyebrow },
+    { key: "au_hero_text",    value: auHeroText },
+  ], setAuHeroSaving);
+
+  const saveAuBanner = () => saveAuBatch([
+    { key: "au_banner_img", value: auBannerImg },
+  ], setAuBannerSaving);
+
+  const saveAuStory = () => saveAuBatch([
+    { key: "au_s1_heading", value: auS1Heading },
+    { key: "au_s1_text",    value: auS1Text },
+    { key: "au_s1_img",     value: auS1Img },
+    { key: "au_s2_heading", value: auS2Heading },
+    { key: "au_s2_text",    value: auS2Text },
+    { key: "au_s2_img",     value: auS2Img },
+    { key: "au_s3_heading", value: auS3Heading },
+    { key: "au_s3_text",    value: auS3Text },
+    { key: "au_s3_img",     value: auS3Img },
+  ], setAuStorySaving);
+
+  const saveAuFeatures = () => saveAuBatch([
+    { key: "au_feats_heading", value: auFeatsHeading },
+    { key: "au_feat1_icon",    value: auFeat1Icon },
+    { key: "au_feat1_title",   value: auFeat1Title },
+    { key: "au_feat1_desc",    value: auFeat1Desc },
+    { key: "au_feat2_icon",    value: auFeat2Icon },
+    { key: "au_feat2_title",   value: auFeat2Title },
+    { key: "au_feat2_desc",    value: auFeat2Desc },
+    { key: "au_feat3_icon",    value: auFeat3Icon },
+    { key: "au_feat3_title",   value: auFeat3Title },
+    { key: "au_feat3_desc",    value: auFeat3Desc },
+  ], setAuFeatsSaving);
+
+  const saveAuFounder = () => saveAuBatch([
+    { key: "au_founder_quote", value: auFounderQuote },
+    { key: "au_founder_name",  value: auFounderName },
+    { key: "au_founder_title", value: auFounderTitle },
+    { key: "au_founder_img",   value: auFounderImg },
+  ], setAuFounderSaving);
+
   const fetchCoupons = useCallback(async () => {
     const { data } = await supabase.from("coupons").select("*").order("display_order", { ascending: true });
     setCoupons((data ?? []) as Coupon[]);
@@ -1945,12 +2078,14 @@ export default function AdminPage() {
     if (tab === "hd-coupons") fetchCoupons();
     if (tab === "hd-stats")   fetchCouponStats();
 
+    if (["au-hero","au-banner","au-story","au-features","au-founder"].includes(tab)) fetchAboutUs();
+
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -2447,6 +2582,7 @@ export default function AdminPage() {
     { id: "style-ideas-page",   label: "Style Ideas Page", icon: Camera },
     { id: "advanced-settings",  label: "Advanced Settings", icon: Settings },
     { id: "hot-deals",          label: "Hot Deals",         icon: Tag },
+    { id: "about-us",           label: "About Us",          icon: Users },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -2484,6 +2620,7 @@ export default function AdminPage() {
               id === "collections-page" ? "collections-page" :
               id === "style-ideas-page" ? "style-ideas-page" :
               id === "hot-deals" ? "hd-page" :
+              id === "about-us" ? "au-hero" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -2538,6 +2675,7 @@ export default function AdminPage() {
                mainSection === "style-ideas-page" ? "Style Ideas Page" :
                mainSection === "advanced-settings" ? "Advanced Settings" :
                mainSection === "hot-deals" ? "Hot Deals" :
+               mainSection === "about-us" ? "About Us" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -6460,6 +6598,259 @@ export default function AdminPage() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              ABOUT US — au-hero TAB
+          ══════════════════════════════════════ */}
+          {tab === "au-hero" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Hero Section</h2>
+                <p className="text-xs text-gray-400 mb-4">Split layout — large heading on the left, story text on the right.</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Eyebrow Text</p>
+                    <input type="text" value={auHeroEyebrow} onChange={e => setAuHeroEyebrow(e.target.value)} className={inputCls} placeholder="Our Story" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Hero Heading</p>
+                    <input type="text" value={auHeroHeading} onChange={e => setAuHeroHeading(e.target.value)} className={inputCls} placeholder="About CLASSIE" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Story Text <span className="normal-case text-gray-300">— use \n\n for new paragraph, \n for line break</span></p>
+                    <textarea rows={8} value={auHeroText} onChange={e => setAuHeroText(e.target.value)} className={inputCls + " resize-y font-mono text-xs"} />
+                  </div>
+                  <button onClick={saveAuHero} disabled={auHeroSaving}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4" />{auHeroSaving ? "Saving…" : "Save Hero"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              ABOUT US — au-banner TAB
+          ══════════════════════════════════════ */}
+          {tab === "au-banner" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Full-Width Banner</h2>
+                <p className="text-xs text-gray-400 mb-4">Image shown between the hero and story sections. Leave empty for a navy placeholder.</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Banner Image URL</p>
+                    <input type="text" value={auBannerImg} onChange={e => setAuBannerImg(e.target.value)} className={inputCls} placeholder="https://..." />
+                    {auBannerImg && (
+                      <img src={auBannerImg} alt="banner preview" className="mt-2 h-32 w-full object-cover rounded-lg object-center" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    )}
+                  </div>
+                  <button onClick={saveAuBanner} disabled={auBannerSaving}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4" />{auBannerSaving ? "Saving…" : "Save Banner"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              ABOUT US — au-story TAB
+          ══════════════════════════════════════ */}
+          {tab === "au-story" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Our Story Sections</h2>
+                <p className="text-xs text-gray-400 mb-4">Three alternating text + image sections. Leave image URL empty to hide the image.</p>
+
+                {/* Story 1 */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4 mb-6">
+                  <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Section 1 — Text Left, Image Right</p>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Heading</p>
+                    <input type="text" value={auS1Heading} onChange={e => setAuS1Heading(e.target.value)} className={inputCls} placeholder="Where It All Began" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Text <span className="normal-case text-gray-300">— \n\n = new paragraph</span></p>
+                    <textarea rows={6} value={auS1Text} onChange={e => setAuS1Text(e.target.value)} className={inputCls + " resize-y font-mono text-xs"} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Image URL</p>
+                    <input type="text" value={auS1Img} onChange={e => setAuS1Img(e.target.value)} className={inputCls} placeholder="https://..." />
+                    {auS1Img && (
+                      <img src={auS1Img} alt="s1 preview" className="mt-2 h-24 w-full object-cover rounded-lg" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    )}
+                  </div>
+                </div>
+
+                {/* Story 2 */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4 mb-6">
+                  <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Section 2 — Image Left, Text Right</p>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Heading</p>
+                    <input type="text" value={auS2Heading} onChange={e => setAuS2Heading(e.target.value)} className={inputCls} placeholder="Classic Heels — Easy to Love" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Text</p>
+                    <textarea rows={6} value={auS2Text} onChange={e => setAuS2Text(e.target.value)} className={inputCls + " resize-y font-mono text-xs"} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Image URL</p>
+                    <input type="text" value={auS2Img} onChange={e => setAuS2Img(e.target.value)} className={inputCls} placeholder="https://..." />
+                    {auS2Img && (
+                      <img src={auS2Img} alt="s2 preview" className="mt-2 h-24 w-full object-cover rounded-lg" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    )}
+                  </div>
+                </div>
+
+                {/* Story 3 */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                  <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Section 3 — Text Left, Image Right</p>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Heading</p>
+                    <input type="text" value={auS3Heading} onChange={e => setAuS3Heading(e.target.value)} className={inputCls} placeholder="Classie Is More Than Heels" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Text</p>
+                    <textarea rows={5} value={auS3Text} onChange={e => setAuS3Text(e.target.value)} className={inputCls + " resize-y font-mono text-xs"} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Image URL</p>
+                    <input type="text" value={auS3Img} onChange={e => setAuS3Img(e.target.value)} className={inputCls} placeholder="https://..." />
+                    {auS3Img && (
+                      <img src={auS3Img} alt="s3 preview" className="mt-2 h-24 w-full object-cover rounded-lg" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <button onClick={saveAuStory} disabled={auStorySaving}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4" />{auStorySaving ? "Saving…" : "Save All Story Sections"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              ABOUT US — au-features TAB
+          ══════════════════════════════════════ */}
+          {tab === "au-features" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Features Section</h2>
+                <p className="text-xs text-gray-400 mb-4">3-card grid highlighting what makes Classie different.</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-6">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Section Heading</p>
+                    <input type="text" value={auFeatsHeading} onChange={e => setAuFeatsHeading(e.target.value)} className={inputCls} placeholder="What Makes Classie Different" />
+                  </div>
+
+                  {/* Feature 1 */}
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
+                    <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Feature 1</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Icon (emoji)</p>
+                        <input type="text" value={auFeat1Icon} onChange={e => setAuFeat1Icon(e.target.value)} className={inputCls} placeholder="👠" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Title</p>
+                        <input type="text" value={auFeat1Title} onChange={e => setAuFeat1Title(e.target.value)} className={inputCls} placeholder="Handcrafted With Purpose" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Description</p>
+                      <textarea rows={2} value={auFeat1Desc} onChange={e => setAuFeat1Desc(e.target.value)} className={inputCls + " resize-none"} />
+                    </div>
+                  </div>
+
+                  {/* Feature 2 */}
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
+                    <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Feature 2</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Icon (emoji)</p>
+                        <input type="text" value={auFeat2Icon} onChange={e => setAuFeat2Icon(e.target.value)} className={inputCls} placeholder="✨" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Title</p>
+                        <input type="text" value={auFeat2Title} onChange={e => setAuFeat2Title(e.target.value)} className={inputCls} placeholder="Premium Materials, Refined Finish" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Description</p>
+                      <textarea rows={2} value={auFeat2Desc} onChange={e => setAuFeat2Desc(e.target.value)} className={inputCls + " resize-none"} />
+                    </div>
+                  </div>
+
+                  {/* Feature 3 */}
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
+                    <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Feature 3</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Icon (emoji)</p>
+                        <input type="text" value={auFeat3Icon} onChange={e => setAuFeat3Icon(e.target.value)} className={inputCls} placeholder="🎀" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Title</p>
+                        <input type="text" value={auFeat3Title} onChange={e => setAuFeat3Title(e.target.value)} className={inputCls} placeholder="Heel + Clip On" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Description</p>
+                      <textarea rows={2} value={auFeat3Desc} onChange={e => setAuFeat3Desc(e.target.value)} className={inputCls + " resize-none"} />
+                    </div>
+                  </div>
+
+                  <button onClick={saveAuFeatures} disabled={auFeatsSaving}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4" />{auFeatsSaving ? "Saving…" : "Save Features"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              ABOUT US — au-founder TAB
+          ══════════════════════════════════════ */}
+          {tab === "au-founder" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Founder Section</h2>
+                <p className="text-xs text-gray-400 mb-4">Centered quote with founder photo and name.</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Founder Quote</p>
+                    <textarea rows={5} value={auFounderQuote} onChange={e => setAuFounderQuote(e.target.value)} className={inputCls + " resize-y"} placeholder="Classie was created to give women the freedom…" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Founder Name</p>
+                      <input type="text" value={auFounderName} onChange={e => setAuFounderName(e.target.value)} className={inputCls} placeholder="Ishika Garg" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Title / Role</p>
+                      <input type="text" value={auFounderTitle} onChange={e => setAuFounderTitle(e.target.value)} className={inputCls} placeholder="Founder, Classie" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Photo URL <span className="normal-case text-gray-300">— circular, shown below the quote</span></p>
+                    <input type="text" value={auFounderImg} onChange={e => setAuFounderImg(e.target.value)} className={inputCls} placeholder="https://..." />
+                    {auFounderImg && (
+                      <img src={auFounderImg} alt="founder preview" className="mt-2 h-20 w-20 object-cover rounded-full border-2 border-[#3B5373]" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    )}
+                  </div>
+                  <button onClick={saveAuFounder} disabled={auFounderSaving}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4" />{auFounderSaving ? "Saving…" : "Save Founder Section"}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
