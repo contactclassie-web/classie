@@ -70,12 +70,12 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
             <span className="text-white text-[10px] tracking-[0.25em] uppercase mt-2 relative z-10" style={{ opacity: 0.5 }}>use code below</span>
           </div>
         )}
-        {/* Status badge */}
+        {/* Status badge — top left */}
         <span className="absolute top-3 left-3 text-white text-[9px] font-bold tracking-[0.15em] uppercase px-3 py-1"
           style={{ background: status.color, borderRadius: "2px" }}>● {status.label}</span>
-        {/* Discount badge — only when image */}
+        {/* Discount badge — bottom right (only when image) */}
         {coupon.image_url && (
-          <span className="absolute top-3 right-3 text-white text-[11px] font-bold px-3 py-1"
+          <span className="absolute bottom-3 right-3 text-white text-[11px] font-bold px-3 py-1"
             style={{ background: "#3B5373", borderRadius: "2px" }}>{discountLabel}</span>
         )}
       </div>
