@@ -263,7 +263,7 @@ export default function HotDealsPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section style={{ background: "#EEF1F6" }}>
+      <section style={{ background: "#f7f7f7" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 min-h-[420px] md:min-h-[520px]">
             {/* Left: text */}
