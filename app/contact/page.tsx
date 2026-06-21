@@ -59,8 +59,7 @@ export default async function ContactPage() {
         {/* Left — image or navy */}
         <div className="w-full md:w-[40%] relative flex items-center justify-center" style={{ minHeight: "280px" }}>
           {heroImg ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={heroImg} alt="Contact Classie" className="absolute inset-0 w-full h-full object-cover object-center" />
+            <div className="absolute inset-0" style={{ backgroundImage: `url(${heroImg})`, backgroundSize: "cover", backgroundPosition: "center" }} />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center" style={{ background: "#3B5373" }}>
               <p className="font-serif text-4xl md:text-5xl text-white italic text-center px-8 leading-tight">
