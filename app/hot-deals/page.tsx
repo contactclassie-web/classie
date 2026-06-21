@@ -20,6 +20,7 @@ type Coupon = {
   valid_until: string | null;
   uses_count: number;
   max_uses_total: number | null;
+  min_order_value: number;
   display_order: number;
 };
 
@@ -66,74 +67,67 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
       ? `${coupon.discount_value}% OFF`
       : `₹${coupon.discount_value} OFF`;
 
+  const statusColors: Record<string, string> = {
+    green: "#22c55e", orange: "#f97316", gray: "#94a3b8", red: "#ef4444"
+  };
+
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden flex flex-col"
-      style={{ boxShadow: "0 2px 16px rgba(59,83,115,0.10)" }}
+      className="overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1"
+      style={{ background: "#fff", boxShadow: "0 4px 24px rgba(59,83,115,0.10)", borderRadius: "0px", border: "1px solid #ece9e3" }}
     >
-      {/* Image */}
-      <div className="relative flex-shrink-0 bg-[#f0eee9] overflow-hidden" style={{ height: `${cardH}px` }}>
+      {/* Image / Fallback */}
+      <div className="relative flex-shrink-0 overflow-hidden" style={{ height: `${cardH}px` }}>
         {coupon.image_url ? (
-          <img
-            src={coupon.image_url}
-            alt={coupon.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={coupon.image_url} alt={coupon.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-5xl">🏷️</span>
+          /* No image — show navy bg with big discount text */
+          <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: "#3B5373" }}>
+            <span className="text-white font-serif" style={{ fontSize: "clamp(3rem,8vw,5rem)", fontWeight: 700, lineHeight: 1, opacity: 0.15, letterSpacing: "-2px", position: "absolute" }}>DEAL</span>
+            <span className="text-white font-bold relative z-10" style={{ fontSize: "clamp(2rem,6vw,3.5rem)", letterSpacing: "-1px" }}>{discountLabel}</span>
+            <span className="text-white text-xs tracking-[0.2em] uppercase mt-2 relative z-10" style={{ opacity: 0.6 }}>use code below</span>
           </div>
         )}
-        {/* Status badge */}
+        {/* Status badge — top left */}
         <span
-          className="absolute top-3 left-3 text-white text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded-full"
-          style={{ background: status.color }}
-        >
-          {status.label}
-        </span>
-        {/* Discount badge */}
-        <span
-          className="absolute top-3 right-3 text-white text-[11px] font-bold px-2.5 py-1 rounded-full"
-          style={{ background: "#3B5373" }}
-        >
-          {discountLabel}
-        </span>
+          className="absolute top-3 left-3 text-white text-[9px] font-bold tracking-[0.15em] uppercase px-3 py-1"
+          style={{ background: statusColors[status.color] || "#22c55e", borderRadius: "2px" }}
+        >● {status.label}</span>
+        {/* Discount badge — top right (only when image present) */}
+        {coupon.image_url && (
+          <span className="absolute top-3 right-3 text-white text-[11px] font-bold px-3 py-1" style={{ background: "#3B5373", borderRadius: "2px" }}>
+            {discountLabel}
+          </span>
+        )}
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1 gap-3">
-        <div>
-          <h3 className="font-semibold text-[#1a1a1a] text-sm leading-snug">{coupon.title}</h3>
-          {coupon.description && (
-            <p className="text-[12px] text-[#888] mt-1 leading-relaxed">{coupon.description}</p>
+      <div className="flex flex-col flex-1 gap-0">
+        {/* Title + desc */}
+        <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: "#f0ede8" }}>
+          {coupon.title && <h3 className="font-serif text-[#1a1a1a] mb-1" style={{ fontSize: "1.15rem", fontWeight: 700 }}>{coupon.title}</h3>}
+          {coupon.description && <p className="text-[12px] leading-relaxed" style={{ color: "#888" }}>{coupon.description}</p>}
+          {coupon.min_order_value > 0 && (
+            <p className="text-[10px] mt-2 font-medium" style={{ color: "#3B5373" }}>Min. order: ₹{coupon.min_order_value}</p>
           )}
         </div>
 
-        {/* Coupon code box */}
-        <div
-          className="flex items-center justify-between gap-2 rounded-lg px-3 py-2"
-          style={{ border: "2px dashed #3B5373", background: "#f0eee9" }}
-        >
-          <span className="font-mono font-bold text-[#3B5373] text-sm tracking-widest">
-            {coupon.code}
-          </span>
-          <button
-            onClick={handleCopy}
-            className="text-[11px] font-semibold uppercase tracking-wider transition-all flex-shrink-0"
-            style={{ color: copied ? "#22c55e" : "#3B5373" }}
-          >
-            {copied ? "✓ Copied!" : "Copy"}
-          </button>
+        {/* Coupon code row */}
+        <div className="px-5 py-4">
+          <p className="text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: "#bbb" }}>Coupon Code</p>
+          <div className="flex items-center gap-0" style={{ border: "1.5px dashed #c0ccd8", borderRadius: "4px", overflow: "hidden" }}>
+            <span className="flex-1 font-mono font-bold tracking-[0.15em] px-4 py-3 text-sm" style={{ color: "#3B5373", background: "#f8f9fb" }}>
+              {coupon.code}
+            </span>
+            <button
+              onClick={handleCopy}
+              className="px-4 py-3 text-[10px] font-bold tracking-[0.15em] uppercase transition-all flex-shrink-0"
+              style={{ background: copied ? "#22c55e" : "#3B5373", color: "#fff", borderLeft: "1.5px dashed #c0ccd8" }}
+            >
+              {copied ? "✓" : "Copy"}
+            </button>
+          </div>
         </div>
-
-        {/* Copy Code button */}
-        <button
-          onClick={handleCopy}
-          className="mt-auto w-full py-2.5 text-white text-[12px] font-semibold tracking-widest uppercase transition-all"
-          style={{ background: copied ? "#22c55e" : "#3B5373", borderRadius: "8px" }}
-        >
-          {copied ? "✓ Copied!" : "Copy Code"}
-        </button>
       </div>
     </div>
   );
@@ -269,7 +263,7 @@ export default function HotDealsPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section style={{ background: "#f0eee9" }}>
+      <section style={{ background: "#EEF1F6" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 min-h-[420px] md:min-h-[520px]">
             {/* Left: text */}
@@ -315,7 +309,7 @@ export default function HotDealsPage() {
             </div>
 
             {/* Right: image */}
-            <div className="relative hidden md:block overflow-hidden" style={{ background: "#e8e4de" }}>
+            <div className="relative hidden md:block overflow-hidden" style={{ background: "#3B5373" }}>
               {heroImg ? (
                 <img
                   src={heroImg}
@@ -323,7 +317,9 @@ export default function HotDealsPage() {
                   className="w-full h-full object-cover object-center"
                 />
               ) : (
-                <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #e8e4de 0%, #d5cfc6 100%)" }} />
+                <div className="w-full h-full flex items-center justify-center" style={{ background: "#3B5373" }}>
+                  <span style={{ fontSize: "8rem", fontWeight: 800, color: "rgba(255,255,255,0.06)", letterSpacing: "-4px", fontFamily: "serif" }}>HOT</span>
+                </div>
               )}
             </div>
           </div>
