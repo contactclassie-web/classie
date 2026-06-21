@@ -66,8 +66,23 @@ interface CfgMap {
   ct_social?: string;
 }
 
+const DEFAULT_CFG: CfgMap = {
+  ct_heading: "Contact Us",
+  ct_subtext: "Your perfect look deserves the perfect heel. Whether you need help with sizing, styling, orders, or customisation — our team is here to assist you.\n\nDrop us a message and we\'ll get back to you within 24–48 hours.",
+  ct_track_text: "Log in to check the status of your order.",
+  ct_track_url: "/track",
+  ct_return_text: "We make it easy to return and exchange styles.",
+  ct_return_url: "/returns",
+  ct_faq_heading: "Popular Searched Questions",
+  ct_info_heading: "Any other questions?",
+  ct_info_sub: "We\'re here to help! Contact us any time Monday–Saturday, 9 AM–9 PM.",
+  ct_phone: "91-9468147781",
+  ct_email: "contact.classie@gmail.com",
+  ct_social: "@classsie.in",
+};
+
 export default function ContactPage() {
-  const [cfg, setCfg] = useState<CfgMap>({});
+  const [cfg, setCfg] = useState<CfgMap>(DEFAULT_CFG);
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
