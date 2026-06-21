@@ -55,53 +55,53 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
     : `₹${coupon.discount_value} OFF`;
 
   return (
-    <div className="overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1"
-      style={{ background: "#fff", boxShadow: "0 4px 24px rgba(59,83,115,0.10)", border: "1px solid #ece9e3" }}>
-      {/* Image / Fallback */}
-      <div className="relative flex-shrink-0 overflow-hidden" style={{ height: `${cardH}px` }}>
+    <div className="overflow-hidden flex transition-all duration-300 hover:-translate-y-1 group"
+      style={{ background: "#fff", boxShadow: "0 4px 28px rgba(59,83,115,0.10)", border: "1px solid #ece9e3", minHeight: "260px" }}>
+
+      {/* Left — Image */}
+      <div className="relative flex-shrink-0 overflow-hidden" style={{ width: "44%" }}>
         {coupon.image_url ? (
           <img src={coupon.image_url} alt={coupon.title}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center relative" style={{ background: "#3B5373" }}>
-            <span className="absolute text-white font-serif select-none pointer-events-none"
-              style={{ fontSize: "6rem", fontWeight: 700, opacity: 0.07, letterSpacing: "-4px" }}>DEAL</span>
-            <span className="text-white font-bold relative z-10" style={{ fontSize: "2.5rem", letterSpacing: "-1px" }}>{discountLabel}</span>
-            <span className="text-white text-[10px] tracking-[0.25em] uppercase mt-2 relative z-10" style={{ opacity: 0.5 }}>use code below</span>
+          <div className="w-full h-full flex flex-col items-center justify-center relative" style={{ background: "#3B5373", minHeight: "260px" }}>
+            <span className="text-white font-serif absolute select-none pointer-events-none"
+              style={{ fontSize: "4rem", fontWeight: 700, opacity: 0.07, letterSpacing: "-2px" }}>DEAL</span>
+            <span className="text-white font-bold relative z-10" style={{ fontSize: "1.8rem", letterSpacing: "-1px" }}>{discountLabel}</span>
+            <span className="text-white text-[9px] tracking-[0.2em] uppercase mt-1 relative z-10" style={{ opacity: 0.5 }}>use code</span>
           </div>
         )}
         {/* Status badge — top left */}
-        <span className="absolute top-3 left-3 text-white text-[9px] font-bold tracking-[0.15em] uppercase px-3 py-1"
+        <span className="absolute top-3 left-3 text-white text-[8px] font-bold tracking-[0.12em] uppercase px-2.5 py-1"
           style={{ background: status.color, borderRadius: "2px" }}>● {status.label}</span>
-        {/* Discount badge — bottom right (only when image) */}
+        {/* Discount badge — bottom left (only when image) */}
         {coupon.image_url && (
-          <span className="absolute bottom-3 right-3 text-white text-[11px] font-bold px-3 py-1"
+          <span className="absolute bottom-3 left-3 text-white text-[10px] font-bold px-2.5 py-1"
             style={{ background: "#3B5373", borderRadius: "2px" }}>{discountLabel}</span>
         )}
       </div>
 
-      {/* Content */}
-      <div className="flex flex-col flex-1">
-        <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: "#f0ede8" }}>
+      {/* Right — Content */}
+      <div className="flex flex-col flex-1 justify-between p-5">
+        <div className="mb-4">
           {coupon.title && (
-            <h3 className="font-serif text-[#1a1a1a] mb-1" style={{ fontSize: "1.1rem", fontWeight: 700 }}>{coupon.title}</h3>
+            <h3 className="font-serif mb-1.5" style={{ fontSize: "1.1rem", fontWeight: 700, color: "#1a1a1a", lineHeight: 1.25 }}>{coupon.title}</h3>
           )}
           {coupon.description && (
             <p className="text-[12px] leading-relaxed" style={{ color: "#888" }}>{coupon.description}</p>
           )}
           {coupon.min_order_value > 0 && (
-            <p className="text-[10px] mt-2 font-medium" style={{ color: "#3B5373" }}>Min. order: ₹{coupon.min_order_value}</p>
+            <p className="text-[10px] mt-2 font-semibold" style={{ color: "#3B5373" }}>Min. ₹{coupon.min_order_value}</p>
           )}
         </div>
-        {/* Coupon code row */}
-        <div className="px-5 py-4">
-          <p className="text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: "#bbb" }}>Coupon Code</p>
-          <div className="flex items-center" style={{ border: "1.5px dashed #c0ccd8", borderRadius: "4px", overflow: "hidden" }}>
-            <span className="flex-1 font-mono font-bold tracking-[0.15em] px-4 py-3 text-sm"
-              style={{ color: "#3B5373", background: "#f8f9fb" }}>{coupon.code}</span>
+        <div>
+          <p className="text-[8px] tracking-[0.25em] uppercase mb-1.5 font-medium" style={{ color: "#bbb" }}>Use Code</p>
+          <div className="flex items-stretch" style={{ border: "1.5px dashed #b8c5d1", borderRadius: "3px", overflow: "hidden" }}>
+            <span className="flex-1 font-mono font-bold tracking-[0.1em] px-3 py-2.5 text-[13px]"
+              style={{ color: "#3B5373", background: "#f8fafc" }}>{coupon.code}</span>
             <button onClick={handleCopy}
-              className="px-4 py-3 text-[10px] font-bold tracking-[0.15em] uppercase transition-all flex-shrink-0"
-              style={{ background: copied ? "#22c55e" : "#3B5373", color: "#fff" }}>
+              className="px-3 text-[9px] font-bold tracking-[0.12em] uppercase transition-all flex-shrink-0"
+              style={{ background: copied ? "#22c55e" : "#3B5373", color: "#fff", minWidth: "52px" }}>
               {copied ? "✓" : "Copy"}
             </button>
           </div>
