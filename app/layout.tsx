@@ -3,7 +3,6 @@ import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import LuxuryCursor from "@/components/LuxuryCursor";
 
 export const metadata: Metadata = {
@@ -43,7 +42,6 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />
-          <WhatsAppButton />
           <LuxuryCursor />
         </CartProvider>
       </body>
