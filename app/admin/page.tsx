@@ -332,8 +332,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -376,6 +376,11 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "ct-faq":   "contact-us",
   "ct-info":  "contact-us",
   "ct-inbox": "contact-us",
+
+  "sp-hero":    "shipping-policy",
+  "sp-tiles":   "shipping-policy",
+  "sp-content": "shipping-policy",
+  "sp-cta":     "shipping-policy",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -433,6 +438,12 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "ct-faq",   label: "FAQ" },
     { id: "ct-info",  label: "Contact Info" },
     { id: "ct-inbox", label: "Inbox" },
+  ],
+  "shipping-policy": [
+    { id: "sp-hero",    label: "Hero" },
+    { id: "sp-tiles",   label: "Tiles" },
+    { id: "sp-content", label: "Content" },
+    { id: "sp-cta",     label: "CTA" },
   ],
   orders:   [],
   settings: [],
@@ -735,6 +746,34 @@ export default function AdminPage() {
 
   const [ctInbox,        setCtInbox]        = useState<CtSubmission[]>([]);
   const [ctInboxLoading, setCtInboxLoading] = useState(false);
+
+  // ── Shipping Policy state ─────────────────────────────────────────────────
+  const [spHeading,        setSpHeading]        = useState("Shipping Policy");
+  const [spEyebrow,        setSpEyebrow]        = useState("CLASSIE");
+  const [spUpdated,        setSpUpdated]        = useState("Last updated: June 2025");
+  const [spTile1Title,     setSpTile1Title]     = useState("Free Shipping");
+  const [spTile1Sub,       setSpTile1Sub]       = useState("On all orders above ₹999");
+  const [spTile2Title,     setSpTile2Title]     = useState("Delivery Time");
+  const [spTile2Sub,       setSpTile2Sub]       = useState("4–5 business days standard");
+  const [spTile3Title,     setSpTile3Title]     = useState("Pan-India");
+  const [spTile3Sub,       setSpTile3Sub]       = useState("All serviceable pincodes");
+  const [spTile4Title,     setSpTile4Title]     = useState("Processing");
+  const [spTile4Sub,       setSpTile4Sub]       = useState("1–2 business days before dispatch");
+  const [spRatesHeading,   setSpRatesHeading]   = useState("Shipping Rates");
+  const [spRatesBody,      setSpRatesBody]      = useState("Free shipping on all orders above ₹999\n₹99 flat fee on orders below ₹999\nCash on Delivery (COD) is available across India");
+  const [spTimelineHeading,setSpTimelineHeading]= useState("Delivery Timelines");
+  const [spTimelineBody,   setSpTimelineBody]   = useState("Metro cities: 3–5 business days\nTier 2 cities: 5–7 business days\nRemote areas: 7–10 business days\n\nOrders placed before 12 PM IST are processed the same day. Weekend orders are processed on Monday.");
+  const [spTrackingHeading,setSpTrackingHeading]= useState("Order Tracking");
+  const [spTrackingBody,   setSpTrackingBody]   = useState("Once dispatched, you'll receive tracking details via SMS/WhatsApp.\n\nUse our Track Order page for real-time updates.");
+  const [spAddressHeading, setSpAddressHeading] = useState("Incorrect Address");
+  const [spAddressBody,    setSpAddressBody]    = useState("Please ensure your delivery address and phone number are correct at checkout.\n\nClassie is not responsible for failed deliveries due to incorrect address details.");
+  const [spLostHeading,    setSpLostHeading]    = useState("Lost or Damaged Packages");
+  const [spLostBody,       setSpLostBody]       = useState("If your order arrives damaged or is lost in transit, please contact us within 48 hours of the expected delivery date at contact.classie@gmail.com or WhatsApp us.");
+  const [spCtaText,        setSpCtaText]        = useState("Have questions about your order?");
+  const [spHeroSaving,     setSpHeroSaving]     = useState(false);
+  const [spTilesSaving,    setSpTilesSaving]    = useState(false);
+  const [spContentSaving,  setSpContentSaving]  = useState(false);
+  const [spCtaSaving,      setSpCtaSaving]      = useState(false);
 
   const [couponModal, setCouponModal] = useState<{ open: boolean; mode: "add" | "edit"; data: Partial<Coupon> }>({ open: false, mode: "add", data: {} });
   const [couponSaving, setCouponSaving] = useState(false);
@@ -2104,6 +2143,79 @@ export default function AdminPage() {
     setCtInboxLoading(false);
   }, []);
 
+  // ── Shipping Policy fetch + save ─────────────────────────────────────────
+  const fetchShippingPolicy = useCallback(async () => {
+    const { data } = await supabase.from("site_settings").select("key,value").like("key", "sp_%");
+    const m: Record<string, string> = {};
+    (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+    if (m.sp_heading  !== undefined) setSpHeading(m.sp_heading  || "Shipping Policy");
+    if (m.sp_eyebrow  !== undefined) setSpEyebrow(m.sp_eyebrow  || "CLASSIE");
+    if (m.sp_updated  !== undefined) setSpUpdated(m.sp_updated  || "Last updated: June 2025");
+    if (m.sp_tile1_title !== undefined) setSpTile1Title(m.sp_tile1_title);
+    if (m.sp_tile1_sub   !== undefined) setSpTile1Sub(m.sp_tile1_sub);
+    if (m.sp_tile2_title !== undefined) setSpTile2Title(m.sp_tile2_title);
+    if (m.sp_tile2_sub   !== undefined) setSpTile2Sub(m.sp_tile2_sub);
+    if (m.sp_tile3_title !== undefined) setSpTile3Title(m.sp_tile3_title);
+    if (m.sp_tile3_sub   !== undefined) setSpTile3Sub(m.sp_tile3_sub);
+    if (m.sp_tile4_title !== undefined) setSpTile4Title(m.sp_tile4_title);
+    if (m.sp_tile4_sub   !== undefined) setSpTile4Sub(m.sp_tile4_sub);
+    if (m.sp_rates_heading    !== undefined) setSpRatesHeading(m.sp_rates_heading);
+    if (m.sp_rates_body       !== undefined) setSpRatesBody(m.sp_rates_body);
+    if (m.sp_timeline_heading !== undefined) setSpTimelineHeading(m.sp_timeline_heading);
+    if (m.sp_timeline_body    !== undefined) setSpTimelineBody(m.sp_timeline_body);
+    if (m.sp_tracking_heading !== undefined) setSpTrackingHeading(m.sp_tracking_heading);
+    if (m.sp_tracking_body    !== undefined) setSpTrackingBody(m.sp_tracking_body);
+    if (m.sp_address_heading  !== undefined) setSpAddressHeading(m.sp_address_heading);
+    if (m.sp_address_body     !== undefined) setSpAddressBody(m.sp_address_body);
+    if (m.sp_lost_heading     !== undefined) setSpLostHeading(m.sp_lost_heading);
+    if (m.sp_lost_body        !== undefined) setSpLostBody(m.sp_lost_body);
+    if (m.sp_cta_text         !== undefined) setSpCtaText(m.sp_cta_text);
+  }, []);
+
+  const saveSpBatch = async (pairs: { key: string; value: string }[], setSaving: (v: boolean) => void) => {
+    setSaving(true);
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key", p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setSaving(false);
+  };
+
+  const saveSpHero    = () => saveSpBatch([
+    { key: "sp_heading", value: spHeading },
+    { key: "sp_eyebrow", value: spEyebrow },
+    { key: "sp_updated", value: spUpdated },
+  ], setSpHeroSaving);
+
+  const saveSpTiles   = () => saveSpBatch([
+    { key: "sp_tile1_title", value: spTile1Title },
+    { key: "sp_tile1_sub",   value: spTile1Sub },
+    { key: "sp_tile2_title", value: spTile2Title },
+    { key: "sp_tile2_sub",   value: spTile2Sub },
+    { key: "sp_tile3_title", value: spTile3Title },
+    { key: "sp_tile3_sub",   value: spTile3Sub },
+    { key: "sp_tile4_title", value: spTile4Title },
+    { key: "sp_tile4_sub",   value: spTile4Sub },
+  ], setSpTilesSaving);
+
+  const saveSpContent = () => saveSpBatch([
+    { key: "sp_rates_heading",    value: spRatesHeading },
+    { key: "sp_rates_body",       value: spRatesBody },
+    { key: "sp_timeline_heading", value: spTimelineHeading },
+    { key: "sp_timeline_body",    value: spTimelineBody },
+    { key: "sp_tracking_heading", value: spTrackingHeading },
+    { key: "sp_tracking_body",    value: spTrackingBody },
+    { key: "sp_address_heading",  value: spAddressHeading },
+    { key: "sp_address_body",     value: spAddressBody },
+    { key: "sp_lost_heading",     value: spLostHeading },
+    { key: "sp_lost_body",        value: spLostBody },
+  ], setSpContentSaving);
+
+  const saveSpCta     = () => saveSpBatch([
+    { key: "sp_cta_text", value: spCtaText },
+  ], setSpCtaSaving);
+
   const fetchCoupons = useCallback(async () => {
     const { data } = await supabase.from("coupons").select("*").order("display_order", { ascending: true });
     setCoupons((data ?? []) as Coupon[]);
@@ -2219,12 +2331,14 @@ export default function AdminPage() {
     if (["ct-hero","ct-help","ct-faq","ct-info"].includes(tab)) fetchContactUs();
     if (tab === "ct-inbox") fetchCtInbox();
 
+    if (["sp-hero","sp-tiles","sp-content","sp-cta"].includes(tab)) fetchShippingPolicy();
+
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -2723,6 +2837,7 @@ export default function AdminPage() {
     { id: "hot-deals",          label: "Hot Deals",         icon: Tag },
     { id: "about-us",           label: "About Us",          icon: Users },
     { id: "contact-us",         label: "Contact Us",        icon: MessageSquare },
+    { id: "shipping-policy",    label: "Shipping Policy",   icon: Truck },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -2762,6 +2877,7 @@ export default function AdminPage() {
               id === "hot-deals" ? "hd-page" :
               id === "about-us" ? "au-hero" :
               id === "contact-us" ? "ct-hero" :
+              id === "shipping-policy" ? "sp-hero" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -2818,6 +2934,7 @@ export default function AdminPage() {
                mainSection === "hot-deals" ? "Hot Deals" :
                mainSection === "about-us" ? "About Us" :
                mainSection === "contact-us" ? "Contact Us" :
+               mainSection === "shipping-policy" ? "Shipping Policy" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -7177,6 +7294,133 @@ export default function AdminPage() {
                   </table>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SHIPPING POLICY — sp-hero TAB
+          ══════════════════════════════════════ */}
+          {tab === "sp-hero" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Controls the full-navy top section of the shipping page.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>Eyebrow Label</label>
+                  <input type="text" value={spEyebrow} onChange={e => setSpEyebrow(e.target.value)} className={inputCls} placeholder="CLASSIE" />
+                </div>
+                <div>
+                  <label className={labelCls}>Page Heading</label>
+                  <input type="text" value={spHeading} onChange={e => setSpHeading(e.target.value)} className={inputCls} placeholder="Shipping Policy" />
+                </div>
+                <div>
+                  <label className={labelCls}>Last Updated Text</label>
+                  <input type="text" value={spUpdated} onChange={e => setSpUpdated(e.target.value)} className={inputCls} placeholder="Last updated: June 2025" />
+                </div>
+                <button onClick={saveSpHero} disabled={spHeroSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{spHeroSaving ? "Saving…" : "Save Hero"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SHIPPING POLICY — sp-tiles TAB
+          ══════════════════════════════════════ */}
+          {tab === "sp-tiles" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">KPI Tiles</h2>
+                <p className="text-xs text-gray-400 mt-0.5">4 highlight tiles shown below the hero section.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+                {[
+                  { emoji: "🚚", label: "Tile 1", titleVal: spTile1Title, setTitle: setSpTile1Title, subVal: spTile1Sub, setSub: setSpTile1Sub },
+                  { emoji: "⏱️", label: "Tile 2", titleVal: spTile2Title, setTitle: setSpTile2Title, subVal: spTile2Sub, setSub: setSpTile2Sub },
+                  { emoji: "🗺️", label: "Tile 3", titleVal: spTile3Title, setTitle: setSpTile3Title, subVal: spTile3Sub, setSub: setSpTile3Sub },
+                  { emoji: "⚡", label: "Tile 4", titleVal: spTile4Title, setTitle: setSpTile4Title, subVal: spTile4Sub, setSub: setSpTile4Sub },
+                ].map(({ emoji, label, titleVal, setTitle, subVal, setSub }) => (
+                  <div key={label} className="border border-gray-100 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{emoji} {label}</p>
+                    <div>
+                      <label className={labelCls}>Title</label>
+                      <input type="text" value={titleVal} onChange={e => setTitle(e.target.value)} className={inputCls} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Subtitle</label>
+                      <input type="text" value={subVal} onChange={e => setSub(e.target.value)} className={inputCls} />
+                    </div>
+                  </div>
+                ))}
+                <button onClick={saveSpTiles} disabled={spTilesSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{spTilesSaving ? "Saving…" : "Save Tiles"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SHIPPING POLICY — sp-content TAB
+          ══════════════════════════════════════ */}
+          {tab === "sp-content" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Content Sections</h2>
+                <p className="text-xs text-gray-400 mt-0.5">5 accordion-style cards. Use line breaks in the body for new lines.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+                {[
+                  { num: 1, label: "Shipping Rates",          headingVal: spRatesHeading,    setHeading: setSpRatesHeading,    bodyVal: spRatesBody,    setBody: setSpRatesBody },
+                  { num: 2, label: "Delivery Timelines",      headingVal: spTimelineHeading, setHeading: setSpTimelineHeading, bodyVal: spTimelineBody, setBody: setSpTimelineBody },
+                  { num: 3, label: "Order Tracking",          headingVal: spTrackingHeading, setHeading: setSpTrackingHeading, bodyVal: spTrackingBody, setBody: setSpTrackingBody },
+                  { num: 4, label: "Incorrect Address",       headingVal: spAddressHeading,  setHeading: setSpAddressHeading,  bodyVal: spAddressBody,  setBody: setSpAddressBody },
+                  { num: 5, label: "Lost or Damaged Packages",headingVal: spLostHeading,     setHeading: setSpLostHeading,     bodyVal: spLostBody,     setBody: setSpLostBody },
+                ].map(({ num, label, headingVal, setHeading, bodyVal, setBody }) => (
+                  <div key={num} className="border border-gray-100 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Section {num} — {label}</p>
+                    <div>
+                      <label className={labelCls}>Section Heading</label>
+                      <input type="text" value={headingVal} onChange={e => setHeading(e.target.value)} className={inputCls} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Body Text</label>
+                      <textarea value={bodyVal} onChange={e => setBody(e.target.value)} rows={4}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white resize-y" />
+                    </div>
+                  </div>
+                ))}
+                <button onClick={saveSpContent} disabled={spContentSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{spContentSaving ? "Saving…" : "Save Content"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SHIPPING POLICY — sp-cta TAB
+          ══════════════════════════════════════ */}
+          {tab === "sp-cta" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">CTA Strip</h2>
+                <p className="text-xs text-gray-400 mt-0.5">The navy bottom strip with a "Contact Us" button.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>CTA Text</label>
+                  <input type="text" value={spCtaText} onChange={e => setSpCtaText(e.target.value)} className={inputCls} placeholder="Have questions about your order?" />
+                  <p className="text-xs text-gray-400 mt-1">The button always links to /contact and reads "Contact Us →".</p>
+                </div>
+                <button onClick={saveSpCta} disabled={spCtaSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{spCtaSaving ? "Saving…" : "Save CTA"}
+                </button>
+              </div>
             </div>
           )}
 
