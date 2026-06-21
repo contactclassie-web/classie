@@ -8,7 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home, Layout, Tag,
+  Star, Camera, Palette, Home, Layout, Tag, Ruler,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -332,8 +332,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -381,6 +381,16 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "sp-tiles":   "shipping-policy",
   "sp-content": "shipping-policy",
   "sp-cta":     "shipping-policy",
+  "sg-hero":    "size-guide",
+  "sg-measure": "size-guide",
+  "sg-chart":   "size-guide",
+  "sg-tips":    "size-guide",
+  "sg-cta":     "size-guide",
+
+  "re-hero":   "returns",
+  "re-tiles":  "returns",
+  "re-policy": "returns",
+  "re-cta":    "returns",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -444,6 +454,19 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "sp-tiles",   label: "Tiles" },
     { id: "sp-content", label: "Content" },
     { id: "sp-cta",     label: "CTA" },
+  ],
+  "size-guide": [
+    { id: "sg-hero",    label: "Hero" },
+    { id: "sg-measure", label: "How to Measure" },
+    { id: "sg-chart",   label: "Size Chart" },
+    { id: "sg-tips",    label: "Fit Tips" },
+    { id: "sg-cta",     label: "CTA" },
+  ],
+  "returns": [
+    { id: "re-hero",   label: "Hero" },
+    { id: "re-tiles",  label: "Tiles" },
+    { id: "re-policy", label: "Policy" },
+    { id: "re-cta",    label: "CTA" },
   ],
   orders:   [],
   settings: [],
@@ -774,6 +797,59 @@ export default function AdminPage() {
   const [spTilesSaving,    setSpTilesSaving]    = useState(false);
   const [spContentSaving,  setSpContentSaving]  = useState(false);
   const [spCtaSaving,      setSpCtaSaving]      = useState(false);
+
+  // ── Size Guide state ──────────────────────────────────────────────────────
+  const [sgEyebrow,       setSgEyebrow]       = useState("CLASSIE");
+  const [sgHeading,       setSgHeading]       = useState("Size Guide");
+  const [sgSub,           setSgSub]           = useState("Find your perfect fit — every time");
+  const [sgMeasureHeading,setSgMeasureHeading]= useState("How to Measure Your Foot");
+  const [sgMeasureSteps,  setSgMeasureSteps]  = useState("Step 1: Place a blank sheet of paper on a flat floor\nStep 2: Stand on the paper with your heel against a wall\nStep 3: Mark the tip of your longest toe with a pencil\nStep 4: Measure the distance from the wall to the mark in centimetres\nStep 5: Use the chart below to find your size");
+  const [sgChartHeading,  setSgChartHeading]  = useState("Heel Size Chart");
+  const [sgChartSub,      setSgChartSub]      = useState("All measurements are in centimetres (cm)");
+  const [sgChartJson,     setSgChartJson]     = useState('[{"eu":"35","uk":"2","in":"3","cm":"22.0"},{"eu":"36","uk":"3","in":"4","cm":"22.5–23.0"},{"eu":"37","uk":"4","in":"5","cm":"23.5"},{"eu":"38","uk":"5","in":"6","cm":"24.0–24.5"},{"eu":"39","uk":"6","in":"7","cm":"25.0"},{"eu":"40","uk":"7","in":"8","cm":"25.5–26.0"},{"eu":"41","uk":"8","in":"9","cm":"26.5"}]');
+  const [sgTipsHeading,   setSgTipsHeading]   = useState("Tips for the Perfect Fit");
+  const [sgTip1Icon,      setSgTip1Icon]      = useState("📏");
+  const [sgTip1Title,     setSgTip1Title]     = useState("Measure in the Evening");
+  const [sgTip1Body,      setSgTip1Body]      = useState("Feet tend to swell throughout the day. Measure in the evening for the most accurate size.");
+  const [sgTip2Icon,      setSgTip2Icon]      = useState("👟");
+  const [sgTip2Title,     setSgTip2Title]     = useState("If Between Sizes");
+  const [sgTip2Body,      setSgTip2Body]      = useState("We recommend sizing up. A slightly larger heel is easier to style than one that's too tight.");
+  const [sgTip3Icon,      setSgTip3Icon]      = useState("💬");
+  const [sgTip3Title,     setSgTip3Title]     = useState("Need Help?");
+  const [sgTip3Body,      setSgTip3Body]      = useState("Contact our team via WhatsApp or email — we're happy to help you find the right size.");
+  const [sgCtaText,       setSgCtaText]       = useState("Still not sure about your size?");
+  const [sgHeroSaving,    setSgHeroSaving]    = useState(false);
+  const [sgMeasureSaving, setSgMeasureSaving] = useState(false);
+  const [sgChartSaving,   setSgChartSaving]   = useState(false);
+  const [sgTipsSaving,    setSgTipsSaving]    = useState(false);
+  const [sgCtaSaving,     setSgCtaSaving]     = useState(false);
+
+  // ── Returns & Exchanges state ─────────────────────────────────────────────
+  const [reEyebrow,          setReEyebrow]          = useState("CLASSIE");
+  const [reHeading,          setReHeading]          = useState("Returns & Exchanges");
+  const [reSub,              setReSub]              = useState("Hassle-free returns within 7 days of delivery");
+  const [reUpdated,          setReUpdated]          = useState("Last updated: June 2025");
+  const [reTile1Title,       setReTile1Title]       = useState("7-Day Returns");
+  const [reTile1Sub,         setReTile1Sub]         = useState("Return within 7 days of delivery");
+  const [reTile2Title,       setReTile2Title]       = useState("Free Size Exchange");
+  const [reTile2Sub,         setReTile2Sub]         = useState("Subject to stock availability");
+  const [reTile3Title,       setReTile3Title]       = useState("Refund in 5–7 Days");
+  const [reTile3Sub,         setReTile3Sub]         = useState("After product inspection");
+  const [reEligibleHeading,  setReEligibleHeading]  = useState("Eligible Returns");
+  const [reEligibleBody,     setReEligibleBody]     = useState("Products are eligible for return if:\n\n• Returned within 7 days of delivery\n• Unused, unworn, and in original condition\n• In original packaging with all tags attached\n• Accompanied by the original invoice");
+  const [reNonreturnHeading, setReNonreturnHeading] = useState("Non-Returnable Items");
+  const [reNonreturnBody,    setReNonreturnBody]    = useState("• Style Clips and accessories (not eligible for return)\n• Items worn or used\n• Items without original packaging\n• Products purchased during clearance or final sale");
+  const [reInitiateHeading,  setReInitiateHeading]  = useState("How to Initiate a Return");
+  const [reInitiateBody,     setReInitiateBody]     = useState("1. WhatsApp us at +91-9468147781 with your Order ID and reason\n2. We'll confirm eligibility and schedule a free pickup\n3. Pack the product securely in original packaging\n4. Refund or exchange is processed after inspection (2–3 business days)");
+  const [reExchangeHeading,  setReExchangeHeading]  = useState("Exchanges");
+  const [reExchangeBody,     setReExchangeBody]     = useState("Size exchanges are free within 7 days of delivery, subject to stock availability.\n\nContact us to check availability before initiating. Only heels are eligible for size exchange — Style Clips cannot be exchanged.");
+  const [reRefundHeading,    setReRefundHeading]    = useState("Refunds");
+  const [reRefundBody,       setReRefundBody]       = useState("Once we receive and inspect the returned product (2–3 business days), refunds are processed within 5–7 business days.\n\nFor COD orders, refunds are issued via bank transfer. For online payments, the refund is credited back to the original payment method.");
+  const [reCtaText,          setReCtaText]          = useState("Need help with a return or exchange?");
+  const [reHeroSaving,       setReHeroSaving]       = useState(false);
+  const [reTilesSaving,      setReTilesSaving]      = useState(false);
+  const [rePolicySaving,     setRePolicySaving]     = useState(false);
+  const [reCtaSaving,        setReCtaSaving]        = useState(false);
 
   const [couponModal, setCouponModal] = useState<{ open: boolean; mode: "add" | "edit"; data: Partial<Coupon> }>({ open: false, mode: "add", data: {} });
   const [couponSaving, setCouponSaving] = useState(false);
@@ -2216,6 +2292,147 @@ export default function AdminPage() {
     { key: "sp_cta_text", value: spCtaText },
   ], setSpCtaSaving);
 
+  // ── Size Guide fetcher & savers ───────────────────────────────────────────
+  const fetchSizeGuide = useCallback(async () => {
+    const { data } = await supabase.from("site_settings").select("key,value").like("key", "sg_%");
+    const m: Record<string, string> = {};
+    (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+    if (m.sg_eyebrow        !== undefined) setSgEyebrow(m.sg_eyebrow        || "CLASSIE");
+    if (m.sg_heading        !== undefined) setSgHeading(m.sg_heading        || "Size Guide");
+    if (m.sg_sub            !== undefined) setSgSub(m.sg_sub                || "Find your perfect fit — every time");
+    if (m.sg_measure_heading !== undefined) setSgMeasureHeading(m.sg_measure_heading || "How to Measure Your Foot");
+    if (m.sg_measure_steps  !== undefined) setSgMeasureSteps(m.sg_measure_steps);
+    if (m.sg_chart_heading  !== undefined) setSgChartHeading(m.sg_chart_heading || "Heel Size Chart");
+    if (m.sg_chart_sub      !== undefined) setSgChartSub(m.sg_chart_sub     || "All measurements are in centimetres (cm)");
+    if (m.sg_chart_json     !== undefined) setSgChartJson(m.sg_chart_json);
+    if (m.sg_tips_heading   !== undefined) setSgTipsHeading(m.sg_tips_heading || "Tips for the Perfect Fit");
+    if (m.sg_tip1_icon      !== undefined) setSgTip1Icon(m.sg_tip1_icon     || "📏");
+    if (m.sg_tip1_title     !== undefined) setSgTip1Title(m.sg_tip1_title   || "Measure in the Evening");
+    if (m.sg_tip1_body      !== undefined) setSgTip1Body(m.sg_tip1_body);
+    if (m.sg_tip2_icon      !== undefined) setSgTip2Icon(m.sg_tip2_icon     || "👟");
+    if (m.sg_tip2_title     !== undefined) setSgTip2Title(m.sg_tip2_title   || "If Between Sizes");
+    if (m.sg_tip2_body      !== undefined) setSgTip2Body(m.sg_tip2_body);
+    if (m.sg_tip3_icon      !== undefined) setSgTip3Icon(m.sg_tip3_icon     || "💬");
+    if (m.sg_tip3_title     !== undefined) setSgTip3Title(m.sg_tip3_title   || "Need Help?");
+    if (m.sg_tip3_body      !== undefined) setSgTip3Body(m.sg_tip3_body);
+    if (m.sg_cta_text       !== undefined) setSgCtaText(m.sg_cta_text       || "Still not sure about your size?");
+  }, []);
+
+  const saveSgBatch = async (pairs: { key: string; value: string }[], setSaving: (v: boolean) => void) => {
+    setSaving(true);
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key", p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setSaving(false);
+  };
+
+  const saveSgHero    = () => saveSgBatch([
+    { key: "sg_eyebrow", value: sgEyebrow },
+    { key: "sg_heading", value: sgHeading },
+    { key: "sg_sub",     value: sgSub },
+  ], setSgHeroSaving);
+
+  const saveSgMeasure = () => saveSgBatch([
+    { key: "sg_measure_heading", value: sgMeasureHeading },
+    { key: "sg_measure_steps",   value: sgMeasureSteps },
+  ], setSgMeasureSaving);
+
+  const saveSgChart   = () => saveSgBatch([
+    { key: "sg_chart_heading", value: sgChartHeading },
+    { key: "sg_chart_sub",     value: sgChartSub },
+    { key: "sg_chart_json",    value: sgChartJson },
+  ], setSgChartSaving);
+
+  const saveSgTips    = () => saveSgBatch([
+    { key: "sg_tips_heading", value: sgTipsHeading },
+    { key: "sg_tip1_icon",    value: sgTip1Icon },
+    { key: "sg_tip1_title",   value: sgTip1Title },
+    { key: "sg_tip1_body",    value: sgTip1Body },
+    { key: "sg_tip2_icon",    value: sgTip2Icon },
+    { key: "sg_tip2_title",   value: sgTip2Title },
+    { key: "sg_tip2_body",    value: sgTip2Body },
+    { key: "sg_tip3_icon",    value: sgTip3Icon },
+    { key: "sg_tip3_title",   value: sgTip3Title },
+    { key: "sg_tip3_body",    value: sgTip3Body },
+  ], setSgTipsSaving);
+
+  const saveSgCta     = () => saveSgBatch([
+    { key: "sg_cta_text", value: sgCtaText },
+  ], setSgCtaSaving);
+
+  // ── Returns & Exchanges fetcher & savers ──────────────────────────────────
+  const fetchReturns = useCallback(async () => {
+    const { data } = await supabase.from("site_settings").select("key,value").like("key", "re_%");
+    const m: Record<string, string> = {};
+    (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+    if (m.re_eyebrow           !== undefined) setReEyebrow(m.re_eyebrow           || "CLASSIE");
+    if (m.re_heading           !== undefined) setReHeading(m.re_heading           || "Returns & Exchanges");
+    if (m.re_sub               !== undefined) setReSub(m.re_sub                   || "Hassle-free returns within 7 days of delivery");
+    if (m.re_updated           !== undefined) setReUpdated(m.re_updated           || "Last updated: June 2025");
+    if (m.re_tile1_title       !== undefined) setReTile1Title(m.re_tile1_title    || "7-Day Returns");
+    if (m.re_tile1_sub         !== undefined) setReTile1Sub(m.re_tile1_sub        || "Return within 7 days of delivery");
+    if (m.re_tile2_title       !== undefined) setReTile2Title(m.re_tile2_title    || "Free Size Exchange");
+    if (m.re_tile2_sub         !== undefined) setReTile2Sub(m.re_tile2_sub        || "Subject to stock availability");
+    if (m.re_tile3_title       !== undefined) setReTile3Title(m.re_tile3_title    || "Refund in 5–7 Days");
+    if (m.re_tile3_sub         !== undefined) setReTile3Sub(m.re_tile3_sub        || "After product inspection");
+    if (m.re_eligible_heading  !== undefined) setReEligibleHeading(m.re_eligible_heading  || "Eligible Returns");
+    if (m.re_eligible_body     !== undefined) setReEligibleBody(m.re_eligible_body);
+    if (m.re_nonreturn_heading !== undefined) setReNonreturnHeading(m.re_nonreturn_heading || "Non-Returnable Items");
+    if (m.re_nonreturn_body    !== undefined) setReNonreturnBody(m.re_nonreturn_body);
+    if (m.re_initiate_heading  !== undefined) setReInitiateHeading(m.re_initiate_heading  || "How to Initiate a Return");
+    if (m.re_initiate_body     !== undefined) setReInitiateBody(m.re_initiate_body);
+    if (m.re_exchange_heading  !== undefined) setReExchangeHeading(m.re_exchange_heading  || "Exchanges");
+    if (m.re_exchange_body     !== undefined) setReExchangeBody(m.re_exchange_body);
+    if (m.re_refund_heading    !== undefined) setReRefundHeading(m.re_refund_heading      || "Refunds");
+    if (m.re_refund_body       !== undefined) setReRefundBody(m.re_refund_body);
+    if (m.re_cta_text          !== undefined) setReCtaText(m.re_cta_text || "Need help with a return or exchange?");
+  }, []);
+
+  const saveReBatch = async (pairs: { key: string; value: string }[], setSaving: (v: boolean) => void) => {
+    setSaving(true);
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key", p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setSaving(false);
+  };
+
+  const saveReHero   = () => saveReBatch([
+    { key: "re_eyebrow", value: reEyebrow },
+    { key: "re_heading", value: reHeading },
+    { key: "re_sub",     value: reSub },
+    { key: "re_updated", value: reUpdated },
+  ], setReHeroSaving);
+
+  const saveReTiles  = () => saveReBatch([
+    { key: "re_tile1_title", value: reTile1Title },
+    { key: "re_tile1_sub",   value: reTile1Sub },
+    { key: "re_tile2_title", value: reTile2Title },
+    { key: "re_tile2_sub",   value: reTile2Sub },
+    { key: "re_tile3_title", value: reTile3Title },
+    { key: "re_tile3_sub",   value: reTile3Sub },
+  ], setReTilesSaving);
+
+  const saveRePolicy = () => saveReBatch([
+    { key: "re_eligible_heading",  value: reEligibleHeading },
+    { key: "re_eligible_body",     value: reEligibleBody },
+    { key: "re_nonreturn_heading", value: reNonreturnHeading },
+    { key: "re_nonreturn_body",    value: reNonreturnBody },
+    { key: "re_initiate_heading",  value: reInitiateHeading },
+    { key: "re_initiate_body",     value: reInitiateBody },
+    { key: "re_exchange_heading",  value: reExchangeHeading },
+    { key: "re_exchange_body",     value: reExchangeBody },
+    { key: "re_refund_heading",    value: reRefundHeading },
+    { key: "re_refund_body",       value: reRefundBody },
+  ], setRePolicySaving);
+
+  const saveReCta    = () => saveReBatch([
+    { key: "re_cta_text", value: reCtaText },
+  ], setReCtaSaving);
+
   const fetchCoupons = useCallback(async () => {
     const { data } = await supabase.from("coupons").select("*").order("display_order", { ascending: true });
     setCoupons((data ?? []) as Coupon[]);
@@ -2332,13 +2549,15 @@ export default function AdminPage() {
     if (tab === "ct-inbox") fetchCtInbox();
 
     if (["sp-hero","sp-tiles","sp-content","sp-cta"].includes(tab)) fetchShippingPolicy();
+    if (["sg-hero","sg-measure","sg-chart","sg-tips","sg-cta"].includes(tab)) fetchSizeGuide();
+    if (["re-hero","re-tiles","re-policy","re-cta"].includes(tab)) fetchReturns();
 
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -2838,6 +3057,8 @@ export default function AdminPage() {
     { id: "about-us",           label: "About Us",          icon: Users },
     { id: "contact-us",         label: "Contact Us",        icon: MessageSquare },
     { id: "shipping-policy",    label: "Shipping Policy",   icon: Truck },
+    { id: "size-guide",         label: "Size Guide",        icon: Ruler },
+    { id: "returns",            label: "Returns & Exchanges", icon: RefreshCw },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -2878,6 +3099,7 @@ export default function AdminPage() {
               id === "about-us" ? "au-hero" :
               id === "contact-us" ? "ct-hero" :
               id === "shipping-policy" ? "sp-hero" :
+              id === "size-guide" ? "sg-hero" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -2935,6 +3157,7 @@ export default function AdminPage() {
                mainSection === "about-us" ? "About Us" :
                mainSection === "contact-us" ? "Contact Us" :
                mainSection === "shipping-policy" ? "Shipping Policy" :
+               mainSection === "size-guide" ? "Size Guide" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -7419,6 +7642,172 @@ export default function AdminPage() {
                 <button onClick={saveSpCta} disabled={spCtaSaving}
                   className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
                   <Save className="w-4 h-4" />{spCtaSaving ? "Saving…" : "Save CTA"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SIZE GUIDE — sg-hero TAB
+          ══════════════════════════════════════ */}
+          {tab === "sg-hero" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Full navy top section of the size guide page.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>Eyebrow Label</label>
+                  <input type="text" value={sgEyebrow} onChange={e => setSgEyebrow(e.target.value)} className={inputCls} placeholder="CLASSIE" />
+                </div>
+                <div>
+                  <label className={labelCls}>Page Heading</label>
+                  <input type="text" value={sgHeading} onChange={e => setSgHeading(e.target.value)} className={inputCls} placeholder="Size Guide" />
+                </div>
+                <div>
+                  <label className={labelCls}>Subheading</label>
+                  <input type="text" value={sgSub} onChange={e => setSgSub(e.target.value)} className={inputCls} placeholder="Find your perfect fit — every time" />
+                </div>
+                <button onClick={saveSgHero} disabled={sgHeroSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{sgHeroSaving ? "Saving…" : "Save Hero"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SIZE GUIDE — sg-measure TAB
+          ══════════════════════════════════════ */}
+          {tab === "sg-measure" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">How to Measure</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Section heading and measurement steps.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>Section Heading</label>
+                  <input type="text" value={sgMeasureHeading} onChange={e => setSgMeasureHeading(e.target.value)} className={inputCls} placeholder="How to Measure Your Foot" />
+                </div>
+                <div>
+                  <label className={labelCls}>Steps (one step per line)</label>
+                  <textarea
+                    rows={7}
+                    value={sgMeasureSteps}
+                    onChange={e => setSgMeasureSteps(e.target.value)}
+                    className={inputCls + " resize-y"}
+                    placeholder={"Step 1: Place a blank sheet of paper on a flat floor\nStep 2: Stand on the paper with your heel against a wall"}
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Each line becomes a numbered step. "Step N:" prefix is stripped automatically.</p>
+                </div>
+                <button onClick={saveSgMeasure} disabled={sgMeasureSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{sgMeasureSaving ? "Saving…" : "Save Measure Section"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SIZE GUIDE — sg-chart TAB
+          ══════════════════════════════════════ */}
+          {tab === "sg-chart" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Size Chart</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Table heading, subtext, and size data.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>Chart Heading</label>
+                  <input type="text" value={sgChartHeading} onChange={e => setSgChartHeading(e.target.value)} className={inputCls} placeholder="Heel Size Chart" />
+                </div>
+                <div>
+                  <label className={labelCls}>Chart Subtext</label>
+                  <input type="text" value={sgChartSub} onChange={e => setSgChartSub(e.target.value)} className={inputCls} placeholder="All measurements are in centimetres (cm)" />
+                </div>
+                <div>
+                  <label className={labelCls}>Chart Data (JSON)</label>
+                  <textarea
+                    rows={10}
+                    value={sgChartJson}
+                    onChange={e => setSgChartJson(e.target.value)}
+                    className={inputCls + " resize-y font-mono text-xs"}
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Edit as JSON array with <code className="bg-gray-100 px-1 rounded">eu</code>, <code className="bg-gray-100 px-1 rounded">uk</code>, <code className="bg-gray-100 px-1 rounded">in</code>, <code className="bg-gray-100 px-1 rounded">cm</code> fields.</p>
+                </div>
+                <button onClick={saveSgChart} disabled={sgChartSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{sgChartSaving ? "Saving…" : "Save Chart"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SIZE GUIDE — sg-tips TAB
+          ══════════════════════════════════════ */}
+          {tab === "sg-tips" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Fit Tips</h2>
+                <p className="text-xs text-gray-400 mt-0.5">3 tip cards shown below the size chart.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <div>
+                  <label className={labelCls}>Section Heading</label>
+                  <input type="text" value={sgTipsHeading} onChange={e => setSgTipsHeading(e.target.value)} className={inputCls} placeholder="Tips for the Perfect Fit" />
+                </div>
+                {[
+                  { num: 1, icon: sgTip1Icon, setIcon: setSgTip1Icon, title: sgTip1Title, setTitle: setSgTip1Title, body: sgTip1Body, setBody: setSgTip1Body },
+                  { num: 2, icon: sgTip2Icon, setIcon: setSgTip2Icon, title: sgTip2Title, setTitle: setSgTip2Title, body: sgTip2Body, setBody: setSgTip2Body },
+                  { num: 3, icon: sgTip3Icon, setIcon: setSgTip3Icon, title: sgTip3Title, setTitle: setSgTip3Title, body: sgTip3Body, setBody: setSgTip3Body },
+                ].map(({ num, icon, setIcon, title, setTitle, body, setBody }) => (
+                  <div key={num} className="border border-gray-100 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tip {num}</p>
+                    <div className="grid grid-cols-4 gap-3">
+                      <div>
+                        <label className={labelCls}>Icon</label>
+                        <input type="text" value={icon} onChange={e => setIcon(e.target.value)} className={inputCls} placeholder="📏" />
+                      </div>
+                      <div className="col-span-3">
+                        <label className={labelCls}>Title</label>
+                        <input type="text" value={title} onChange={e => setTitle(e.target.value)} className={inputCls} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Body Text</label>
+                      <textarea rows={2} value={body} onChange={e => setBody(e.target.value)} className={inputCls + " resize-y"} />
+                    </div>
+                  </div>
+                ))}
+                <button onClick={saveSgTips} disabled={sgTipsSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{sgTipsSaving ? "Saving…" : "Save Fit Tips"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              SIZE GUIDE — sg-cta TAB
+          ══════════════════════════════════════ */}
+          {tab === "sg-cta" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">CTA Strip</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Navy bottom strip. Button always reads "Chat With Us →" and links to /contact.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>CTA Text</label>
+                  <input type="text" value={sgCtaText} onChange={e => setSgCtaText(e.target.value)} className={inputCls} placeholder="Still not sure about your size?" />
+                </div>
+                <button onClick={saveSgCta} disabled={sgCtaSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{sgCtaSaving ? "Saving…" : "Save CTA"}
                 </button>
               </div>
             </div>
