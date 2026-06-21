@@ -323,17 +323,8 @@ export default function HotDealsPage() {
                   className="w-full h-full object-cover object-center"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span style={{ fontSize: "6rem" }}>🏷️</span>
-                </div>
+                <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #e8e4de 0%, #d5cfc6 100%)" }} />
               )}
-              {/* Overlay badge */}
-              <div
-                className="absolute bottom-6 left-6 text-white text-[10px] tracking-[0.3em] uppercase font-semibold px-4 py-2"
-                style={{ background: "#3B5373" }}
-              >
-                Limited Time Only
-              </div>
             </div>
           </div>
         </div>
