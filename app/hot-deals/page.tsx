@@ -114,17 +114,12 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
 // ── Section Divider (replaces stray circle) ───────────────────────────────
 function SectionDivider({ heading, sub }: { heading: string; sub: string }) {
   return (
-    <div className="text-center mb-14">
-      <div className="flex items-center justify-center gap-4 mb-6">
-        <div className="h-px flex-1 max-w-[80px]" style={{ background: "#3B5373", opacity: 0.2 }} />
-        <span className="text-[9px] tracking-[0.35em] uppercase font-semibold" style={{ color: "#3B5373", opacity: 0.5 }}>Classie</span>
-        <div className="h-px flex-1 max-w-[80px]" style={{ background: "#3B5373", opacity: 0.2 }} />
-      </div>
-      <h2 className="font-serif mb-3" style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: "#1a1a1a", fontWeight: 700 }}>
+    <div className="text-center mb-12">
+      <h2 className="font-serif mb-2" style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", color: "#1a1a1a" }}>
         {heading}
       </h2>
       {sub && (
-        <p className="text-[10px] tracking-[0.25em] uppercase" style={{ color: "#999" }}>{sub}</p>
+        <p className="text-xs tracking-widest uppercase" style={{ color: "#888" }}>{sub}</p>
       )}
     </div>
   );
