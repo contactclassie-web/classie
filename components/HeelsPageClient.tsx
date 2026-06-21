@@ -258,7 +258,7 @@ function HeelCard({ product }: { product: HeelProduct }) {
 }
 
 // ── Main client component ─────────────────────────────────────────────────
-export default function HeelsPageClient({ initialProducts, initialSettings = {} }: { initialProducts: HeelProduct[]; initialSettings?: HeelsSettings }) {
+export default function HeelsPageClient({ initialProducts, initialSettings = {}, initialOccasions }: { initialProducts: HeelProduct[]; initialSettings?: HeelsSettings; initialOccasions?: { title: string; slug: string; image: string; tag_label?: string; image_position?: string }[] }) {
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const [selectedHeelTypes, setSelectedHeelTypes] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number>(9999);
@@ -328,6 +328,7 @@ export default function HeelsPageClient({ initialProducts, initialSettings = {} 
         activeOccasion={activeOccasion}
         onOccasionClick={setActiveOccasion}
         activeCategorySlug="heels"
+        initialOccasions={initialOccasions}
       />
 
       {/* ── Filter + Grid ─────────────────────────────────────────────── */}

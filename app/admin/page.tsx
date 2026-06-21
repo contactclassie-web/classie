@@ -8,7 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home, Layout,
+  Star, Camera, Palette, Home, Layout, Tag,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -201,6 +201,42 @@ interface NewsletterSubscriber {
   subscribed_at?: string;
 }
 
+interface Coupon {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  image_url: string;
+  discount_type: "percent" | "flat";
+  discount_value: number;
+  active: boolean;
+  require_phone: boolean;
+  require_email: boolean;
+  max_uses_total: number | null;
+  max_uses_per_user: number;
+  valid_from: string | null;
+  valid_until: string | null;
+  uses_count: number;
+  min_order_value: number;
+  display_order: number;
+}
+
+interface CouponUse {
+  id: string;
+  coupon_id: string;
+  coupon_code?: string;
+  user_phone: string | null;
+  user_email: string | null;
+  user_name: string | null;
+  order_id: string | null;
+  order_total: number | null;
+  discount_applied: number | null;
+  final_amount: number | null;
+  products_json: Array<{ name: string; qty: number; price: number; variant?: string }> | null;
+  items_count: number | null;
+  used_at: string;
+}
+
 interface Testimonial {
   id?: string;
   customer_name: string;
@@ -286,8 +322,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -314,6 +350,10 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "adv-picks":   "advanced-settings",
   "adv-inspo":   "advanced-settings",
   "adv-related": "advanced-settings",
+
+  "hd-page":    "hot-deals",
+  "hd-coupons": "hot-deals",
+  "hd-stats":   "hot-deals",
 
   "orders":         "orders",
   "settings":       "settings",
@@ -352,6 +392,11 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "adv-picks",   label: "Featured Picks" },
     { id: "adv-inspo",   label: "Style Inspo" },
     { id: "adv-related", label: "Related Products" },
+  ],
+  "hot-deals": [
+    { id: "hd-page",    label: "Page Settings" },
+    { id: "hd-coupons", label: "Coupons" },
+    { id: "hd-stats",   label: "Usage Stats" },
   ],
   orders:   [],
   settings: [],
@@ -575,6 +620,24 @@ export default function AdminPage() {
   const [advRelatedRadius, setAdvRelatedRadius] = useState("sharp");
   const [advRelatedCardH,  setAdvRelatedCardH]  = useState(0);
   const [advSaving,        setAdvSaving]        = useState(false);
+
+  // ── Hot Deals state ───────────────────────────────────────────────────────
+  const [hdTicker, setHdTicker] = useState("ONGOING & UPCOMING|NEW OFFERS INSIDE|DON'T MISS OUT");
+  const [hdHeroHeading, setHdHeroHeading] = useState("HOT\nDEALS");
+  const [hdHeroEyebrow, setHdHeroEyebrow] = useState("Limited Time");
+  const [hdHeroSub, setHdHeroSub] = useState("OFFERS YOU DON'T WANT TO MISS");
+  const [hdHeroImg, setHdHeroImg] = useState("");
+  const [hdSectionHeading, setHdSectionHeading] = useState("Current Offers");
+  const [hdSectionSub, setHdSectionSub] = useState("Use the code at checkout · Limited stock");
+  const [hdCols, setHdCols] = useState(3);
+  const [hdMobileCols, setHdMobileCols] = useState(1);
+  const [hdCardH, setHdCardH] = useState(280);
+  const [hdCardGap, setHdCardGap] = useState(28);
+  const [hdPageSaving, setHdPageSaving] = useState(false);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [couponModal, setCouponModal] = useState<{ open: boolean; mode: "add" | "edit"; data: Partial<Coupon> }>({ open: false, mode: "add", data: {} });
+  const [couponSaving, setCouponSaving] = useState(false);
+  const [couponStats, setCouponStats] = useState<CouponUse[]>([]);
 
   const [bowWhyHeading, setBowWhyHeading] = useState("Why Choose");
   const [bowWhyHeadingItalic, setBowWhyHeadingItalic] = useState("Classie?");
@@ -1731,6 +1794,111 @@ export default function AdminPage() {
     if (m.adv_related_card_h) setAdvRelatedCardH(parseInt(m.adv_related_card_h)||0);
   }, []);
 
+  // ── Hot Deals fetchers ────────────────────────────────────────────────────
+  const fetchHdPage = useCallback(async () => {
+    const { data } = await supabase.from("site_settings").select("key,value").like("key", "hd_%");
+    const m: Record<string, string> = {};
+    (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+    if (m.hd_ticker)          setHdTicker(m.hd_ticker);
+    if (m.hd_hero_heading)    setHdHeroHeading(m.hd_hero_heading);
+    if (m.hd_hero_eyebrow)    setHdHeroEyebrow(m.hd_hero_eyebrow);
+    if (m.hd_hero_sub)        setHdHeroSub(m.hd_hero_sub);
+    if (m.hd_hero_img !== undefined) setHdHeroImg(m.hd_hero_img || "");
+    if (m.hd_section_heading) setHdSectionHeading(m.hd_section_heading);
+    if (m.hd_section_sub)     setHdSectionSub(m.hd_section_sub);
+    if (m.hd_cols)            setHdCols(parseInt(m.hd_cols) || 3);
+    if (m.hd_mobile_cols)     setHdMobileCols(parseInt(m.hd_mobile_cols) || 1);
+    if (m.hd_card_h)          setHdCardH(parseInt(m.hd_card_h) || 280);
+    if (m.hd_card_gap)        setHdCardGap(parseInt(m.hd_card_gap) || 28);
+  }, []);
+
+  const saveHdPage = async () => {
+    setHdPageSaving(true);
+    const pairs = [
+      { key: "hd_ticker",          value: hdTicker },
+      { key: "hd_hero_heading",    value: hdHeroHeading },
+      { key: "hd_hero_eyebrow",    value: hdHeroEyebrow },
+      { key: "hd_hero_sub",        value: hdHeroSub },
+      { key: "hd_hero_img",        value: hdHeroImg },
+      { key: "hd_section_heading", value: hdSectionHeading },
+      { key: "hd_section_sub",     value: hdSectionSub },
+      { key: "hd_cols",            value: String(hdCols) },
+      { key: "hd_mobile_cols",     value: String(hdMobileCols) },
+      { key: "hd_card_h",          value: String(hdCardH) },
+      { key: "hd_card_gap",        value: String(hdCardGap) },
+    ];
+    for (const p of pairs) {
+      await supabase.from("site_settings").delete().eq("key", p.key);
+      await supabase.from("site_settings").insert(p);
+    }
+    await revalidateSite();
+    setHdPageSaving(false);
+  };
+
+  const fetchCoupons = useCallback(async () => {
+    const { data } = await supabase.from("coupons").select("*").order("display_order", { ascending: true });
+    setCoupons((data ?? []) as Coupon[]);
+  }, []);
+
+  const fetchCouponStats = useCallback(async () => {
+    const { data } = await supabase
+      .from("coupon_uses")
+      .select("*, coupons(code)")
+      .order("used_at", { ascending: false });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = (data ?? []).map((r: any) => ({
+      ...r,
+      coupon_code: r.coupons?.code || "",
+    }));
+    setCouponStats(rows);
+  }, []);
+
+  const saveCoupon = async () => {
+    setCouponSaving(true);
+    try {
+      const d = couponModal.data;
+      const payload = {
+        code: (d.code || "").toUpperCase().trim(),
+        title: d.title || "",
+        description: d.description || "",
+        image_url: d.image_url || "",
+        discount_type: d.discount_type || "percent",
+        discount_value: d.discount_value || 0,
+        active: d.active !== false,
+        require_phone: d.require_phone || false,
+        require_email: d.require_email || false,
+        max_uses_total: d.max_uses_total ?? null,
+        max_uses_per_user: d.max_uses_per_user ?? 1,
+        valid_from: d.valid_from || null,
+        valid_until: d.valid_until || null,
+        min_order_value: d.min_order_value || 0,
+        display_order: d.display_order || 0,
+      };
+      if (couponModal.mode === "add") {
+        await supabase.from("coupons").insert({ ...payload, uses_count: 0 });
+      } else {
+        await supabase.from("coupons").update(payload).eq("id", d.id!);
+      }
+      await fetchCoupons();
+      await revalidateSite();
+      setCouponModal(m => ({ ...m, open: false }));
+    } finally {
+      setCouponSaving(false);
+    }
+  };
+
+  const deleteCoupon = async (id: string) => {
+    await supabase.from("coupons").delete().eq("id", id);
+    await fetchCoupons();
+    await revalidateSite();
+  };
+
+  const toggleCouponActive = async (id: string, active: boolean) => {
+    await supabase.from("coupons").update({ active }).eq("id", id);
+    setCoupons(cs => cs.map(c => c.id === id ? { ...c, active } : c));
+    await revalidateSite();
+  };
+
   const saveAdvSection = async (section: string) => {
     setAdvSaving(true);
     let pairs: {key:string;value:string}[] = [];
@@ -1773,12 +1941,16 @@ export default function AdminPage() {
 
     if (["adv-shop","adv-coll","adv-picks","adv-inspo","adv-related"].includes(tab)) fetchAdvSettings();
 
+    if (tab === "hd-page")    fetchHdPage();
+    if (tab === "hd-coupons") fetchCoupons();
+    if (tab === "hd-stats")   fetchCouponStats();
+
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -2274,6 +2446,7 @@ export default function AdminPage() {
     { id: "collections-page", label: "Collections Page", icon: Grid3x3 },
     { id: "style-ideas-page",   label: "Style Ideas Page", icon: Camera },
     { id: "advanced-settings",  label: "Advanced Settings", icon: Settings },
+    { id: "hot-deals",          label: "Hot Deals",         icon: Tag },
     { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
     { id: "settings",  label: "Settings",   icon: Settings },
     { id: "footer",    label: "Footer",     icon: Layout },
@@ -2310,6 +2483,7 @@ export default function AdminPage() {
               id === "bow-page" ? "bow-page" :
               id === "collections-page" ? "collections-page" :
               id === "style-ideas-page" ? "style-ideas-page" :
+              id === "hot-deals" ? "hd-page" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -2363,6 +2537,7 @@ export default function AdminPage() {
                mainSection === "collections-page" ? "Collections Page" :
                mainSection === "style-ideas-page" ? "Style Ideas Page" :
                mainSection === "advanced-settings" ? "Advanced Settings" :
+               mainSection === "hot-deals" ? "Hot Deals" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}

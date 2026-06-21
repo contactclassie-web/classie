@@ -14,6 +14,7 @@ interface Props {
   settingsPrefix: string;
   categoryLabel: string;
   activeCategorySlug: string;
+  initialOccasions?: { title: string; slug: string; image: string; tag_label?: string; image_position?: string }[];
 }
 
 // ── Why Choose Section ────────────────────────────────────────────────
@@ -295,6 +296,7 @@ export default function ShopCategoryPageClient({
   settingsPrefix,
   categoryLabel,
   activeCategorySlug,
+  initialOccasions,
 }: Props) {
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const [selectedFilterTypes, setSelectedFilterTypes] = useState<string[]>([]);
@@ -401,6 +403,7 @@ export default function ShopCategoryPageClient({
         activeOccasion={activeOccasion}
         onOccasionClick={setActiveOccasion}
         activeCategorySlug={activeCategorySlug}
+        initialOccasions={initialOccasions}
       />
 
       <section className="py-12" style={{ background: "#f5f5f5" }}>

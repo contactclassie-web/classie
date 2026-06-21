@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Deals — Classie (Design B)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Poppins', sans-serif; background: #fff; color: #1a1a1a; }
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
+  /* ── Ticker ── */
+  .ticker-wrap { background: #1a1a1a; overflow: hidden; padding: 8px 0; }
+  .ticker { display: flex; animation: ticker 24s linear infinite; width: max-content; }
+  .ticker span { color: #fff; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; padding: 0 36px; white-space: nowrap; }
+  .ticker .dot-sep { color: #3B5373; margin: 0 4px; }
+  @keyframes ticker { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
+  /* ── Hero — Full bleed dark ── */
+  .hero {
+    background: #3B5373;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 500px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-text {
+    position: absolute;
+    font-size: 260px;
+    font-weight: 800;
+    color: rgba(255,255,255,.04);
+    top: -20px;
+    left: -20px;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    letter-spacing: -10px;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 40px 60px 80px;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    color: #fff;
+    font-size: 9px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 20px;
+    width: fit-content;
+    margin-bottom: 28px;
+  }
+  .hero-tag::before { content: '🔥'; }
+  .hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 96px;
+    font-weight: 800;
+    line-height: .85;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: -4px;
+  }
+  .hero-title span { color: #e8d5b0; display: block; font-style: italic; font-weight: 700; font-size: 72px; letter-spacing: -2px; }
+  .hero-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,.15);
+  }
+  .hero-right {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-top: 40px;
+    overflow: hidden;
+  }
+  .hero-right img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center top;
+    opacity: .85;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #3B5373 0%, transparent 20%);
+    z-index: 1;
+  }
+
+  /* ── Offer strip ── */
+  .offer-strip {
+    background: #e8d5b0;
+    text-align: center;
+    padding: 14px;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #3B5373;
+    font-weight: 600;
+  }
+
+  /* ── Deals section ── */
+  .deals-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 72px 40px 80px;
+  }
+  .deals-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 52px;
+  }
+  .deals-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    color: #1a1a1a;
+    line-height: 1.1;
+  }
+  .deals-header h2 em { color: #3B5373; }
+  .deals-header p { font-size: 11px; color: #999; letter-spacing: .12em; text-transform: uppercase; }
+
+  /* Cards */
+  .deals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .deal-card {
+    border: 1px solid #eee;
+    overflow: hidden;
+    position: relative;
+    transition: border-color .3s;
+  }
+  .deal-card:hover { border-color: #3B5373; }
+
+  /* Big number background */
+  .deal-number {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 100px;
+    font-weight: 800;
+    color: rgba(59,83,115,.06);
+    line-height: 1;
+    z-index: 0;
+    user-select: none;
+  }
+
+  .deal-img {
+    height: 260px;
+    overflow: hidden;
+    background: #f0eeeb;
+    position: relative;
+  }
+  .deal-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s; }
+  .deal-card:hover .deal-img img { transform: scale(1.05); }
+
+  .status-pill {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+  .pill-on   { background: #3B5373; color: #fff; }
+  .pill-end  { background: #ef4444; color: #fff; }
+  .pill-up   { background: #1a1a1a; color: #fff; }
+
+  .deal-body {
+    padding: 24px 24px 28px;
+    position: relative;
+    z-index: 1;
+    background: #fff;
+  }
+  .deal-name {
+    font-size: 9px;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: #3B5373;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .deal-headline {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  .deal-desc {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.65;
+    margin-bottom: 22px;
+  }
+
+  /* Savings badge */
+  .savings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .savings-badge {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 3px;
+  }
+  .savings-label { font-size: 11px; color: #999; }
+
+  .coupon-area {
+    background: #f8f9fb;
+    border: 1.5px dashed #c8d1db;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+  .coupon-left .c-label { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #bbb; margin-bottom: 3px; }
+  .coupon-left .c-code { font-size: 16px; font-weight: 700; letter-spacing: .12em; color: #3B5373; }
+  .coupon-copy {
+    background: none;
+    border: 1.5px solid #3B5373;
+    color: #3B5373;
+    padding: 7px 14px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: 'Poppins', sans-serif;
+    flex-shrink: 0;
+  }
+  .coupon-copy:hover, .coupon-copy.copied { background: #3B5373; color: #fff; border-color: #3B5373; }
+  .coupon-copy.copied { background: #22c55e; border-color: #22c55e; }
+
+  .shop-link {
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #3B5373;
+    text-decoration: none;
+    padding: 10px;
+    transition: opacity .2s;
+    font-weight: 600;
+  }
+  .shop-link:hover { opacity: .7; }
+  .shop-link::after { content: ' →'; }
+
+  /* ── Bottom banner ── */
+  .bottom-banner {
+    background: #f0eeeb;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 220px;
+    overflow: hidden;
+  }
+  .bb-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 60px;
+  }
+  .bb-left h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+  .bb-left p { font-size: 13px; color: #666; margin-bottom: 22px; line-height: 1.6; }
+  .bb-btn {
+    display: inline-block;
+    background: #3B5373;
+    color: #fff;
+    padding: 13px 30px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    width: fit-content;
+    transition: background .2s;
+  }
+  .bb-btn:hover { background: #2d3f54; }
+  .bb-right {
+    background: url('https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=800&q=80') center/cover;
+    min-height: 220px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>🔥 HOT DEALS</span>
+    <span>✦ LIMITED TIME OFFERS</span>
+    <span>✦ DON'T MISS OUT</span>
+    <span>✦ NEW CODES ADDED</span>
+    <span>🔥 HOT DEALS</span>
+    <span>✦ LIMITED TIME OFFERS</span>
+    <span>✦ DON'T MISS OUT</span>
+    <span>✦ NEW CODES ADDED</span>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg-text">HOT</div>
+  <div class="hero-left">
+    <div class="hero-tag">Limited Time Offers</div>
+    <div class="hero-title">
+      HOT
+      <span>Deals.</span>
+    </div>
+    <div class="hero-sub">Exclusive codes · Limited stock · Shop now</div>
+  </div>
+  <div class="hero-right">
+    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80" alt="Hot Deals">
+  </div>
+</section>
+
+<!-- Offer strip -->
+<div class="offer-strip">
+  🎉 &nbsp; All offer codes are valid at checkout &nbsp; · &nbsp; New deals added weekly &nbsp; · &nbsp; Share with friends
+</div>
+
+<!-- Deals Section -->
+<div class="deals-section">
+  <div class="deals-header">
+    <h2>Current <em>Offers</em></h2>
+    <p>Use code at checkout &nbsp;·&nbsp; Limited stock</p>
+  </div>
+
+  <div class="deals-grid">
+
+    <!-- Card 1 -->
+    <div class="deal-card">
+      <div class="deal-number">01</div>
+      <div class="deal-img">
+        <span class="status-pill pill-on">● Ongoing</span>
+        <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&q=80" alt="">
+      </div>
+      <div class="deal-body">
+        <div class="deal-name">First Purchase Offer</div>
+        <div class="deal-headline">Your First Step<br>with Classie</div>
+        <div class="deal-desc">New to Classie? Get flat 10% off on your very first order. No minimum required.</div>
+        <div class="savings-row">
+          <span class="savings-badge">10% OFF</span>
+          <span class="savings-label">No minimum order</span>
+        </div>
+        <div class="coupon-area">
+          <div class="coupon-left">
+            <div class="c-label">Use Code</div>
+            <div class="c-code">FIRST10</div>
+          </div>
+          <button class="coupon-copy" onclick="copyCode(this,'FIRST10')">Copy</button>
+        </div>
+        <a href="/shop" class="shop-link">Shop Now</a>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="deal-card">
+      <div class="deal-number">02</div>
+      <div class="deal-img">
+        <span class="status-pill pill-on">● Ongoing</span>
+        <img src="https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=600&q=80" alt="">
+      </div>
+      <div class="deal-body">
+        <div class="deal-name">Combo Offer</div>
+        <div class="deal-headline">One Heel.<br>Endless Looks.</div>
+        <div class="deal-desc">Pair your heels with clip-ons and save more. Mix and match for unlimited styles.</div>
+        <div class="savings-row">
+          <span class="savings-badge">COMBO DEAL</span>
+          <span class="savings-label">Heels + Clip-ons</span>
+        </div>
+        <div class="coupon-area">
+          <div class="coupon-left">
+            <div class="c-label">Use Code</div>
+            <div class="c-code">STYLEWITHCLASSIE</div>
+          </div>
+          <button class="coupon-copy" onclick="copyCode(this,'STYLEWITHCLASSIE')">Copy</button>
+        </div>
+        <a href="/shop/heels" class="shop-link">Shop Heels</a>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="deal-card">
+      <div class="deal-number">03</div>
+      <div class="deal-img">
+        <span class="status-pill pill-end">⚡ Ending Soon</span>
+        <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&q=80" alt="">
+      </div>
+      <div class="deal-body">
+        <div class="deal-name">Shipping Special</div>
+        <div class="deal-headline">Free Shipping<br>on Orders ₹1499+</div>
+        <div class="deal-desc">Shop for ₹1499 or more and enjoy free delivery — no shipping charges, no surprises.</div>
+        <div class="savings-row">
+          <span class="savings-badge">FREE SHIP</span>
+          <span class="savings-label">Orders above ₹1499</span>
+        </div>
+        <div class="coupon-area">
+          <div class="coupon-left">
+            <div class="c-label">Use Code</div>
+            <div class="c-code">SHIPFREE</div>
+          </div>
+          <button class="coupon-copy" onclick="copyCode(this,'SHIPFREE')">Copy</button>
+        </div>
+        <a href="/shop" class="shop-link">Shop Now</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom banner -->
+<div class="bottom-banner">
+  <div class="bb-left">
+    <h3>More deals<br>every week.</h3>
+    <p>Bookmark this page and check back often — we add new limited-time offers regularly for our Classie community.</p>
+    <a href="/shop" class="bb-btn">Explore All Products</a>
+  </div>
+  <div class="bb-right"></div>
+</div>
+
+<script>
+function copyCode(btn, code) {
+  navigator.clipboard.writeText(code).catch(()=>{});
+  const orig = btn.textContent;
+  btn.textContent = '✓ Copied';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+}
+</script>
+</body>
+</html>

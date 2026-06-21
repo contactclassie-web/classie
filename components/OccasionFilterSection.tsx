@@ -17,6 +17,7 @@ interface Props {
   onOccasionClick: (slug: string | null) => void;
   excludeCategorySlug?: string;
   activeCategorySlug?: string; // show this as selected in CategoryLinks strip
+  initialOccasions?: Occasion[]; // server-preloaded to prevent blink
 }
 
 function OccasionFilterCard({
@@ -105,10 +106,12 @@ function OccasionFilterCard({
   );
 }
 
-export default function OccasionFilterSection({ activeOccasion, onOccasionClick, excludeCategorySlug, activeCategorySlug }: Props) {
-  const [occasions, setOccasions] = useState<Occasion[]>([]);
+export default function OccasionFilterSection({ activeOccasion, onOccasionClick, excludeCategorySlug, activeCategorySlug, initialOccasions }: Props) {
+  const [occasions, setOccasions] = useState<Occasion[]>(initialOccasions ?? []);
 
   useEffect(() => {
+    // Only fetch if not pre-loaded from server
+    if (initialOccasions && initialOccasions.length > 0) return;
     supabase
       .from("collections")
       .select("*")
@@ -127,6 +130,7 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick,
           );
         }
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (occasions.length === 0) return null;
