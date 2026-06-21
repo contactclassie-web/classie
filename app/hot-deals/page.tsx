@@ -59,7 +59,7 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
       style={{ background: "#fff", boxShadow: "0 6px 32px rgba(59,83,115,0.12)", border: "1px solid #e8e4de" }}>
 
       {/* Top — Image strip */}
-      <div className="relative overflow-hidden" style={{ height: "200px" }}>
+      <div className="relative overflow-hidden" style={{ height: "280px" }}>
         {coupon.image_url ? (
           <img src={coupon.image_url} alt={coupon.title}
             className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
@@ -148,7 +148,7 @@ export default function HotDealsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const cols       = parseInt(settings.hd_cols || "2") || 2;
+  const cols       = parseInt(settings.hd_cols || "1") || 1;
   const mobileCols = parseInt(settings.hd_mobile_cols || "1") || 1;
   const cardH      = parseInt(settings.hd_card_h || "280") || 280;
   const gap        = parseInt(settings.hd_card_gap || "28") || 28;
@@ -201,7 +201,7 @@ export default function HotDealsPage() {
 
           {!ready ? (
             /* Skeleton cards while loading */
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols || 2}, 1fr)`, gap: "28px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols || 1}, 1fr)`, gap: "28px" }}>
               {[1, 2].map(i => (
                 <div key={i} className="overflow-hidden animate-pulse" style={{ border: "1px solid #ece9e3", background: "#fff" }}>
                   <div style={{ height: "280px", background: "#f0f0f0" }} />
