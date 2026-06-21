@@ -55,56 +55,58 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
     : `₹${coupon.discount_value} OFF`;
 
   return (
-    <div className="overflow-hidden flex transition-all duration-300 hover:-translate-y-1 group"
-      style={{ background: "#fff", boxShadow: "0 4px 28px rgba(59,83,115,0.10)", border: "1px solid #ece9e3", minHeight: "260px" }}>
+    <div className="overflow-hidden transition-all duration-300 hover:-translate-y-1 group"
+      style={{ background: "#fff", boxShadow: "0 6px 32px rgba(59,83,115,0.12)", border: "1px solid #e8e4de" }}>
 
-      {/* Left — Image */}
-      <div className="relative flex-shrink-0 overflow-hidden" style={{ width: "44%" }}>
+      {/* Top — Image strip */}
+      <div className="relative overflow-hidden" style={{ height: "200px" }}>
         {coupon.image_url ? (
           <img src={coupon.image_url} alt={coupon.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center relative" style={{ background: "#3B5373", minHeight: "260px" }}>
+          <div className="w-full h-full flex flex-col items-center justify-center relative" style={{ background: "#3B5373" }}>
             <span className="text-white font-serif absolute select-none pointer-events-none"
-              style={{ fontSize: "4rem", fontWeight: 700, opacity: 0.07, letterSpacing: "-2px" }}>DEAL</span>
-            <span className="text-white font-bold relative z-10" style={{ fontSize: "1.8rem", letterSpacing: "-1px" }}>{discountLabel}</span>
-            <span className="text-white text-[9px] tracking-[0.2em] uppercase mt-1 relative z-10" style={{ opacity: 0.5 }}>use code</span>
+              style={{ fontSize: "7rem", fontWeight: 900, opacity: 0.06, letterSpacing: "-4px" }}>OFF</span>
+            <span className="text-white font-bold relative z-10" style={{ fontSize: "2.8rem", letterSpacing: "-1px", fontFamily: "serif" }}>{discountLabel}</span>
+            <span className="text-white text-[9px] tracking-[0.3em] uppercase mt-1 relative z-10" style={{ opacity: 0.45 }}>exclusive offer</span>
           </div>
         )}
-        {/* Status badge — top left */}
-        <span className="absolute top-3 left-3 text-white text-[8px] font-bold tracking-[0.12em] uppercase px-2.5 py-1"
-          style={{ background: status.color, borderRadius: "2px" }}>● {status.label}</span>
-        {/* Discount badge — bottom left (only when image) */}
-        {coupon.image_url && (
-          <span className="absolute bottom-3 left-3 text-white text-[10px] font-bold px-2.5 py-1"
-            style={{ background: "#3B5373", borderRadius: "2px" }}>{discountLabel}</span>
-        )}
+        {/* Status badge */}
+        <span className="absolute top-3 left-3 text-white text-[8px] font-bold tracking-widest uppercase px-2.5 py-1 whitespace-nowrap"
+          style={{ background: status.color, borderRadius: "2px" }}>{status.label}</span>
+        {/* Discount badge */}
+        <span className="absolute top-3 right-3 text-white text-[10px] font-bold px-3 py-1"
+          style={{ background: "#3B5373", borderRadius: "2px" }}>{discountLabel}</span>
       </div>
 
-      {/* Right — Content */}
-      <div className="flex flex-col flex-1 justify-between p-5">
+      {/* Notch divider */}
+      <div className="relative flex items-center" style={{ margin: "0 -1px", borderTop: "1.5px dashed #d8d0c8" }}>
+        <div className="absolute -left-3 w-6 h-6 rounded-full" style={{ background: "#fafafa", border: "1px solid #e8e4de" }} />
+        <div className="absolute -right-3 w-6 h-6 rounded-full" style={{ background: "#fafafa", border: "1px solid #e8e4de" }} />
+      </div>
+
+      {/* Bottom — Content */}
+      <div className="px-5 pt-4 pb-5">
         <div className="mb-4">
           {coupon.title && (
-            <h3 className="font-serif mb-1.5" style={{ fontSize: "1.1rem", fontWeight: 700, color: "#1a1a1a", lineHeight: 1.25 }}>{coupon.title}</h3>
+            <h3 className="font-serif mb-1" style={{ fontSize: "1.05rem", fontWeight: 700, color: "#1a1a1a", lineHeight: 1.3 }}>{coupon.title}</h3>
           )}
           {coupon.description && (
-            <p className="text-[12px] leading-relaxed" style={{ color: "#888" }}>{coupon.description}</p>
+            <p className="text-[11px] leading-relaxed" style={{ color: "#999" }}>{coupon.description}</p>
           )}
           {coupon.min_order_value > 0 && (
-            <p className="text-[10px] mt-2 font-semibold" style={{ color: "#3B5373" }}>Min. ₹{coupon.min_order_value}</p>
+            <p className="text-[10px] mt-1.5 font-semibold" style={{ color: "#3B5373" }}>Min. order ₹{coupon.min_order_value}</p>
           )}
         </div>
-        <div>
-          <p className="text-[8px] tracking-[0.25em] uppercase mb-1.5 font-medium" style={{ color: "#bbb" }}>Use Code</p>
-          <div className="flex items-stretch" style={{ border: "1.5px dashed #b8c5d1", borderRadius: "3px", overflow: "hidden" }}>
-            <span className="flex-1 font-mono font-bold tracking-[0.1em] px-3 py-2.5 text-[13px]"
-              style={{ color: "#3B5373", background: "#f8fafc" }}>{coupon.code}</span>
-            <button onClick={handleCopy}
-              className="px-3 text-[9px] font-bold tracking-[0.12em] uppercase transition-all flex-shrink-0"
-              style={{ background: copied ? "#22c55e" : "#3B5373", color: "#fff", minWidth: "52px" }}>
-              {copied ? "✓" : "Copy"}
-            </button>
-          </div>
+        {/* Code row */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 font-mono font-bold tracking-[0.12em] text-[13px] px-3 py-2.5 border-2 border-dashed text-center"
+            style={{ color: "#3B5373", borderColor: "#b8c5d1", background: "#f8fafc" }}>{coupon.code}</div>
+          <button onClick={handleCopy}
+            className="text-[9px] font-bold tracking-widest uppercase px-4 py-2.5 transition-all flex-shrink-0"
+            style={{ background: copied ? "#22c55e" : "#3B5373", color: "#fff", minWidth: "60px", borderRadius: "2px" }}>
+            {copied ? "✓ Done" : "Copy"}
+          </button>
         </div>
       </div>
     </div>
