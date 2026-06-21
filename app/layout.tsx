@@ -3,7 +3,6 @@ import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import LuxuryCursor from "@/components/LuxuryCursor";
 
 export const metadata: Metadata = {
   title: {
@@ -42,7 +41,6 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />
-          <LuxuryCursor />
         </CartProvider>
       </body>
     </html>
