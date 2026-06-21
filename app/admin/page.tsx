@@ -4926,6 +4926,284 @@ export default function AdminPage() {
           )}
 
           {/* ══════════════════════════════════════
+              HOT DEALS — hd-page TAB
+          ══════════════════════════════════════ */}
+          {tab === "hd-page" && (
+            <div className="space-y-8">
+              {/* Ticker */}
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Ticker Bar</h2>
+                <p className="text-xs text-gray-400 mb-4">Scrolling ticker at the top of the Hot Deals page. Separate items with a pipe <code className="bg-gray-100 px-1 rounded">|</code></p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <textarea
+                    rows={2}
+                    value={hdTicker}
+                    onChange={e => setHdTicker(e.target.value)}
+                    placeholder="ONGOING & UPCOMING|NEW OFFERS INSIDE|DON'T MISS OUT"
+                    className={inputCls + " font-mono resize-none"}
+                  />
+                  <p className="text-[10px] text-gray-400 mt-2">Each phrase separated by <strong>|</strong> will scroll across the ticker.</p>
+                </div>
+              </div>
+
+              {/* Hero */}
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Hero Section</h2>
+                <p className="text-xs text-gray-400 mb-4">Left-side text + right-side product image (Design A layout).</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Eyebrow Text</p>
+                    <input type="text" value={hdHeroEyebrow} onChange={e => setHdHeroEyebrow(e.target.value)} className={inputCls} placeholder="Limited Time" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Hero Heading <span className="normal-case text-gray-300">— use \n for line break (e.g. HOT\nDEALS)</span></p>
+                    <textarea rows={2} value={hdHeroHeading} onChange={e => setHdHeroHeading(e.target.value)} className={inputCls + " resize-none font-mono"} placeholder={"HOT\nDEALS"} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Subtitle</p>
+                    <input type="text" value={hdHeroSub} onChange={e => setHdHeroSub(e.target.value)} className={inputCls} placeholder="OFFERS YOU DON'T WANT TO MISS" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Hero Image URL <span className="normal-case text-gray-300">— right side of the hero</span></p>
+                    <input type="text" value={hdHeroImg} onChange={e => setHdHeroImg(e.target.value)} className={inputCls} placeholder="https://..." />
+                    {hdHeroImg && (
+                      <img src={hdHeroImg} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-center" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Section Header */}
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Section Header</h2>
+                <p className="text-xs text-gray-400 mb-4">Heading and subtitle above the deals grid.</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Heading</p>
+                    <input type="text" value={hdSectionHeading} onChange={e => setHdSectionHeading(e.target.value)} className={inputCls} placeholder="Current Offers" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Subtitle</p>
+                    <input type="text" value={hdSectionSub} onChange={e => setHdSectionSub(e.target.value)} className={inputCls} placeholder="Use the code at checkout · Limited stock" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid Settings */}
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Grid Settings</h2>
+                <p className="text-xs text-gray-400 mb-4">Layout of the deal cards grid.</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-5">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Mobile Columns</p>
+                    <div className="flex gap-2">
+                      {[1, 2].map(n => (
+                        <button key={n} type="button" onClick={() => setHdMobileCols(n)}
+                          className={`w-12 h-12 text-sm font-semibold border rounded-xl transition-colors ${hdMobileCols === n ? "bg-[#3B5373] text-white border-[#3B5373]" : "border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Desktop Columns</p>
+                    <div className="flex gap-2">
+                      {[2, 3, 4, 5, 6].map(n => (
+                        <button key={n} type="button" onClick={() => setHdCols(n)}
+                          className={`w-12 h-12 text-sm font-semibold border rounded-xl transition-colors ${hdCols === n ? "bg-[#3B5373] text-white border-[#3B5373]" : "border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex gap-8">
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Card Height (px)</p>
+                      <input type="number" min={100} max={600} value={hdCardH} onChange={e => setHdCardH(parseInt(e.target.value) || 280)}
+                        className="w-32 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Gap (px)</p>
+                      <input type="number" min={0} max={80} value={hdCardGap} onChange={e => setHdCardGap(parseInt(e.target.value) || 28)}
+                        className="w-32 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg" />
+                    </div>
+                  </div>
+                  <button onClick={saveHdPage} disabled={hdPageSaving}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                    <Save className="w-4 h-4" />{hdPageSaving ? "Saving…" : "Save Page Settings"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              HOT DEALS — hd-coupons TAB
+          ══════════════════════════════════════ */}
+          {tab === "hd-coupons" && (
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-800">Coupon Codes</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">{coupons.length} coupon{coupons.length !== 1 ? "s" : ""} total · {coupons.filter(c => c.active).length} active</p>
+                </div>
+                <button
+                  onClick={() => setCouponModal({ open: true, mode: "add", data: { discount_type: "percent", active: true, require_phone: false, require_email: false, max_uses_per_user: 1, min_order_value: 0, display_order: coupons.length, uses_count: 0 } })}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors"
+                >
+                  <Plus className="w-4 h-4" /> Add Coupon
+                </button>
+              </div>
+
+              {/* List */}
+              {coupons.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+                  <Tag className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+                  <p className="text-sm text-gray-400">No coupons yet. Add your first one.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {coupons.map(c => (
+                    <div key={c.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+                      {/* Code + title */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono font-bold text-[#3B5373] text-sm tracking-widest">{c.code}</span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white" style={{ background: "#3B5373" }}>
+                            {c.discount_type === "percent" ? `${c.discount_value}% OFF` : `₹${c.discount_value} OFF`}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-0.5 truncate">{c.title}</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">
+                          {c.max_uses_total != null ? `${c.uses_count}/${c.max_uses_total} used` : `${c.uses_count} used`}
+                          {c.valid_until && ` · Expires ${new Date(c.valid_until).toLocaleDateString("en-IN")}`}
+                        </p>
+                      </div>
+                      {/* Active toggle */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-[11px] text-gray-400">{c.active ? "Active" : "Inactive"}</span>
+                        <button onClick={() => toggleCouponActive(c.id, !c.active)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${c.active ? "bg-[#3B5373]" : "bg-gray-200"}`}>
+                          <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${c.active ? "translate-x-6" : "translate-x-1"}`} />
+                        </button>
+                      </div>
+                      {/* Edit / Delete */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button onClick={() => setCouponModal({ open: true, mode: "edit", data: { ...c } })}
+                          className="p-2 text-gray-400 hover:text-[#3B5373] hover:bg-gray-50 rounded-lg transition-colors">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => { if (confirm(`Delete coupon ${c.code}?`)) deleteCoupon(c.id); }}
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              HOT DEALS — hd-stats TAB
+          ══════════════════════════════════════ */}
+          {tab === "hd-stats" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-semibold text-gray-800">Usage Stats</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">Every time a coupon was used at checkout.</p>
+                </div>
+                <button onClick={fetchCouponStats}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
+                  <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                </button>
+              </div>
+
+              {/* Summary cards */}
+              {couponStats.length > 0 && (() => {
+                const totalUses = couponStats.length;
+                const totalDiscount = couponStats.reduce((s, r) => s + (r.discount_applied || 0), 0);
+                const totalRevenue = couponStats.reduce((s, r) => s + (r.final_amount || 0), 0);
+                return (
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { label: "Total Uses", value: String(totalUses), icon: "🏷️" },
+                      { label: "Total Discount Given", value: `₹${totalDiscount.toLocaleString("en-IN")}`, icon: "💸" },
+                      { label: "Revenue from Coupon Orders", value: `₹${totalRevenue.toLocaleString("en-IN")}`, icon: "💰" },
+                    ].map(card => (
+                      <div key={card.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                        <p className="text-2xl mb-1">{card.icon}</p>
+                        <p className="font-bold text-xl text-[#3B5373]">{card.value}</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">{card.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {couponStats.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+                  <p className="text-sm text-gray-400">No coupon usage yet.</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100">
+                          {["Date", "Code", "Customer", "Contact", "Products", "Items", "Order Total", "Discount", "Final"].map(h => (
+                            <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {couponStats.map(r => (
+                          <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                            <td className="px-4 py-3 text-[11px] text-gray-500 whitespace-nowrap">
+                              {new Date(r.used_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                              <br />
+                              <span className="text-gray-400">{new Date(r.used_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="font-mono font-bold text-[#3B5373] text-xs">{r.coupon_code || "—"}</span>
+                            </td>
+                            <td className="px-4 py-3 text-xs text-gray-700 whitespace-nowrap">{r.user_name || "—"}</td>
+                            <td className="px-4 py-3 text-[11px] text-gray-500">
+                              {r.user_phone && <div>{r.user_phone}</div>}
+                              {r.user_email && <div className="text-gray-400">{r.user_email}</div>}
+                              {!r.user_phone && !r.user_email && "—"}
+                            </td>
+                            <td className="px-4 py-3 text-[11px] text-gray-600 max-w-[200px]">
+                              {r.products_json && r.products_json.length > 0
+                                ? r.products_json.map((p, i) => (
+                                    <div key={i} className="whitespace-nowrap">{p.name}{p.variant ? ` (${p.variant})` : ""} × {p.qty}</div>
+                                  ))
+                                : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-xs text-gray-700 text-center">{r.items_count ?? "—"}</td>
+                            <td className="px-4 py-3 text-xs text-gray-700 whitespace-nowrap">
+                              {r.order_total != null ? `₹${r.order_total.toLocaleString("en-IN")}` : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-xs font-semibold text-emerald-600 whitespace-nowrap">
+                              {r.discount_applied != null ? `−₹${r.discount_applied.toLocaleString("en-IN")}` : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-xs font-bold text-[#3B5373] whitespace-nowrap">
+                              {r.final_amount != null ? `₹${r.final_amount.toLocaleString("en-IN")}` : "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
               CATEGORIES TAB
           ══════════════════════════════════════ */}
           {tab === "categories" && (
@@ -7303,6 +7581,138 @@ export default function AdminPage() {
                 finally { setStyleInspoSaving(false); }
               }} className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
                 {styleInspoSaving ? "Saving…" : "Save Look"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          COUPON MODAL (Add / Edit)
+      ══════════════════════════════════════════════════ */}
+      {couponModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.5)" }}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">{couponModal.mode === "add" ? "Add Coupon" : "Edit Coupon"}</h2>
+              <button onClick={() => setCouponModal(m => ({ ...m, open: false }))} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                {/* Code */}
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Code <span className="text-red-400">*</span></p>
+                  <input type="text" value={couponModal.data.code || ""} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, code: e.target.value.toUpperCase() } }))}
+                    className={inputCls + " font-mono tracking-widest"} placeholder="SAVE10" />
+                </div>
+                {/* Display Order */}
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Display Order</p>
+                  <input type="number" value={couponModal.data.display_order ?? 0} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, display_order: parseInt(e.target.value) || 0 } }))}
+                    className={inputCls} />
+                </div>
+              </div>
+              {/* Title */}
+              <div>
+                <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Title</p>
+                <input type="text" value={couponModal.data.title || ""} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, title: e.target.value } }))}
+                  className={inputCls} placeholder="10% Off Sitewide" />
+              </div>
+              {/* Description */}
+              <div>
+                <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Description</p>
+                <textarea rows={2} value={couponModal.data.description || ""} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, description: e.target.value } }))}
+                  className={inputCls + " resize-none"} placeholder="Use at checkout to save on your order." />
+              </div>
+              {/* Image URL */}
+              <div>
+                <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Card Image URL <span className="normal-case text-gray-300">— shown on Hot Deals page</span></p>
+                <input type="text" value={couponModal.data.image_url || ""} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, image_url: e.target.value } }))}
+                  className={inputCls} placeholder="https://..." />
+                {couponModal.data.image_url && (
+                  <img src={couponModal.data.image_url} alt="preview" className="mt-2 h-20 w-full object-cover rounded-lg" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                )}
+              </div>
+              {/* Discount Type + Value */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-2 uppercase tracking-wider font-medium">Discount Type</p>
+                  <div className="flex gap-2">
+                    {(["percent", "flat"] as const).map(t => (
+                      <button key={t} type="button" onClick={() => setCouponModal(m => ({ ...m, data: { ...m.data, discount_type: t } }))}
+                        className={`flex-1 py-2 text-xs font-semibold border rounded-lg transition-colors ${couponModal.data.discount_type === t ? "bg-[#3B5373] text-white border-[#3B5373]" : "border-gray-200 text-gray-500 hover:border-[#3B5373]"}`}>
+                        {t === "percent" ? "% Percent" : "₹ Flat Amount"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">
+                    Discount Value {couponModal.data.discount_type === "percent" ? "(%)" : "(₹)"}
+                  </p>
+                  <input type="number" min={0} value={couponModal.data.discount_value ?? 0} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, discount_value: parseFloat(e.target.value) || 0 } }))}
+                    className={inputCls} />
+                </div>
+              </div>
+              {/* Min Order Value */}
+              <div>
+                <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Min Order Value (₹) <span className="normal-case text-gray-300">— 0 = no minimum</span></p>
+                <input type="number" min={0} value={couponModal.data.min_order_value ?? 0} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, min_order_value: parseFloat(e.target.value) || 0 } }))}
+                  className={inputCls} placeholder="0" />
+              </div>
+              {/* Uses */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Max Total Uses <span className="normal-case text-gray-300">— empty = unlimited</span></p>
+                  <input type="number" min={0} value={couponModal.data.max_uses_total ?? ""} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, max_uses_total: e.target.value === "" ? null : parseInt(e.target.value) } }))}
+                    className={inputCls} placeholder="Unlimited" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Max Uses Per User</p>
+                  <input type="number" min={1} value={couponModal.data.max_uses_per_user ?? 1} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, max_uses_per_user: parseInt(e.target.value) || 1 } }))}
+                    className={inputCls} />
+                </div>
+              </div>
+              {/* Valid dates */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Valid From <span className="normal-case text-gray-300">— optional</span></p>
+                  <input type="date" value={couponModal.data.valid_from ? couponModal.data.valid_from.slice(0, 10) : ""} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, valid_from: e.target.value || null } }))}
+                    className={inputCls} />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Valid Until <span className="normal-case text-gray-300">— optional</span></p>
+                  <input type="date" value={couponModal.data.valid_until ? couponModal.data.valid_until.slice(0, 10) : ""} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, valid_until: e.target.value || null } }))}
+                    className={inputCls} />
+                </div>
+              </div>
+              {/* Toggles */}
+              <div className="grid grid-cols-3 gap-4">
+                {([
+                  { key: "active", label: "Active" },
+                  { key: "require_phone", label: "Require Phone" },
+                  { key: "require_email", label: "Require Email" },
+                ] as const).map(({ key, label }) => (
+                  <label key={key} className="flex items-center gap-2 cursor-pointer">
+                    <button type="button" onClick={() => setCouponModal(m => ({ ...m, data: { ...m.data, [key]: !m.data[key] } }))}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${couponModal.data[key] ? "bg-[#3B5373]" : "bg-gray-200"}`}>
+                      <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${couponModal.data[key] ? "translate-x-6" : "translate-x-1"}`} />
+                    </button>
+                    <span className="text-xs text-gray-600">{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            {/* Footer */}
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setCouponModal(m => ({ ...m, open: false }))} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Cancel</button>
+              <button disabled={couponSaving} onClick={saveCoupon}
+                className="px-6 py-2 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] disabled:opacity-50">
+                {couponSaving ? "Saving…" : couponModal.mode === "add" ? "Add Coupon" : "Save Changes"}
               </button>
             </div>
           </div>
