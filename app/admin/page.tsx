@@ -3100,6 +3100,7 @@ export default function AdminPage() {
               id === "contact-us" ? "ct-hero" :
               id === "shipping-policy" ? "sp-hero" :
               id === "size-guide" ? "sg-hero" :
+              id === "returns" ? "re-hero" :
               (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             return (
               <button
@@ -3158,6 +3159,7 @@ export default function AdminPage() {
                mainSection === "contact-us" ? "Contact Us" :
                mainSection === "shipping-policy" ? "Shipping Policy" :
                mainSection === "size-guide" ? "Size Guide" :
+               mainSection === "returns" ? "Returns & Exchanges" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" : "Messages"}
@@ -7808,6 +7810,136 @@ export default function AdminPage() {
                 <button onClick={saveSgCta} disabled={sgCtaSaving}
                   className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
                   <Save className="w-4 h-4" />{sgCtaSaving ? "Saving…" : "Save CTA"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              RETURNS & EXCHANGES — re-hero TAB
+          ══════════════════════════════════════ */}
+          {tab === "re-hero" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Hero Section</h2>
+                <p className="text-xs text-gray-400 mt-0.5">The navy hero banner at the top of the Returns & Exchanges page.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>Eyebrow Label</label>
+                  <input type="text" value={reEyebrow} onChange={e => setReEyebrow(e.target.value)} className={inputCls} placeholder="CLASSIE" />
+                </div>
+                <div>
+                  <label className={labelCls}>Page Heading</label>
+                  <input type="text" value={reHeading} onChange={e => setReHeading(e.target.value)} className={inputCls} placeholder="Returns & Exchanges" />
+                </div>
+                <div>
+                  <label className={labelCls}>Subtitle</label>
+                  <input type="text" value={reSub} onChange={e => setReSub(e.target.value)} className={inputCls} placeholder="Hassle-free returns within 7 days of delivery" />
+                </div>
+                <div>
+                  <label className={labelCls}>Last Updated Text</label>
+                  <input type="text" value={reUpdated} onChange={e => setReUpdated(e.target.value)} className={inputCls} placeholder="Last updated: June 2025" />
+                </div>
+                <button onClick={saveReHero} disabled={reHeroSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{reHeroSaving ? "Saving…" : "Save Hero"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              RETURNS & EXCHANGES — re-tiles TAB
+          ══════════════════════════════════════ */}
+          {tab === "re-tiles" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">KPI Tiles</h2>
+                <p className="text-xs text-gray-400 mt-0.5">3 highlight tiles shown below the hero section.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+                {[
+                  { emoji: "♻️", label: "Tile 1", titleVal: reTile1Title, setTitle: setReTile1Title, subVal: reTile1Sub, setSub: setReTile1Sub },
+                  { emoji: "🔄", label: "Tile 2", titleVal: reTile2Title, setTitle: setReTile2Title, subVal: reTile2Sub, setSub: setReTile2Sub },
+                  { emoji: "💰", label: "Tile 3", titleVal: reTile3Title, setTitle: setReTile3Title, subVal: reTile3Sub, setSub: setReTile3Sub },
+                ].map(({ emoji, label, titleVal, setTitle, subVal, setSub }) => (
+                  <div key={label} className="border border-gray-100 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{emoji} {label}</p>
+                    <div>
+                      <label className={labelCls}>Title</label>
+                      <input type="text" value={titleVal} onChange={e => setTitle(e.target.value)} className={inputCls} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Subtitle</label>
+                      <input type="text" value={subVal} onChange={e => setSub(e.target.value)} className={inputCls} />
+                    </div>
+                  </div>
+                ))}
+                <button onClick={saveReTiles} disabled={reTilesSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{reTilesSaving ? "Saving…" : "Save Tiles"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              RETURNS & EXCHANGES — re-policy TAB
+          ══════════════════════════════════════ */}
+          {tab === "re-policy" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">Policy Cards</h2>
+                <p className="text-xs text-gray-400 mt-0.5">5 policy sections. Use line breaks in the body for new lines.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+                {[
+                  { num: 1, label: "Eligible Returns",       headingVal: reEligibleHeading,  setHeading: setReEligibleHeading,  bodyVal: reEligibleBody,  setBody: setReEligibleBody },
+                  { num: 2, label: "Non-Returnable Items",   headingVal: reNonreturnHeading, setHeading: setReNonreturnHeading, bodyVal: reNonreturnBody, setBody: setReNonreturnBody },
+                  { num: 3, label: "How to Initiate Return", headingVal: reInitiateHeading,  setHeading: setReInitiateHeading,  bodyVal: reInitiateBody,  setBody: setReInitiateBody },
+                  { num: 4, label: "Exchanges",              headingVal: reExchangeHeading,  setHeading: setReExchangeHeading,  bodyVal: reExchangeBody,  setBody: setReExchangeBody },
+                  { num: 5, label: "Refunds",                headingVal: reRefundHeading,    setHeading: setReRefundHeading,    bodyVal: reRefundBody,    setBody: setReRefundBody },
+                ].map(({ num, label, headingVal, setHeading, bodyVal, setBody }) => (
+                  <div key={num} className="border border-gray-100 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Section {num} — {label}</p>
+                    <div>
+                      <label className={labelCls}>Section Heading</label>
+                      <input type="text" value={headingVal} onChange={e => setHeading(e.target.value)} className={inputCls} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Body Text</label>
+                      <textarea value={bodyVal} onChange={e => setBody(e.target.value)} rows={4}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] transition-colors bg-white resize-y" />
+                    </div>
+                  </div>
+                ))}
+                <button onClick={saveRePolicy} disabled={rePolicySaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{rePolicySaving ? "Saving…" : "Save Policy"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              RETURNS & EXCHANGES — re-cta TAB
+          ══════════════════════════════════════ */}
+          {tab === "re-cta" && (
+            <div className="space-y-6 max-w-2xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800">CTA Strip</h2>
+                <p className="text-xs text-gray-400 mt-0.5">The navy bottom strip with a "Contact Us →" button.</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+                <div>
+                  <label className={labelCls}>CTA Text</label>
+                  <input type="text" value={reCtaText} onChange={e => setReCtaText(e.target.value)} className={inputCls} placeholder="Need help with a return or exchange?" />
+                  <p className="text-xs text-gray-400 mt-1">The button always links to /contact and reads "Contact Us →".</p>
+                </div>
+                <button onClick={saveReCta} disabled={reCtaSaving}
+                  className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] disabled:opacity-60">
+                  <Save className="w-4 h-4" />{reCtaSaving ? "Saving…" : "Save CTA"}
                 </button>
               </div>
             </div>
