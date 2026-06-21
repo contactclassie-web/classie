@@ -123,36 +123,4 @@ h4, h5, h6 { font-family: var(--font-cormorant); font-weight: 400; }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── Luxury cursor — desktop only ───────────────────────────────── */
-@media (min-width: 768px) {
-  body { cursor: none; }
 
-  .luxury-cursor-dot {
-    position: fixed;
-    top: 0; left: 0;
-    width: 6px; height: 6px;
-    background: #3B5373;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-200px, -200px);
-  }
-
-  .luxury-cursor-ring {
-    position: fixed;
-    top: 0; left: 0;
-    width: 28px; height: 28px;
-    border: 1px solid #3B5373;
-    border-radius: 50%;
-    opacity: 0.4;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-200px, -200px);
-    transition: width 0.15s ease, height 0.15s ease, opacity 0.15s ease;
-  }
-}
-
-@media (max-width: 767px) {
-  .luxury-cursor-dot,
-  .luxury-cursor-ring { display: none; }
-}
