@@ -74,7 +74,8 @@ export default function StyleInspoSection() {
         </div>
 
         {/* Grid — 3 cols on mobile, configurable on desktop */}
-        <div className={`grid grid-cols-3 md:grid-cols-${advDesktop}`} style={{ gap: advGap + "px" }}>
+        {/* Using inline style for gridTemplateColumns to avoid Tailwind purge issues with dynamic classes */}
+        <div className="grid grid-cols-3" style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}>
           {images.map((item, i) => (
             <a key={i} href={item.link_url || "#"} target="_blank" rel="noopener noreferrer"
               className="group relative overflow-hidden bg-[#c8d6e5]" style={{ aspectRatio: "1 / 1" }}>

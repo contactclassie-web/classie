@@ -7224,7 +7224,7 @@ function AdvGridPanel({ title, desc, section, mobile, setMobile, desktop, setDes
           <span>{saving ? "Saving…" : "Save Settings"}</span>
         </button>
       </div>
-      <p className="text-[11px] text-gray-300">Section: {section}</p>
+
     </div>
   );
 }

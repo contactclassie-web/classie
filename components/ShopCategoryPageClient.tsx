@@ -518,8 +518,8 @@ export default function ShopCategoryPageClient({
                 </div>
               ) : (
                 <div
-                  className={`grid grid-cols-${advMobile} md:grid-cols-${advDesktop}`}
-                  style={{ gap: advGap + "px" }}
+                  className="grid"
+                  style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}
                 >
                   {filtered.map((product) => (
                     <CategoryProductCard key={product.slug} product={product} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />

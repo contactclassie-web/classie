@@ -254,8 +254,8 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
 
         {/* Grid */}
         <div
-          className={`grid grid-cols-${advMobile} md:grid-cols-${advDesktop}`}
-          style={{ gap: advGap + "px" }}
+          className="grid"
+          style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}
         >
           {products.map((product, idx) => (
             <ProductCard key={product.slug} product={product} isNew={activeTab === "latest" && idx === 0} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />

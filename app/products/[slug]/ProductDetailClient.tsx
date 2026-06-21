@@ -257,8 +257,8 @@ export default function ProductDetailClient({ product, related }: { product: Pro
           <div className="mt-20 border-t border-classie-border pt-14">
             <h2 className="font-serif text-2xl md:text-3xl text-classie-black mb-8">You May Also Like</h2>
             <div
-              className={`grid grid-cols-${advMobile} sm:grid-cols-${advDesktop} md:grid-cols-${advDesktop}`}
-              style={{ gap: advGap + "px" }}
+              className="grid"
+              style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}
             >
               {related.map((p) => <ProductCard key={p.slug} product={p} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />)}
             </div>

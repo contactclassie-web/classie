@@ -36,8 +36,6 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, s
     : looks.filter(l => l.tag === activeTab);
 
   const mobileColMap: Record<number,string> = { 1:"grid-cols-1", 2:"grid-cols-2", 3:"grid-cols-3" };
-  const desktopColMap: Record<number,string> = { 2:"lg:grid-cols-2", 3:"lg:grid-cols-3", 4:"lg:grid-cols-4", 5:"lg:grid-cols-5", 6:"lg:grid-cols-6" };
-  const colClass = `${mobileColMap[mobileCols]||"grid-cols-2"} ${desktopColMap[cardsPerRow]||"lg:grid-cols-4"}`;
   const radiusMap: Record<string,string> = { sharp:"rounded-none", slight:"rounded", rounded:"rounded-xl", pill:"rounded-3xl" };
 
   return (
@@ -72,7 +70,7 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, s
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-[#888] text-sm">No looks in this category yet.</div>
         ) : (
-          <div className={`grid ${colClass}`} style={{ gap: `${gap}px` }}>
+          <div className={`grid ${mobileColMap[mobileCols]||"grid-cols-2"}`} style={{ gap: `${gap}px`, gridTemplateColumns: `repeat(${cardsPerRow}, minmax(0, 1fr))` }}>
             {filtered.map((look) => (
               <LookCard key={look.id} look={look} showTag={showTag} aspect={aspect} radius={radiusMap[radius]||"rounded-none"} cardH={cardH} />
             ))}
