@@ -4930,22 +4930,6 @@ export default function AdminPage() {
           ══════════════════════════════════════ */}
           {tab === "hd-page" && (
             <div className="space-y-8">
-              {/* Ticker */}
-              <div>
-                <h2 className="text-base font-semibold text-gray-800 mb-1">Ticker Bar</h2>
-                <p className="text-xs text-gray-400 mb-4">Scrolling ticker at the top of the Hot Deals page. Separate items with a pipe <code className="bg-gray-100 px-1 rounded">|</code></p>
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                  <textarea
-                    rows={2}
-                    value={hdTicker}
-                    onChange={e => setHdTicker(e.target.value)}
-                    placeholder="ONGOING & UPCOMING|NEW OFFERS INSIDE|DON'T MISS OUT"
-                    className={inputCls + " font-mono resize-none"}
-                  />
-                  <p className="text-[10px] text-gray-400 mt-2">Each phrase separated by <strong>|</strong> will scroll across the ticker.</p>
-                </div>
-              </div>
-
               {/* Hero */}
               <div>
                 <h2 className="text-base font-semibold text-gray-800 mb-1">Hero Section</h2>

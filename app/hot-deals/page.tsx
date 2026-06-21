@@ -268,9 +268,6 @@ export default function HotDealsPage() {
 
   return (
     <>
-      {/* ── Ticker ── */}
-      <TickerBar text={ticker} />
-
       {/* ── Hero ── */}
       <section style={{ background: "#f0eee9" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
