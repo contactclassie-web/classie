@@ -151,7 +151,7 @@ export default function HotDealsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const cols       = parseInt(settings.hd_cols || "3") || 3;
+  const cols       = parseInt(settings.hd_cols || "2") || 2;
   const mobileCols = parseInt(settings.hd_mobile_cols || "1") || 1;
   const cardH      = parseInt(settings.hd_card_h || "280") || 280;
   const gap        = parseInt(settings.hd_card_gap || "28") || 28;
@@ -204,8 +204,8 @@ export default function HotDealsPage() {
 
           {!ready ? (
             /* Skeleton cards while loading */
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(3, 1fr)`, gap: "28px" }}>
-              {[1, 2, 3].map(i => (
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols || 2}, 1fr)`, gap: "28px" }}>
+              {[1, 2].map(i => (
                 <div key={i} className="overflow-hidden animate-pulse" style={{ border: "1px solid #ece9e3", background: "#fff" }}>
                   <div style={{ height: "280px", background: "#f0f0f0" }} />
                   <div className="p-5 space-y-3">
