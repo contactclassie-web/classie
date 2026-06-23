@@ -2726,6 +2726,7 @@ export default function AdminPage() {
         const { error } = await supabase.from("site_categories").update(rest).eq("id", id);
         if (error) { alert("Error: " + error.message); return; }
       }
+      await revalidateSite();
       await fetchCategories();
       closeCategoryModal();
     } catch (e: unknown) { alert("Save failed: " + (e instanceof Error ? e.message : String(e))); }
@@ -2734,12 +2735,14 @@ export default function AdminPage() {
 
   const deleteCategory = async (id: string) => {
     await supabase.from("site_categories").delete().eq("id", id);
+    await revalidateSite();
     setSiteCategories((prev) => prev.filter((c) => c.id !== id));
     setDeleteCategoryConfirm(null);
   };
 
   const toggleCategoryActive = async (c: SiteCategory) => {
     await supabase.from("site_categories").update({ active: !c.active }).eq("id", c.id);
+    await revalidateSite();
     setSiteCategories((prev) => prev.map((x) => (x.id === c.id ? { ...x, active: !x.active } : x)));
   };
 
@@ -2986,6 +2989,7 @@ export default function AdminPage() {
       } else {
         await supabase.from("features_bar").update(rest).eq("id", id);
       }
+      await revalidateSite();
       await fetchFeaturesBar();
       closeFeaturesBarModal();
     } catch { /* ignore */ }
@@ -2994,12 +2998,14 @@ export default function AdminPage() {
 
   const deleteFeature = async (id: string) => {
     await supabase.from("features_bar").delete().eq("id", id);
+    await revalidateSite();
     setFeaturesBarItems((prev) => prev.filter((f) => f.id !== id));
     setDeleteFeatureConfirm(null);
   };
 
   const toggleFeatureActive = async (f: FeatureBarItem) => {
     await supabase.from("features_bar").update({ active: !f.active }).eq("id", f.id);
+    await revalidateSite();
     setFeaturesBarItems((prev) => prev.map((x) => (x.id === f.id ? { ...x, active: !x.active } : x)));
   };
 
@@ -5222,7 +5228,7 @@ export default function AdminPage() {
                                   </span>
                                 </td>
                                 <td className="px-4 py-3 text-center">
-                                  <button onClick={async()=>{await supabase.from("style_inspo").update({active:!inspo.active}).eq("id",inspo.id);setStyleInspos(prev=>prev.map(x=>x.id===inspo.id?{...x,active:!x.active}:x));}}
+                                  <button onClick={async()=>{await supabase.from("style_inspo").update({active:!inspo.active}).eq("id",inspo.id);await revalidateSite();setStyleInspos(prev=>prev.map(x=>x.id===inspo.id?{...x,active:!x.active}:x));}}
                                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${inspo.active?"bg-[#3B5373]":"bg-gray-200"}`}>
                                     <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${inspo.active?"translate-x-6":"translate-x-1"}`}/>
                                   </button>
@@ -7065,6 +7071,7 @@ export default function AdminPage() {
                       <button onClick={() => setDeleteInstagramConfirm(null)} className="px-5 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
                       <button onClick={async () => {
                         await supabase.from("instagram_images").delete().eq("id", deleteInstagramConfirm);
+                        await revalidateSite();
                         setDeleteInstagramConfirm(null);
                         await fetchInstagramImages();
                       }} className="px-5 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
@@ -7140,6 +7147,7 @@ export default function AdminPage() {
                       <button onClick={() => setDeleteStyleInspoConfirm(null)} className="px-5 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
                       <button onClick={async () => {
                         await supabase.from("style_inspo").delete().eq("id", deleteStyleInspoConfirm);
+                        await revalidateSite();
                         setDeleteStyleInspoConfirm(null);
                         await fetchStyleInspos();
                       }} className="px-5 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
@@ -9002,6 +9010,7 @@ export default function AdminPage() {
                   } else {
                     await supabase.from("instagram_images").update({ ...d }).eq("id", d.id!);
                   }
+                  await revalidateSite();
                   await fetchInstagramImages();
                   setInstagramModal(m => ({ ...m, open: false }));
                 } catch { /* ignore */ }
