@@ -5,10 +5,7 @@ import CollectionsClient from "./CollectionsClient";
 export const revalidate = 0;
 
 async function getCategories() {
-  const sb = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
   const { data } = await sb
     .from("site_categories")
     .select("name,slug,image_url,description")

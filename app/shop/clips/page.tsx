@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Shop Classie's Rhinestone Clip-ons — transform any heel in seconds.",
 };
 
-const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
 
 export default async function ClipsPage() {
   const [products, settings, collectionsData] = await Promise.all([

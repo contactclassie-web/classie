@@ -23,7 +23,7 @@ const DEFAULT_FAQS = [
 ];
 
 export default async function ContactPage() {
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
   const { data } = await sb.from("site_settings").select("key,value").like("key", "ct_%");
   const cfg: Record<string, string> = {};
   (data ?? []).forEach((r: { key: string; value: string }) => { cfg[r.key] = r.value; });
