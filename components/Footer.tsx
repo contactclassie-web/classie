@@ -78,20 +78,29 @@ const DEFAULT_DATA: FooterData = {
   footer_company_heading: "COMPANY",
 };
 
-export default function Footer() {
-  const [data, setData] = useState<FooterData>(DEFAULT_DATA);
+interface FooterProps { initialSettings?: Record<string, string>; }
+
+export default function Footer({ initialSettings }: FooterProps) {
+  const buildData = (s?: Record<string, string>): FooterData => {
+    if (!s) return DEFAULT_DATA;
+    const merged = { ...DEFAULT_DATA };
+    Object.keys(DEFAULT_DATA).forEach(k => {
+      if (s[k] !== undefined) (merged as Record<string, string>)[k] = s[k];
+    });
+    return merged;
+  };
+
+  const [data, setData] = useState<FooterData>(buildData(initialSettings));
 
   useEffect(() => {
+    if (initialSettings && Object.keys(initialSettings).length > 0) return;
     const keys = [
       "footer_logo_url", "footer_tagline", "footer_desc",
       "footer_ig_url", "footer_tiktok_url", "footer_fb_url", "footer_pinterest_url", "footer_whatsapp_url",
       "footer_shop_links", "footer_help_links", "footer_company_links",
       "footer_copyright", "footer_shop_heading", "footer_help_heading", "footer_company_heading",
     ];
-    supabase
-      .from("site_settings")
-      .select("*")
-      .in("key", keys)
+    supabase.from("site_settings").select("*").in("key", keys)
       .then(({ data: rows }) => {
         if (!rows) return;
         const update: Partial<FooterData> = {};
@@ -100,6 +109,7 @@ export default function Footer() {
         });
         setData((prev) => ({ ...prev, ...update }));
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const shopLinks = parseLinks(data.footer_shop_links, DEFAULT_SHOP_LINKS);

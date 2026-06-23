@@ -21,15 +21,25 @@ const NAV_LINK_CLS = "text-[11px] font-normal text-[#1a1a1a] hover:text-[#3B5373
 
 interface Category { name: string; slug: string; display_order: number; image_url?: string; description?: string; }
 
-export default function Navbar() {
+interface NavbarProps {
+  initialSettings?: Record<string, string>;
+  initialCategories?: Category[];
+}
+
+const LOGO_FALLBACK = "https://res.cloudinary.com/dbzt3soyi/image/upload/v1780757501/unnamed_5_nzzrwl.jpg";
+const DEFAULT_CATS: Category[] = [
+  { name: "Heels", slug: "heels", display_order: 1 },
+  { name: "Clip-ons", slug: "clips", display_order: 2 },
+];
+
+export default function Navbar({ initialSettings, initialCategories }: NavbarProps) {
   const { count } = useCart();
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [logoUrl, setLogoUrl]   = useState("https://res.cloudinary.com/dbzt3soyi/image/upload/v1780757501/unnamed_5_nzzrwl.jpg");
-  const [categories, setCategories] = useState<Category[]>([
-    { name: "Heels", slug: "heels", display_order: 1, image_url: "", description: "" },
-    { name: "Clip-ons", slug: "clips", display_order: 2, image_url: "", description: "" },
-  ]);
+  const [logoUrl, setLogoUrl]   = useState(initialSettings?.logo_image_url || LOGO_FALLBACK);
+  const [categories, setCategories] = useState<Category[]>(
+    initialCategories && initialCategories.length > 0 ? initialCategories : DEFAULT_CATS
+  );
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -38,24 +48,26 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    // Load logo
+    // Skip client fetch if server provided data
+    if (initialSettings && initialCategories && initialCategories.length > 0) return;
+
     supabase.from("site_settings").select("value").eq("key", "logo_image_url").single()
       .then(({ data }) => { if (data?.value) setLogoUrl(data.value); });
 
-    // Load categories from DB
     supabase.from("site_categories").select("name,slug,display_order,image_url,description")
       .eq("active", true).order("display_order")
       .then(({ data }) => { if (data) setCategories(data); });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // First 2 categories shown as direct links, rest in Collections dropdown
   const directLinks = categories.slice(0, 2);
-  const dropdownLinks = categories; // all categories in Collections dropdown
+  const dropdownLinks = categories;
 
   return (
     <header className={`sticky top-0 z-50 bg-white transition-all duration-300 ${scrolled ? "border-b border-gray-100 shadow-sm" : "border-b border-gray-100"}`}>
       {/* ── Announcement Bar ── */}
-      <AnnouncementBar />
+      <AnnouncementBar initialSettings={initialSettings} />
 
       {/* ── Desktop Nav ── */}
       <div className="hidden lg:block" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 40px" }}>

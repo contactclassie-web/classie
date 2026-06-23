@@ -27,13 +27,23 @@ const BAR_STYLE: React.CSSProperties = {
   overflow: "hidden",
 };
 
-export default function AnnouncementBar() {
-  const [msgs, setMsgs]       = useState<string[]>([DEFAULT_TEXT]);
-  const [speed, setSpeed]     = useState("15");
-  const [mode, setMode]       = useState<"scroll" | "rotate">("rotate");
-  const [idx, setIdx]         = useState(0);
+interface AnnProps { initialSettings?: Record<string, string>; }
+
+export default function AnnouncementBar({ initialSettings }: AnnProps) {
+  const buildFromSettings = (s?: Record<string, string>) => {
+    if (!s) return null;
+    const list = ALL_KEYS.map(k => s[k] ?? "").filter(Boolean);
+    return { msgs: list.length > 0 ? list : [DEFAULT_TEXT], speed: s.announcement_speed || "15", mode: (s.announcement_mode === "scroll" ? "scroll" : "rotate") as "scroll" | "rotate" };
+  };
+
+  const init = buildFromSettings(initialSettings);
+  const [msgs, setMsgs]   = useState<string[]>(init?.msgs ?? [DEFAULT_TEXT]);
+  const [speed, setSpeed] = useState(init?.speed ?? "15");
+  const [mode, setMode]   = useState<"scroll" | "rotate">(init?.mode ?? "rotate");
+  const [idx, setIdx]     = useState(0);
 
   useEffect(() => {
+    if (initialSettings && Object.keys(initialSettings).length > 0) return;
     supabase.from("site_settings").select("key,value")
       .in("key", [...ALL_KEYS, "announcement_speed", "announcement_mode"])
       .then(({ data }) => {
@@ -44,6 +54,7 @@ export default function AnnouncementBar() {
         const list = ALL_KEYS.map(k => get(k)).filter(Boolean);
         if (list.length > 0) setMsgs(list);
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Rotate mode: cycle messages
