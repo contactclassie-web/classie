@@ -1213,6 +1213,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setHeelsHeroSaving(false); }
   };
@@ -1239,6 +1240,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setWhySaving(false); }
   };
@@ -1248,6 +1250,7 @@ export default function AdminPage() {
     try {
       await supabase.from("site_settings").delete().eq("key", "heels_filter_heel_types");
       await supabase.from("site_settings").insert({ key: "heels_filter_heel_types", value: JSON.stringify(types) });
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setHeelsFilterSaving(false); }
   };
@@ -1319,6 +1322,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setClipsHeroSaving(false); }
   };
@@ -1345,6 +1349,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setClipsWhySaving(false); }
   };
@@ -1354,6 +1359,7 @@ export default function AdminPage() {
     try {
       await supabase.from("site_settings").delete().eq("key", "clips_filter_types");
       await supabase.from("site_settings").insert({ key: "clips_filter_types", value: JSON.stringify(types) });
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setClipsFilterSaving(false); }
   };
@@ -1739,6 +1745,7 @@ export default function AdminPage() {
         await supabase.from("site_settings").delete().eq("key", p.key);
         await supabase.from("site_settings").insert(p);
       }
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setBowWhySaving(false); }
   };
@@ -1748,6 +1755,7 @@ export default function AdminPage() {
     try {
       await supabase.from("site_settings").delete().eq("key", "bow_filter_types");
       await supabase.from("site_settings").insert({ key: "bow_filter_types", value: JSON.stringify(types) });
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setBowFilterSaving(false); }
   };
@@ -2598,6 +2606,7 @@ export default function AdminPage() {
       }
       await fetchProducts();
       closeProductModal();
+      await revalidateSite();
     } catch { /* ignore */ }
     finally { setProductSaving(false); }
   };
@@ -2675,6 +2684,7 @@ export default function AdminPage() {
       }
       await fetchCollections();
       closeCollectionModal();
+      await revalidateSite();
     } catch (e: unknown) { alert("Save failed: " + (e instanceof Error ? e.message : String(e))); }
     finally { setCollectionSaving(false); }
   };
