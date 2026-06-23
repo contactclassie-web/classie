@@ -17,6 +17,7 @@ interface FeaturedPicksProps {
   latestProducts?: Product[];
   bestSellers?: Product[];
   saleProducts?: Product[];
+  initialSettings?: Record<string, string>;
 }
 
 // Map DB row to Product shape
@@ -152,53 +153,70 @@ const DEFAULT_SETTINGS: FPSettings = {
   headingItalic: "Picks",
 };
 
-export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, saleProducts: _s }: FeaturedPicksProps) {
+export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, saleProducts: _s, initialSettings }: FeaturedPicksProps) {
   const [activeTab, setActiveTab] = useState<"latest" | "bestsellers" | "sale">("latest");
-  const [fps, setFps] = useState<FPSettings>(DEFAULT_SETTINGS);
+  const [fps, setFps] = useState<FPSettings>(() => {
+    if (initialSettings && Object.keys(initialSettings).length > 0) {
+      const m = initialSettings;
+      return {
+        tab1: { label: m.fp_tab1_label ?? "Latest Styles", active: (m.fp_tab1_active ?? "true") === "true" },
+        tab2: { label: m.fp_tab2_label ?? "Best Sellers",  active: (m.fp_tab2_active ?? "true") === "true" },
+        tab3: { label: m.fp_tab3_label ?? "On Sale",       active: (m.fp_tab3_active ?? "true") === "true" },
+        eyebrow:       m.fp_eyebrow        ?? "New Arrivals",
+        heading:       m.fp_heading        ?? "Featured",
+        headingItalic: m.fp_heading_italic ?? "Picks",
+      };
+    }
+    return DEFAULT_SETTINGS;
+  });
   const [latestProducts, setLatestProducts]   = useState<Product[]>(_l ?? []);
   const [bestSellers,    setBestSellers]       = useState<Product[]>(_b ?? []);
   const [saleProducts,   setSaleProducts]      = useState<Product[]>(_s ?? []);
-  const [advMobile,  setAdvMobile]  = useState(2);
-  const [advDesktop, setAdvDesktop] = useState(4);
-  const [advGap,     setAdvGap]     = useState(12);
-  const [advAspect,  setAdvAspect]  = useState("4/5");
-  const [advRadius,  setAdvRadius]  = useState("sharp");
-  const [advCardH,   setAdvCardH]   = useState(0);
+  const [advMobile,  setAdvMobile]  = useState(() => initialSettings?.adv_picks_mobile  ? parseInt(initialSettings.adv_picks_mobile)  || 2 : 2);
+  const [advDesktop, setAdvDesktop] = useState(() => initialSettings?.adv_picks_desktop ? parseInt(initialSettings.adv_picks_desktop) || 4 : 4);
+  const [advGap,     setAdvGap]     = useState(() => initialSettings?.adv_picks_gap     ? parseInt(initialSettings.adv_picks_gap)     || 12 : 12);
+  const [advAspect,  setAdvAspect]  = useState(() => initialSettings?.adv_picks_aspect  || "4/5");
+  const [advRadius,  setAdvRadius]  = useState(() => initialSettings?.adv_picks_radius  || "sharp");
+  const [advCardH,   setAdvCardH]   = useState(() => initialSettings?.adv_picks_card_h  ? parseInt(initialSettings.adv_picks_card_h) || 0 : 0);
 
   const radiusMap: Record<string,string> = { sharp: "", slight: "rounded", rounded: "rounded-xl", pill: "rounded-3xl" };
 
   useEffect(() => {
-    // Fetch adv grid settings
-    supabase.from("site_settings").select("key,value")
-      .in("key", ["adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_picks_aspect","adv_picks_radius","adv_picks_card_h"])
-      .then(({ data }) => {
-        if (!data) return;
-        const m: Record<string,string> = {};
-        data.forEach(({ key, value }) => { m[key] = value; });
-        if (m.adv_picks_mobile)  setAdvMobile(parseInt(m.adv_picks_mobile) || 2);
-        if (m.adv_picks_desktop) setAdvDesktop(parseInt(m.adv_picks_desktop) || 4);
-        if (m.adv_picks_gap)     setAdvGap(parseInt(m.adv_picks_gap) || 12);
-        if (m.adv_picks_aspect)  setAdvAspect(m.adv_picks_aspect);
-        if (m.adv_picks_radius)  setAdvRadius(m.adv_picks_radius);
-        if (m.adv_picks_card_h)  setAdvCardH(parseInt(m.adv_picks_card_h) || 0);
-      });
-
-    // Fetch settings
-    supabase.from("site_settings").select("key,value")
-      .in("key", ["fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active","fp_eyebrow","fp_heading","fp_heading_italic"])
-      .then(({ data }) => {
-        if (!data || data.length === 0) return;
-        const m: Record<string, string> = {};
-        data.forEach(({ key, value }) => { m[key] = value; });
-        setFps({
-          tab1: { label: m.fp_tab1_label ?? "Latest Styles", active: (m.fp_tab1_active ?? "true") === "true" },
-          tab2: { label: m.fp_tab2_label ?? "Best Sellers",  active: (m.fp_tab2_active ?? "true") === "true" },
-          tab3: { label: m.fp_tab3_label ?? "On Sale",       active: (m.fp_tab3_active ?? "true") === "true" },
-          eyebrow:       m.fp_eyebrow         ?? "New Arrivals",
-          heading:       m.fp_heading         ?? "Featured",
-          headingItalic: m.fp_heading_italic  ?? "Picks",
+    // Fetch adv grid settings (skip if provided via SSR)
+    if (!initialSettings?.adv_picks_mobile) {
+      supabase.from("site_settings").select("key,value")
+        .in("key", ["adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_picks_aspect","adv_picks_radius","adv_picks_card_h"])
+        .then(({ data }) => {
+          if (!data) return;
+          const m: Record<string,string> = {};
+          data.forEach(({ key, value }) => { m[key] = value; });
+          if (m.adv_picks_mobile)  setAdvMobile(parseInt(m.adv_picks_mobile) || 2);
+          if (m.adv_picks_desktop) setAdvDesktop(parseInt(m.adv_picks_desktop) || 4);
+          if (m.adv_picks_gap)     setAdvGap(parseInt(m.adv_picks_gap) || 12);
+          if (m.adv_picks_aspect)  setAdvAspect(m.adv_picks_aspect);
+          if (m.adv_picks_radius)  setAdvRadius(m.adv_picks_radius);
+          if (m.adv_picks_card_h)  setAdvCardH(parseInt(m.adv_picks_card_h) || 0);
         });
-      });
+    }
+
+    // Fetch FP text settings (skip if provided via SSR)
+    if (!initialSettings || Object.keys(initialSettings).length === 0) {
+      supabase.from("site_settings").select("key,value")
+        .in("key", ["fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active","fp_eyebrow","fp_heading","fp_heading_italic"])
+        .then(({ data }) => {
+          if (!data || data.length === 0) return;
+          const m: Record<string, string> = {};
+          data.forEach(({ key, value }) => { m[key] = value; });
+          setFps({
+            tab1: { label: m.fp_tab1_label ?? "Latest Styles", active: (m.fp_tab1_active ?? "true") === "true" },
+            tab2: { label: m.fp_tab2_label ?? "Best Sellers",  active: (m.fp_tab2_active ?? "true") === "true" },
+            tab3: { label: m.fp_tab3_label ?? "On Sale",       active: (m.fp_tab3_active ?? "true") === "true" },
+            eyebrow:       m.fp_eyebrow         ?? "New Arrivals",
+            heading:       m.fp_heading         ?? "Featured",
+            headingItalic: m.fp_heading_italic  ?? "Picks",
+          });
+        });
+    }
 
     // Fetch products client-side for instant updates
     supabase.from("products").select("*").eq("featured_tab", "latest").eq("active", true).limit(4)
@@ -207,6 +225,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
       .then(({ data }) => { if (data && data.length > 0) setBestSellers(data.map(mapDbToProduct)); });
     supabase.from("products").select("*").eq("featured_tab", "sale").eq("active", true).limit(4)
       .then(({ data }) => { if (data && data.length > 0) setSaleProducts(data.map(mapDbToProduct)); });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const tabs = [

@@ -192,16 +192,16 @@ export default async function HomePage() {
   const philCtaUrl = cfg["philosophy_cta_url"] || "/about";
   const philImageUrl = cfg["philosophy_image_url"] || "";
 
-  // Instagram / Style Inspo feed — from DB first, fallback to products
-  const { data: dbInstagramImages } = await sb
-    .from("instagram_images")
+  // Style Inspo feed — from style_inspo table (managed via Admin → Style Inspo tab)
+  const { data: dbStyleInspo } = await sb
+    .from("style_inspo")
     .select("image_url, link_url")
     .eq("active", true)
     .order("display_order", { ascending: true })
-    .limit(6);
+    .limit(9);
 
-  const igImages = dbInstagramImages && dbInstagramImages.length > 0
-    ? dbInstagramImages.map((img: { image_url: string; link_url: string }) => ({
+  const igImages = dbStyleInspo && dbStyleInspo.length > 0
+    ? dbStyleInspo.map((img: { image_url: string; link_url: string }) => ({
         image: img.image_url,
         link: img.link_url || "https://www.instagram.com/_classie_in/",
       }))
