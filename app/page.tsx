@@ -219,7 +219,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ══ 1. HERO ═══════════════════════════════════════════════════════ */}
-      <HeroSection heroSlides={heroSlides ?? []} heroImageUrl={heroImageUrl} />
+      <HeroSection heroSlides={heroSlides ?? []} heroImageUrl={heroImageUrl} initialSettings={cfg} />
 
       {/* ══ 2. TRUST BAND ══════════════════════════════════════════════════ */}
       <TrustBand />

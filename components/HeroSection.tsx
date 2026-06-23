@@ -43,12 +43,18 @@ interface Slide { image_url: string; }
 interface Props {
   heroSlides: Slide[];
   heroImageUrl: string;
+  initialSettings?: Record<string, string>;
 }
 
-export default function HeroSection({ heroSlides, heroImageUrl }: Props) {
-  const [cfg, setCfg] = useState<Record<string, string>>(DEFAULTS);
+export default function HeroSection({ heroSlides, heroImageUrl, initialSettings }: Props) {
+  // If server passes settings as props, use them directly — no client fetch needed (eliminates blink)
+  const [cfg, setCfg] = useState<Record<string, string>>(
+    initialSettings ? { ...DEFAULTS, ...initialSettings } : DEFAULTS
+  );
 
   useEffect(() => {
+    // Skip client fetch if server already provided settings — prevents flash
+    if (initialSettings && Object.keys(initialSettings).length > 0) return;
     sb.from("site_settings")
       .select("key,value")
       .in("key", HERO_KEYS)
@@ -60,6 +66,7 @@ export default function HeroSection({ heroSlides, heroImageUrl }: Props) {
         });
         setCfg(merged);
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const eyebrow   = cfg.hero_eyebrow;
