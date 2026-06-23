@@ -258,14 +258,15 @@ function HeelCard({ product }: { product: HeelProduct }) {
 }
 
 // ── Main client component ─────────────────────────────────────────────────
-export default function HeelsPageClient({ initialProducts, initialSettings = {}, initialOccasions }: { initialProducts: HeelProduct[]; initialSettings?: HeelsSettings; initialOccasions?: { title: string; slug: string; image: string; tag_label?: string; image_position?: string }[] }) {
+export default function HeelsPageClient({ initialProducts, initialSettings = {}, initialOccasions, initialFilterTypes }: { initialProducts: HeelProduct[]; initialSettings?: HeelsSettings; initialOccasions?: { title: string; slug: string; image: string; tag_label?: string; image_position?: string }[]; initialFilterTypes?: string[] }) {
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const [selectedHeelTypes, setSelectedHeelTypes] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number>(9999);
   const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "newest">("default");
 
-  // Load filter types from DB (admin-managed)
+  // Load filter types: use SSR-provided initialFilterTypes if available
   const [heelTypes, setHeelTypes] = useState<string[]>(() => {
+    if (initialFilterTypes && initialFilterTypes.length > 0) return initialFilterTypes;
     // Fallback: auto-generate from products
     const types = new Set<string>();
     initialProducts.forEach((p) => { if (p.heel_type) types.add(p.heel_type); });
@@ -273,6 +274,8 @@ export default function HeelsPageClient({ initialProducts, initialSettings = {},
   });
 
   useEffect(() => {
+    // Skip if provided via SSR
+    if (initialFilterTypes && initialFilterTypes.length > 0) return;
     supabase.from("site_settings").select("value").eq("key", "heels_filter_heel_types").maybeSingle()
       .then(({ data }) => {
         if (data?.value) {
@@ -282,6 +285,7 @@ export default function HeelsPageClient({ initialProducts, initialSettings = {},
           } catch { /* use fallback */ }
         }
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = useMemo(() => {

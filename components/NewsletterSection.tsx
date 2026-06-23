@@ -17,27 +17,42 @@ const DEFAULTS: NLCfg = {
 };
 const KEYS = ["nl_eyebrow","nl_heading","nl_heading_italic","nl_subtext","nl_placeholder","nl_btn_text","nl_success_text"];
 
-export default function NewsletterSection() {
+function buildCfg(m: Record<string, string>): NLCfg {
+  return {
+    eyebrow:      m.nl_eyebrow         || DEFAULTS.eyebrow,
+    heading:      m.nl_heading         || DEFAULTS.heading,
+    headingItalic: m.nl_heading_italic || DEFAULTS.headingItalic,
+    subtext:      m.nl_subtext         || DEFAULTS.subtext,
+    placeholder:  m.nl_placeholder     || DEFAULTS.placeholder,
+    btnText:      m.nl_btn_text        || DEFAULTS.btnText,
+    successText:  m.nl_success_text    || DEFAULTS.successText,
+  };
+}
+
+interface NewsletterSectionProps {
+  initialSettings?: Record<string, string>;
+}
+
+export default function NewsletterSection({ initialSettings }: NewsletterSectionProps = {}) {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [cfg, setCfg] = useState<NLCfg>(DEFAULTS);
+  const [cfg, setCfg] = useState<NLCfg>(() =>
+    initialSettings && Object.keys(initialSettings).length > 0
+      ? buildCfg(initialSettings)
+      : DEFAULTS
+  );
 
   useEffect(() => {
+    // Skip if settings already provided via SSR
+    if (initialSettings && Object.keys(initialSettings).length > 0) return;
     supabase.from("site_settings").select("key,value").in("key", KEYS).then(({ data }) => {
       if (!data || data.length === 0) return;
       const m: Record<string, string> = {};
       data.forEach(({ key, value }) => { m[key] = value; });
-      setCfg({
-        eyebrow:      m.nl_eyebrow         || DEFAULTS.eyebrow,
-        heading:      m.nl_heading         || DEFAULTS.heading,
-        headingItalic: m.nl_heading_italic || DEFAULTS.headingItalic,
-        subtext:      m.nl_subtext         || DEFAULTS.subtext,
-        placeholder:  m.nl_placeholder     || DEFAULTS.placeholder,
-        btnText:      m.nl_btn_text        || DEFAULTS.btnText,
-        successText:  m.nl_success_text    || DEFAULTS.successText,
-      });
+      setCfg(buildCfg(m));
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

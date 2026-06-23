@@ -343,19 +343,22 @@ export default function ShopCategoryPageClient({
         if (m.adv_coll_card_h)  setAdvCardH(parseInt(m.adv_coll_card_h) || 0);
       });
 
-    supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", `${settingsPrefix}_filter_types`)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.value) {
-          try {
-            const parsed = JSON.parse(data.value);
-            if (Array.isArray(parsed) && parsed.length > 0) setFilterTypes(parsed);
-          } catch { /* use fallback */ }
-        }
-      });
+    // Skip filter_types fetch if already provided via SSR initialSettings
+    if (!initialSettings[`${settingsPrefix}_filter_types`]) {
+      supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", `${settingsPrefix}_filter_types`)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.value) {
+            try {
+              const parsed = JSON.parse(data.value);
+              if (Array.isArray(parsed) && parsed.length > 0) setFilterTypes(parsed);
+            } catch { /* use fallback */ }
+          }
+        });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsPrefix]);
 

@@ -141,16 +141,32 @@ export default async function HomePage() {
   const CAT_KEYS = [
     "cat_links_bold","cat_links_hover","cat_links_hover_bg","cat_links_hover_text","cat_num_color","cat_text_size",
   ];
+  const FP_KEYS = [
+    "fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active",
+    "fp_eyebrow","fp_heading","fp_heading_italic",
+    "adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_picks_aspect","adv_picks_radius","adv_picks_card_h",
+  ];
+  const NL_KEYS = [
+    "nl_eyebrow","nl_heading","nl_heading_italic","nl_subtext","nl_placeholder","nl_btn_text","nl_success_text",
+  ];
 
   const { data: settingsRows } = await sb
     .from("site_settings")
     .select("key,value")
-    .in("key", [...HERO_KEYS, ...PHIL_KEYS, ...IG_KEYS, ...CAT_KEYS]);
+    .in("key", [...HERO_KEYS, ...PHIL_KEYS, ...IG_KEYS, ...CAT_KEYS, ...FP_KEYS, ...NL_KEYS]);
 
   const cfg: Record<string, string> = {};
   (settingsRows ?? []).forEach((r: { key: string; value: string }) => {
     cfg[r.key] = r.value;
   });
+
+  // FeaturedPicks settings
+  const fpSettings: Record<string, string> = {};
+  [...FP_KEYS].forEach((k) => { if (cfg[k] !== undefined) fpSettings[k] = cfg[k]; });
+
+  // Newsletter settings
+  const nlSettings: Record<string, string> = {};
+  [...NL_KEYS].forEach((k) => { if (cfg[k] !== undefined) nlSettings[k] = cfg[k]; });
 
   // Hero
   const heroEyebrow = cfg["hero_eyebrow"] || "";
@@ -243,7 +259,7 @@ export default async function HomePage() {
       </section>
 
       {/* ══ 5. FEATURED PICKS ═════════════════════════════════════════════ */}
-      <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} saleProducts={saleProducts} />
+      <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} saleProducts={saleProducts} initialSettings={fpSettings} />
 
       {/* ══ 6. PHILOSOPHY ═════════════════════════════════════════════════ */}
       <PhilosophySection initialSettings={cfg} />
@@ -252,7 +268,7 @@ export default async function HomePage() {
       <StyleInspoSection initialImages={igImages} initialSettings={cfg} />
 
       {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
-      <NewsletterSection />
+      <NewsletterSection initialSettings={nlSettings} />
     </>
   );
 }

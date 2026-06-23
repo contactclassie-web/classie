@@ -14,10 +14,11 @@ export const metadata: Metadata = {
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
 
 export default async function HeelsPage() {
-  const [products, settings, collectionsData] = await Promise.all([
+  const [products, settings, collectionsData, filterSettingData] = await Promise.all([
     getHeelsForPageFromDB(),
     getHeelsSettings(),
     sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true }),
+    sb.from("site_settings").select("value").eq("key", "heels_filter_heel_types").maybeSingle(),
   ]);
 
   const initialOccasions = (collectionsData.data ?? []).map((c) => ({
@@ -28,5 +29,13 @@ export default async function HeelsPage() {
     image_position: c.image_position ?? "50% 50%",
   }));
 
-  return <HeelsPageClient initialProducts={products} initialSettings={settings} initialOccasions={initialOccasions} />;
+  let initialFilterTypes: string[] | undefined;
+  if (filterSettingData.data?.value) {
+    try {
+      const parsed = JSON.parse(filterSettingData.data.value);
+      if (Array.isArray(parsed) && parsed.length > 0) initialFilterTypes = parsed;
+    } catch { /* ignore */ }
+  }
+
+  return <HeelsPageClient initialProducts={products} initialSettings={settings} initialOccasions={initialOccasions} initialFilterTypes={initialFilterTypes} />;
 }
