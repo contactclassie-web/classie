@@ -2632,6 +2632,7 @@ export default function AdminPage() {
         await supabase.from("hero_slides").update(rest).eq("id", id);
       }
       await fetchSlides();
+      await revalidateSite(); // ← was missing! now website updates instantly
       closeSlideModal();
     } catch { /* ignore */ }
     finally { setSlideSaving(false); }
@@ -2641,11 +2642,13 @@ export default function AdminPage() {
     await supabase.from("hero_slides").delete().eq("id", id);
     setSlides((prev) => prev.filter((s) => s.id !== id));
     setDeleteSlideConfirm(null);
+    await revalidateSite();
   };
 
   const toggleSlideActive = async (s: HeroSlide) => {
     await supabase.from("hero_slides").update({ active: !s.active }).eq("id", s.id);
     setSlides((prev) => prev.map((x) => (x.id === s.id ? { ...x, active: !x.active } : x)));
+    await revalidateSite();
   };
 
   const setSlideField = (key: keyof HeroSlide, val: unknown) =>
