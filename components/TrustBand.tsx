@@ -5,13 +5,19 @@ import { supabase } from "@/lib/supabase";
 
 interface Feature { icon: string; title: string; active: boolean; display_order: number; }
 
-export default function TrustBand() {
-  const [items, setItems] = useState<Feature[]>([]);
+interface Props {
+  initialItems?: Feature[];
+}
+
+export default function TrustBand({ initialItems }: Props) {
+  const [items, setItems] = useState<Feature[]>(initialItems ?? []);
 
   useEffect(() => {
+    if (initialItems && initialItems.length > 0) return;
     supabase.from("features_bar").select("icon,title,active,display_order")
       .eq("active", true).order("display_order", { ascending: true })
       .then(({ data }) => { if (data && data.length > 0) setItems(data as Feature[]); });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (items.length === 0) return null;

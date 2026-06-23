@@ -15,11 +15,35 @@ interface Style {
 
 const DEFAULTS: Style = { bold: true, hoverBg: "#3B5373", hoverText: "#ffffff", numColor: "#9ca3af", textSize: "1.1" };
 
-export default function CategoryLinks({ excludeSlug, activeSlug }: { excludeSlug?: string; activeSlug?: string } = {}) {
-  const [cats, setCats]   = useState<Cat[]>([]);
-  const [style, setStyle] = useState<Style>(DEFAULTS);
+interface Props {
+  excludeSlug?: string;
+  activeSlug?: string;
+  initialCategories?: Array<{ name: string; slug: string; display_order?: number }>;
+  initialSettings?: Record<string, string>;
+}
+
+export default function CategoryLinks({ excludeSlug, activeSlug, initialCategories, initialSettings }: Props) {
+  const buildStyle = (s?: Record<string, string>): Style => s ? {
+    bold:      (s.cat_links_bold ?? "true") === "true",
+    hoverBg:   s.cat_links_hover_bg   ?? "#3B5373",
+    hoverText: s.cat_links_hover_text ?? "#ffffff",
+    numColor:  s.cat_num_color        ?? "#9ca3af",
+    textSize:  s.cat_text_size        ?? "1.1",
+  } : DEFAULTS;
+
+  const buildCats = (data?: Array<{ name: string; slug: string }>): Cat[] => {
+    if (!data) return [];
+    const filtered = excludeSlug ? data.filter((c) => c.slug !== excludeSlug) : data;
+    return filtered.map(c => ({ name: c.name, slug: c.slug }));
+  };
+
+  const [cats, setCats]   = useState<Cat[]>(buildCats(initialCategories));
+  const [style, setStyle] = useState<Style>(buildStyle(initialSettings));
 
   useEffect(() => {
+    // Skip if server provided data
+    if (initialCategories && initialCategories.length > 0 && initialSettings) return;
+
     supabase.from("site_categories").select("name,slug,display_order").eq("active", true)
       .order("display_order").then(({ data }) => {
         if (data) {
@@ -42,6 +66,7 @@ export default function CategoryLinks({ excludeSlug, activeSlug }: { excludeSlug
           textSize:  m.cat_text_size        ?? "1.1",
         });
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (cats.length === 0) return null;

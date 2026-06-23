@@ -6,10 +6,16 @@ import OccasionCarousel from "./OccasionCarousel";
 
 interface Occasion { title: string; href: string; image: string; tag_label?: string; image_position?: string; }
 
-export default function OccasionSection() {
-  const [occasions, setOccasions] = useState<Occasion[]>([]);
+interface Props {
+  initialOccasions?: Occasion[];
+}
+
+export default function OccasionSection({ initialOccasions }: Props) {
+  const [occasions, setOccasions] = useState<Occasion[]>(initialOccasions ?? []);
 
   useEffect(() => {
+    // Skip client fetch if server already provided data — prevents blink
+    if (initialOccasions && initialOccasions.length > 0) return;
     supabase.from("collections").select("*").eq("active", true).order("display_order", { ascending: true })
       .then(({ data }) => {
         if (data && data.length > 0) {
@@ -22,6 +28,7 @@ export default function OccasionSection() {
           })));
         }
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (occasions.length === 0) return null;

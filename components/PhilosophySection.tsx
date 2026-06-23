@@ -31,30 +31,39 @@ const KEYS = [
   "phil_f1_title","phil_f1_desc","phil_f2_title","phil_f2_desc",
 ];
 
-export default function PhilosophySection() {
-  const [d, setD] = useState<PhilData>(D);
+interface Props { initialSettings?: Record<string, string>; }
+
+function buildPhilData(m?: Record<string, string>): PhilData {
+  if (!m) return D;
+  return {
+    eyebrow:    m.philosophy_eyebrow          || D.eyebrow,
+    headLine1:  m.philosophy_headline         || D.headLine1,
+    headItalic: m.philosophy_headline_italic  || D.headItalic,
+    headLine2:  m.philosophy_headline2        || D.headLine2,
+    body:       m.philosophy_body             || D.body,
+    ctaText:    m.philosophy_cta_text         || D.ctaText,
+    ctaUrl:     m.philosophy_cta_url          || D.ctaUrl,
+    imageUrl:   m.philosophy_image_url        || "",
+    stat1n: m.phil_stat1_number || D.stat1n, stat1l: m.phil_stat1_label || D.stat1l,
+    stat2n: m.phil_stat2_number || D.stat2n, stat2l: m.phil_stat2_label || D.stat2l,
+    stat3n: m.phil_stat3_number || D.stat3n, stat3l: m.phil_stat3_label || D.stat3l,
+    f1Title: m.phil_f1_title || D.f1Title, f1Desc: m.phil_f1_desc || D.f1Desc,
+    f2Title: m.phil_f2_title || D.f2Title, f2Desc: m.phil_f2_desc || D.f2Desc,
+  };
+}
+
+export default function PhilosophySection({ initialSettings }: Props) {
+  const [d, setD] = useState<PhilData>(buildPhilData(initialSettings));
 
   useEffect(() => {
+    if (initialSettings && Object.keys(initialSettings).length > 0) return;
     supabase.from("site_settings").select("key,value").in("key", KEYS).then(({ data }) => {
       if (!data || data.length === 0) return;
       const m: Record<string, string> = {};
       data.forEach(({ key, value }) => { m[key] = value; });
-      setD({
-        eyebrow:   m.philosophy_eyebrow          || D.eyebrow,
-        headLine1: m.philosophy_headline         || D.headLine1,
-        headItalic: m.philosophy_headline_italic || D.headItalic,
-        headLine2: m.philosophy_headline2        || D.headLine2,
-        body:      m.philosophy_body             || D.body,
-        ctaText:   m.philosophy_cta_text         || D.ctaText,
-        ctaUrl:    m.philosophy_cta_url          || D.ctaUrl,
-        imageUrl:  m.philosophy_image_url        || "",
-        stat1n: m.phil_stat1_number || D.stat1n, stat1l: m.phil_stat1_label || D.stat1l,
-        stat2n: m.phil_stat2_number || D.stat2n, stat2l: m.phil_stat2_label || D.stat2l,
-        stat3n: m.phil_stat3_number || D.stat3n, stat3l: m.phil_stat3_label || D.stat3l,
-        f1Title: m.phil_f1_title || D.f1Title, f1Desc: m.phil_f1_desc || D.f1Desc,
-        f2Title: m.phil_f2_title || D.f2Title, f2Desc: m.phil_f2_desc || D.f2Desc,
-      });
+      setD(buildPhilData(m));
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const bodyParagraphs = d.body.split("\n\n").filter(Boolean);

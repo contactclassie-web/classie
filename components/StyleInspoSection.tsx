@@ -14,13 +14,32 @@ const IG_DEFAULTS: IgSettings = {
   followText: "Follow @classie_in →", followUrl: "https://www.instagram.com/_classie_in/",
 };
 
-export default function StyleInspoSection() {
-  const [images, setImages] = useState<IgImage[]>([]);
-  const [cfg, setCfg] = useState<IgSettings>(IG_DEFAULTS);
-  const [advDesktop, setAdvDesktop] = useState(4);
-  const [advGap,     setAdvGap]     = useState(4);
+interface Props {
+  initialImages?: Array<{ image: string; link: string }>;
+  initialSettings?: Record<string, string>;
+}
+
+export default function StyleInspoSection({ initialImages, initialSettings }: Props) {
+  const buildCfg = (s?: Record<string, string>): IgSettings => !s ? IG_DEFAULTS : {
+    handle:     s.ig_handle      || IG_DEFAULTS.handle,
+    heading:    s.ig_heading     || IG_DEFAULTS.heading,
+    subtext:    s.ig_subtext     || IG_DEFAULTS.subtext,
+    followText: s.ig_follow_text || IG_DEFAULTS.followText,
+    followUrl:  s.ig_follow_url  || IG_DEFAULTS.followUrl,
+  };
+
+  const mapImages = (imgs?: Array<{ image: string; link: string }>): IgImage[] =>
+    (imgs ?? []).map((img, i) => ({ image_url: img.image, link_url: img.link, display_order: i, active: true }));
+
+  const [images, setImages] = useState<IgImage[]>(mapImages(initialImages));
+  const [cfg, setCfg] = useState<IgSettings>(buildCfg(initialSettings));
+  const [advDesktop, setAdvDesktop] = useState(initialSettings?.adv_inspo_desktop ? parseInt(initialSettings.adv_inspo_desktop) || 4 : 4);
+  const [advGap,     setAdvGap]     = useState(initialSettings?.adv_inspo_gap ? parseInt(initialSettings.adv_inspo_gap) || 4 : 4);
 
   useEffect(() => {
+    // Skip if server provided data
+    if (initialImages && initialImages.length > 0 && initialSettings) return;
+
     supabase.from("site_settings").select("key,value")
       .in("key", ["adv_inspo_desktop","adv_inspo_gap"])
       .then(({ data }) => {
@@ -40,14 +59,9 @@ export default function StyleInspoSection() {
         if (!data || data.length === 0) return;
         const m: Record<string, string> = {};
         data.forEach(({ key, value }) => { m[key] = value; });
-        setCfg({
-          handle:     m.ig_handle      || IG_DEFAULTS.handle,
-          heading:    m.ig_heading     || IG_DEFAULTS.heading,
-          subtext:    m.ig_subtext     || IG_DEFAULTS.subtext,
-          followText: m.ig_follow_text || IG_DEFAULTS.followText,
-          followUrl:  m.ig_follow_url  || IG_DEFAULTS.followUrl,
-        });
+        setCfg(buildCfg(m));
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (images.length === 0) return null;

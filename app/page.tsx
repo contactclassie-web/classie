@@ -63,6 +63,13 @@ export default async function HomePage() {
     .select("*")
     .eq("active", true)
     .order("display_order", { ascending: true });
+
+  // ── Trust Band (features_bar) ──────────────────────────────────────────
+  const { data: dbFeaturesBar } = await sb
+    .from("features_bar")
+    .select("icon,title,active,display_order")
+    .eq("active", true)
+    .order("display_order", { ascending: true });
   const { data: dbSiteCategories } = await sb
     .from("site_categories")
     .select("*")
@@ -113,39 +120,30 @@ export default async function HomePage() {
 
   // ── Site Settings ──────────────────────────────────────────────────────
   const HERO_KEYS = [
-    "hero_eyebrow",
-    "hero_heading_line1",
-    "hero_heading_italic",
-    "hero_heading_line3",
-    "hero_subtitle",
-    "hero_cta1_text",
-    "hero_cta1_url",
-    "hero_cta2_text",
-    "hero_cta2_url",
-    "hero_image_url",
-    "hero_stat1_number",
-    "hero_stat1_label",
-    "hero_stat2_number",
-    "hero_stat2_label",
-    "hero_stat3_number",
-    "hero_stat3_label",
-    "hero_chip_code",
-    "hero_chip_text",
-    "band_text",
+    "hero_eyebrow","hero_heading_line1","hero_heading_italic","hero_heading_line3",
+    "hero_subtitle","hero_cta1_text","hero_cta1_url","hero_cta2_text","hero_cta2_url",
+    "hero_image_url","hero_stat1_number","hero_stat1_label","hero_stat2_number","hero_stat2_label",
+    "hero_stat3_number","hero_stat3_label","hero_chip_code","hero_chip_text","band_text",
+    "hero_badge_text","hero_badge_sub","hero_badge_active","hero_pill_text","hero_pill_sub","hero_pill_active",
   ];
   const PHIL_KEYS = [
-    "philosophy_eyebrow",
-    "philosophy_headline",
-    "philosophy_body",
-    "philosophy_cta_text",
-    "philosophy_cta_url",
-    "philosophy_image_url",
+    "philosophy_eyebrow","philosophy_headline","philosophy_headline_italic","philosophy_headline2",
+    "philosophy_body","philosophy_cta_text","philosophy_cta_url","philosophy_image_url",
+    "phil_stat1_number","phil_stat1_label","phil_stat2_number","phil_stat2_label",
+    "phil_stat3_number","phil_stat3_label","phil_f1_title","phil_f1_desc","phil_f2_title","phil_f2_desc",
+  ];
+  const IG_KEYS = [
+    "ig_handle","ig_heading","ig_subtext","ig_follow_text","ig_follow_url",
+    "adv_inspo_desktop","adv_inspo_gap",
+  ];
+  const CAT_KEYS = [
+    "cat_links_bold","cat_links_hover","cat_links_hover_bg","cat_links_hover_text","cat_num_color","cat_text_size",
   ];
 
   const { data: settingsRows } = await sb
     .from("site_settings")
     .select("key,value")
-    .in("key", [...HERO_KEYS, ...PHIL_KEYS]);
+    .in("key", [...HERO_KEYS, ...PHIL_KEYS, ...IG_KEYS, ...CAT_KEYS]);
 
   const cfg: Record<string, string> = {};
   (settingsRows ?? []).forEach((r: { key: string; value: string }) => {
@@ -222,7 +220,7 @@ export default async function HomePage() {
       <HeroSection heroSlides={heroSlides ?? []} heroImageUrl={heroImageUrl} initialSettings={cfg} />
 
       {/* ══ 2. TRUST BAND ══════════════════════════════════════════════════ */}
-      <TrustBand />
+      <TrustBand initialItems={dbFeaturesBar ?? []} />
 
       {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
       <section className="py-12 bg-white">
@@ -236,9 +234,9 @@ export default async function HomePage() {
                 Shop by <em className="italic text-[#3B5373]">Occasion</em>
               </h2>
           </div>
-          <OccasionSection />
+          <OccasionSection initialOccasions={occasions} />
           {/* Numbered Quick Links Row */}
-          <CategoryLinks />
+          <CategoryLinks initialCategories={siteCategories} initialSettings={cfg} />
         </div>
       </section>
 
@@ -246,10 +244,10 @@ export default async function HomePage() {
       <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} saleProducts={saleProducts} />
 
       {/* ══ 6. PHILOSOPHY ═════════════════════════════════════════════════ */}
-      <PhilosophySection />
+      <PhilosophySection initialSettings={cfg} />
 
       {/* ══ 7. STYLE INSPO ════════════════════════════════════════════════ */}
-      <StyleInspoSection />
+      <StyleInspoSection initialImages={igImages} initialSettings={cfg} />
 
       {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
       <NewsletterSection />
