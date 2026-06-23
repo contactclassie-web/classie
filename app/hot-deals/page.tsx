@@ -134,7 +134,7 @@ export default function HotDealsPage() {
   const [ready, setReady] = useState(false);
 
   const load = useCallback(async () => {
-    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
     const [{ data: sRows }, { data: cData }] = await Promise.all([
       sb.from("site_settings").select("key,value").like("key", "hd_%"),
       sb.from("coupons").select("*").eq("active", true).order("display_order", { ascending: true }),
