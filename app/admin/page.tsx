@@ -332,7 +332,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta";
 type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -340,7 +340,6 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "slides":         "homepage",
   "featured-picks": "homepage",
   "testimonials":   "homepage",
-  "instagram":      "homepage",
   "style-inspo":    "homepage",
   "announcement":   "homepage",
   "trust-band":     "homepage",
@@ -405,7 +404,6 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "announcement",   label: "Announcement" },
     { id: "featured-picks", label: "Featured Picks" },
     { id: "testimonials",   label: "Reviews" },
-    { id: "instagram",      label: "Instagram" },
     { id: "style-inspo",    label: "Style Inspo" },
     { id: "trust-band",     label: "Trust Band" },
   ],
@@ -2563,7 +2561,6 @@ export default function AdminPage() {
     if (tab === "categories") fetchCategories();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
-    if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
   }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
 
@@ -6969,114 +6966,6 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* ══ INSTAGRAM TAB ══════════════════════════════════════════════ */}
-          {tab === "instagram" && (
-            <div className="space-y-6">
-
-              {/* Section Header Settings */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
-                <h2 className="font-semibold text-gray-700">Section Header & Link</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div><label className={labelCls}>Handle (shown above heading)</label>
-                    <input type="text" value={siteSettings.ig_handle} className={inputCls}
-                      onChange={e => setSiteSettings(s => ({ ...s, ig_handle: e.target.value }))} placeholder="@classie_in" />
-                  </div>
-                  <div><label className={labelCls}>Section Heading (last word = italic)</label>
-                    <input type="text" value={siteSettings.ig_heading} className={inputCls}
-                      onChange={e => setSiteSettings(s => ({ ...s, ig_heading: e.target.value }))} placeholder="Style Inspo" />
-                  </div>
-                  <div><label className={labelCls}>Subtext</label>
-                    <input type="text" value={siteSettings.ig_subtext} className={inputCls}
-                      onChange={e => setSiteSettings(s => ({ ...s, ig_subtext: e.target.value }))} placeholder="Tag us to be featured" />
-                  </div>
-                  <div><label className={labelCls}>Follow Button Text</label>
-                    <input type="text" value={siteSettings.ig_follow_text} className={inputCls}
-                      onChange={e => setSiteSettings(s => ({ ...s, ig_follow_text: e.target.value }))} placeholder="Follow @classie_in →" />
-                  </div>
-                </div>
-                <div><label className={labelCls}>Follow Button URL</label>
-                  <input type="url" value={siteSettings.ig_follow_url} className={inputCls}
-                    onChange={e => setSiteSettings(s => ({ ...s, ig_follow_url: e.target.value }))} placeholder="https://www.instagram.com/..." />
-                </div>
-                <button onClick={saveInstagramSettings} disabled={settingsSaving}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
-                  <Save className="w-4 h-4" />
-                  {settingsSaving ? "Saving…" : "Save Section Settings"}
-                </button>
-              </div>
-
-              {/* Images list */}
-              <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-800">Instagram Feed Images</h2>
-                  <p className="text-xs text-gray-400 mt-0.5">{instagramImages.length} images (4 shown on homepage)</p>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={fetchInstagramImages} disabled={instagramLoading}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-[#3B5373] border border-gray-200 rounded-xl transition-colors">
-                    <RefreshCw className={`w-3.5 h-3.5 ${instagramLoading ? "animate-spin" : ""}`} />Refresh
-                  </button>
-                  <button onClick={() => setInstagramModal({ open: true, mode: "add", data: { ...EMPTY_INSTAGRAM } })}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
-                    <Plus className="w-3.5 h-3.5" />Add Image
-                  </button>
-                </div>
-              </div>
-              {instagramLoading ? (
-                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400 text-sm">Loading…</div>
-              ) : instagramImages.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
-                  <Camera className="w-8 h-8 text-gray-200 mx-auto mb-3" />
-                  <p className="text-gray-400 text-sm">No images yet. Add Instagram images to show on homepage!</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {instagramImages.map((img, idx) => (
-                    <div key={img.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                      <div className="relative aspect-square bg-gray-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        {img.image_url ? <img src={img.image_url} alt="Instagram" className="w-full h-full object-cover" /> :
-                          <div className="w-full h-full flex items-center justify-center text-gray-300"><Camera className="w-8 h-8" /></div>}
-                        <span className="absolute top-2 left-2 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded">#{idx + 1}</span>
-                        <span className={`absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded ${img.active ? "bg-green-500/80 text-white" : "bg-gray-400/80 text-white"}`}>
-                          {img.active ? "ON" : "OFF"}
-                        </span>
-                      </div>
-                      <div className="p-3 flex justify-end gap-2">
-                        <button onClick={() => setInstagramModal({ open: true, mode: "edit", data: { ...img } })}
-                          className="p-1.5 text-gray-400 hover:text-[#3B5373] hover:bg-gray-50 rounded-lg transition-colors">
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => setDeleteInstagramConfirm(img.id!)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {deleteInstagramConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-                  <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
-                    <p className="font-semibold text-gray-800 mb-2">Delete Image?</p>
-                    <div className="flex gap-3 justify-center">
-                      <button onClick={() => setDeleteInstagramConfirm(null)} className="px-5 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
-                      <button onClick={async () => {
-                        await supabase.from("instagram_images").delete().eq("id", deleteInstagramConfirm);
-                        setDeleteInstagramConfirm(null);
-                        await fetchInstagramImages();
-                      }} className="px-5 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            </div>
-          )}
-
-          {/* ══ STYLE INSPO TAB ════════════════════════════════════════════ */}
           {tab === "style-inspo" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
