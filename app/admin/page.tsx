@@ -3043,26 +3043,63 @@ export default function AdminPage() {
 
   const mainSection: MainSection = TAB_TO_SECTION[tab];
 
-  const MAIN_SECTIONS: { id: MainSection; label: string; icon: React.ElementType; badge?: number }[] = [
-    { id: "dashboard", label: "Dashboard",  icon: LayoutDashboard },
-    { id: "homepage",  label: "Homepage",   icon: Home },
-    { id: "catalog",   label: "Catalog",    icon: ImageIcon, badge: dbProducts.length },
-    { id: "heels",       label: "Heels Page",  icon: Layers },
-    { id: "clips-page", label: "Clips Page",  icon: Sparkles },
-    { id: "bow-page",          label: "Bow Page",         icon: Sparkles },
-    { id: "collections-page", label: "Collections Page", icon: Grid3x3 },
-    { id: "style-ideas-page",   label: "Style Ideas Page", icon: Camera },
-    { id: "advanced-settings",  label: "Advanced Settings", icon: Settings },
-    { id: "hot-deals",          label: "Hot Deals",         icon: Tag },
-    { id: "about-us",           label: "About Us",          icon: Users },
-    { id: "contact-us",         label: "Contact Us",        icon: MessageSquare },
-    { id: "shipping-policy",    label: "Shipping Policy",   icon: Truck },
-    { id: "size-guide",         label: "Size Guide",        icon: Ruler },
-    { id: "returns",            label: "Returns & Exchanges", icon: RefreshCw },
-    { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.length },
-    { id: "settings",  label: "Settings",   icon: Settings },
-    { id: "footer",    label: "Footer",     icon: Layout },
-    { id: "messages",  label: "Messages",   icon: MessageSquare, badge: messages.length },
+  const SIDEBAR_GROUPS: {
+    header?: string;
+    items: { id: MainSection; label: string; icon: React.ElementType; badge?: number }[];
+  }[] = [
+    {
+      items: [
+        { id: "dashboard", label: "Dashboard",  icon: LayoutDashboard },
+        { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.filter(o => o.status === "pending").length },
+      ],
+    },
+    {
+      header: "CATALOG",
+      items: [
+        { id: "catalog", label: "Products",  icon: ImageIcon, badge: dbProducts.length },
+      ],
+    },
+    {
+      header: "CONTENT",
+      items: [
+        { id: "homepage",   label: "Homepage",  icon: Home },
+        { id: "hot-deals",  label: "Hot Deals", icon: Tag },
+      ],
+    },
+    {
+      header: "SHOP PAGES",
+      items: [
+        { id: "heels",             label: "Heels",           icon: Layers },
+        { id: "clips-page",        label: "Clip-ons",        icon: Sparkles },
+        { id: "bow-page",          label: "Bow Collection",  icon: Star },
+        { id: "collections-page",  label: "Collections",     icon: Grid3x3 },
+        { id: "style-ideas-page",  label: "Style Ideas",     icon: Camera },
+      ],
+    },
+    {
+      header: "INFO PAGES",
+      items: [
+        { id: "about-us",    label: "About Us",    icon: Users },
+        { id: "contact-us",  label: "Contact Us",  icon: MessageSquare },
+      ],
+    },
+    {
+      header: "POLICIES",
+      items: [
+        { id: "shipping-policy", label: "Shipping",         icon: Truck },
+        { id: "size-guide",      label: "Size Guide",       icon: Ruler },
+        { id: "returns",         label: "Returns",          icon: RefreshCw },
+      ],
+    },
+    {
+      header: "SYSTEM",
+      items: [
+        { id: "settings",          label: "Settings",  icon: Settings },
+        { id: "footer",            label: "Footer",    icon: Layout },
+        { id: "advanced-settings", label: "Advanced",  icon: Palette },
+        { id: "messages",          label: "Messages",  icon: MessageSquare, badge: messages.length },
+      ],
+    },
   ];
 
   // ── Main layout ───────────────────────────────────────────────────────────
@@ -3083,46 +3120,61 @@ export default function AdminPage() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-4 px-3 space-y-0.5">
-          {MAIN_SECTIONS.map(({ id, label, icon: Icon, badge }) => {
-            const active = mainSection === id;
-            const firstTab: TabId = id === "dashboard" ? "dashboard" :
-              id === "orders" ? "orders" :
-              id === "settings" ? "settings" :
-              id === "footer" ? "footer" :
-              id === "messages" ? "messages" :
-              id === "clips-page" ? "clips-page" :
-              id === "bow-page" ? "bow-page" :
-              id === "collections-page" ? "collections-page" :
-              id === "style-ideas-page" ? "style-ideas-page" :
-              id === "hot-deals" ? "hd-page" :
-              id === "about-us" ? "au-hero" :
-              id === "contact-us" ? "ct-hero" :
-              id === "shipping-policy" ? "sp-hero" :
-              id === "size-guide" ? "sg-hero" :
-              id === "returns" ? "re-hero" :
-              (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
+        <nav className="flex-1 py-3 px-2.5 overflow-y-auto">
+          {SIDEBAR_GROUPS.map((group, gi) => {
+            const getFirstTab = (id: MainSection): TabId => {
+              if (id === "dashboard") return "dashboard";
+              if (id === "orders") return "orders";
+              if (id === "settings") return "settings";
+              if (id === "footer") return "footer";
+              if (id === "messages") return "messages";
+              if (id === "clips-page") return "clips-page";
+              if (id === "bow-page") return "bow-page";
+              if (id === "collections-page") return "collections-page";
+              if (id === "style-ideas-page") return "style-ideas-page";
+              if (id === "hot-deals") return "hd-page";
+              if (id === "about-us") return "au-hero";
+              if (id === "contact-us") return "ct-hero";
+              if (id === "shipping-policy") return "sp-hero";
+              if (id === "size-guide") return "sg-hero";
+              if (id === "returns") return "re-hero";
+              return (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
+            };
             return (
-              <button
-                key={id}
-                onClick={() => setTab(firstTab)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-left ${
-                  active
-                    ? "bg-white/15 text-white border-l-2 border-white pl-[10px]"
-                    : "text-white/65 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span className="flex-1">{label}</span>
-                {badge !== undefined && badge > 0 && (
-                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${active ? "bg-white text-[#3B5373]" : "bg-white/20 text-white/80"}`}>
-                    {badge}
-                  </span>
+              <div key={gi} className={gi > 0 ? "mt-1" : ""}>
+                {group.header && (
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-white/35 px-3 pt-4 pb-1.5">
+                    {group.header}
+                  </p>
                 )}
-              </button>
+                <div className="space-y-0.5">
+                  {group.items.map(({ id, label, icon: Icon, badge }) => {
+                    const active = mainSection === id;
+                    return (
+                      <button
+                        key={id}
+                        onClick={() => setTab(getFirstTab(id))}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                          active
+                            ? "bg-white/15 text-white"
+                            : "text-white/60 hover:text-white hover:bg-white/10"
+                        }`}
+                      >
+                        {active && <span className="absolute left-0 w-0.5 h-5 bg-white rounded-r-full" style={{marginLeft: "0px"}} />}
+                        <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="flex-1 text-[13px]">{label}</span>
+                        {badge !== undefined && badge > 0 && (
+                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${active ? "bg-white text-[#3B5373]" : "bg-white/20 text-white/70"}`}>
+                            {badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
-
         </nav>
 
         {/* Sign Out */}
