@@ -80,11 +80,11 @@ function ProductCard({ product, isNew, cardStyle }: { product: Product; isNew?: 
   return (
     <div className="group cursor-pointer" onClick={() => router.push(`/products/${product.slug}`)}>
       {/* Card */}
-      <div className={`relative overflow-hidden ${cardStyle?.borderRadius || ""}`} style={{ aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "3/4"), height: cardStyle?.height ? `${cardStyle.height}px` : undefined, background: `linear-gradient(145deg, ${c1}, ${c2})` }}>
+      <div className={`relative overflow-hidden ${cardStyle?.borderRadius || ""}`} style={{ aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "3/4"), height: cardStyle?.height ? `${cardStyle.height}px` : undefined, background: `#f9f9f9` }}>
         {/* Product image */}
         {product.image && (
           <Image src={product.image} alt={product.title} fill
-            className="object-cover object-bottom transition-transform duration-700 group-hover:scale-105"
+            className="object-contain transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 50vw, 25vw" />
         )}
 
