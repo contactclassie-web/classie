@@ -364,38 +364,28 @@ export default function ProductDetailClient({
                 ? Math.round(product.price * (1 - offer.discount_value / 100))
                 : Math.max(0, Math.round(product.price - offer.discount_value));
               return (
-                <div key={offer.id} style={{ borderRadius: "12px", overflow: "hidden", border: "1.5px solid #3B5373" }}>
-                  {/* Top accent bar */}
-                  <div style={{ background: "#3B5373", padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: "#fff" }}>Limited Offer</span>
-                    </div>
-                    <span style={{ background: "#fff", color: "#3B5373", fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "100px", letterSpacing: "0.05em" }}>Save {disc}</span>
+                <div key={offer.id} style={{ borderRadius: "12px", border: "1px solid #E8E3DD", background: "#fff", padding: "18px" }}>
+                  {/* Header row */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                    <p style={{ fontFamily: "Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#1a1a1a" }}>Buy 2, Get {disc} Off</p>
+                    <span style={{ background: "#EEF2F7", color: "#3B5373", fontSize: "11px", fontWeight: 700, padding: "4px 12px", borderRadius: "100px" }}>Save {disc}</span>
                   </div>
-                  {/* Body */}
-                  <div style={{ background: "#fff", padding: "16px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
-                      <div>
-                        <p style={{ fontFamily: "Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#1a1a1a", marginBottom: "4px" }}>Buy 2, Get {disc} Off</p>
-                        <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.5 }}>
-                          {offer.custom_label || `Purchase 2 pairs and enjoy ${disc} off each — automatically applied at checkout.`}
-                        </p>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "14px", paddingTop: "10px", borderTop: "1px solid #E8E3DD" }}>
-                      <span style={{ fontSize: "22px", fontWeight: 700, color: "#3B5373" }}>₹{discPrice}</span>
-                      <span style={{ fontSize: "13px", color: "#bbb", textDecoration: "line-through" }}>₹{product.price}</span>
-                      <span style={{ fontSize: "11px", color: "#888" }}>each × 2 pairs</span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
-                      }}
-                      style={{ width: "100%", padding: "13px", background: "#3B5373", color: "#fff", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer" }}
-                    >
-                      Add 2 to Cart — Save {disc}
-                    </button>
+                  <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.5, marginBottom: "14px" }}>
+                    {offer.custom_label || `Purchase 2 pairs and enjoy ${disc} off each.`}
+                  </p>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "16px", paddingTop: "12px", borderTop: "1px solid #F0EDEA" }}>
+                    <span style={{ fontSize: "20px", fontWeight: 700, color: "#1a1a1a" }}>₹{discPrice}</span>
+                    <span style={{ fontSize: "12px", color: "#bbb", textDecoration: "line-through" }}>₹{product.price}</span>
+                    <span style={{ fontSize: "11px", color: "#888" }}>each × 2 pairs</span>
                   </div>
+                  <button
+                    onClick={() => {
+                      addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
+                    }}
+                    style={{ width: "100%", padding: "13px", background: "#fff", color: "#3B5373", border: "1.5px solid #3B5373", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer" }}
+                  >
+                    Add 2 to Cart — Save {disc}
+                  </button>
                 </div>
               );
             })}
