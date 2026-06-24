@@ -134,17 +134,17 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
       {/* Text */}
       <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-20`} style={{ minHeight: "320px" }}>
         <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
-          <div className="w-8 h-px bg-white/40" />
-          <span className="text-[10px] tracking-[0.5em] uppercase text-white/60" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <div className="w-8 h-px bg-[#3B5373]/50" />
+          <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "'Poppins', sans-serif" }}>
             {eyebrow}
           </span>
-          <div className="w-8 h-px bg-white/40" />
+          <div className="w-8 h-px bg-[#3B5373]/50" />
         </div>
-        <h1 className="font-serif font-light text-white leading-none mb-5" style={{ fontSize: "clamp(64px, 10vw, 96px)" }}>
+        <h1 className="font-serif font-light text-[#1a1a1a] leading-none mb-5" style={{ fontSize: "clamp(64px, 10vw, 96px)" }}>
           {title}
         </h1>
         {subtitle && (
-          <p className="font-serif italic text-white/60 text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          <p className="font-serif italic text-[#3B5373] text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             {subtitle}
           </p>
         )}
@@ -156,10 +156,10 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
               { val: stat3Val, label: stat3Label },
             ].map((s, i) => (
               <>
-                {i > 0 && <div key={`div-${i}`} className="w-px h-8 bg-white/20" />}
+                {i > 0 && <div key={`div-${i}`} className="w-px h-8 bg-[#3B5373]/30" />}
                 <div key={s.label} className="text-center">
-                  <p className="text-2xl font-serif font-light text-white">{s.val}</p>
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.label}</p>
+                  <p className="text-2xl font-serif font-light text-[#1a1a1a]">{s.val}</p>
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-[#3B5373] mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.label}</p>
                 </div>
               </>
             ))}
