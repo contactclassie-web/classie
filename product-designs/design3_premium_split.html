@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Radiance Heart Crystal Clip — Classie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #3B5373;
+      --navy-dark: #2e4460;
+      --bg-right: #F7F5F3;
+      --text: #1c1c1c;
+      --muted: #888;
+      --border: #e0ddd8;
+      --gold: #D4AF37;
+      --silver: #C0C0C0;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* TOP NAV */
+    .top-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 60px;
+    }
+    .nav-logo-3 {
+      font-family: 'Italiana', serif;
+      font-size: 24px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--navy);
+    }
+    .nav-links-3 { display: flex; gap: 28px; }
+    .nav-links-3 a {
+      font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-links-3 a:hover { color: var(--navy); }
+    .nav-icons-3 { display: flex; gap: 16px; cursor: pointer; font-size: 17px; }
+
+    /* SPLIT LAYOUT */
+    .split-layout {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 60px;
+    }
+
+    /* LEFT: STICKY IMAGE */
+    .image-side {
+      width: 52%;
+      position: sticky;
+      top: 60px;
+      height: calc(100vh - 60px);
+      overflow: hidden;
+      background: #ede9e3;
+    }
+    .image-slides { position: relative; width: 100%; height: 100%; }
+    .slide {
+      position: absolute; inset: 0;
+      opacity: 0; transition: opacity .5s;
+    }
+    .slide.active { opacity: 1; }
+    .slide img { width: 100%; height: 100%; object-fit: cover; }
+    .dot-nav {
+      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 10;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.5); cursor: pointer;
+      transition: background .3s, transform .3s;
+    }
+    .dot.active { background: #fff; transform: scale(1.3); }
+    .img-label {
+      position: absolute; top: 28px; left: 28px;
+      background: var(--navy); color: #fff;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 6px 12px; border-radius: 20px;
+    }
+
+    /* RIGHT: SCROLLABLE */
+    .info-side {
+      width: 48%;
+      background: var(--bg-right);
+      padding: 60px;
+      overflow-y: auto;
+    }
+
+    .brand-tag {
+      font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--navy); font-variant: small-caps; font-weight: 600;
+      margin-bottom: 16px; display: block;
+    }
+    .product-title-3 {
+      font-family: 'Italiana', serif;
+      font-size: 44px; line-height: 1.1; color: var(--text);
+      margin-bottom: 20px;
+    }
+    .stars-row-3 { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
+    .stars-3 { color: var(--gold); font-size: 16px; letter-spacing: 2px; }
+    .rev-ct { font-size: 12px; color: var(--muted); }
+    .price-elegant {
+      margin-bottom: 28px;
+      padding: 20px 24px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 12px;
+    }
+    .pe-current {
+      font-family: 'Italiana', serif;
+      font-size: 36px; color: var(--text);
+    }
+    .pe-original { font-size: 16px; color: var(--muted); text-decoration: line-through; }
+    .pe-badge {
+      background: #e8f5ee; color: #2d7a4a;
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* COLOR SWATCHES */
+    .color-section { margin-bottom: 28px; }
+    .color-heading {
+      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px;
+    }
+    .swatches-3 { display: flex; gap: 20px; }
+    .swatch-3-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      cursor: pointer;
+    }
+    .swatch-3 {
+      width: 56px; height: 56px; border-radius: 50%;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .swatch-3-wrap.active .swatch-3 {
+      box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--navy);
+      transform: scale(1.1);
+    }
+    .swatch-3-name { font-size: 11px; color: var(--muted); letter-spacing: .5px; }
+
+    /* BUTTONS */
+    .btn-section { margin-bottom: 28px; }
+    .btn-add-3 {
+      width: 100%; padding: 16px;
+      background: var(--navy); color: #fff;
+      border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      border-radius: 8px; margin-bottom: 10px;
+      transition: background .2s;
+    }
+    .btn-add-3:hover { background: var(--navy-dark); }
+    .btn-wa {
+      width: 100%; padding: 14px;
+      background: transparent; color: var(--text);
+      border: 1.5px solid var(--border); cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: border-color .2s;
+    }
+    .btn-wa:hover { border-color: #25D366; color: #25D366; }
+    .wa-icon { font-size: 16px; }
+
+    /* FEATURE CARDS */
+    .feature-grid-3 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 36px;
+    }
+    .feat-card {
+      background: var(--navy);
+      color: #fff; padding: 20px 18px; border-radius: 14px;
+    }
+    .feat-card .fc-icon { font-size: 22px; margin-bottom: 8px; }
+    .feat-card h4 { font-size: 12px; font-weight: 600; letter-spacing: .3px; margin-bottom: 3px; }
+    .feat-card p { font-size: 11px; color: rgba(255,255,255,.65); }
+
+    /* COMPLETE THE LOOK */
+    .look-section { margin-bottom: 20px; }
+    .look-title {
+      font-family: 'Italiana', serif;
+      font-size: 28px; margin-bottom: 16px; color: var(--text);
+    }
+    .look-scroll {
+      display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;
+      scrollbar-width: thin;
+    }
+    .look-card {
+      flex: 0 0 180px; cursor: pointer;
+    }
+    .look-img {
+      width: 180px; height: 220px; object-fit: cover; border-radius: 10px;
+      display: block; margin-bottom: 10px;
+      transition: transform .3s;
+    }
+    .look-card:hover .look-img { transform: translateY(-4px); }
+    .look-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+    .look-price { font-size: 12px; color: var(--navy); font-weight: 600; }
+
+    /* STICKY BOTTOM BAR */
+    .sticky-bar {
+      position: sticky; bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 12px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+      z-index: 50;
+    }
+    .sticky-price-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .sticky-price-val {
+      font-family: 'Italiana', serif;
+      font-size: 28px; color: var(--text);
+    }
+    .sticky-btn {
+      padding: 13px 36px;
+      background: var(--navy); color: #fff;
+      border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      border-radius: 8px;
+      transition: background .2s;
+    }
+    .sticky-btn:hover { background: var(--navy-dark); }
+    .desc-text {
+      font-size: 13px; line-height: 1.8; color: #555; margin-bottom: 28px;
+      border-left: 3px solid var(--navy); padding-left: 16px;
+    }
+    .divider-3 { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="top-nav">
+  <div class="nav-logo-3">Classie</div>
+  <div class="nav-links-3">
+    <a href="#">Heels</a>
+    <a href="#">Clips</a>
+    <a href="#">Bags</a>
+    <a href="#">New In</a>
+  </div>
+  <div class="nav-icons-3">
+    <span>🔍</span><span>♡</span><span>🛍</span>
+  </div>
+</div>
+
+<!-- SPLIT LAYOUT -->
+<div class="split-layout">
+
+  <!-- LEFT: STICKY IMAGE -->
+  <div class="image-side">
+    <div class="image-slides">
+      <div class="slide active">
+        <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800" alt="Crystal Clip">
+      </div>
+      <div class="slide">
+        <img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800" alt="Crystal Clip Alt">
+      </div>
+      <div class="slide">
+        <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800" alt="Crystal Clip Detail">
+      </div>
+    </div>
+    <div class="img-label">✦ New Arrival</div>
+    <div class="dot-nav">
+      <div class="dot active" onclick="goSlide(0)"></div>
+      <div class="dot" onclick="goSlide(1)"></div>
+      <div class="dot" onclick="goSlide(2)"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: SCROLLABLE INFO -->
+  <div class="info-side">
+    <span class="brand-tag">Classie Accessories</span>
+    <h1 class="product-title-3">Radiance Heart<br>Crystal Clip<br><em style="font-style:italic;color:var(--muted);font-size:32px">(Pair)</em></h1>
+
+    <div class="stars-row-3">
+      <div class="stars-3">★★★★★</div>
+      <div class="rev-ct">4.9 · <a href="#" style="color:var(--navy);text-decoration:none;">38 reviews</a></div>
+    </div>
+
+    <div class="price-elegant">
+      <span class="pe-current">₹399</span>
+      <span class="pe-original">₹499</span>
+      <span class="pe-badge">20% OFF</span>
+    </div>
+
+    <p class="desc-text">
+      A heart-shaped crystal clip designed to add romance and sparkle. Secure alligator clasp. Perfect for heels, bags, and hair. Sold as a pair.
+    </p>
+
+    <hr class="divider-3">
+
+    <!-- COLOR -->
+    <div class="color-section">
+      <div class="color-heading">Select Finish</div>
+      <div class="swatches-3">
+        <div class="swatch-3-wrap active" onclick="selColor3(this,'Gold')">
+          <div class="swatch-3" style="background:linear-gradient(135deg,#D4AF37,#f0d060);"></div>
+          <span class="swatch-3-name">Gold</span>
+        </div>
+        <div class="swatch-3-wrap" onclick="selColor3(this,'Silver')">
+          <div class="swatch-3" style="background:linear-gradient(135deg,#C0C0C0,#e8e8e8);"></div>
+          <span class="swatch-3-name">Silver</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider-3">
+
+    <!-- BUTTONS -->
+    <div class="btn-section">
+      <button class="btn-add-3">Add to Bag</button>
+      <button class="btn-wa">
+        <span class="wa-icon">💬</span> Chat to Order on WhatsApp
+      </button>
+    </div>
+
+    <!-- FEATURE CARDS -->
+    <div class="feature-grid-3">
+      <div class="feat-card">
+        <div class="fc-icon">✨</div>
+        <h4>Multipurpose Styling</h4>
+        <p>Heels, bags &amp; hair</p>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon">🔒</div>
+        <h4>Secure Alligator Clasp</h4>
+        <p>Firm all-day grip</p>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon">⚡</div>
+        <h4>Clip On/Off in Seconds</h4>
+        <p>Effortless styling</p>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon">🌿</div>
+        <h4>Reusable &amp; Lightweight</h4>
+        <p>Built to last</p>
+      </div>
+    </div>
+
+    <hr class="divider-3">
+
+    <!-- COMPLETE THE LOOK -->
+    <div class="look-section">
+      <div class="look-title">Complete the Look</div>
+      <div class="look-scroll">
+        <div class="look-card">
+          <img class="look-img" src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400" alt="">
+          <div class="look-name">Pearl Bow Clip</div>
+          <div class="look-price">₹349</div>
+        </div>
+        <div class="look-card">
+          <img class="look-img" src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=400" alt="">
+          <div class="look-name">Star Crystal Clip</div>
+          <div class="look-price">₹449</div>
+        </div>
+        <div class="look-card">
+          <img class="look-img" src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400" alt="">
+          <div class="look-name">Rose Gold Floral</div>
+          <div class="look-price">₹299</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY BOTTOM BAR -->
+<div class="sticky-bar">
+  <div>
+    <div class="sticky-price-label">Radiance Heart Crystal Clip (Pair)</div>
+    <div class="sticky-price-val">₹399</div>
+  </div>
+  <button class="sticky-btn">Add to Bag</button>
+</div>
+
+<script>
+  let currentSlide = 0;
+  function goSlide(n) {
+    document.querySelectorAll('.slide').forEach((s, i) => {
+      s.classList.toggle('active', i === n);
+    });
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === n);
+    });
+    currentSlide = n;
+  }
+
+  // Auto-slide
+  setInterval(() => {
+    goSlide((currentSlide + 1) % 3);
+  }, 4000);
+
+  function selColor3(el, name) {
+    document.querySelectorAll('.swatch-3-wrap').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>

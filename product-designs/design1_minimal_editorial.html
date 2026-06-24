@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Radiance Heart Crystal Clip — Classie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #3B5373;
+      --navy-light: #4a6690;
+      --gold: #D4AF37;
+      --silver: #C0C0C0;
+      --text: #1a1a1a;
+      --muted: #888;
+      --border: #e8e8e8;
+      --green: #2d7a4a;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--navy);
+    }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text); text-decoration: none; font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--navy); }
+    .nav-icons { display: flex; gap: 20px; cursor: pointer; }
+    .nav-icons span { font-size: 18px; }
+
+    /* BREADCRUMB */
+    .breadcrumb {
+      padding: 14px 48px;
+      font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .breadcrumb span { margin: 0 6px; }
+
+    /* PRODUCT LAYOUT */
+    .product-layout {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+      gap: 0;
+    }
+
+    /* LEFT: IMAGES */
+    .product-images { padding-right: 40px; }
+    .main-image-wrap {
+      position: relative;
+      aspect-ratio: 1 / 1.2;
+      overflow: hidden;
+      background: #f9f9f9;
+    }
+    .main-image-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .6s ease;
+    }
+    .main-image-wrap:hover img { transform: scale(1.04); }
+    .badge-sale {
+      position: absolute; top: 16px; left: 16px;
+      background: var(--navy); color: #fff;
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      padding: 5px 10px;
+    }
+    .thumbnails {
+      display: flex; gap: 10px; margin-top: 12px;
+    }
+    .thumb {
+      width: 80px; height: 80px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color .2s;
+    }
+    .thumb.active, .thumb:hover { border-color: var(--navy); }
+
+    /* RIGHT: STICKY PANEL */
+    .product-info {
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+      padding: 8px 0 0 48px;
+      border-left: 1px solid var(--border);
+    }
+    .category-tag {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: #aaa; margin-bottom: 12px; display: block;
+    }
+    .product-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px; font-weight: 600; line-height: 1.2;
+      color: var(--text); margin-bottom: 16px;
+    }
+    .reviews-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+    }
+    .stars { color: var(--gold); font-size: 16px; letter-spacing: 2px; }
+    .review-text { font-size: 12px; color: var(--muted); }
+    .review-text strong { color: var(--text); }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* PRICE */
+    .price-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .price-current { font-size: 26px; font-weight: 700; color: var(--text); font-family: 'Playfair Display', serif; }
+    .price-original { font-size: 16px; color: var(--muted); text-decoration: line-through; }
+    .discount-pill {
+      background: #e8f5ee; color: var(--green);
+      font-size: 11px; font-weight: 600; letter-spacing: .5px;
+      padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* COLOR */
+    .color-label { font-size: 12px; font-weight: 600; letter-spacing: .5px; margin-bottom: 10px; }
+    .color-label span { font-weight: 400; color: var(--muted); }
+    .swatches { display: flex; gap: 10px; margin-bottom: 24px; }
+    .swatch {
+      width: 36px; height: 36px; border-radius: 50%;
+      cursor: pointer; border: 2px solid transparent;
+      position: relative; transition: border-color .2s;
+    }
+    .swatch.active { border-color: var(--navy); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--navy); }
+    .swatch-gold { background: var(--gold); }
+    .swatch-silver { background: var(--silver); }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 24px;
+    }
+    .feature-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #444;
+    }
+    .feature-check {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #eef2f7;
+      color: var(--navy); font-size: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-weight: 700;
+    }
+
+    /* QUANTITY + BUTTONS */
+    .qty-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+    .qty-stepper {
+      display: flex; align-items: center;
+      border: 1px solid var(--border);
+    }
+    .qty-btn {
+      width: 40px; height: 44px;
+      border: none; background: none; cursor: pointer;
+      font-size: 18px; color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .qty-btn:hover { background: #f5f5f5; }
+    .qty-val {
+      width: 44px; height: 44px;
+      text-align: center; font-size: 14px; font-weight: 600;
+      border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+      outline: none;
+    }
+    .btn-add {
+      width: 100%;
+      padding: 15px;
+      background: var(--navy); color: #fff;
+      border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      transition: background .2s;
+      margin-bottom: 10px;
+    }
+    .btn-add:hover { background: var(--navy-light); }
+    .btn-buy {
+      width: 100%;
+      padding: 14px;
+      background: transparent; color: var(--navy);
+      border: 1.5px solid var(--navy); cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      transition: all .2s;
+    }
+    .btn-buy:hover { background: var(--navy); color: #fff; }
+
+    /* TRUST ROW */
+    .trust-row {
+      display: flex; gap: 0; margin-top: 20px;
+      border: 1px solid var(--border);
+    }
+    .trust-item {
+      flex: 1; text-align: center; padding: 12px 8px;
+      font-size: 11px; color: var(--muted);
+      border-right: 1px solid var(--border);
+    }
+    .trust-item:last-child { border-right: none; }
+    .trust-item .trust-icon { font-size: 16px; display: block; margin-bottom: 4px; }
+    .trust-item strong { display: block; color: var(--text); font-size: 11px; font-weight: 600; }
+
+    /* BELOW FOLD */
+    .below-fold {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 48px 80px;
+    }
+
+    /* ACCORDION */
+    .accordion-section { border-top: 1px solid var(--border); }
+    .accordion-item { border-bottom: 1px solid var(--border); }
+    .accordion-header {
+      width: 100%; background: none; border: none; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 0;
+      font-family: 'Playfair Display', serif;
+      font-size: 16px; font-weight: 500;
+      color: var(--text); text-align: left;
+    }
+    .accordion-icon { font-size: 18px; transition: transform .3s; color: var(--muted); }
+    .accordion-item.open .accordion-icon { transform: rotate(45deg); }
+    .accordion-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s ease, padding .35s;
+      font-size: 13px; line-height: 1.8; color: #555;
+    }
+    .accordion-item.open .accordion-body {
+      max-height: 300px; padding-bottom: 18px;
+    }
+
+    /* ICON GRID */
+    .icon-section { margin: 48px 0; }
+    .icon-section h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; margin-bottom: 24px; text-align: center;
+    }
+    .icon-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .icon-card {
+      text-align: center; padding: 28px 16px;
+      border: 1px solid var(--border);
+      transition: box-shadow .2s;
+    }
+    .icon-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+    .icon-card .ic { font-size: 28px; margin-bottom: 10px; }
+    .icon-card h4 { font-size: 12px; font-weight: 600; letter-spacing: .5px; margin-bottom: 4px; }
+    .icon-card p { font-size: 11px; color: var(--muted); }
+
+    /* YOU MAY ALSO LIKE */
+    .also-like { margin-top: 48px; }
+    .also-like h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px; font-weight: 500;
+      margin-bottom: 28px; text-align: center;
+    }
+    .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .product-card { cursor: pointer; }
+    .product-card-img {
+      aspect-ratio: 3/4; overflow: hidden; background: #f5f5f5; margin-bottom: 12px;
+    }
+    .product-card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .5s;
+    }
+    .product-card:hover .product-card-img img { transform: scale(1.06); }
+    .product-card-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .product-card-price { font-size: 13px; color: var(--navy); font-weight: 600; }
+    .product-card-old { font-size: 12px; color: var(--muted); text-decoration: line-through; margin-left: 6px; }
+
+    /* FOOTER */
+    footer {
+      background: var(--navy); color: rgba(255,255,255,.85);
+      text-align: center; padding: 28px;
+      font-size: 12px; letter-spacing: 1px;
+    }
+    footer strong { color: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Classie</div>
+  <div class="nav-links">
+    <a href="#">New In</a>
+    <a href="#">Heels</a>
+    <a href="#">Accessories</a>
+    <a href="#">Collections</a>
+    <a href="#">About</a>
+  </div>
+  <div class="nav-icons">
+    <span>🔍</span>
+    <span>♡</span>
+    <span>🛍</span>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  Home <span>/</span> Accessories <span>/</span> Hair &amp; Shoe Clips
+</div>
+
+<!-- PRODUCT MAIN -->
+<div class="product-layout">
+
+  <!-- LEFT: IMAGE -->
+  <div class="product-images">
+    <div class="main-image-wrap">
+      <img id="mainImg" src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800" alt="Radiance Heart Crystal Clip">
+      <div class="badge-sale">20% OFF</div>
+    </div>
+    <div class="thumbnails">
+      <img class="thumb active" src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800" alt="thumb1" onclick="setImg(this)">
+      <img class="thumb" src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800" alt="thumb2" onclick="setImg(this)">
+      <img class="thumb" src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800" alt="thumb3" onclick="setImg(this)">
+    </div>
+  </div>
+
+  <!-- RIGHT: STICKY INFO -->
+  <div class="product-info">
+    <span class="category-tag">Hair &amp; Shoe Accessories</span>
+    <h1 class="product-title">Radiance Heart<br>Crystal Clip (Pair)</h1>
+
+    <div class="reviews-row">
+      <div class="stars">★★★★★</div>
+      <div class="review-text"><strong>4.9</strong> (38 reviews)</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="price-row">
+      <span class="price-current">₹399</span>
+      <span class="price-original">₹499</span>
+      <span class="discount-pill">20% off</span>
+    </div>
+
+    <hr class="divider">
+
+    <div class="color-label">Color: <span id="colorName">Gold</span></div>
+    <div class="swatches">
+      <div class="swatch swatch-gold active" title="Gold" onclick="selectColor(this,'Gold')"></div>
+      <div class="swatch swatch-silver" title="Silver" onclick="selectColor(this,'Silver')"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="features-grid">
+      <div class="feature-item"><span class="feature-check">✓</span> Premium Metal Finish</div>
+      <div class="feature-item"><span class="feature-check">✓</span> Handcrafted Design</div>
+      <div class="feature-item"><span class="feature-check">✓</span> Comfortable for long wear</div>
+      <div class="feature-item"><span class="feature-check">✓</span> High Quality Product</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="qty-row">
+      <div class="qty-stepper">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <input class="qty-val" type="text" value="1" id="qtyVal" readonly>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+    </div>
+
+    <button class="btn-add">Add to Bag</button>
+    <button class="btn-buy">Buy Now</button>
+
+    <div class="trust-row">
+      <div class="trust-item">
+        <span class="trust-icon">🚚</span>
+        <strong>Free Shipping</strong>
+        on orders ₹999+
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">↩</span>
+        <strong>Easy Returns</strong>
+        7-day policy
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">💳</span>
+        <strong>COD Available</strong>
+        all orders
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BELOW FOLD -->
+<div class="below-fold">
+  <hr style="border:none;border-top:1px solid #e8e8e8;margin-bottom:0;">
+
+  <!-- ACCORDION -->
+  <div class="accordion-section">
+    <div class="accordion-item open">
+      <button class="accordion-header" onclick="toggleAccordion(this)">
+        Description <span class="accordion-icon">+</span>
+      </button>
+      <div class="accordion-body">
+        A heart-shaped crystal clip designed to add romance and sparkle to any look. Secured with a reliable alligator clasp that grips firmly without slipping. Versatile enough for heels, bags, and hair — this clip is your finishing touch for every occasion. Sold as a pair.
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-header" onclick="toggleAccordion(this)">
+        Key Features <span class="accordion-icon">+</span>
+      </button>
+      <div class="accordion-body">
+        <ul style="padding-left:18px;">
+          <li>Heart-shaped crystal embellishment</li>
+          <li>Premium alligator clasp — secure grip</li>
+          <li>Multipurpose: heels, bags, hair accessories</li>
+          <li>Clip on and off in seconds</li>
+          <li>Reusable &amp; lightweight design</li>
+          <li>Available in Gold and Silver finishes</li>
+        </ul>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-header" onclick="toggleAccordion(this)">
+        Care Instructions <span class="accordion-icon">+</span>
+      </button>
+      <div class="accordion-body">
+        Avoid contact with water, perfume, and harsh chemicals. Store in a dry place away from direct sunlight. Clean gently with a soft dry cloth. Handle with care to preserve the crystal finish.
+      </div>
+    </div>
+  </div>
+
+  <!-- ICON GRID -->
+  <div class="icon-section">
+    <h3>Why You'll Love It</h3>
+    <div class="icon-grid">
+      <div class="icon-card">
+        <div class="ic">✨</div>
+        <h4>Multipurpose Styling</h4>
+        <p>Heels, bags &amp; hair — style it your way</p>
+      </div>
+      <div class="icon-card">
+        <div class="ic">🔒</div>
+        <h4>Secure Alligator Clasp</h4>
+        <p>Grips firmly, stays all day</p>
+      </div>
+      <div class="icon-card">
+        <div class="ic">⚡</div>
+        <h4>Clip On/Off in Seconds</h4>
+        <p>No tools needed — effortless wear</p>
+      </div>
+      <div class="icon-card">
+        <div class="ic">🌿</div>
+        <h4>Reusable &amp; Lightweight</h4>
+        <p>Built to last, easy to carry</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- YOU MAY ALSO LIKE -->
+  <div class="also-like">
+    <h2>You May Also Like</h2>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-card-img"><img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800" alt="product"></div>
+        <div class="product-card-name">Pearl Bow Heel Clip (Pair)</div>
+        <div><span class="product-card-price">₹349</span><span class="product-card-old">₹449</span></div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-img"><img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800" alt="product"></div>
+        <div class="product-card-name">Rose Gold Floral Clip</div>
+        <div><span class="product-card-price">₹299</span><span class="product-card-old">₹399</span></div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-img"><img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800" alt="product"></div>
+        <div class="product-card-name">Crystal Star Heel Clip</div>
+        <div><span class="product-card-price">₹449</span><span class="product-card-old">₹549</span></div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-img"><img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800" alt="product"></div>
+        <div class="product-card-name">Butterfly Charm Clip (Pair)</div>
+        <div><span class="product-card-price">₹379</span><span class="product-card-old">₹479</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>CLASSIE</strong> &nbsp;·&nbsp; Premium Women's Heels &amp; Accessories &nbsp;·&nbsp; Made in India 🇮🇳
+</footer>
+
+<script>
+  function setImg(thumb) {
+    document.getElementById('mainImg').src = thumb.src;
+    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  }
+
+  function selectColor(el, name) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('colorName').textContent = name;
+  }
+
+  let qty = 1;
+  function changeQty(d) {
+    qty = Math.max(1, qty + d);
+    document.getElementById('qtyVal').value = qty;
+  }
+
+  function toggleAccordion(btn) {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>

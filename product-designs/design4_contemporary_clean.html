@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classie — Design 4: Contemporary Clean</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--navy:#3B5373;--navy-dark:#2e3f56;--cream:#FAFAFA;--border:#E8E4DF;--gray:#6B7280;--light:#F5F3F0}
+  body{font-family:'DM Sans',sans-serif;background:#fff;color:#1a1a1a}
+
+  /* NAV */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 48px;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:0;z-index:100}
+  .nav-logo{font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:4px;color:var(--navy)}
+  .nav-links{display:flex;gap:28px;font-size:13px;font-weight:500;color:#444;letter-spacing:.05em}
+  .nav-links a{text-decoration:none;color:inherit;transition:color .2s}
+  .nav-links a:hover{color:var(--navy)}
+  .nav-icons{display:flex;gap:20px;font-size:20px;cursor:pointer}
+
+  /* BREADCRUMB */
+  .breadcrumb{padding:14px 48px;font-size:12px;color:var(--gray);display:flex;gap:8px;align-items:center}
+  .breadcrumb a{color:inherit;text-decoration:none}
+  .breadcrumb a:hover{color:var(--navy)}
+
+  /* TRUST PILLS */
+  .trust-pills{display:flex;gap:10px;padding:0 48px 20px;flex-wrap:wrap}
+  .pill{display:flex;align-items:center;gap:6px;padding:7px 16px;border:1px solid var(--border);border-radius:100px;font-size:12px;font-weight:500;color:#444;background:#fff}
+
+  /* MAIN PRODUCT */
+  .product-section{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:70vh}
+
+  /* IMAGE GRID */
+  .image-grid{display:grid;grid-template-columns:3fr 2fr;grid-template-rows:1fr 1fr;gap:4px;padding:0 4px 4px 48px}
+  .img-main{grid-row:1/3;border-radius:16px 0 0 16px;overflow:hidden;background:#f0ebe4}
+  .img-main img{width:100%;height:100%;object-fit:cover;display:block}
+  .img-sm{border-radius:0;overflow:hidden;background:#ede8e1}
+  .img-sm:first-of-type{border-radius:0 16px 0 0}
+  .img-sm:last-of-type{border-radius:0 0 16px 0}
+  .img-sm img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* PRODUCT INFO */
+  .product-info{padding:32px 48px 40px 40px;background:var(--cream);display:flex;flex-direction:column;gap:0}
+
+  .category-label{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gray);margin-bottom:10px}
+  .product-title{font-family:'DM Serif Display',serif;font-size:30px;line-height:1.2;color:#1a1a1a;margin-bottom:14px}
+  .stars-row{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+  .stars{color:#F59E0B;font-size:14px;letter-spacing:2px}
+  .review-count{font-size:12px;color:var(--gray)}
+
+  /* PRICE */
+  .price-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+  .price-main{font-size:26px;font-weight:700;color:#1a1a1a}
+  .price-compare{font-size:16px;color:var(--gray);text-decoration:line-through}
+  .discount-badge{background:#ECFDF5;color:#059669;font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px}
+
+  /* COLOR */
+  .option-section{margin-bottom:20px}
+  .option-label{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:10px}
+  .swatches{display:flex;gap:10px}
+  .swatch{width:44px;height:44px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative}
+  .swatch.active{border-color:var(--navy);transform:scale(1.1);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--navy)}
+  .swatch-name{font-size:11px;color:var(--gray);text-align:center;margin-top:4px}
+  .swatch-wrap{display:flex;flex-direction:column;align-items:center}
+
+  /* QUANTITY + CTA */
+  .buy-row{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-bottom:14px}
+  .qty-stepper{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:100px;overflow:hidden}
+  .qty-btn{width:38px;height:48px;background:none;border:none;font-size:18px;cursor:pointer;color:#1a1a1a;transition:background .15s}
+  .qty-btn:hover{background:#f0f0f0}
+  .qty-val{flex:1;text-align:center;font-size:15px;font-weight:600}
+  .btn-cart{background:var(--navy);color:#fff;border:none;border-radius:100px;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;height:48px}
+  .btn-cart:hover{background:var(--navy-dark)}
+  .btn-buy{width:100%;border:1.5px solid var(--navy);color:var(--navy);background:transparent;border-radius:100px;height:48px;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:20px}
+  .btn-buy:hover{background:var(--navy);color:#fff}
+
+  /* MINI TRUST */
+  .mini-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+  .trust-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+  .trust-card .ti{font-size:18px;margin-bottom:4px}
+  .trust-card .tt{font-size:10px;color:var(--gray);line-height:1.4}
+
+  /* TABS */
+  .tab-section{border-top:1px solid var(--border);padding-top:20px}
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+  .tab{padding:10px 18px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;border-bottom:2px solid transparent;color:var(--gray);transition:all .2s}
+  .tab.active{border-bottom-color:var(--navy);color:var(--navy)}
+  .tab-content{font-size:13px;color:#555;line-height:1.8;display:none}
+  .tab-content.active{display:block}
+
+  /* FEATURES GRID */
+  .features-section{padding:60px 48px}
+  .features-section h2{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:32px;text-align:center}
+  .features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .feature-card{background:var(--navy);color:#fff;border-radius:16px;padding:28px 20px;text-align:center}
+  .feature-card .fi{font-size:28px;margin-bottom:12px}
+  .feature-card .ft{font-size:13px;font-weight:600;margin-bottom:6px}
+  .feature-card .fd{font-size:11px;opacity:.75;line-height:1.5}
+
+  /* COLLECTION SECTION */
+  .collection-section{padding:40px 48px 80px}
+  .coll-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .coll-header h2{font-family:'DM Serif Display',serif;font-size:26px}
+  .coll-tabs{display:flex;gap:0;border:1.5px solid var(--border);border-radius:100px;overflow:hidden}
+  .coll-tab{padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+  .coll-tab.active{background:var(--navy);color:#fff}
+  .products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .product-card{border-radius:16px;overflow:hidden;cursor:pointer}
+  .product-card:hover .pc-img img{transform:scale(1.05)}
+  .pc-img{aspect-ratio:3/4;overflow:hidden;background:#F0EBE4}
+  .pc-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+  .pc-info{padding:12px 4px}
+  .pc-name{font-size:13px;font-weight:500;margin-bottom:4px}
+  .pc-price{font-size:14px;font-weight:700;color:var(--navy)}
+  .pc-compare{font-size:11px;color:var(--gray);text-decoration:line-through;margin-left:6px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">CLASSIE</div>
+  <div class="nav-links">
+    <a href="#">Shop</a><a href="#">Collections</a><a href="#">Style Ideas</a><a href="#">About</a>
+  </div>
+  <div class="nav-icons">🔍 🛍️ 👤</div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="#">Home</a> › <a href="#">Clips</a> › Radiance Heart Crystal Clip
+</div>
+
+<div class="trust-pills">
+  <div class="pill">🚚 Free Shipping above ₹999</div>
+  <div class="pill">↩ Easy 7-Day Returns</div>
+  <div class="pill">💳 COD Available</div>
+  <div class="pill">✅ 100% Authentic</div>
+</div>
+
+<div class="product-section">
+  <!-- IMAGE GRID -->
+  <div class="image-grid">
+    <div class="img-main">
+      <img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&q=80" alt="Product">
+    </div>
+    <div class="img-sm">
+      <img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80" alt="Product 2">
+    </div>
+    <div class="img-sm">
+      <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80" alt="Product 3">
+    </div>
+  </div>
+
+  <!-- PRODUCT INFO -->
+  <div class="product-info">
+    <div class="category-label">Classie Accessories — Crystal Clips</div>
+    <h1 class="product-title">Radiance Heart Crystal<br>Clip (Pair)</h1>
+    <div class="stars-row">
+      <div class="stars">★★★★★</div>
+      <div class="review-count">4.9 · 38 reviews</div>
+    </div>
+
+    <div class="price-row">
+      <span class="price-main">₹399</span>
+      <span class="price-compare">₹499</span>
+      <span class="discount-badge">20% OFF</span>
+    </div>
+
+    <div class="option-section">
+      <div class="option-label">Select Color: <span style="font-weight:400;color:var(--gray)">Gold</span></div>
+      <div class="swatches">
+        <div class="swatch-wrap">
+          <div class="swatch active" style="background:linear-gradient(135deg,#D4AF37,#F0C040)"></div>
+          <div class="swatch-name">Gold</div>
+        </div>
+        <div class="swatch-wrap">
+          <div class="swatch" style="background:linear-gradient(135deg,#C0C0C0,#E8E8E8)"></div>
+          <div class="swatch-name">Silver</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="buy-row">
+      <div class="qty-stepper">
+        <button class="qty-btn">−</button>
+        <span class="qty-val">1</span>
+        <button class="qty-btn">+</button>
+      </div>
+      <button class="btn-cart">Add to Cart</button>
+    </div>
+    <button class="btn-buy">Buy Now</button>
+
+    <div class="mini-trust">
+      <div class="trust-card"><div class="ti">🚚</div><div class="tt">Free Shipping<br>above ₹999</div></div>
+      <div class="trust-card"><div class="ti">↩</div><div class="tt">Easy 7-Day<br>Returns</div></div>
+      <div class="trust-card"><div class="ti">💳</div><div class="tt">Cash on<br>Delivery</div></div>
+    </div>
+
+    <div class="tab-section">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('desc',this)">Description</div>
+        <div class="tab" onclick="switchTab('feat',this)">Key Features</div>
+        <div class="tab" onclick="switchTab('care',this)">Care & Info</div>
+      </div>
+      <div class="tab-content active" id="tab-desc">
+        A heart-shaped crystal clip designed to add romance and sparkle to every outfit. Features a secure alligator clasp that grips firmly without damaging fabric. Sold as a pair — perfect for heels, handbags, and hair accessories.
+      </div>
+      <div class="tab-content" id="tab-feat">
+        <ul style="padding-left:18px;display:grid;gap:8px">
+          <li>Premium metal alloy with crystal embellishments</li>
+          <li>Secure alligator clasp — holds firmly, removes cleanly</li>
+          <li>Handcrafted with precision for consistent quality</li>
+          <li>Lightweight — comfortable for all-day wear</li>
+          <li>Available in Gold & Silver finishes</li>
+        </ul>
+      </div>
+      <div class="tab-content" id="tab-care">
+        <ul style="padding-left:18px;display:grid;gap:8px">
+          <li>Wipe gently with a soft dry cloth</li>
+          <li>Avoid water and perfume contact</li>
+          <li>Store in the pouch provided</li>
+          <li>Not suitable for use in water</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features-section">
+  <h2>Why You'll Love It</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="fi">✨</div>
+      <div class="ft">Multipurpose Styling</div>
+      <div class="fd">Use on heels, bags, or hair for any occasion</div>
+    </div>
+    <div class="feature-card">
+      <div class="fi">🔒</div>
+      <div class="ft">Secure Alligator Clasp</div>
+      <div class="fd">Grips firmly without damaging your items</div>
+    </div>
+    <div class="feature-card">
+      <div class="fi">⚡</div>
+      <div class="ft">Clip On/Off in Seconds</div>
+      <div class="fd">Change your look instantly — no tools needed</div>
+    </div>
+    <div class="feature-card">
+      <div class="fi">♻️</div>
+      <div class="ft">Reusable & Lightweight</div>
+      <div class="fd">Durable design you can wear again and again</div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLECTION -->
+<div class="collection-section">
+  <div class="coll-header">
+    <h2>Shop Full Collection</h2>
+    <div class="coll-tabs">
+      <div class="coll-tab active">Latest Styles</div>
+      <div class="coll-tab">Best Sellers</div>
+    </div>
+  </div>
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="pc-img"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=80" alt=""></div>
+      <div class="pc-info"><div class="pc-name">Pearl Drop Bow Clip</div><div><span class="pc-price">₹349</span><span class="pc-compare">₹449</span></div></div>
+    </div>
+    <div class="product-card">
+      <div class="pc-img"><img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80" alt=""></div>
+      <div class="pc-info"><div class="pc-name">Velvet Rose Heel Clip</div><div><span class="pc-price">₹429</span><span class="pc-compare">₹549</span></div></div>
+    </div>
+    <div class="product-card">
+      <div class="pc-img"><img src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=400&q=80" alt=""></div>
+      <div class="pc-info"><div class="pc-name">Satin Bow Duo Set</div><div><span class="pc-price">₹379</span><span class="pc-compare">₹499</span></div></div>
+    </div>
+    <div class="product-card">
+      <div class="pc-img"><img src="https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&q=80" alt=""></div>
+      <div class="pc-info"><div class="pc-name">Gold Leaf Clip Pair</div><div><span class="pc-price">₹459</span><span class="pc-compare">₹599</span></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+</script>
+</body>
+</html>

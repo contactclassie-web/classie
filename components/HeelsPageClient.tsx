@@ -105,13 +105,13 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
     <section className="relative overflow-hidden" style={{ background: "#3B5373", minHeight: "320px" }}>
       {/* Background */}
       {bgType === "image" && bgUrl && (
-        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-40" />
+        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-90" />
       )}
       {bgType === "slider" && slides.length > 0 && (
         <>
           {slides.map((s, i) => (
             <img key={s} src={s} alt="" className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700"
-              style={{ opacity: i === slideIdx ? 0.4 : 0 }} />
+              style={{ opacity: i === slideIdx ? 0.9 : 0 }} />
           ))}
           {slides.length > 1 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
