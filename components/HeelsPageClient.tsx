@@ -105,7 +105,7 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
     <section className="relative overflow-hidden" style={{ background: "#3B5373", minHeight: "320px" }}>
       {/* Background */}
       {bgType === "image" && bgUrl && (
-        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-90" />
+        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-top opacity-90" />
       )}
       {bgType === "slider" && slides.length > 0 && (
         <>
