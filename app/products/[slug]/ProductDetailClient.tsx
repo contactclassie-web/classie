@@ -364,37 +364,50 @@ export default function ProductDetailClient({
                 ? Math.round(product.price * (1 - offer.discount_value / 100))
                 : Math.max(0, Math.round(product.price - offer.discount_value));
               return (
-                <div key={offer.id} style={{ background: "linear-gradient(135deg, #3B5373 0%, #2d3f56 100%)", borderRadius: "12px", padding: "18px", color: "#fff" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "20px" }}>🎉</span>
-                    <span style={{ fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Buy 2 Get {disc} Off</span>
+                <div key={offer.id} style={{ borderRadius: "12px", overflow: "hidden", border: "1.5px solid #3B5373" }}>
+                  {/* Top accent bar */}
+                  <div style={{ background: "#3B5373", padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: "#fff" }}>Limited Offer</span>
+                    </div>
+                    <span style={{ background: "#fff", color: "#3B5373", fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "100px", letterSpacing: "0.05em" }}>Save {disc}</span>
                   </div>
-                  <p style={{ fontSize: "12px", opacity: 0.8, marginBottom: "14px" }}>
-                    {offer.custom_label || `2 pieces kharidne pe har ek pe ${disc} discount milega`}
-                  </p>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "14px" }}>
-                    <span style={{ fontSize: "18px", fontWeight: 700 }}>₹{discPrice} × 2</span>
-                    <span style={{ fontSize: "13px", opacity: 0.6, textDecoration: "line-through" }}>₹{product.price} × 2</span>
-                    <span style={{ fontSize: "11px", background: "#fff", color: "#3B5373", fontWeight: 700, padding: "2px 8px", borderRadius: "100px" }}>Save {disc}</span>
+                  {/* Body */}
+                  <div style={{ background: "#fff", padding: "16px 18px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
+                      <div>
+                        <p style={{ fontFamily: "Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#1a1a1a", marginBottom: "4px" }}>Buy 2, Get {disc} Off</p>
+                        <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.5 }}>
+                          {offer.custom_label || `Purchase 2 pairs and enjoy ${disc} off each — automatically applied at checkout.`}
+                        </p>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "14px", paddingTop: "10px", borderTop: "1px solid #E8E3DD" }}>
+                      <span style={{ fontSize: "22px", fontWeight: 700, color: "#3B5373" }}>₹{discPrice}</span>
+                      <span style={{ fontSize: "13px", color: "#bbb", textDecoration: "line-through" }}>₹{product.price}</span>
+                      <span style={{ fontSize: "11px", color: "#888" }}>each × 2 pairs</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
+                      }}
+                      style={{ width: "100%", padding: "13px", background: "#3B5373", color: "#fff", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer" }}
+                    >
+                      Add 2 to Cart — Save {disc}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
-                    }}
-                    style={{ width: "100%", padding: "12px", background: "#fff", color: "#3B5373", border: "none", borderRadius: "8px", fontSize: "12.5px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer" }}
-                  >
-                    Buy 2 Now — Save {disc}
-                  </button>
                 </div>
               );
             })}
 
             {/* ── Style it with Clip-ons ── */}
             {bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
-              <div style={{ background: "#f7f7f7", borderRadius: "12px", padding: "18px" }}>
-                <p style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#3B5373", marginBottom: "12px" }}>
-                  Style it with clip-ons
-                </p>
+              <div style={{ border: "1px solid #E8E3DD", borderRadius: "12px", overflow: "hidden" }}>
+                <div style={{ padding: "12px 18px", borderBottom: "1px solid #E8E3DD", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff" }}>
+                  <p style={{ fontFamily: "Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>Style it with Clip-ons</p>
+                  <span style={{ fontSize: "10px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase" }}>Exclusive bundle savings</span>
+                </div>
+                <div style={{ background: "#fff", padding: "0 18px" }}>
                 {bundleOffers.filter(o => o.accessory_slug !== product.slug).map((offer) => {
                   const discountedPrice = offer.discount_type === "percentage"
                     ? Math.round(offer.product.price * (1 - offer.discount_value / 100))
@@ -403,43 +416,45 @@ export default function ProductDetailClient({
                   const bundleVariant = bundleVariants[offer.id] ?? offer.product.variants.options[0] ?? "";
 
                   return (
-                    <div key={offer.id} className="flex items-center gap-3" style={{ padding: "10px 0", borderBottom: "1px solid #E8E3DD" }}>
+                    <div key={offer.id} className="flex items-center gap-3" style={{ padding: "14px 0", borderBottom: "1px solid #F0EDEA" }}>
                       {/* Thumbnail */}
-                      <div className="relative rounded-[6px] overflow-hidden flex-shrink-0" style={{ width: "52px", height: "52px", background: "#EDE8E1" }}>
-                        <Image src={offer.product.image} alt={offer.product.title} fill className="object-cover object-center" sizes="52px" />
+                      <div className="relative rounded-[8px] overflow-hidden flex-shrink-0" style={{ width: "64px", height: "64px", background: "#EDE8E1" }}>
+                        <Image src={offer.product.image} alt={offer.product.title} fill className="object-cover object-center" sizes="64px" />
                       </div>
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p style={{ fontSize: "12.5px", fontWeight: 500, color: "#1a1a1a", marginBottom: "2px" }} className="truncate">
+                        <p style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", marginBottom: "3px" }} className="truncate">
                           {offer.product.title}
                         </p>
                         {offer.product.variants.type !== "none" && offer.product.variants.options.length > 0 && (
                           <select
                             value={bundleVariant}
                             onChange={(e) => setBundleVariants((prev) => ({ ...prev, [offer.id]: e.target.value }))}
-                            style={{ fontSize: "11px", color: "#888", border: "none", background: "transparent", cursor: "pointer", padding: 0, marginBottom: "2px" }}
+                            style={{ fontSize: "11px", color: "#888", border: "none", background: "transparent", cursor: "pointer", padding: 0, marginBottom: "3px" }}
                           >
                             {offer.product.variants.options.map((opt) => (
                               <option key={opt} value={opt}>{opt}</option>
                             ))}
                           </select>
                         )}
-                        <div className="flex items-baseline gap-1">
-                          <span style={{ fontSize: "12px", fontWeight: 600, color: "#3B5373" }}>₹{discountedPrice.toLocaleString("en-IN")}</span>
-                          <span style={{ fontSize: "11px", color: "#888", textDecoration: "line-through" }}>₹{offer.product.price.toLocaleString("en-IN")}</span>
+                        <div className="flex items-center gap-2">
+                          <span style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>₹{discountedPrice.toLocaleString("en-IN")}</span>
+                          <span style={{ fontSize: "11px", color: "#bbb", textDecoration: "line-through" }}>₹{offer.product.price.toLocaleString("en-IN")}</span>
+                          {bundleDiscount > 0 && (
+                            <span style={{ fontSize: "10px", background: "#ECFDF5", color: "#059669", fontWeight: 600, padding: "2px 7px", borderRadius: "100px" }}>{bundleDiscount}% off</span>
+                          )}
                         </div>
-                        {bundleDiscount > 0 && (
-                          <p style={{ fontSize: "10px", color: "#059669", fontWeight: 500 }}>{bundleDiscount}% off with heels</p>
-                        )}
                       </div>
                       {/* Add button */}
                       <button
                         onClick={() => addBundleItem(offer)}
-                        className="flex-shrink-0 transition-colors"
+                        className="flex-shrink-0 transition-all"
                         style={{
-                          padding: "6px 14px", borderRadius: "100px", border: "none",
-                          background: addedBundle[offer.id] ? "#16a34a" : "#3B5373",
-                          color: "#fff", fontSize: "11px", fontWeight: 600, cursor: "pointer",
+                          padding: "8px 18px", borderRadius: "100px",
+                          border: addedBundle[offer.id] ? "1.5px solid #16a34a" : "1.5px solid #3B5373",
+                          background: "transparent",
+                          color: addedBundle[offer.id] ? "#16a34a" : "#3B5373",
+                          fontSize: "12px", fontWeight: 600, cursor: "pointer", letterSpacing: "0.04em",
                         }}
                       >
                         {addedBundle[offer.id] ? "✓ Added" : "+ Add"}
@@ -447,6 +462,7 @@ export default function ProductDetailClient({
                     </div>
                   );
                 })}
+                </div>
               </div>
             )}
           </div>
