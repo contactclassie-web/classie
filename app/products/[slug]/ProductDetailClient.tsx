@@ -391,7 +391,7 @@ export default function ProductDetailClient({
 
             {/* ── Style it with Clip-ons ── */}
             {bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
-              <div style={{ background: "#F9F7F5", borderRadius: "12px", padding: "18px" }}>
+              <div style={{ background: "#f7f7f7", borderRadius: "12px", padding: "18px" }}>
                 <p style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#3B5373", marginBottom: "12px" }}>
                   Style it with clip-ons
                 </p>
@@ -502,7 +502,7 @@ export default function ProductDetailClient({
       </div>
 
       {/* ── Feature Tiles ── */}
-      <div style={{ background: "#FEFCFA", padding: "60px 0" }}>
+      <div style={{ background: "#f7f7f7", padding: "60px 0" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           <h2 className="font-serif text-center" style={{ fontSize: "28px", color: "#3B5373", marginBottom: "32px" }}>
             Designed for Every Moment
@@ -584,7 +584,7 @@ export default function ProductDetailClient({
       </div>
 
       {/* ── Customer Reviews ── */}
-      <div style={{ background: "#FEFCFA", padding: "60px 0" }}>
+      <div style={{ background: "#f7f7f7", padding: "60px 0" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           {/* Header: score + bars */}
           <div className="flex gap-10 items-start" style={{ marginBottom: "32px", flexWrap: "wrap" }}>
