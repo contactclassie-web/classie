@@ -75,7 +75,7 @@ export default function HeroImageSlider({
             key={i}
             src={src}
             alt="Classie"
-            className="absolute inset-0 w-full h-full object-cover object-center"
+            className="absolute inset-0 w-full h-full object-contain object-center"
             style={{
               opacity: i === current ? 1 : 0,
               transition: "opacity 0.8s ease-in-out",
