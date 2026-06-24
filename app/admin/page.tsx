@@ -8437,7 +8437,7 @@ export default function AdminPage() {
                       {bundleOffers.map((offer) => (
                         <div key={offer.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100">
                           <div>
-                            <p className="text-sm font-medium text-gray-800">{offer.accessory_slug}</p>
+                            <p className="text-sm font-medium text-gray-800">{dbProducts.find(p => p.slug === offer.accessory_slug)?.title || offer.accessory_slug}</p>
                             <p className="text-xs text-gray-400">{offer.discount_value}{offer.discount_type === "percentage" ? "%" : "₹"} off</p>
                           </div>
                           <button
@@ -8464,7 +8464,7 @@ export default function AdminPage() {
                         >
                           <option value="">Select accessory…</option>
                           {dbProducts.filter((p) => p.category === "clips" || p.category === "bow").map((p) => (
-                            <option key={p.slug} value={p.slug}>{p.title} ({p.slug})</option>
+                            <option key={p.slug} value={p.slug}>{p.title}</option>
                           ))}
                         </select>
                       </div>
