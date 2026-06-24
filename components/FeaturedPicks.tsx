@@ -250,7 +250,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
 
         {/* Heading row */}
         <div className="flex items-end justify-between mb-6">
-          <h2 className="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] font-bold leading-[1.1] text-[#1a1a1a]">
+          <h2 className="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] font-normal leading-[1.1] text-[#1a1a1a]">
             {fps.heading} <em className="italic font-light text-[#3B5373]">{fps.headingItalic}</em>
           </h2>
 
