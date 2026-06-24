@@ -8463,7 +8463,7 @@ export default function AdminPage() {
                           className={inputCls}
                         >
                           <option value="">Select accessory…</option>
-                          {dbProducts.filter((p) => p.category === "accessories").map((p) => (
+                          {dbProducts.filter((p) => p.category === "clips" || p.category === "bow").map((p) => (
                             <option key={p.slug} value={p.slug}>{p.title} ({p.slug})</option>
                           ))}
                         </select>
