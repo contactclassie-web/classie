@@ -291,6 +291,29 @@ const EMPTY_STYLE_INSPO: StyleInspo = {
   description: "", media_type: "image", look_number: 0,
 };
 
+interface BundleOffer {
+  id?: string;
+  main_product_slug: string;
+  accessory_slug: string;
+  discount_type: string;
+  discount_value: number;
+  sort_order: number;
+  active: boolean;
+}
+
+interface FeatureTileItem {
+  icon: string;
+  title: string;
+  desc: string;
+}
+
+const DEFAULT_FEATURE_TILES_ADMIN: FeatureTileItem[] = [
+  { icon: "🤍", title: "Made with Care", desc: "Handcrafted details for lasting elegance" },
+  { icon: "🌤", title: "All-Season Wear", desc: "Versatile style for every season" },
+  { icon: "👗", title: "Casual to Formal", desc: "Effortlessly transitions day to evening" },
+  { icon: "🌙", title: "Day to Night", desc: "From morning meetings to evening soirées" },
+];
+
 // ── Constants ──────────────────────────────────────────────────────────────
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"];
@@ -332,7 +355,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page";
 type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -348,6 +371,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "products":       "catalog",
   "collections":    "catalog",
   "categories":     "catalog",
+  "product-page":   "catalog",
   "heels-page":     "heels",
   "clips-page":     "clips-page",
   "bow-page":           "bow-page",
@@ -412,9 +436,10 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "philosophy",      label: "Philosophy" },
   ],
   catalog: [
-    { id: "products",    label: "Products" },
-    { id: "collections", label: "Collections" },
-    { id: "categories",  label: "Categories" },
+    { id: "products",     label: "Products" },
+    { id: "collections",  label: "Collections" },
+    { id: "categories",   label: "Categories" },
+    { id: "product-page", label: "Product Page" },
   ],
   heels:       [{ id: "heels-page", label: "Heels Page" }],
   "clips-page": [{ id: "clips-page", label: "Clips Page" }],
@@ -501,6 +526,16 @@ export default function AdminPage() {
     open: false, mode: "add", data: EMPTY_PRODUCT,
   });
   const [productSaving, setProductSaving] = useState(false);
+
+  // Bundle Offers (inside product modal)
+  const [bundleOffers, setBundleOffers] = useState<BundleOffer[]>([]);
+  const [bundleOffersLoading, setBundleOffersLoading] = useState(false);
+  const [newBundleOffer, setNewBundleOffer] = useState<{ accessory_slug: string; discount_type: string; discount_value: number }>({ accessory_slug: "", discount_type: "percentage", discount_value: 0 });
+  const [bundleOfferSaving, setBundleOfferSaving] = useState(false);
+
+  // Feature tiles (product page settings)
+  const [featureTiles, setFeatureTiles] = useState<FeatureTileItem[]>(DEFAULT_FEATURE_TILES_ADMIN);
+  const [featureTilesSaving, setFeatureTilesSaving] = useState(false);
 
   // ── Heels Page state ──────────────────────────────────────────────────
   const [heelsPageProducts, setHeelsPageProducts] = useState<DbProduct[]>([]);
@@ -2563,6 +2598,7 @@ export default function AdminPage() {
     if (["re-hero","re-tiles","re-policy","re-cta"].includes(tab)) fetchReturns();
 
     if (tab === "categories") fetchCategories();
+    if (tab === "product-page") loadFeatureTiles();
     if (tab === "featured-picks") { fetchFeaturedPicks(); fetchSettings(); }
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
@@ -2593,8 +2629,8 @@ export default function AdminPage() {
 
   // ── Product actions ───────────────────────────────────────────────────────
 
-  const openAddProduct = () => setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } });
-  const openEditProduct = (p: DbProduct) => setProductModal({ open: true, mode: "edit", data: { ...p } });
+  const openAddProduct = () => { setBundleOffers([]); setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } }); };
+  const openEditProduct = (p: DbProduct) => { setProductModal({ open: true, mode: "edit", data: { ...p } }); if (p.slug) loadBundleOffers(p.slug); };
   const closeProductModal = () => setProductModal((m) => ({ ...m, open: false }));
 
   const handleProductSave = async () => {
@@ -2626,6 +2662,73 @@ export default function AdminPage() {
 
   const setProductField = (key: keyof DbProduct, val: unknown) =>
     setProductModal((m) => ({ ...m, data: { ...m.data, [key]: val } }));
+
+  // ── Bundle Offer actions ───────────────────────────────────────────────────
+
+  const loadBundleOffers = async (mainSlug: string) => {
+    if (!mainSlug) return;
+    setBundleOffersLoading(true);
+    try {
+      const { data } = await supabase
+        .from("product_bundle_offers")
+        .select("*")
+        .eq("main_product_slug", mainSlug)
+        .order("sort_order");
+      setBundleOffers((data as BundleOffer[]) ?? []);
+    } finally {
+      setBundleOffersLoading(false);
+    }
+  };
+
+  const addBundleOffer = async () => {
+    if (!newBundleOffer.accessory_slug || !productModal.data.slug) return;
+    setBundleOfferSaving(true);
+    try {
+      await supabase.from("product_bundle_offers").insert([{
+        main_product_slug: productModal.data.slug,
+        accessory_slug: newBundleOffer.accessory_slug,
+        discount_type: newBundleOffer.discount_type,
+        discount_value: newBundleOffer.discount_value,
+        sort_order: bundleOffers.length,
+        active: true,
+      }]);
+      await loadBundleOffers(productModal.data.slug);
+      setNewBundleOffer({ accessory_slug: "", discount_type: "percentage", discount_value: 0 });
+      await revalidateSite();
+    } finally {
+      setBundleOfferSaving(false);
+    }
+  };
+
+  const deleteBundleOffer = async (id: string) => {
+    await supabase.from("product_bundle_offers").delete().eq("id", id);
+    setBundleOffers((prev) => prev.filter((o) => o.id !== id));
+    await revalidateSite();
+  };
+
+  // ── Feature Tiles actions ──────────────────────────────────────────────────
+
+  const loadFeatureTiles = async () => {
+    try {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "feature_tiles").maybeSingle();
+      if (data?.value) {
+        const parsed = JSON.parse(data.value);
+        if (Array.isArray(parsed) && parsed.length > 0) setFeatureTiles(parsed);
+      }
+    } catch { /* use defaults */ }
+  };
+
+  const saveFeatureTiles = async () => {
+    setFeatureTilesSaving(true);
+    try {
+      await supabase.from("site_settings").delete().eq("key", "feature_tiles");
+      await supabase.from("site_settings").insert({ key: "feature_tiles", value: JSON.stringify(featureTiles) });
+      await revalidateSite();
+      alert("Feature tiles saved!");
+    } finally {
+      setFeatureTilesSaving(false);
+    }
+  };
 
   // ── Slide actions ─────────────────────────────────────────────────────────
 
@@ -3870,6 +3973,68 @@ export default function AdminPage() {
           {/* ══════════════════════════════════════
               COLLECTIONS TAB
           ══════════════════════════════════════ */}
+
+          {/* ── PRODUCT PAGE SETTINGS TAB ── */}
+          {tab === "product-page" && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <h3 className="font-semibold text-gray-800 text-sm">Feature Tiles</h3>
+                    <p className="text-xs text-gray-400 mt-0.5">4 tiles shown on product page below the fold (icon + title + description)</p>
+                  </div>
+                  <button
+                    onClick={saveFeatureTiles}
+                    disabled={featureTilesSaving}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-50"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    {featureTilesSaving ? "Saving…" : "Save Tiles"}
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {featureTiles.map((tile, i) => (
+                    <div key={i} className="border border-gray-100 rounded-xl p-4 bg-gray-50">
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Tile {i + 1}</p>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className={labelCls}>Icon / Emoji</label>
+                          <input
+                            type="text"
+                            value={tile.icon}
+                            onChange={(e) => setFeatureTiles((prev) => prev.map((t, j) => j === i ? { ...t, icon: e.target.value } : t))}
+                            className={inputCls}
+                            placeholder="e.g. 🤍"
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Title</label>
+                          <input
+                            type="text"
+                            value={tile.title}
+                            onChange={(e) => setFeatureTiles((prev) => prev.map((t, j) => j === i ? { ...t, title: e.target.value } : t))}
+                            className={inputCls}
+                            placeholder="e.g. Made with Care"
+                          />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Description</label>
+                          <input
+                            type="text"
+                            value={tile.desc}
+                            onChange={(e) => setFeatureTiles((prev) => prev.map((t, j) => j === i ? { ...t, desc: e.target.value } : t))}
+                            className={inputCls}
+                            placeholder="Short description…"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ── HEELS PAGE TAB ───────────────────────────────── */}
           {tab === "heels-page" && (
             <div className="space-y-8">
@@ -8256,6 +8421,87 @@ export default function AdminPage() {
                   </label>
                 ))}
               </div>
+
+              {/* ── Bundle Offers (Edit mode only) ── */}
+              {productModal.mode === "edit" && (
+                <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Bundle Offers (Style it with Clip-ons)</p>
+
+                  {/* Existing offers */}
+                  {bundleOffersLoading ? (
+                    <p className="text-xs text-gray-400">Loading…</p>
+                  ) : bundleOffers.length === 0 ? (
+                    <p className="text-xs text-gray-400">No bundle offers yet.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {bundleOffers.map((offer) => (
+                        <div key={offer.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100">
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{offer.accessory_slug}</p>
+                            <p className="text-xs text-gray-400">{offer.discount_value}{offer.discount_type === "percentage" ? "%" : "₹"} off</p>
+                          </div>
+                          <button
+                            onClick={() => offer.id && deleteBundleOffer(offer.id)}
+                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add new bundle offer */}
+                  <div className="border-t border-gray-200 pt-3 space-y-2">
+                    <p className="text-xs font-medium text-gray-500">Add Bundle Offer</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className={labelCls}>Accessory Slug</label>
+                        <select
+                          value={newBundleOffer.accessory_slug}
+                          onChange={(e) => setNewBundleOffer((prev) => ({ ...prev, accessory_slug: e.target.value }))}
+                          className={inputCls}
+                        >
+                          <option value="">Select accessory…</option>
+                          {dbProducts.filter((p) => p.category === "accessories").map((p) => (
+                            <option key={p.slug} value={p.slug}>{p.title} ({p.slug})</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Discount Type</label>
+                        <select
+                          value={newBundleOffer.discount_type}
+                          onChange={(e) => setNewBundleOffer((prev) => ({ ...prev, discount_type: e.target.value }))}
+                          className={inputCls}
+                        >
+                          <option value="percentage">Percentage (%)</option>
+                          <option value="flat">Flat (₹)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Discount Value</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={newBundleOffer.discount_value}
+                        onChange={(e) => setNewBundleOffer((prev) => ({ ...prev, discount_value: Number(e.target.value) }))}
+                        className={inputCls}
+                        placeholder="e.g. 30 for 30%"
+                      />
+                    </div>
+                    <button
+                      onClick={addBundleOffer}
+                      disabled={bundleOfferSaving || !newBundleOffer.accessory_slug}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-[#3B5373] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-50"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      {bundleOfferSaving ? "Adding…" : "Add Bundle Offer"}
+                    </button>
+                  </div>
+                </div>
+              )}
 
             </div>
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">

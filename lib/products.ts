@@ -9,6 +9,7 @@ export interface Product {
   collection: "heels" | "clips" | "bow";
   variants: { type: "size" | "color" | "none"; options: string[] };
   image: string;
+  images?: string[];
   description: string;
   featured_tab?: string | null;
 }
@@ -139,6 +140,7 @@ function mapDbProduct(row: DbProduct): Product {
       options: Array.isArray(row.variants) ? row.variants : [],
     },
     image: row.image,
+    images: Array.isArray((row as any).images) ? (row as any).images : [],
     description: row.description,
     featured_tab: row.featured_tab ?? null,
   };

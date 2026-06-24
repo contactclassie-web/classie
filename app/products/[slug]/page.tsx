@@ -1,18 +1,40 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { products, getProductBySlugFromDB, getProductsFromDB } from "@/lib/products";
+import { createClient } from "@supabase/supabase-js";
+import { products, getProductBySlugFromDB, getProductsFromDB, getTabProductsFromDB, Product } from "@/lib/products";
 import ProductDetailClient from "./ProductDetailClient";
 
 export const revalidate = 60;
 export const dynamicParams = true;
+
+// Server-side Supabase client (no-store)
+function serverSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } }
+  );
+}
+
+export interface BundleOfferWithProduct {
+  id: string;
+  accessory_slug: string;
+  discount_type: string;
+  discount_value: number;
+  product: Product;
+}
+
+export interface FeatureTile {
+  icon: string;
+  title: string;
+  desc: string;
+}
 
 interface Props {
   params: { slug: string };
 }
 
 export async function generateStaticParams() {
-  // Pre-generate pages for all hardcoded products at build time.
-  // New DB-only products are handled on-demand via dynamicParams = true.
   return products.map((p) => ({ slug: p.slug }));
 }
 
@@ -29,7 +51,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Props) {
-  const product = await getProductBySlugFromDB(params.slug);
+  const supabase = serverSupabase();
+  const { slug } = params;
+
+  const product = await getProductBySlugFromDB(slug);
   if (!product) notFound();
 
   // Related products (same collection, exclude self)
@@ -38,5 +63,88 @@ export default async function ProductPage({ params }: Props) {
     .filter((p) => p.collection === product.collection && p.slug !== product.slug)
     .slice(0, 4);
 
-  return <ProductDetailClient product={product} related={related} />;
+  // Bundle offers
+  let bundleOffers: BundleOfferWithProduct[] = [];
+  try {
+    const { data: offerRows } = await supabase
+      .from("product_bundle_offers")
+      .select("*")
+      .eq("main_product_slug", slug)
+      .eq("active", true)
+      .order("sort_order");
+
+    if (offerRows && offerRows.length > 0) {
+      const slugs = offerRows.map((r: any) => r.accessory_slug);
+      const { data: accessoryRows } = await supabase
+        .from("products")
+        .select("*")
+        .in("slug", slugs)
+        .eq("active", true);
+
+      if (accessoryRows) {
+        bundleOffers = offerRows
+          .map((offer: any) => {
+            const acc = (accessoryRows as any[]).find((p) => p.slug === offer.accessory_slug);
+            if (!acc) return null;
+            const p: Product = {
+              slug: acc.slug,
+              title: acc.title,
+              price: Number(acc.price),
+              comparePrice: Number(acc.compare_price),
+              category: acc.category,
+              collection: acc.category === "heels" ? "heels" : acc.slug.includes("fauxbow") || acc.slug.includes("satin-swirl") || acc.slug.includes("glitzknot") ? "bow" : "clips",
+              variants: { type: acc.variant_type ?? "none", options: Array.isArray(acc.variants) ? acc.variants : [] },
+              image: acc.image,
+              images: Array.isArray(acc.images) ? acc.images : [],
+              description: acc.description,
+            };
+            return { id: offer.id, accessory_slug: offer.accessory_slug, discount_type: offer.discount_type, discount_value: Number(offer.discount_value), product: p };
+          })
+          .filter(Boolean) as BundleOfferWithProduct[];
+      }
+    }
+  } catch {
+    // silent fail
+  }
+
+  // Feature tiles from site_settings
+  let featureTiles: FeatureTile[] = [];
+  try {
+    const { data: settingRow } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "feature_tiles")
+      .maybeSingle();
+    if (settingRow?.value) {
+      const parsed = JSON.parse(settingRow.value);
+      if (Array.isArray(parsed)) featureTiles = parsed;
+    }
+  } catch {
+    // silent fail — use defaults in client
+  }
+
+  // Collection products for "Shop the Full Collection"
+  let latestProducts: Product[] = [];
+  let bestsellerProducts: Product[] = [];
+  try {
+    latestProducts = await getTabProductsFromDB("latest");
+    bestsellerProducts = await getTabProductsFromDB("bestseller");
+    // If no DB data, use related as fallback
+    if (latestProducts.length === 0) latestProducts = related;
+    if (bestsellerProducts.length === 0) bestsellerProducts = related;
+  } catch {
+    latestProducts = related;
+    bestsellerProducts = related;
+  }
+
+  return (
+    <ProductDetailClient
+      product={product}
+      related={related}
+      bundleOffers={bundleOffers}
+      featureTiles={featureTiles}
+      latestProducts={latestProducts}
+      bestsellerProducts={bestsellerProducts}
+    />
+  );
 }
