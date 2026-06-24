@@ -332,7 +332,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy";
 type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -344,6 +344,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "style-inspo":    "homepage",
   "announcement":   "homepage",
   "trust-band":     "homepage",
+  "philosophy":     "homepage",
   "products":       "catalog",
   "collections":    "catalog",
   "categories":     "catalog",
@@ -408,6 +409,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "instagram",      label: "Instagram" },
     { id: "style-inspo",    label: "Style Inspo" },
     { id: "trust-band",     label: "Trust Band" },
+    { id: "philosophy",      label: "Philosophy" },
   ],
   catalog: [
     { id: "products",    label: "Products" },
@@ -6398,6 +6400,108 @@ export default function AdminPage() {
           )}
 
           {/* ══════════════════════════════════════
+              PHILOSOPHY TAB
+          ══════════════════════════════════════ */}
+          {tab === "philosophy" && (
+            <div className="space-y-6 max-w-3xl">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                <h2 className="font-semibold text-gray-700">Philosophy Section</h2>
+                <div>
+                  <label className={labelCls}>Eyebrow Text</label>
+                  <input type="text" value={siteSettings.philosophy_eyebrow} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_eyebrow: e.target.value }))}
+                    placeholder="e.g. Our Philosophy" />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div><label className={labelCls}>Heading Line 1</label>
+                    <input type="text" value={siteSettings.philosophy_headline} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, philosophy_headline: e.target.value }))} placeholder="One Heel." />
+                  </div>
+                  <div><label className={labelCls}>Italic Word (navy)</label>
+                    <input type="text" value={siteSettings.philosophy_headline_italic} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, philosophy_headline_italic: e.target.value }))} placeholder="Endless" />
+                  </div>
+                  <div><label className={labelCls}>Heading Line 2</label>
+                    <input type="text" value={siteSettings.philosophy_headline2} className={inputCls}
+                      onChange={e => setSiteSettings(s => ({ ...s, philosophy_headline2: e.target.value }))} placeholder="Possibilities." />
+                  </div>
+                </div>
+                <div>
+                  <label className={labelCls}>Body Text</label>
+                  <textarea value={siteSettings.philosophy_body} rows={4}
+                    className={`${inputCls} resize-none`}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_body: e.target.value }))}
+                    placeholder="Describe your brand philosophy…" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelCls}>CTA Button Text</label>
+                    <input type="text" value={siteSettings.philosophy_cta_text} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_cta_text: e.target.value }))}
+                      placeholder="e.g. Our Story" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>CTA Button URL</label>
+                    <input type="text" value={siteSettings.philosophy_cta_url} className={inputCls}
+                      onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_cta_url: e.target.value }))}
+                      placeholder="e.g. /about" />
+                  </div>
+                </div>
+                <div>
+                  <label className={labelCls}>Image URL <span className="normal-case text-gray-400 font-normal">(leave empty to hide image)</span></label>
+                  <input type="text" value={siteSettings.philosophy_image_url} className={inputCls}
+                    onChange={(e) => setSiteSettings((s) => ({ ...s, philosophy_image_url: e.target.value }))}
+                    placeholder="https://cdn.shopify.com/…/image.jpg" />
+                  {siteSettings.philosophy_image_url && (
+                    <div className="mt-3 relative w-40 h-24 overflow-hidden border border-gray-200">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={siteSettings.philosophy_image_url} alt="Philosophy preview" className="w-full h-full object-cover object-center" />
+                    </div>
+                  )}
+                </div>
+                <div className="border-t border-gray-100 pt-4 space-y-3">
+                  <p className={labelCls + " text-sm font-semibold text-gray-700"}>Stats (leave empty to hide)</p>
+                  {([
+                    { nKey: "phil_stat1_number" as const, lKey: "phil_stat1_label" as const },
+                    { nKey: "phil_stat2_number" as const, lKey: "phil_stat2_label" as const },
+                    { nKey: "phil_stat3_number" as const, lKey: "phil_stat3_label" as const },
+                  ]).map(({ nKey, lKey }, i) => (
+                    <div key={i} className="grid grid-cols-2 gap-3">
+                      <div><label className={labelCls}>Stat {i+1} Number</label>
+                        <input type="text" value={siteSettings[nKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [nKey]: e.target.value }))} placeholder="10K+" />
+                      </div>
+                      <div><label className={labelCls}>Stat {i+1} Label</label>
+                        <input type="text" value={siteSettings[lKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [lKey]: e.target.value }))} placeholder="Happy Customers" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t border-gray-100 pt-4 space-y-4">
+                  <p className={labelCls + " text-sm font-semibold text-gray-700"}>2 Feature Points</p>
+                  {([
+                    { tKey: "phil_f1_title" as const, dKey: "phil_f1_desc" as const, num: "1" },
+                    { tKey: "phil_f2_title" as const, dKey: "phil_f2_desc" as const, num: "2" },
+                  ]).map(({ tKey, dKey, num }) => (
+                    <div key={num} className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-xl">
+                      <div><label className={labelCls}>Feature {num} Title</label>
+                        <input type="text" value={siteSettings[tKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [tKey]: e.target.value }))} />
+                      </div>
+                      <div><label className={labelCls}>Feature {num} Description</label>
+                        <input type="text" value={siteSettings[dKey]} className={inputCls} onChange={e => setSiteSettings(s => ({ ...s, [dKey]: e.target.value }))} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={savePhilosophy} disabled={settingsSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                  <Save className="w-4 h-4" />
+                  {settingsSaving ? "Saving…" : "Save Philosophy"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
               TRUST BAND TAB
           ══════════════════════════════════════ */}
           {tab === "trust-band" && (
@@ -6484,9 +6588,9 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* ── Philosophy Section ── */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-                <h2 className="font-semibold text-gray-700">Philosophy Section</h2>
+              {/* Philosophy moved to Homepage → Philosophy tab */}
+              <div className="bg-blue-50 rounded-2xl border border-blue-100 p-4 text-sm text-blue-700">
+                Philosophy section settings have moved to <strong>Homepage → Philosophy tab</strong>.
                 <div>
                   <label className={labelCls}>Eyebrow Text</label>
                   <input
