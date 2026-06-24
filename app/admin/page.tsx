@@ -531,6 +531,7 @@ export default function AdminPage() {
   const [bundleOffers, setBundleOffers] = useState<BundleOffer[]>([]);
   const [bundleOffersLoading, setBundleOffersLoading] = useState(false);
   const [newBundleOffer, setNewBundleOffer] = useState<{ accessory_slug: string; discount_type: string; discount_value: number }>({ accessory_slug: "", discount_type: "percentage", discount_value: 0 });
+  const [bundleSearch, setBundleSearch] = useState("");
   const [bundleOfferSaving, setBundleOfferSaving] = useState(false);
 
   // Feature tiles (product page settings)
@@ -8476,15 +8477,25 @@ export default function AdminPage() {
                     {/* Add new — inline row */}
                     <div className="bg-gray-50 rounded-xl p-3 space-y-2">
                       <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">+ Add Accessory</p>
+                      <input
+                        type="text"
+                        placeholder="Search product…"
+                        value={bundleSearch}
+                        onChange={(e) => setBundleSearch(e.target.value)}
+                        className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-[#3B5373]"
+                      />
                       <select
                         value={newBundleOffer.accessory_slug}
                         onChange={(e) => setNewBundleOffer((prev) => ({ ...prev, accessory_slug: e.target.value }))}
                         className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-[#3B5373]"
+                        size={5}
                       >
-                        <option value="">Choose accessory…</option>
-                        {dbProducts.filter((p) => p.category === "clips" || p.category === "bow").map((p) => (
-                          <option key={p.slug} value={p.slug}>{p.title}</option>
-                        ))}
+                        <option value="">Choose product…</option>
+                        {dbProducts
+                          .filter((p) => !bundleSearch || p.title.toLowerCase().includes(bundleSearch.toLowerCase()))
+                          .map((p) => (
+                            <option key={p.slug} value={p.slug}>[{p.category}] {p.title}</option>
+                          ))}
                       </select>
                       <div className="flex gap-2">
                         <select
