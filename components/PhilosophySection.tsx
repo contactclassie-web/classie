@@ -90,10 +90,10 @@ export default function PhilosophySection({ initialSettings }: Props) {
         <p className="font-sans text-[10px] tracking-[0.28em] uppercase text-[#3B5373] mb-6">{d.eyebrow}</p>
 
         {/* Heading */}
-        <h2 className="font-serif text-[clamp(28px,3.5vw,52px)] font-bold leading-[1.15] text-[#1a1a1a] mb-6">
+        <h2 className="font-serif text-[clamp(28px,3.5vw,52px)] font-normal leading-[1.15] text-[#1a1a1a] mb-6">
           {d.headLine1}<br />
-          <em className="italic font-light text-[#3B5373] not-italic" style={{ fontStyle: "italic" }}>{d.headItalic}</em>{" "}
-          <span className="font-bold not-italic">{d.headLine2}</span>
+          <em className="italic font-light text-[#3B5373]" style={{ fontStyle: "italic" }}>{d.headItalic}</em>{" "}
+          <span className="font-normal not-italic">{d.headLine2}</span>
         </h2>
 
         {/* Body */}
