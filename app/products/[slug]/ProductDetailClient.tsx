@@ -379,7 +379,7 @@ export default function ProductDetailClient({
                   </div>
                   <button
                     onClick={() => {
-                      addToCart({ ...product, price: discPrice }, selectedVariant, 2);
+                      addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
                     }}
                     style={{ width: "100%", padding: "12px", background: "#fff", color: "#3B5373", border: "none", borderRadius: "8px", fontSize: "12.5px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer" }}
                   >
