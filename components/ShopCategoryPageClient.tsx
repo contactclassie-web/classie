@@ -73,12 +73,12 @@ function WhyChooseSection({ m, prefix, categoryLabel }: { m: HeelsSettings; pref
           <div key={i} className="bg-[#f5f5f5] px-8 py-10 text-center">
             <div className="text-4xl mb-4">{item.icon}</div>
             <p className="text-sm font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.title}</p>
-            <p className="text-xs text-gray-500 leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.desc}</p>
+            <p className="text-xs text-[#1a1a1a] leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.desc}</p>
           </div>
         ))}
       </div>
       {cfg.footerText && (
-        <p className="text-sm text-gray-500 leading-loose max-w-[680px] mx-auto" style={{ fontFamily: "'Poppins', sans-serif" }}>
+        <p className="text-sm text-[#1a1a1a] leading-loose max-w-[680px] mx-auto" style={{ fontFamily: "'Poppins', sans-serif" }}>
           {cfg.footerText}
         </p>
       )}
@@ -265,7 +265,7 @@ function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; car
           {product.title}
         </p>
         {product.heel_type && (
-          <p className="text-[11px] text-gray-400 mt-0.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <p className="text-[11px] text-[#1a1a1a] mt-0.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
             {product.heel_type}
           </p>
         )}
@@ -418,7 +418,7 @@ export default function ShopCategoryPageClient({
               <div className="sticky top-24 space-y-6">
 
                 <div>
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-gray-500 mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
                     Availability
                   </p>
                   <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -431,7 +431,7 @@ export default function ShopCategoryPageClient({
                   <>
                     <div className="border-t border-gray-200" />
                     <div>
-                      <p className="text-[10px] tracking-[0.3em] uppercase text-gray-500 mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
                         Type
                       </p>
                       <div className="space-y-2">
@@ -454,7 +454,7 @@ export default function ShopCategoryPageClient({
                 <div className="border-t border-gray-200" />
 
                 <div>
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-gray-500 mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
                     Max Price
                   </p>
                   <input
@@ -466,7 +466,7 @@ export default function ShopCategoryPageClient({
                     onChange={(e) => setMaxPrice(Number(e.target.value))}
                     className="w-full accent-[#3B5373]"
                   />
-                  <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <p className="text-xs text-[#1a1a1a] mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
                     Up to ₹{maxPrice >= 9999 ? "Any" : maxPrice.toLocaleString("en-IN")}
                   </p>
                 </div>
@@ -493,14 +493,14 @@ export default function ShopCategoryPageClient({
             {/* Grid */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-6">
-                <p className="text-sm text-gray-500" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                <p className="text-sm text-[#1a1a1a]" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   {filtered.length} {filtered.length === 1 ? "item" : "items"}
                   {hasFilters && " (filtered)"}
                 </p>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                  className="text-xs border border-gray-200 px-3 py-2 bg-white text-gray-600 focus:outline-none focus:border-[#3B5373]"
+                  className="text-xs border border-gray-200 px-3 py-2 bg-white text-[#1a1a1a] focus:outline-none focus:border-[#3B5373]"
                   style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
                   <option value="default">Sort: Featured</option>
@@ -512,8 +512,8 @@ export default function ShopCategoryPageClient({
 
               {filtered.length === 0 ? (
                 <div className="text-center py-20">
-                  <p className="font-serif text-2xl text-gray-400 mb-3">No items found</p>
-                  <p className="text-sm text-gray-400" style={{ fontFamily: "'Poppins', sans-serif" }}>Try removing some filters</p>
+                  <p className="font-serif text-2xl text-[#1a1a1a] mb-3">No items found</p>
+                  <p className="text-sm text-[#1a1a1a]" style={{ fontFamily: "'Poppins', sans-serif" }}>Try removing some filters</p>
                   <button
                     onClick={() => { setActiveOccasion(null); setSelectedFilterTypes([]); setMaxPrice(9999); }}
                     className="mt-4 text-[11px] tracking-[0.2em] uppercase text-[#3B5373] border border-[#3B5373] px-6 py-2"

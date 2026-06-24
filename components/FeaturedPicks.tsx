@@ -263,7 +263,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
             {tabs.map(({ key, cfg }) => (
               <button key={key} onClick={() => setActiveTab(key)}
                 className={`relative pb-3 text-[11px] tracking-[0.15em] uppercase font-medium transition-colors duration-200 ${
-                  activeTab === key ? "text-[#1a1a1a] border-b-2 border-[#3B5373]" : "text-gray-400 hover:text-gray-600"
+                  activeTab === key ? "text-[#1a1a1a] border-b-2 border-[#3B5373]" : "text-[#1a1a1a] hover:text-[#1a1a1a]"
                 }`} style={{ fontFamily: "'Poppins', sans-serif" }}>
                 {cfg.label}
               </button>

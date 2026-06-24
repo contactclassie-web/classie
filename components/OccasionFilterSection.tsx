@@ -147,7 +147,7 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick,
           <h2 className="font-serif text-[clamp(2rem,3.5vw,3.2rem)] font-light leading-[1.08] text-[#1a1a1a] mt-3">
             Shop by <em className="italic text-[#3B5373]">Occasion</em>
           </h2>
-          <p className="text-[11px] text-gray-400 mt-2 tracking-[0.08em]">
+          <p className="text-[11px] text-[#1a1a1a] mt-2 tracking-[0.08em]">
             Click to filter heels by occasion
           </p>
         </div>

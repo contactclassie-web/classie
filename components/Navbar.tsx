@@ -119,7 +119,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
                             {cat.name}
                           </p>
                           {cat.description && (
-                            <p className="text-[10px] text-gray-400 mt-1 leading-relaxed tracking-wide line-clamp-2">
+                            <p className="text-[10px] text-[#1a1a1a] mt-1 leading-relaxed tracking-wide line-clamp-2">
                               {cat.description}
                             </p>
                           )}
@@ -132,7 +132,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
                   </div>
                   {/* Bottom bar */}
                   <div className="px-5 py-3 bg-[#faf9ff] border-t border-gray-100 flex items-center justify-between">
-                    <p className="text-[9px] tracking-[0.2em] uppercase text-gray-400">All Collections</p>
+                    <p className="text-[9px] tracking-[0.2em] uppercase text-[#1a1a1a]">All Collections</p>
                     <Link href="/collections" className="text-[9px] tracking-[0.2em] uppercase text-[#3B5373] hover:underline">
                       View All →
                     </Link>
@@ -232,7 +232,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
               <div className="flex flex-col pl-3 gap-1">
                 {dropdownLinks.map((cat) => (
                   <Link key={cat.slug} href={`/shop/${cat.slug}`} onClick={() => setOpen(false)}
-                    className="py-1.5 text-xs font-light text-gray-500 tracking-[0.12em] uppercase hover:text-[#3B5373] transition-colors">
+                    className="py-1.5 text-xs font-light text-[#1a1a1a] tracking-[0.12em] uppercase hover:text-[#3B5373] transition-colors">
                     — {cat.name}
                   </Link>
                 ))}
