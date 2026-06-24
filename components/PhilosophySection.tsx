@@ -110,7 +110,7 @@ export default function PhilosophySection({ initialSettings }: Props) {
               .filter(s => s.n).map((s, i) => (
               <div key={i}>
                 <p className="font-serif text-[2rem] font-bold text-[#3B5373] leading-none mb-1">{s.n}</p>
-                <p className="font-sans text-[9px] tracking-[0.18em] uppercase text-gray-400">{s.l}</p>
+                <p className="font-sans text-[9px] tracking-[0.18em] uppercase text-gray-700">{s.l}</p>
               </div>
             ))}
           </div>
