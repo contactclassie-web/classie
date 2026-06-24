@@ -84,7 +84,7 @@ function ProductCard({ product, isNew, cardStyle }: { product: Product; isNew?: 
         {/* Product image */}
         {product.image && (
           <Image src={product.image} alt={product.title} fill
-            className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+            className="object-cover object-bottom transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 50vw, 25vw" />
         )}
 
