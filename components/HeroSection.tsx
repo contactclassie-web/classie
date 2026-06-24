@@ -152,7 +152,7 @@ export default function HeroSection({ heroSlides, heroImageUrl, initialSettings 
       </div>
 
       {/* Right: image */}
-      <div className="relative overflow-hidden bg-[#F9F9F9] min-h-[400px]">
+      <div className="relative overflow-hidden bg-[#f7f7f7] min-h-[400px]">
         <HeroImageSlider slides={heroSlides} fallbackUrl={heroImageUrl} />
         {chipCode && (
           <div className="absolute bottom-12 left-0 bg-white px-7 py-5 border-l-[3px] border-[#3B5373] shadow-xl">
