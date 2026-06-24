@@ -103,7 +103,7 @@ export default function HeroSection({ heroSlides, heroImageUrl, initialSettings 
     <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[calc(100vh-72px)]">
       {/* Left: text */}
       <div className="flex flex-col justify-center px-6 md:px-20 py-16 md:py-24 bg-[#f7f7f7] relative">
-        <div className="absolute right-0 top-[12%] bottom-[12%] w-px bg-gradient-to-b from-transparent via-[rgba(59,83,115,0.2)] to-transparent hidden md:block" />
+
 
         {eyebrow && (
           <div className="flex items-center gap-4 mb-7">
