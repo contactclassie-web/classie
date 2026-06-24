@@ -299,6 +299,7 @@ interface BundleOffer {
   discount_value: number;
   sort_order: number;
   active: boolean;
+  custom_label?: string;
 }
 
 interface FeatureTileItem {
@@ -530,7 +531,7 @@ export default function AdminPage() {
   // Bundle Offers (inside product modal)
   const [bundleOffers, setBundleOffers] = useState<BundleOffer[]>([]);
   const [bundleOffersLoading, setBundleOffersLoading] = useState(false);
-  const [newBundleOffer, setNewBundleOffer] = useState<{ accessory_slug: string; discount_type: string; discount_value: number }>({ accessory_slug: "", discount_type: "percentage", discount_value: 0 });
+  const [newBundleOffer, setNewBundleOffer] = useState<{ accessory_slug: string; discount_type: string; discount_value: number; custom_label: string }>({ accessory_slug: "", discount_type: "percentage", discount_value: 0, custom_label: "" });
   const [bundleSearch, setBundleSearch] = useState("");
   const [bundleOfferSaving, setBundleOfferSaving] = useState(false);
 
@@ -2690,11 +2691,12 @@ export default function AdminPage() {
         accessory_slug: newBundleOffer.accessory_slug,
         discount_type: newBundleOffer.discount_type,
         discount_value: newBundleOffer.discount_value,
+        custom_label: newBundleOffer.custom_label || "",
         sort_order: bundleOffers.length,
         active: true,
       }]);
       await loadBundleOffers(productModal.data.slug);
-      setNewBundleOffer({ accessory_slug: "", discount_type: "percentage", discount_value: 0 });
+      setNewBundleOffer({ accessory_slug: "", discount_type: "percentage", discount_value: 0, custom_label: "" });
       await revalidateSite();
     } finally {
       setBundleOfferSaving(false);
@@ -8514,6 +8516,15 @@ export default function AdminPage() {
                           className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-[#3B5373]"
                           placeholder="e.g. 20"
                         />
+                        </div>
+                      <input
+                        type="text"
+                        placeholder="Custom text (optional) e.g. 'Do pair khareedo aur bachao!'"
+                        value={newBundleOffer.custom_label}
+                        onChange={(e) => setNewBundleOffer((prev) => ({ ...prev, custom_label: e.target.value }))}
+                        className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-[#3B5373]"
+                      />
+                      <div className="flex gap-2">
                         <button
                           onClick={addBundleOffer}
                           disabled={bundleOfferSaving || !newBundleOffer.accessory_slug}

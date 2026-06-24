@@ -21,6 +21,7 @@ export interface BundleOfferWithProduct {
   accessory_slug: string;
   discount_type: string;
   discount_value: number;
+  custom_label?: string;
   product: Product;
 }
 
@@ -98,7 +99,7 @@ export default async function ProductPage({ params }: Props) {
               images: Array.isArray(acc.images) ? acc.images : [],
               description: acc.description,
             };
-            return { id: offer.id, accessory_slug: offer.accessory_slug, discount_type: offer.discount_type, discount_value: Number(offer.discount_value), product: p };
+            return { id: offer.id, accessory_slug: offer.accessory_slug, discount_type: offer.discount_type, discount_value: Number(offer.discount_value), custom_label: offer.custom_label || "", product: p };
           })
           .filter(Boolean) as BundleOfferWithProduct[];
       }

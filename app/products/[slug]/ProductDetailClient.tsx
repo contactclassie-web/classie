@@ -370,7 +370,7 @@ export default function ProductDetailClient({
                     <span style={{ fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Buy 2 Get {disc} Off</span>
                   </div>
                   <p style={{ fontSize: "12px", opacity: 0.8, marginBottom: "14px" }}>
-                    2 pieces kharidne pe har ek pe {disc} discount milega
+                    {offer.custom_label || `2 pieces kharidne pe har ek pe ${disc} discount milega`}
                   </p>
                   <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "14px" }}>
                     <span style={{ fontSize: "18px", fontWeight: 700 }}>₹{discPrice} × 2</span>
