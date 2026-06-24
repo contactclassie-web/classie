@@ -360,7 +360,7 @@ export default function ProductDetailClient({
             {/* ── Style it with Clip-ons ── */}
             {bundleOffers.length > 0 && (
               <div style={{ background: "#F9F7F5", borderRadius: "12px", padding: "18px" }}>
-                <p style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#1a1a1a", marginBottom: "12px" }}>
+                <p style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#3B5373", marginBottom: "12px" }}>
                   Style it with clip-ons
                 </p>
                 {bundleOffers.map((offer) => {
@@ -472,14 +472,14 @@ export default function ProductDetailClient({
       {/* ── Feature Tiles ── */}
       <div style={{ background: "#FEFCFA", padding: "60px 0" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
-          <h2 className="font-serif text-center" style={{ fontSize: "28px", color: "#1a1a1a", marginBottom: "32px" }}>
+          <h2 className="font-serif text-center" style={{ fontSize: "28px", color: "#3B5373", marginBottom: "32px" }}>
             Designed for Every Moment
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
             {tiles.map((tile, i) => (
-              <div key={i} className="text-center" style={{ padding: "28px 20px", border: "1px solid #E8E3DD", borderRadius: "8px", background: "#fff" }}>
+              <div key={i} className="text-center" style={{ padding: "28px 20px", border: "1.5px solid #3B5373", borderRadius: "8px", background: "#fff" }}>
                 <div style={{ fontSize: "30px", marginBottom: "12px" }}>{tile.icon}</div>
-                <div style={{ fontSize: "12.5px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#1a1a1a", marginBottom: "8px" }}>{tile.title}</div>
+                <div style={{ fontSize: "12.5px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#3B5373", marginBottom: "8px" }}>{tile.title}</div>
                 <div style={{ fontSize: "12px", color: "#888", lineHeight: 1.6 }}>{tile.desc}</div>
               </div>
             ))}
@@ -492,7 +492,7 @@ export default function ProductDetailClient({
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           {/* Header */}
           <div className="text-center" style={{ marginBottom: "32px" }}>
-            <h2 className="font-serif" style={{ fontSize: "30px", letterSpacing: "0.06em", textTransform: "uppercase", color: "#1a1a1a", marginBottom: "16px" }}>
+            <h2 className="font-serif" style={{ fontSize: "30px", letterSpacing: "0.06em", textTransform: "uppercase", color: "#3B5373", marginBottom: "16px" }}>
               Shop the Full Collection
             </h2>
             <div style={{ display: "inline-flex", borderBottom: "2px solid #E8E3DD" }}>
@@ -557,7 +557,7 @@ export default function ProductDetailClient({
           {/* Header: score + bars */}
           <div className="flex gap-10 items-start" style={{ marginBottom: "32px", flexWrap: "wrap" }}>
             <div>
-              <h2 className="font-serif" style={{ fontSize: "26px", color: "#1a1a1a", marginBottom: "8px" }}>Customer Reviews</h2>
+              <h2 className="font-serif" style={{ fontSize: "26px", color: "#3B5373", marginBottom: "8px" }}>Customer Reviews</h2>
               <div style={{ fontSize: "48px", fontWeight: 700, color: "#1a1a1a", lineHeight: 1 }}>5.0</div>
               <div style={{ color: "#D4A843", fontSize: "18px", margin: "4px 0" }}>★★★★★</div>
               <div style={{ fontSize: "13px", color: "#888" }}>{STATIC_REVIEWS.length} reviews</div>
