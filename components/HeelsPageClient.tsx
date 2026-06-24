@@ -144,7 +144,7 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
           {title}
         </h1>
         {subtitle && (
-          <p className="font-serif italic text-[#3B5373] text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          <p className="font-serif italic text-[#1a1a1a] text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             {subtitle}
           </p>
         )}
