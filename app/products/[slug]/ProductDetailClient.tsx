@@ -418,8 +418,8 @@ export default function ProductDetailClient({
                   return (
                     <div key={offer.id} className="flex items-center gap-3" style={{ padding: "14px 0", borderBottom: "1px solid #F0EDEA" }}>
                       {/* Thumbnail */}
-                      <div className="relative rounded-[8px] overflow-hidden flex-shrink-0" style={{ width: "64px", height: "64px", background: "#EDE8E1" }}>
-                        <Image src={offer.product.image} alt={offer.product.title} fill className="object-cover object-center" sizes="64px" />
+                      <div className="rounded-[8px] overflow-hidden flex-shrink-0" style={{ width: "64px", height: "64px", background: "#EDE8E1" }}>
+                        <img src={offer.product.image} alt={offer.product.title} style={{ width: "64px", height: "64px", objectFit: "cover", display: "block" }} />
                       </div>
                       {/* Info */}
                       <div className="flex-1 min-w-0">
