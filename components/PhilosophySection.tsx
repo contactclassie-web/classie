@@ -99,7 +99,7 @@ export default function PhilosophySection({ initialSettings }: Props) {
         {/* Body */}
         <div className="mb-8 space-y-3 max-w-[480px]">
           {bodyParagraphs.map((p, i) => (
-            <p key={i} className="font-sans text-sm font-light leading-[1.8] text-gray-800">{p}</p>
+            <p key={i} className="font-sans text-sm font-light leading-[1.8] text-[#1a1a1a]">{p}</p>
           ))}
         </div>
 
@@ -110,7 +110,7 @@ export default function PhilosophySection({ initialSettings }: Props) {
               .filter(s => s.n).map((s, i) => (
               <div key={i}>
                 <p className="font-serif text-[2rem] font-bold text-[#3B5373] leading-none mb-1">{s.n}</p>
-                <p className="font-sans text-[9px] tracking-[0.18em] uppercase text-gray-700">{s.l}</p>
+                <p className="font-sans text-[9px] tracking-[0.18em] uppercase text-[#1a1a1a]">{s.l}</p>
               </div>
             ))}
           </div>
@@ -122,8 +122,8 @@ export default function PhilosophySection({ initialSettings }: Props) {
             <div key={i} className="flex items-start gap-3">
               <span className="text-[#3B5373] text-base mt-0.5 flex-shrink-0">{i === 0 ? "✦" : "⬡"}</span>
               <div>
-                <p className="font-sans text-[11px] font-semibold text-gray-800 mb-1 tracking-wide">{f.t}</p>
-                <p className="font-sans text-[11px] text-gray-700 leading-[1.6]">{f.desc}</p>
+                <p className="font-sans text-[11px] font-semibold text-[#1a1a1a] mb-1 tracking-wide">{f.t}</p>
+                <p className="font-sans text-[11px] text-[#1a1a1a] leading-[1.6]">{f.desc}</p>
               </div>
             </div>
           ))}
