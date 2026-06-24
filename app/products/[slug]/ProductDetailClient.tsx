@@ -357,13 +357,45 @@ export default function ProductDetailClient({
               Buy it Now
             </button>
 
+            {/* ── Buy 2 Get X% Off ── */}
+            {bundleOffers.filter(o => o.accessory_slug === product.slug).map((offer) => {
+              const disc = offer.discount_type === "percentage" ? `${offer.discount_value}%` : `₹${offer.discount_value}`;
+              const discPrice = offer.discount_type === "percentage"
+                ? Math.round(product.price * (1 - offer.discount_value / 100))
+                : Math.max(0, Math.round(product.price - offer.discount_value));
+              return (
+                <div key={offer.id} style={{ background: "linear-gradient(135deg, #3B5373 0%, #2d3f56 100%)", borderRadius: "12px", padding: "18px", color: "#fff" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                    <span style={{ fontSize: "20px" }}>🎉</span>
+                    <span style={{ fontSize: "14px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Buy 2 Get {disc} Off</span>
+                  </div>
+                  <p style={{ fontSize: "12px", opacity: 0.8, marginBottom: "14px" }}>
+                    2 pieces kharidne pe har ek pe {disc} discount milega
+                  </p>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "14px" }}>
+                    <span style={{ fontSize: "18px", fontWeight: 700 }}>₹{discPrice} × 2</span>
+                    <span style={{ fontSize: "13px", opacity: 0.6, textDecoration: "line-through" }}>₹{product.price} × 2</span>
+                    <span style={{ fontSize: "11px", background: "#fff", color: "#3B5373", fontWeight: 700, padding: "2px 8px", borderRadius: "100px" }}>Save {disc}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      addToCart({ ...product, price: discPrice }, selectedVariant, 2);
+                    }}
+                    style={{ width: "100%", padding: "12px", background: "#fff", color: "#3B5373", border: "none", borderRadius: "8px", fontSize: "12.5px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", cursor: "pointer" }}
+                  >
+                    Buy 2 Now — Save {disc}
+                  </button>
+                </div>
+              );
+            })}
+
             {/* ── Style it with Clip-ons ── */}
-            {bundleOffers.length > 0 && (
+            {bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
               <div style={{ background: "#F9F7F5", borderRadius: "12px", padding: "18px" }}>
                 <p style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#3B5373", marginBottom: "12px" }}>
                   Style it with clip-ons
                 </p>
-                {bundleOffers.map((offer) => {
+                {bundleOffers.filter(o => o.accessory_slug !== product.slug).map((offer) => {
                   const discountedPrice = offer.discount_type === "percentage"
                     ? Math.round(offer.product.price * (1 - offer.discount_value / 100))
                     : Math.max(0, Math.round(offer.product.price - offer.discount_value));
