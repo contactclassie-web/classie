@@ -99,7 +99,7 @@ export default function PhilosophySection({ initialSettings }: Props) {
         {/* Body */}
         <div className="mb-8 space-y-3 max-w-[480px]">
           {bodyParagraphs.map((p, i) => (
-            <p key={i} className="font-sans text-sm font-light leading-[1.8] text-gray-600">{p}</p>
+            <p key={i} className="font-sans text-sm font-light leading-[1.8] text-gray-800">{p}</p>
           ))}
         </div>
 
@@ -123,7 +123,7 @@ export default function PhilosophySection({ initialSettings }: Props) {
               <span className="text-[#3B5373] text-base mt-0.5 flex-shrink-0">{i === 0 ? "✦" : "⬡"}</span>
               <div>
                 <p className="font-sans text-[11px] font-semibold text-gray-800 mb-1 tracking-wide">{f.t}</p>
-                <p className="font-sans text-[11px] text-gray-400 leading-[1.6]">{f.desc}</p>
+                <p className="font-sans text-[11px] text-gray-700 leading-[1.6]">{f.desc}</p>
               </div>
             </div>
           ))}
