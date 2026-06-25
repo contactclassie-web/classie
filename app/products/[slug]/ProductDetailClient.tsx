@@ -80,10 +80,12 @@ export default function ProductDetailClient({
   const [openAcc, setOpenAcc] = useState<string | null>("description");
   const [collTab, setCollTab] = useState<"latest" | "bestseller">("latest");
 
-  // Gallery images: main + additional
+  // Gallery images: main + additional (up to 4), plus optional video
   const rawImages = [product.image, ...(product.images ?? [])].filter(Boolean);
   const galleryImages = rawImages.length >= 4 ? rawImages.slice(0, 4) : [...rawImages, ...Array(4 - rawImages.length).fill(product.image)];
+  const hasVideo = !!product.video_url;
   const [mainImage, setMainImage] = useState(galleryImages[0]);
+  const [showVideo, setShowVideo] = useState(false);
 
   // Adv related grid settings
   const [advDesktop, setAdvDesktop] = useState(4);
@@ -154,35 +156,54 @@ export default function ProductDetailClient({
 
           {/* LEFT — Image Column */}
           <div className="pr-0 md:pr-12 mb-8 md:mb-0">
-            {/* Main image */}
+            {/* Main image / video */}
             <div className="relative rounded-[4px] overflow-hidden mb-3" style={{ aspectRatio: "3/4", background: "#F0EBE4" }}>
-              <Image
-                src={mainImage}
-                alt={product.title}
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 52vw"
-                priority
-              />
-              {discount > 0 && (
+              {showVideo && product.video_url ? (
+                <video
+                  src={product.video_url}
+                  controls autoPlay
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ background: "#000" }}
+                />
+              ) : (
+                <Image
+                  src={mainImage}
+                  alt={product.title}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 768px) 100vw, 52vw"
+                  priority
+                />
+              )}
+              {discount > 0 && !showVideo && (
                 <span className="absolute top-4 left-4 text-white text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#3B5373", fontSize: "11px", letterSpacing: "0.04em" }}>
                   -{discount}% OFF
                 </span>
               )}
             </div>
 
-            {/* Thumbnails */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
+            {/* Thumbnails — 4 images + optional video */}
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${hasVideo ? 5 : 4}, 1fr)`, gap: "8px" }}>
               {galleryImages.map((img, i) => (
                 <button
                   key={i}
-                  onClick={() => setMainImage(img)}
+                  onClick={() => { setShowVideo(false); setMainImage(img); }}
                   className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer"
-                  style={{ aspectRatio: "3/4", border: `2px solid ${mainImage === img ? "#3B5373" : "transparent"}`, background: "#EDE8E1", transition: "border-color 0.2s" }}
+                  style={{ aspectRatio: "3/4", border: `2px solid ${!showVideo && mainImage === img ? "#3B5373" : "transparent"}`, background: "#EDE8E1", transition: "border-color 0.2s" }}
                 >
                   <Image src={img} alt={`View ${i + 1}`} fill className="object-cover object-center" sizes="100px" />
                 </button>
               ))}
+              {hasVideo && (
+                <button
+                  onClick={() => setShowVideo(true)}
+                  className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer flex items-center justify-center"
+                  style={{ aspectRatio: "3/4", border: `2px solid ${showVideo ? "#3B5373" : "transparent"}`, background: "#1a1a1a", transition: "border-color 0.2s" }}
+                  title="Play video"
+                >
+                  <span style={{ fontSize: "22px" }}>▶</span>
+                </button>
+              )}
             </div>
           </div>
 

@@ -10,6 +10,7 @@ export interface Product {
   variants: { type: "size" | "color" | "none"; options: string[] };
   image: string;
   images?: string[];
+  video_url?: string;
   description: string;
   featured_tab?: string | null;
 }
@@ -141,6 +142,7 @@ function mapDbProduct(row: DbProduct): Product {
     },
     image: row.image,
     images: Array.isArray((row as any).images) ? (row as any).images : [],
+    video_url: (row as any).video_url || "",
     description: row.description,
     featured_tab: row.featured_tab ?? null,
   };

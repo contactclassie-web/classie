@@ -40,6 +40,7 @@ interface DbProduct {
   description: string;
   image: string;
   images: string[];
+  video_url?: string;
   variant_type: string;
   variants: string[];
   heel_type?: string;
@@ -337,7 +338,7 @@ const STATUS_ICONS: Record<string, React.ElementType> = {
 
 const EMPTY_PRODUCT: DbProduct = {
   title: "", slug: "", price: 0, compare_price: 0,
-  category: "heels", description: "", image: "", images: [],
+  category: "heels", description: "", image: "", images: [], video_url: "",
   variant_type: "none", variants: [], heel_type: "", toe_style: "",
   heel_height: "", ankle_strap: false, shoe_fit: "", tags: [],
   cod_available: true, free_shipping: false, is_featured: false, featured_tab: null, active: true,
@@ -8414,18 +8415,31 @@ export default function AdminPage() {
                 <label className={labelCls}>Description</label>
                 <textarea rows={3} value={productModal.data.description} onChange={(e) => setProductField("description", e.target.value)} className={inputCls} placeholder="Product description…" />
               </div>
-              <div>
-                <label className={labelCls}>Main Image URL</label>
-                <input type="text" value={productModal.data.image} onChange={(e) => setProductField("image", e.target.value)} className={inputCls} placeholder="https://…" />
-              </div>
-              <div>
-                <label className={labelCls}>Additional Images (comma separated)</label>
-                <input
-                  type="text"
-                  value={productModal.data.images?.join(", ") ?? ""}
-                  onChange={(e) => setProductField("images", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
-                  className={inputCls} placeholder="https://…, https://…"
-                />
+              {/* ── Images + Video ── */}
+              <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50/50">
+                <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">📸 Images &amp; Video</p>
+                <div>
+                  <label className={labelCls}>Image 1 — Main</label>
+                  <input type="text" value={productModal.data.image} onChange={(e) => setProductField("image", e.target.value)} className={inputCls} placeholder="https://…" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelCls}>Image 2</label>
+                    <input type="text" value={productModal.data.images?.[0] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[0] = e.target.value; setProductField("images", arr.filter((_, i) => i < 3 || e.target.value)); }} className={inputCls} placeholder="https://…" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Image 3</label>
+                    <input type="text" value={productModal.data.images?.[1] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[1] = e.target.value; setProductField("images", arr); }} className={inputCls} placeholder="https://…" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Image 4</label>
+                    <input type="text" value={productModal.data.images?.[2] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[2] = e.target.value; setProductField("images", arr); }} className={inputCls} placeholder="https://…" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>🎬 Video URL (mp4 / YouTube)</label>
+                    <input type="text" value={productModal.data.video_url ?? ""} onChange={(e) => setProductField("video_url", e.target.value)} className={inputCls} placeholder="https://… or youtube.com/…" />
+                  </div>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
