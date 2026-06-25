@@ -411,6 +411,48 @@ export default function ShopCategoryPageClient({
         />
       )}
 
+      {/* ── Clip Type Pill Filter (clips page only) ── */}
+      {settingsPrefix === "clips" && filterTypes.length > 0 && (
+        <section className="py-8 bg-white border-b border-gray-100">
+          <div className="max-w-[1280px] mx-auto px-4 md:px-10">
+            <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-[#3B5373] text-center mb-5">
+              Shop by Style
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {/* All pill */}
+              <button
+                onClick={() => setSelectedFilterTypes([])}
+                className="px-6 py-2 text-[11px] tracking-[0.18em] uppercase font-medium transition-all duration-200 border"
+                style={{
+                  background: selectedFilterTypes.length === 0 ? "#3B5373" : "transparent",
+                  color: selectedFilterTypes.length === 0 ? "#ffffff" : "#3B5373",
+                  borderColor: "#3B5373",
+                }}
+              >
+                All
+              </button>
+              {filterTypes.map((ft) => {
+                const isActive = selectedFilterTypes.includes(ft);
+                return (
+                  <button
+                    key={ft}
+                    onClick={() => setSelectedFilterTypes(isActive ? selectedFilterTypes.filter(t => t !== ft) : [...selectedFilterTypes, ft])}
+                    className="px-6 py-2 text-[11px] tracking-[0.18em] uppercase font-medium transition-all duration-200 border"
+                    style={{
+                      background: isActive ? "#3B5373" : "transparent",
+                      color: isActive ? "#ffffff" : "#3B5373",
+                      borderColor: "#3B5373",
+                    }}
+                  >
+                    {ft}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="py-12" style={{ background: "#f5f5f5" }}>
         <div className="max-w-[1280px] mx-auto px-4 md:px-10">
           <div className="flex gap-8">
