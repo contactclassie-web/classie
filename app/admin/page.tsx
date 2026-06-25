@@ -51,6 +51,8 @@ interface DbProduct {
   tags?: string[];
   key_features?: string;
   other_info?: string;
+  specs?: Array<{label: string; value: string}>;
+  feature_checks?: string;
   cod_available: boolean;
   free_shipping: boolean;
   is_featured: boolean;
@@ -343,7 +345,7 @@ const EMPTY_PRODUCT: DbProduct = {
   category: "heels", description: "", image: "", images: [], video_url: "",
   variant_type: "none", variants: [], heel_type: "", toe_style: "",
   heel_height: "", ankle_strap: false, shoe_fit: "", tags: [],
-  key_features: "", other_info: "",
+  key_features: "", other_info: "", specs: [], feature_checks: "",
   cod_available: true, free_shipping: false, is_featured: false, featured_tab: null, active: true,
 };
 
@@ -8426,6 +8428,67 @@ export default function AdminPage() {
                 <label className={labelCls}>ℹ️ Other Info <span className="text-gray-400 font-normal normal-case">(care, storage, etc.)</span></label>
                 <textarea rows={2} value={productModal.data.other_info ?? ""} onChange={(e) => setProductField("other_info", e.target.value)} className={inputCls} placeholder="Clean with a soft dry cloth. Avoid water and perfumes. Store in dust bag…" />
               </div>
+
+              {/* ── Specs Table ── */}
+              <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50/50">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">📋 Specs Table</p>
+                  <button
+                    type="button"
+                    onClick={() => setProductField("specs", [...(productModal.data.specs || []), { label: "", value: "" }])}
+                    className="text-xs text-[#3B5373] font-medium hover:underline"
+                  >+ Add Row</button>
+                </div>
+                {(productModal.data.specs || []).length === 0 && (
+                  <p className="text-xs text-gray-400">No rows yet. Click &quot;+ Add Row&quot; to add specs.</p>
+                )}
+                <div className="space-y-2">
+                  {(productModal.data.specs || []).map((row: {label:string;value:string}, i: number) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <input
+                        type="text" placeholder="Label (e.g. Heel Type)"
+                        value={row.label}
+                        onChange={(e) => {
+                          const arr = [...(productModal.data.specs || [])];
+                          arr[i] = { ...arr[i], label: e.target.value };
+                          setProductField("specs", arr);
+                        }}
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]"
+                      />
+                      <input
+                        type="text" placeholder="Value (e.g. Block Heel)"
+                        value={row.value}
+                        onChange={(e) => {
+                          const arr = [...(productModal.data.specs || [])];
+                          arr[i] = { ...arr[i], value: e.target.value };
+                          setProductField("specs", arr);
+                        }}
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const arr = (productModal.data.specs || []).filter((_: any, j: number) => j !== i);
+                          setProductField("specs", arr);
+                        }}
+                        className="text-red-400 hover:text-red-600 px-2 text-base font-bold flex-shrink-0"
+                      >×</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls}>✅ Feature Checkmarks <span className="text-gray-400 font-normal normal-case">(use | to separate)</span></label>
+                <textarea
+                  rows={2}
+                  value={productModal.data.feature_checks ?? ""}
+                  onChange={(e) => setProductField("feature_checks", e.target.value)}
+                  className={inputCls}
+                  placeholder="Genuine Leather Finish | COD Available | Comfortable for long wear | High Quality Product"
+                />
+              </div>
+
               {/* ── Images + Video ── */}
               <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50/50">
                 <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">📸 Images &amp; Video</p>

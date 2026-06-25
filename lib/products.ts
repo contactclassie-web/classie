@@ -13,6 +13,8 @@ export interface Product {
   video_url?: string;
   key_features?: string;
   other_info?: string;
+  specs?: Array<{label: string; value: string}>;
+  feature_checks?: string;
   description: string;
   featured_tab?: string | null;
 }
@@ -147,6 +149,8 @@ function mapDbProduct(row: DbProduct): Product {
     video_url: (row as any).video_url || "",
     key_features: (row as any).key_features || "",
     other_info: (row as any).other_info || "",
+    specs: Array.isArray((row as any).specs) ? (row as any).specs : [],
+    feature_checks: (row as any).feature_checks || "",
     description: row.description,
     featured_tab: row.featured_tab ?? null,
   };

@@ -121,7 +121,12 @@ export default function ProductDetailClient({
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0;
 
-  const specs = SPECS[product.category] ?? [];
+  const specs: string[][] = (product.specs && product.specs.length > 0)
+    ? product.specs.map((r: {label:string;value:string}) => [r.label, r.value])
+    : (SPECS[product.category] ?? []);
+  const featureChecks = (product.feature_checks && product.feature_checks.trim())
+    ? product.feature_checks.split("|").map((s: string) => s.trim()).filter(Boolean)
+    : FEATURE_CHECKS;
   const tiles = featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES;
 
   const doAdd = () => {
@@ -372,7 +377,7 @@ export default function ProductDetailClient({
 
             {/* Feature checkmarks (2-col grid) */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #E8E3DD" }}>
-              {FEATURE_CHECKS.map((feat) => (
+              {featureChecks.map((feat) => (
                 <div key={feat} className="flex items-center gap-1.5" style={{ fontSize: "12.5px", color: "#444" }}>
                   <span style={{ color: "#3B5373", fontWeight: 700, fontSize: "14px" }}>✓</span>
                   {feat}
