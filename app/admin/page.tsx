@@ -8660,18 +8660,33 @@ export default function AdminPage() {
                         )}
                         <div>
                           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Link another color variant</p>
-                          <div className="flex gap-2 flex-wrap">
-                            <input type="text" placeholder="Product slug (e.g. velora-milk)" value={newColorVariant.product_slug}
+                          <div className="space-y-2">
+                            {/* Product selector */}
+                            <select
+                              value={newColorVariant.product_slug}
                               onChange={(e) => setNewColorVariant(p => ({ ...p, product_slug: e.target.value }))}
-                              className="flex-1 min-w-[140px] px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]" />
-                            <input type="text" placeholder="Color name" value={newColorVariant.color_name}
-                              onChange={(e) => setNewColorVariant(p => ({ ...p, color_name: e.target.value }))}
-                              className="w-28 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]" />
-                            <input type="color" value={newColorVariant.color_hex}
-                              onChange={(e) => setNewColorVariant(p => ({ ...p, color_hex: e.target.value }))}
-                              className="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" />
-                            <button onClick={addColorVariant} disabled={colorVariantSaving || !newColorVariant.product_slug || !newColorVariant.color_name}
-                              className="px-3 py-2 bg-[#3B5373] text-white text-xs rounded-lg disabled:opacity-50">Link</button>
+                              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373] bg-white"
+                            >
+                              <option value="">— Select a product —</option>
+                              {dbProducts
+                                .filter(p => p.slug !== productModal.data?.slug && !colorVariants.some(v => v.product_slug === p.slug))
+                                .map(p => (
+                                  <option key={p.slug} value={p.slug}>{p.title} ({p.slug})</option>
+                                ))
+                              }
+                            </select>
+                            {/* Color name + picker + link button */}
+                            <div className="flex gap-2 items-center">
+                              <input type="text" placeholder="Color name (e.g. Milk)" value={newColorVariant.color_name}
+                                onChange={(e) => setNewColorVariant(p => ({ ...p, color_name: e.target.value }))}
+                                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]" />
+                              <input type="color" value={newColorVariant.color_hex}
+                                onChange={(e) => setNewColorVariant(p => ({ ...p, color_hex: e.target.value }))}
+                                className="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" title="Pick color" />
+                              <div className="w-6 h-6 rounded-full border border-gray-200 flex-shrink-0" style={{ background: newColorVariant.color_hex }} />
+                              <button onClick={addColorVariant} disabled={colorVariantSaving || !newColorVariant.product_slug || !newColorVariant.color_name}
+                                className="px-4 py-2 bg-[#3B5373] text-white text-xs rounded-lg disabled:opacity-50 font-medium">Link</button>
+                            </div>
                           </div>
                         </div>
                       </>
