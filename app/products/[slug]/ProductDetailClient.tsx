@@ -221,29 +221,39 @@ export default function ProductDetailClient({
 
             {/* ── Color Variants ── */}
             {colorVariants.length > 1 && (
-              <div style={{ marginBottom: "16px" }}>
-                <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#888", marginBottom: "8px" }}>Color</p>
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "flex-start" }}>
+              <div style={{ marginBottom: "20px" }}>
+                <p style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", marginBottom: "2px" }}>Available in</p>
+                <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#888", marginBottom: "12px" }}>
+                  {colorVariants.find(v => v.product_slug === product.slug)?.color_name || ""}
+                </p>
+                <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "flex-start" }}>
                   {colorVariants.map((v) => {
                     const isActive = v.product_slug === product.slug;
+                    const circle = (
+                      <div style={{
+                        width: "64px", height: "64px", borderRadius: "50%", overflow: "hidden",
+                        border: isActive ? "2px solid #3B5373" : "1.5px solid #D8D8D8",
+                        background: "#F5F5F5", flexShrink: 0,
+                        boxShadow: isActive ? "0 0 0 3px #fff, 0 0 0 5px #3B5373" : "none",
+                        cursor: isActive ? "default" : "pointer",
+                        transition: "box-shadow 0.15s",
+                      }}>
+                        {v.image ? (
+                          <img src={v.image} alt={v.color_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", background: v.color_hex }} />
+                        )}
+                      </div>
+                    );
                     return isActive ? (
-                      <div key={v.id} title={v.color_name}
-                        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-                        <div style={{
-                          width: "28px", height: "28px", borderRadius: "50%", background: v.color_hex,
-                          border: "2.5px solid #3B5373", boxShadow: "0 0 0 2px #fff inset",
-                          cursor: "default"
-                        }} />
-                        <span style={{ fontSize: "10px", color: "#3B5373", fontWeight: 600 }}>{v.color_name}</span>
+                      <div key={v.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+                        {circle}
+                        <span style={{ fontSize: "10px", color: "#3B5373", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>{v.color_name}</span>
                       </div>
                     ) : (
-                      <Link key={v.id} href={`/products/${v.product_slug}`} title={v.color_name}
-                        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", textDecoration: "none" }}>
-                        <div style={{
-                          width: "28px", height: "28px", borderRadius: "50%", background: v.color_hex,
-                          border: "1.5px solid #D0D0D0", cursor: "pointer"
-                        }} />
-                        <span style={{ fontSize: "10px", color: "#888" }}>{v.color_name}</span>
+                      <Link key={v.id} href={`/products/${v.product_slug}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", textDecoration: "none" }}>
+                        {circle}
+                        <span style={{ fontSize: "10px", color: "#888", textTransform: "uppercase", letterSpacing: "0.06em" }}>{v.color_name}</span>
                       </Link>
                     );
                   })}

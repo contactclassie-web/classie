@@ -37,6 +37,7 @@ export interface ColorVariant {
   color_name: string;
   color_hex: string;
   sort_order: number;
+  image?: string;
 }
 
 interface Props {
@@ -146,7 +147,17 @@ export default async function ProductPage({ params }: Props) {
         .select("*")
         .eq("group_id", myRow.group_id)
         .order("sort_order");
-      colorVariants = groupRows || [];
+      if (groupRows && groupRows.length > 0) {
+        // Fetch product images for each variant
+        const slugs = groupRows.map((r: any) => r.product_slug);
+        const { data: productRows } = await supabase
+          .from("products")
+          .select("slug,image")
+          .in("slug", slugs);
+        const imageMap: Record<string, string> = {};
+        (productRows || []).forEach((p: any) => { imageMap[p.slug] = p.image; });
+        colorVariants = groupRows.map((r: any) => ({ ...r, image: imageMap[r.product_slug] || "" }));
+      }
     }
   } catch {
     // silent fail
