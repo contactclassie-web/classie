@@ -648,28 +648,7 @@ export default function ProductDetailClient({
         </div>
       </div>
 
-      {/* ── Related Products (You May Also Like) ── */}
-      {related.length > 0 && (
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14 mt-16 pb-20 border-t border-[#E8E3DD] pt-14">
-          <h2 className="font-serif text-2xl md:text-3xl mb-8" style={{ color: "#1a1a1a" }}>You May Also Like</h2>
-          <div
-            className="grid"
-            style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}
-          >
-            {related.map((p) => (
-              <ProductCard
-                key={p.slug}
-                product={p}
-                cardStyle={{
-                  aspectRatio: advAspect !== "none" ? advAspect : undefined,
-                  borderRadius: radiusMap[advRadius] || "",
-                  height: advCardH || undefined,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ── Related Products (You May Also Like) — hidden ── */}
     </>
   );
 }
