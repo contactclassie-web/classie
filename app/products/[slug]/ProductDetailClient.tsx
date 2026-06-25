@@ -72,6 +72,13 @@ export default function ProductDetailClient({
   const { addToCart } = useCart();
   const router = useRouter();
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+
+  // Prefetch color variant pages on mount for instant navigation
+  useEffect(() => {
+    colorVariants.forEach(v => {
+      if (v.product_slug !== product.slug) router.prefetch(`/products/${v.product_slug}`);
+    });
+  }, [colorVariants, product.slug, router]);
   const [selectedVariant, setSelectedVariant] = useState(product.variants.options[0] ?? "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
