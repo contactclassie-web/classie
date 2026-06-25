@@ -8548,28 +8548,10 @@ export default function AdminPage() {
               {productModal.data.category === "heels" && (
                 <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Heel Details</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelCls}>Heel Type</label>
-                      <input type="text" value={productModal.data.heel_type ?? ""} onChange={(e) => setProductField("heel_type", e.target.value)} className={inputCls} placeholder="e.g. Block, Stiletto" />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Toe Style</label>
-                      <input type="text" value={productModal.data.toe_style ?? ""} onChange={(e) => setProductField("toe_style", e.target.value)} className={inputCls} placeholder="e.g. Pointed, Round" />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Heel Height</label>
-                      <input type="text" value={productModal.data.heel_height ?? ""} onChange={(e) => setProductField("heel_height", e.target.value)} className={inputCls} placeholder="e.g. 3 inch" />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Shoe Fit</label>
-                      <input type="text" value={productModal.data.shoe_fit ?? ""} onChange={(e) => setProductField("shoe_fit", e.target.value)} className={inputCls} placeholder="e.g. True to size" />
-                    </div>
+                  <div>
+                    <label className={labelCls}>Heel Type <span className="text-gray-400 font-normal normal-case">(used for heels page filter)</span></label>
+                    <input type="text" value={productModal.data.heel_type ?? ""} onChange={(e) => setProductField("heel_type", e.target.value)} className={inputCls} placeholder="e.g. Block, Stiletto, Slim" />
                   </div>
-                  <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
-                    <input type="checkbox" checked={productModal.data.ankle_strap ?? false} onChange={(e) => setProductField("ankle_strap", e.target.checked)} className="w-4 h-4 accent-[#3B5373]" />
-                    Ankle Strap
-                  </label>
                   <div>
                     <label className={labelCls}>Tags (comma separated) — used for occasion filter</label>
                     <input
