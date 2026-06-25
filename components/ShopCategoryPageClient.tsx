@@ -142,7 +142,7 @@ function CategoryHero({
   return (
     <section className="relative overflow-hidden" style={{ background: "#3B5373", minHeight: "320px" }}>
       {bgType === "image" && bgUrl && (
-        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-40" />
+        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-90" />
       )}
       {bgType === "slider" && slides.length > 0 && (
         <>
@@ -161,7 +161,7 @@ function CategoryHero({
         </>
       )}
       {bgType === "video" && bgUrl && !isYouTube && (
-        <video src={bgUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover object-center opacity-40" />
+        <video src={bgUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover object-center opacity-90" />
       )}
       {bgType === "video" && isYouTube && ytId && (
         <iframe src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&showinfo=0`}
@@ -171,16 +171,16 @@ function CategoryHero({
       <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-20`} style={{ minHeight: "320px" }}>
         <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
           <div className="w-8 h-px bg-white/40" />
-          <span className="text-[10px] tracking-[0.5em] uppercase text-white/60" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "'Poppins', sans-serif" }}>
             {eyebrow}
           </span>
           <div className="w-8 h-px bg-white/40" />
         </div>
-        <h1 className="font-serif font-light text-white leading-none mb-5" style={{ fontSize: "clamp(64px, 10vw, 96px)" }}>
+        <h1 className="font-serif font-light text-[#1a1a1a] leading-none mb-5" style={{ fontSize: "clamp(64px, 10vw, 96px)" }}>
           {title}
         </h1>
         {subtitle && (
-          <p className="font-serif italic text-white/60 text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          <p className="font-serif italic text-[#1a1a1a] text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             {subtitle}
           </p>
         )}
@@ -194,8 +194,8 @@ function CategoryHero({
               <>
                 {i > 0 && <div key={`div-${i}`} className="w-px h-8 bg-white/20" />}
                 <div key={s.label} className="text-center">
-                  <p className="text-2xl font-serif font-light text-white">{s.val}</p>
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-white/50 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.label}</p>
+                  <p className="text-2xl font-serif font-light text-[#1a1a1a]">{s.val}</p>
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-[#3B5373] mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.label}</p>
                 </div>
               </>
             ))}
