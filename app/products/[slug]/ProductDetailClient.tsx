@@ -336,7 +336,7 @@ export default function ProductDetailClient({
               <div style={{ marginBottom: "20px" }}>
                 <div className="flex items-center justify-between" style={{ marginBottom: "10px" }}>
                   <p style={{ fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#1a1a1a" }}>
-                    Shoe Size (EU)
+                    {product.variant_label || "Shoe Size (EU)"}
                   </p>
                   <Link href="/faq#size-guide" style={{ fontSize: "11px", color: "#3B5373", textDecoration: "underline" }}>Size Guide</Link>
                 </div>

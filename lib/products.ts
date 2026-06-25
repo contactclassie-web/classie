@@ -15,6 +15,7 @@ export interface Product {
   other_info?: string;
   specs?: Array<{label: string; value: string}>;
   feature_checks?: string;
+  variant_label?: string;
   description: string;
   featured_tab?: string | null;
 }
@@ -151,6 +152,7 @@ function mapDbProduct(row: DbProduct): Product {
     other_info: (row as any).other_info || "",
     specs: Array.isArray((row as any).specs) ? (row as any).specs : [],
     feature_checks: (row as any).feature_checks || "",
+    variant_label: (row as any).variant_label || "",
     description: row.description,
     featured_tab: row.featured_tab ?? null,
   };

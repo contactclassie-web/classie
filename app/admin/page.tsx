@@ -53,6 +53,7 @@ interface DbProduct {
   other_info?: string;
   specs?: Array<{label: string; value: string}>;
   feature_checks?: string;
+  variant_label?: string;
   cod_available: boolean;
   free_shipping: boolean;
   is_featured: boolean;
@@ -345,7 +346,7 @@ const EMPTY_PRODUCT: DbProduct = {
   category: "heels", description: "", image: "", images: [], video_url: "",
   variant_type: "none", variants: [], heel_type: "", toe_style: "",
   heel_height: "", ankle_strap: false, shoe_fit: "", tags: [],
-  key_features: "", other_info: "", specs: [], feature_checks: "",
+  key_features: "", other_info: "", specs: [], feature_checks: "", variant_label: "",
   cod_available: true, free_shipping: false, is_featured: false, featured_tab: null, active: true,
 };
 
@@ -8530,6 +8531,10 @@ export default function AdminPage() {
                     onChange={(e) => setProductField("variants", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
                     className={inputCls} placeholder="35,36,37 or Black,Brown"
                   />
+                </div>
+                <div className="col-span-2">
+                  <label className={labelCls}>Variant Label <span className="text-gray-400 font-normal normal-case">(shown above size/color selector)</span></label>
+                  <input type="text" value={productModal.data.variant_label ?? ""} onChange={(e) => setProductField("variant_label", e.target.value)} className={inputCls} placeholder="Shoe Size (EU) / Ring Size / Color" />
                 </div>
               </div>
               {productModal.data.category === "heels" && (
