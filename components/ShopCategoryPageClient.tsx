@@ -140,9 +140,9 @@ function CategoryHero({
                     "px-6";
 
   return (
-    <section className="relative overflow-hidden" style={{ background: "#3B5373", minHeight: "320px" }}>
+    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", aspectRatio: "2/1" }}>
       {bgType === "image" && bgUrl && (
-        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-90" />
+        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-contain opacity-100" />
       )}
       {bgType === "slider" && slides.length > 0 && (
         <>
