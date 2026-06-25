@@ -364,25 +364,30 @@ export default function ProductDetailClient({
                 ? Math.round(product.price * (1 - offer.discount_value / 100))
                 : Math.max(0, Math.round(product.price - offer.discount_value));
               return (
-                <div key={offer.id} style={{ borderRadius: "12px", border: "1px solid #E8E3DD", background: "#fff", padding: "18px" }}>
-                  {/* Header row */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-                    <p style={{ fontFamily: "Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#1a1a1a" }}>Buy 2, Get {disc} Off</p>
-                    <span style={{ background: "#EEF2F7", color: "#3B5373", fontSize: "11px", fontWeight: 700, padding: "4px 12px", borderRadius: "100px" }}>Save {disc}</span>
+                <div key={offer.id} style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid #D8DFE8" }}>
+                  {/* Top strip — light blue-gray, subtle */}
+                  <div style={{ background: "#EEF1F6", padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#5A6E84" }}>Limited Offer</span>
+                    <span style={{ background: "#fff", color: "#3B5373", fontSize: "11px", fontWeight: 700, padding: "3px 12px", borderRadius: "100px", border: "1px solid #C8D4E0" }}>Save {disc}</span>
                   </div>
-                  <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.5, marginBottom: "14px" }}>
-                    {offer.custom_label || `Purchase 2 pairs and enjoy ${disc} off each.`}
-                  </p>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "16px", paddingTop: "12px", borderTop: "1px solid #F0EDEA" }}>
-                    <span style={{ fontSize: "20px", fontWeight: 700, color: "#1a1a1a" }}>₹{discPrice}</span>
-                    <span style={{ fontSize: "12px", color: "#bbb", textDecoration: "line-through" }}>₹{product.price}</span>
-                    <span style={{ fontSize: "11px", color: "#888" }}>each × 2 pairs</span>
+                  {/* White body */}
+                  <div style={{ background: "#fff", padding: "18px 18px 16px" }}>
+                    <p style={{ fontFamily: "Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#1a1a1a", marginBottom: "6px" }}>Buy 2, Get {disc} Off</p>
+                    <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.5, marginBottom: "0" }}>
+                      {offer.custom_label || `Purchase 2 pairs and enjoy ${disc} off each — automatically applied at checkout.`}
+                    </p>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginTop: "14px", paddingTop: "14px", borderTop: "1px solid #F0EDEA" }}>
+                      <span style={{ fontSize: "22px", fontWeight: 700, color: "#1a1a1a" }}>₹{discPrice.toLocaleString("en-IN")}</span>
+                      <span style={{ fontSize: "12px", color: "#bbb", textDecoration: "line-through" }}>₹{product.price.toLocaleString("en-IN")}</span>
+                      <span style={{ fontSize: "11px", color: "#888" }}>each × 2 pairs</span>
+                    </div>
                   </div>
+                  {/* CTA bar — medium navy, not too dark */}
                   <button
                     onClick={() => {
                       addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
                     }}
-                    style={{ width: "100%", padding: "13px", background: "#fff", color: "#3B5373", border: "1.5px solid #3B5373", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer" }}
+                    style={{ width: "100%", padding: "14px", background: "#4A6580", color: "#fff", border: "none", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer" }}
                   >
                     Add 2 to Cart — Save {disc}
                   </button>
