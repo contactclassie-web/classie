@@ -11,6 +11,8 @@ export interface Product {
   image: string;
   images?: string[];
   video_url?: string;
+  key_features?: string;
+  other_info?: string;
   description: string;
   featured_tab?: string | null;
 }
@@ -143,6 +145,8 @@ function mapDbProduct(row: DbProduct): Product {
     image: row.image,
     images: Array.isArray((row as any).images) ? (row as any).images : [],
     video_url: (row as any).video_url || "",
+    key_features: (row as any).key_features || "",
+    other_info: (row as any).other_info || "",
     description: row.description,
     featured_tab: row.featured_tab ?? null,
   };

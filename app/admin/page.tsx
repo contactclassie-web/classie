@@ -49,6 +49,8 @@ interface DbProduct {
   ankle_strap?: boolean;
   shoe_fit?: string;
   tags?: string[];
+  key_features?: string;
+  other_info?: string;
   cod_available: boolean;
   free_shipping: boolean;
   is_featured: boolean;
@@ -341,6 +343,7 @@ const EMPTY_PRODUCT: DbProduct = {
   category: "heels", description: "", image: "", images: [], video_url: "",
   variant_type: "none", variants: [], heel_type: "", toe_style: "",
   heel_height: "", ankle_strap: false, shoe_fit: "", tags: [],
+  key_features: "", other_info: "",
   cod_available: true, free_shipping: false, is_featured: false, featured_tab: null, active: true,
 };
 
@@ -8414,6 +8417,14 @@ export default function AdminPage() {
               <div>
                 <label className={labelCls}>Description</label>
                 <textarea rows={3} value={productModal.data.description} onChange={(e) => setProductField("description", e.target.value)} className={inputCls} placeholder="Product description…" />
+              </div>
+              <div>
+                <label className={labelCls}>✨ Key Features <span className="text-gray-400 font-normal normal-case">(use | to separate points)</span></label>
+                <textarea rows={3} value={productModal.data.key_features ?? ""} onChange={(e) => setProductField("key_features", e.target.value)} className={inputCls} placeholder="Classie Comfort cushioned insole | Premium material finish | Anti-slip sole | …" />
+              </div>
+              <div>
+                <label className={labelCls}>ℹ️ Other Info <span className="text-gray-400 font-normal normal-case">(care, storage, etc.)</span></label>
+                <textarea rows={2} value={productModal.data.other_info ?? ""} onChange={(e) => setProductField("other_info", e.target.value)} className={inputCls} placeholder="Clean with a soft dry cloth. Avoid water and perfumes. Store in dust bag…" />
               </div>
               {/* ── Images + Video ── */}
               <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50/50">
