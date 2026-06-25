@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingBag, Check, ChevronRight, Plus, Minus } from "lucide-react";
 import { Product } from "@/lib/products";
 import { useCart } from "@/components/CartContext";
@@ -69,6 +70,8 @@ export default function ProductDetailClient({
   colorVariants?: ColorVariant[];
 }) {
   const { addToCart } = useCart();
+  const router = useRouter();
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState(product.variants.options[0] ?? "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -251,10 +254,11 @@ export default function ProductDetailClient({
                         <span style={{ fontSize: "10px", color: "#3B5373", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>{v.color_name}</span>
                       </div>
                     ) : (
-                      <Link key={v.id} href={`/products/${v.product_slug}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", textDecoration: "none" }}>
+                      <button key={v.id} onClick={() => { setNavigatingTo(v.product_slug); router.push(`/products/${v.product_slug}`); }}
+                        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", background: "none", border: "none", padding: 0, cursor: "pointer", opacity: navigatingTo === v.product_slug ? 0.6 : 1, transition: "opacity 0.15s" }}>
                         {circle}
-                        <span style={{ fontSize: "10px", color: "#888", textTransform: "uppercase", letterSpacing: "0.06em" }}>{v.color_name}</span>
-                      </Link>
+                        <span style={{ fontSize: "10px", color: navigatingTo === v.product_slug ? "#3B5373" : "#888", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: navigatingTo === v.product_slug ? 700 : 400 }}>{v.color_name}</span>
+                      </button>
                     );
                   })}
                 </div>
