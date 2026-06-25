@@ -402,12 +402,14 @@ export default function ShopCategoryPageClient({
         categoryLabel={categoryLabel}
       />
 
-      <OccasionFilterSection
-        activeOccasion={activeOccasion}
-        onOccasionClick={setActiveOccasion}
-        activeCategorySlug={activeCategorySlug}
-        initialOccasions={initialOccasions}
-      />
+      {settingsPrefix === "heels" && (
+        <OccasionFilterSection
+          activeOccasion={activeOccasion}
+          onOccasionClick={setActiveOccasion}
+          activeCategorySlug={activeCategorySlug}
+          initialOccasions={initialOccasions}
+        />
+      )}
 
       <section className="py-12" style={{ background: "#f5f5f5" }}>
         <div className="max-w-[1280px] mx-auto px-4 md:px-10">
