@@ -535,6 +535,13 @@ export default function AdminPage() {
   const [bundleSearch, setBundleSearch] = useState("");
   const [bundleOfferSaving, setBundleOfferSaving] = useState(false);
 
+  // Color Variants (inside product modal)
+  const [colorVariants, setColorVariants] = useState<Array<{id:string;group_id:string;product_slug:string;color_name:string;color_hex:string;sort_order:number}>>([]);
+  const [colorVariantsLoading, setColorVariantsLoading] = useState(false);
+  const [colorVariantSaving, setColorVariantSaving] = useState(false);
+  const [newColorVariant, setNewColorVariant] = useState({ product_slug: "", color_name: "", color_hex: "#000000" });
+  const [myColorInfo, setMyColorInfo] = useState({ color_name: "", color_hex: "#000000" });
+
   // Feature tiles (product page settings)
   const [featureTiles, setFeatureTiles] = useState<FeatureTileItem[]>(DEFAULT_FEATURE_TILES_ADMIN);
   const [featureTilesSaving, setFeatureTilesSaving] = useState(false);
@@ -2632,7 +2639,7 @@ export default function AdminPage() {
   // ── Product actions ───────────────────────────────────────────────────────
 
   const openAddProduct = () => { setBundleOffers([]); setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } }); };
-  const openEditProduct = (p: DbProduct) => { setProductModal({ open: true, mode: "edit", data: { ...p } }); if (p.slug) loadBundleOffers(p.slug); };
+  const openEditProduct = (p: DbProduct) => { setProductModal({ open: true, mode: "edit", data: { ...p } }); if (p.slug) { loadBundleOffers(p.slug); loadColorVariants(p.slug); } };
   const closeProductModal = () => setProductModal((m) => ({ ...m, open: false }));
 
   const handleProductSave = async () => {
@@ -2707,6 +2714,75 @@ export default function AdminPage() {
     await supabase.from("product_bundle_offers").delete().eq("id", id);
     setBundleOffers((prev) => prev.filter((o) => o.id !== id));
     await revalidateSite();
+  };
+
+  // ── Color Variant actions ──────────────────────────────────────────────────
+
+  const loadColorVariants = async (slug: string) => {
+    setColorVariantsLoading(true);
+    try {
+      const { data: myRow } = await supabase.from("product_color_variants").select("*").eq("product_slug", slug).maybeSingle();
+      if (myRow) {
+        setMyColorInfo({ color_name: myRow.color_name, color_hex: myRow.color_hex });
+        const { data: groupRows } = await supabase.from("product_color_variants").select("*").eq("group_id", myRow.group_id).order("sort_order");
+        setColorVariants(groupRows || []);
+      } else {
+        setMyColorInfo({ color_name: "", color_hex: "#000000" });
+        setColorVariants([]);
+      }
+    } finally {
+      setColorVariantsLoading(false);
+    }
+  };
+
+  const saveMyColorInfo = async () => {
+    if (!productModal.data?.slug || !myColorInfo.color_name) return;
+    setColorVariantSaving(true);
+    try {
+      const slug = productModal.data.slug;
+      const { data: myRow } = await supabase.from("product_color_variants").select("*").eq("product_slug", slug).maybeSingle();
+      if (myRow) {
+        await supabase.from("product_color_variants").update({ color_name: myColorInfo.color_name, color_hex: myColorInfo.color_hex }).eq("id", myRow.id);
+      } else {
+        const newGroupId = crypto.randomUUID();
+        await supabase.from("product_color_variants").insert({ group_id: newGroupId, product_slug: slug, color_name: myColorInfo.color_name, color_hex: myColorInfo.color_hex, sort_order: 0 });
+      }
+      await loadColorVariants(slug);
+    } finally {
+      setColorVariantSaving(false);
+    }
+  };
+
+  const addColorVariant = async () => {
+    if (!productModal.data?.slug || !newColorVariant.product_slug || !newColorVariant.color_name) return;
+    setColorVariantSaving(true);
+    try {
+      const slug = productModal.data.slug;
+      const { data: myRow } = await supabase.from("product_color_variants").select("*").eq("product_slug", slug).maybeSingle();
+      let groupId: string;
+      if (myRow) {
+        groupId = myRow.group_id;
+      } else {
+        groupId = crypto.randomUUID();
+        await supabase.from("product_color_variants").insert({ group_id: groupId, product_slug: slug, color_name: myColorInfo.color_name || "Default", color_hex: myColorInfo.color_hex || "#000000", sort_order: 0 });
+      }
+      const { data: targetRow } = await supabase.from("product_color_variants").select("*").eq("product_slug", newColorVariant.product_slug).maybeSingle();
+      if (targetRow) {
+        await supabase.from("product_color_variants").update({ group_id: groupId, color_name: newColorVariant.color_name, color_hex: newColorVariant.color_hex }).eq("id", targetRow.id);
+      } else {
+        await supabase.from("product_color_variants").insert({ group_id: groupId, product_slug: newColorVariant.product_slug, color_name: newColorVariant.color_name, color_hex: newColorVariant.color_hex, sort_order: colorVariants.length });
+      }
+      setNewColorVariant({ product_slug: "", color_name: "", color_hex: "#000000" });
+      await loadColorVariants(slug);
+    } finally {
+      setColorVariantSaving(false);
+    }
+  };
+
+  const removeColorVariant = async (id: string) => {
+    if (!productModal.data?.slug) return;
+    await supabase.from("product_color_variants").delete().eq("id", id);
+    await loadColorVariants(productModal.data.slug);
   };
 
   // ── Feature Tiles actions ──────────────────────────────────────────────────
@@ -8535,6 +8611,71 @@ export default function AdminPage() {
                         </button>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Color Variants (Edit mode only) ── */}
+              {productModal.mode === "edit" && (
+                <div className="border border-[#3B5373]/20 rounded-xl overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-[#3B5373]/5 border-b border-[#3B5373]/10">
+                    <span className="text-base">🎨</span>
+                    <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Color Variants</p>
+                    {colorVariants.length > 0 && (
+                      <span className="ml-auto bg-[#3B5373] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{colorVariants.length}</span>
+                    )}
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {colorVariantsLoading ? (
+                      <p className="text-xs text-gray-400 text-center py-2">Loading…</p>
+                    ) : (
+                      <>
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">This product&apos;s color</p>
+                          <div className="flex gap-2 items-center">
+                            <input type="text" placeholder="Color name (e.g. Black)" value={myColorInfo.color_name}
+                              onChange={(e) => setMyColorInfo(p => ({ ...p, color_name: e.target.value }))}
+                              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]" />
+                            <input type="color" value={myColorInfo.color_hex}
+                              onChange={(e) => setMyColorInfo(p => ({ ...p, color_hex: e.target.value }))}
+                              className="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" />
+                            <button onClick={saveMyColorInfo} disabled={colorVariantSaving || !myColorInfo.color_name}
+                              className="px-3 py-2 bg-[#3B5373] text-white text-xs rounded-lg disabled:opacity-50">Set</button>
+                          </div>
+                        </div>
+                        {colorVariants.filter(v => v.product_slug !== productModal.data?.slug).length > 0 && (
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Linked colors</p>
+                            <div className="space-y-2">
+                              {colorVariants.filter(v => v.product_slug !== productModal.data?.slug).map(v => (
+                                <div key={v.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                  <div className="w-5 h-5 rounded-full border border-gray-200 flex-shrink-0" style={{ background: v.color_hex }} />
+                                  <span className="text-xs font-medium text-gray-700 flex-1">{v.color_name}</span>
+                                  <span className="text-xs text-gray-400">{v.product_slug}</span>
+                                  <button onClick={() => removeColorVariant(v.id)} className="text-red-400 hover:text-red-600 text-xs px-2">×</button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Link another color variant</p>
+                          <div className="flex gap-2 flex-wrap">
+                            <input type="text" placeholder="Product slug (e.g. velora-milk)" value={newColorVariant.product_slug}
+                              onChange={(e) => setNewColorVariant(p => ({ ...p, product_slug: e.target.value }))}
+                              className="flex-1 min-w-[140px] px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]" />
+                            <input type="text" placeholder="Color name" value={newColorVariant.color_name}
+                              onChange={(e) => setNewColorVariant(p => ({ ...p, color_name: e.target.value }))}
+                              className="w-28 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]" />
+                            <input type="color" value={newColorVariant.color_hex}
+                              onChange={(e) => setNewColorVariant(p => ({ ...p, color_hex: e.target.value }))}
+                              className="w-10 h-9 rounded border border-gray-200 cursor-pointer p-0.5" />
+                            <button onClick={addColorVariant} disabled={colorVariantSaving || !newColorVariant.product_slug || !newColorVariant.color_name}
+                              className="px-3 py-2 bg-[#3B5373] text-white text-xs rounded-lg disabled:opacity-50">Link</button>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}

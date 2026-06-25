@@ -8,7 +8,7 @@ import { Product } from "@/lib/products";
 import { useCart } from "@/components/CartContext";
 import ProductCard from "@/components/ProductCard";
 import { supabase } from "@/lib/supabase";
-import { BundleOfferWithProduct, FeatureTile } from "./page";
+import { BundleOfferWithProduct, FeatureTile, ColorVariant } from "./page";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -58,6 +58,7 @@ export default function ProductDetailClient({
   featureTiles = [],
   latestProducts = [],
   bestsellerProducts = [],
+  colorVariants = [],
 }: {
   product: Product;
   related: Product[];
@@ -65,6 +66,7 @@ export default function ProductDetailClient({
   featureTiles?: FeatureTile[];
   latestProducts?: Product[];
   bestsellerProducts?: Product[];
+  colorVariants?: ColorVariant[];
 }) {
   const { addToCart } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(product.variants.options[0] ?? "");
@@ -216,6 +218,38 @@ export default function ProductDetailClient({
                 </span>
               )}
             </div>
+
+            {/* ── Color Variants ── */}
+            {colorVariants.length > 1 && (
+              <div style={{ marginBottom: "16px" }}>
+                <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#888", marginBottom: "8px" }}>Color</p>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "flex-start" }}>
+                  {colorVariants.map((v) => {
+                    const isActive = v.product_slug === product.slug;
+                    return isActive ? (
+                      <div key={v.id} title={v.color_name}
+                        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                        <div style={{
+                          width: "28px", height: "28px", borderRadius: "50%", background: v.color_hex,
+                          border: "2.5px solid #3B5373", boxShadow: "0 0 0 2px #fff inset",
+                          cursor: "default"
+                        }} />
+                        <span style={{ fontSize: "10px", color: "#3B5373", fontWeight: 600 }}>{v.color_name}</span>
+                      </div>
+                    ) : (
+                      <Link key={v.id} href={`/products/${v.product_slug}`} title={v.color_name}
+                        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", textDecoration: "none" }}>
+                        <div style={{
+                          width: "28px", height: "28px", borderRadius: "50%", background: v.color_hex,
+                          border: "1.5px solid #D0D0D0", cursor: "pointer"
+                        }} />
+                        <span style={{ fontSize: "10px", color: "#888" }}>{v.color_name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Color thumbnails */}
             {product.variants.type === "color" && (

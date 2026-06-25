@@ -31,6 +31,14 @@ export interface FeatureTile {
   desc: string;
 }
 
+export interface ColorVariant {
+  id: string;
+  product_slug: string;
+  color_name: string;
+  color_hex: string;
+  sort_order: number;
+}
+
 interface Props {
   params: { slug: string };
 }
@@ -124,6 +132,26 @@ export default async function ProductPage({ params }: Props) {
     // silent fail — use defaults in client
   }
 
+  // Color variants
+  let colorVariants: ColorVariant[] = [];
+  try {
+    const { data: myRow } = await supabase
+      .from("product_color_variants")
+      .select("*")
+      .eq("product_slug", slug)
+      .maybeSingle();
+    if (myRow) {
+      const { data: groupRows } = await supabase
+        .from("product_color_variants")
+        .select("*")
+        .eq("group_id", myRow.group_id)
+        .order("sort_order");
+      colorVariants = groupRows || [];
+    }
+  } catch {
+    // silent fail
+  }
+
   // Collection products for "Shop the Full Collection"
   let latestProducts: Product[] = [];
   let bestsellerProducts: Product[] = [];
@@ -146,6 +174,7 @@ export default async function ProductPage({ params }: Props) {
       featureTiles={featureTiles}
       latestProducts={latestProducts}
       bestsellerProducts={bestsellerProducts}
+      colorVariants={colorVariants}
     />
   );
 }
