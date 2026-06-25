@@ -2653,15 +2653,23 @@ export default function AdminPage() {
     setProductSaving(true);
     try {
       const { id, created_at, ...rest } = productModal.data;
+      // Clean specs — remove empty rows
+      if (rest.specs) rest.specs = rest.specs.filter((r: {label:string;value:string}) => r.label.trim() || r.value.trim());
+      // Clean images — remove empty strings
+      if (rest.images) rest.images = rest.images.filter((img: string) => img.trim());
+      let saveError;
       if (productModal.mode === "add") {
-        await supabase.from("products").insert([rest]);
+        const { error } = await supabase.from("products").insert([rest]);
+        saveError = error;
       } else {
-        await supabase.from("products").update(rest).eq("id", id);
+        const { error } = await supabase.from("products").update(rest).eq("id", id);
+        saveError = error;
       }
+      if (saveError) { alert("Save failed: " + saveError.message); return; }
       await fetchProducts();
       closeProductModal();
       await revalidateSite();
-    } catch { /* ignore */ }
+    } catch (e: any) { alert("Save error: " + (e?.message || String(e))); }
     finally { setProductSaving(false); }
   };
 
