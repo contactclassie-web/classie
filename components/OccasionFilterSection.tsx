@@ -35,7 +35,7 @@ function OccasionFilterCard({
       className="group relative overflow-hidden cursor-pointer flex-shrink-0"
       style={{
         aspectRatio: "3 / 4",
-        maxHeight: "520px",
+        maxHeight: "520px", /* overridden by compact in parent */
         outline: active ? "3px solid #3B5373" : "3px solid transparent",
         outlineOffset: "-3px",
         transition: "outline 0.2s",
@@ -106,7 +106,7 @@ function OccasionFilterCard({
   );
 }
 
-export default function OccasionFilterSection({ activeOccasion, onOccasionClick, excludeCategorySlug, activeCategorySlug, initialOccasions }: Props) {
+export default function OccasionFilterSection({ activeOccasion, onOccasionClick, excludeCategorySlug, activeCategorySlug, initialOccasions, compact }: Props & { compact?: boolean }) {
   const [occasions, setOccasions] = useState<Occasion[]>(initialOccasions ?? []);
 
   useEffect(() => {
@@ -138,13 +138,13 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick,
   const show = occasions.slice(0, 3);
 
   return (
-    <section className="py-12 bg-white">
+    <section className={compact ? "py-6 bg-white" : "py-12 bg-white"}>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10">
-        <div className="text-center mb-10">
-          <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
+        <div className={compact ? "text-center mb-5" : "text-center mb-10"}>
+          {!compact && <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
             Curated Edits
-          </span>
-          <h2 className="font-serif text-[clamp(2rem,3.5vw,3.2rem)] font-light leading-[1.08] text-[#1a1a1a] mt-3">
+          </span>}
+          <h2 className={`font-serif font-light leading-[1.08] text-[#1a1a1a] ${compact ? "text-[1.4rem] mt-1" : "text-[clamp(2rem,3.5vw,3.2rem)] mt-3"}`}>
             Shop by <em className="italic text-[#3B5373]">Occasion</em>
           </h2>
           <p className="text-[11px] text-[#1a1a1a] mt-2 tracking-[0.08em]">

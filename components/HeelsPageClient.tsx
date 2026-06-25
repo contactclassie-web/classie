@@ -333,6 +333,7 @@ export default function HeelsPageClient({ initialProducts, initialSettings = {},
         onOccasionClick={setActiveOccasion}
         activeCategorySlug="heels"
         initialOccasions={initialOccasions}
+        compact={true}
       />
 
       {/* ── Filter + Grid ─────────────────────────────────────────────── */}
