@@ -140,7 +140,7 @@ function CategoryHero({
                     "px-6";
 
   return (
-    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", aspectRatio: "2/1" }}>
+    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", aspectRatio: "16/5" }}>
       {bgType === "image" && bgUrl && (
         <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-contain opacity-100" />
       )}
