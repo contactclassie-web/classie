@@ -397,7 +397,7 @@ export default function ProductDetailClient({
 
             {/* ── Style it with Clip-ons ── */}
             {bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
-              <div style={{ border: "1px solid #E8E3DD", borderRadius: "12px", overflow: "hidden" }}>
+              <div style={{ border: "1px solid #E8E3DD", borderRadius: "12px", overflow: "hidden", marginTop: "8px" }}>
                 <div style={{ padding: "12px 18px", borderBottom: "1px solid #E8E3DD", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff" }}>
                   <p style={{ fontFamily: "Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>Style it with Clip-ons</p>
                   <span style={{ fontSize: "10px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase" }}>Exclusive bundle savings</span>
