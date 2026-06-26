@@ -226,24 +226,53 @@ export default function ProductDetailClient({
                 </button>
               )}
               {/* Dot indicators */}
-              {galleryImages.length > 1 && !showVideo && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-[5px]" style={{ zIndex: 10 }}>
-                  {galleryImages.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => { setShowVideo(false); setCurrentIndex(i); }}
-                      style={{ width: i === currentIndex ? "18px" : "6px", height: "6px", borderRadius: "3px", background: i === currentIndex ? "#3B5373" : "rgba(255,255,255,0.7)", border: "none", padding: 0, cursor: "pointer", transition: "all 0.25s" }}
-                    />
-                  ))}
-                  {hasVideo && (
-                    <button
-                      onClick={() => setShowVideo(true)}
-                      style={{ width: showVideo ? "18px" : "6px", height: "6px", borderRadius: "3px", background: showVideo ? "#3B5373" : "rgba(255,255,255,0.7)", border: "none", padding: 0, cursor: "pointer", transition: "all 0.25s" }}
-                    />
-                  )}
-                </div>
-              )}
+              {/* dots removed — thumbnails shown below */}
             </div>
+
+            {/* Thumbnails row */}
+            {(galleryImages.length > 1 || hasVideo) && (
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                {galleryImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setShowVideo(false); setCurrentIndex(i); }}
+                    style={{
+                      flexShrink: 0,
+                      width: "68px", height: "68px",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      border: i === currentIndex && !showVideo ? "2px solid #3B5373" : "2px solid transparent",
+                      padding: 0,
+                      background: "#f5f5f5",
+                      cursor: "pointer",
+                      transition: "border-color 0.2s",
+                      position: "relative",
+                    }}
+                  >
+                    <img src={img} alt={`Image ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+                  </button>
+                ))}
+                {hasVideo && product.video_url && (
+                  <button
+                    onClick={() => setShowVideo(true)}
+                    style={{
+                      flexShrink: 0,
+                      width: "68px", height: "68px",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      border: showVideo ? "2px solid #3B5373" : "2px solid transparent",
+                      padding: 0,
+                      background: "#1a1a1a",
+                      cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "border-color 0.2s",
+                    }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* RIGHT — Info Column */}
