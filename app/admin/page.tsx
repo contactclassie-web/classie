@@ -509,6 +509,48 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   messages: [],
 };
 
+// ── ReviewEditForm (inline helper) ───────────────────────────────────────
+
+function ReviewEditForm({ rev, reviewsModal, setReviewsModal, saveAdminReviewEdit, inputCls }: {
+  rev: { id: string; customer_name: string; rating: number; review_text: string; review_date: string; active: boolean };
+  reviewsModal: { saving: boolean; editData: Record<string, unknown> };
+  setReviewsModal: (fn: (m: any) => any) => void;
+  saveAdminReviewEdit: (id: string) => void;
+  inputCls: string;
+}) {
+  const d = reviewsModal.editData as any;
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
+        <input type="text" value={d.customer_name ?? rev.customer_name}
+          onChange={(e) => setReviewsModal((m: any) => ({ ...m, editData: { ...m.editData, customer_name: e.target.value } }))}
+          className={inputCls} placeholder="Name" />
+        <input type="date" value={d.review_date ?? rev.review_date}
+          onChange={(e) => setReviewsModal((m: any) => ({ ...m, editData: { ...m.editData, review_date: e.target.value } }))}
+          className={inputCls} />
+      </div>
+      <div className="flex gap-1">
+        {[1,2,3,4,5].map(s => (
+          <button key={s} type="button"
+            onClick={() => setReviewsModal((m: any) => ({ ...m, editData: { ...m.editData, rating: s } }))}
+            style={{ fontSize: "20px", background: "none", border: "none", cursor: "pointer", color: s <= (d.rating ?? rev.rating) ? "#C9A84C" : "#D8D8D8" }}>★</button>
+        ))}
+      </div>
+      <textarea rows={2} value={d.review_text ?? rev.review_text}
+        onChange={(e) => setReviewsModal((m: any) => ({ ...m, editData: { ...m.editData, review_text: e.target.value } }))}
+        className={inputCls} placeholder="Review text" />
+      <div className="flex items-center gap-3">
+        <button onClick={() => saveAdminReviewEdit(rev.id)} disabled={reviewsModal.saving}
+          className="px-3 py-1.5 bg-[#3B5373] text-white rounded-lg text-xs font-semibold disabled:opacity-50">
+          {reviewsModal.saving ? "Saving…" : "Save Changes"}
+        </button>
+        <button onClick={() => setReviewsModal((m: any) => ({ ...m, editingId: null, editData: {} }))}
+          className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-500 hover:border-gray-300">Cancel</button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AdminPage() {
@@ -9041,14 +9083,27 @@ export default function AdminPage() {
       {/* ══════════════════════════════════════════════════
           PRODUCT REVIEWS MODAL
       ══════════════════════════════════════════════════ */}
-      {reviewsModal.open && reviewsModal.product && (
+      {reviewsModal.open && reviewsModal.product && (() => {
+        const pendingRevs = reviewsModal.reviews.filter(r => !r.active);
+        const liveRevs    = reviewsModal.reviews.filter(r => r.active);
+        return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col" style={{ maxHeight: "90vh" }}>
-            {/* Header */}
+
+            {/* ── Header ── */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div>
-                <h2 className="font-semibold text-gray-800">Reviews — {reviewsModal.product.title}</h2>
-                <p className="text-xs text-gray-400 mt-0.5">{reviewsModal.reviews.length} review{reviewsModal.reviews.length !== 1 ? "s" : ""}</p>
+                <div className="flex items-center gap-2.5">
+                  <h2 className="font-semibold text-gray-800">Reviews — {reviewsModal.product.title}</h2>
+                  {pendingRevs.length > 0 && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                      ⏳ {pendingRevs.length} pending
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {liveRevs.length} live · {pendingRevs.length} pending approval
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -9063,128 +9118,165 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Add Review Form */}
+            {/* ── Add Review Form (admin-added = always active=true) ── */}
             {reviewsModal.showAddForm && (
-              <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Add Review</h3>
+              <div className="px-6 py-4 border-b border-gray-100 bg-[#f0f4f8]">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-sm font-semibold text-[#3B5373]">Add Review</h3>
+                  <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Goes live immediately</span>
+                </div>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Name *</label>
+                    <label className="block text-xs text-gray-500 mb-1">Customer Name *</label>
                     <input type="text" value={reviewsModal.addForm.customer_name}
                       onChange={(e) => setReviewsModal(m => ({ ...m, addForm: { ...m.addForm, customer_name: e.target.value } }))}
-                      className={inputCls} placeholder="Customer name" />
+                      className={inputCls} placeholder="e.g. Priya S." />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Rating *</label>
                     <div className="flex gap-1 mt-1">
                       {[1,2,3,4,5].map(s => (
                         <button key={s} type="button" onClick={() => setReviewsModal(m => ({ ...m, addForm: { ...m.addForm, rating: s } }))}
-                          style={{ fontSize: "20px", background: "none", border: "none", cursor: "pointer", color: s <= reviewsModal.addForm.rating ? "#C9A84C" : "#D8D8D8" }}>★</button>
+                          style={{ fontSize: "22px", background: "none", border: "none", cursor: "pointer", color: s <= reviewsModal.addForm.rating ? "#C9A84C" : "#D8D8D8" }}>★</button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Date</label>
+                    <label className="block text-xs text-gray-500 mb-1">Review Date</label>
                     <input type="date" value={reviewsModal.addForm.review_date}
                       onChange={(e) => setReviewsModal(m => ({ ...m, addForm: { ...m.addForm, review_date: e.target.value } }))}
                       className={inputCls} />
-                  </div>
-                  <div className="flex items-end">
-                    <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer mb-1">
-                      <input type="checkbox" checked={reviewsModal.addForm.active}
-                        onChange={(e) => setReviewsModal(m => ({ ...m, addForm: { ...m.addForm, active: e.target.checked } }))}
-                        className="w-4 h-4 accent-[#3B5373]" />
-                      Active (visible)
-                    </label>
                   </div>
                 </div>
                 <div className="mb-3">
                   <label className="block text-xs text-gray-500 mb-1">Review Text</label>
                   <textarea rows={2} value={reviewsModal.addForm.review_text}
                     onChange={(e) => setReviewsModal(m => ({ ...m, addForm: { ...m.addForm, review_text: e.target.value } }))}
-                    className={inputCls} placeholder="Review content…" />
+                    className={inputCls} placeholder="What did the customer say?" />
                 </div>
                 <button onClick={addAdminReview} disabled={reviewsModal.saving || !reviewsModal.addForm.customer_name.trim()}
                   className="px-4 py-2 bg-[#3B5373] text-white rounded-lg text-xs font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-50">
-                  {reviewsModal.saving ? "Saving…" : "Save Review"}
+                  {reviewsModal.saving ? "Saving…" : "✓ Save & Publish Review"}
                 </button>
               </div>
             )}
 
-            {/* Reviews List */}
-            <div className="overflow-y-auto flex-1 px-6 py-4 space-y-3">
+            {/* ── Scrollable body ── */}
+            <div className="overflow-y-auto flex-1 px-6 py-4 space-y-5">
               {reviewsModal.loading ? (
                 <p className="text-sm text-gray-400 text-center py-8">Loading reviews…</p>
               ) : reviewsModal.reviews.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">No reviews yet for this product.</p>
-              ) : reviewsModal.reviews.map(rev => (
-                <div key={rev.id} className="border border-gray-100 rounded-xl p-4">
-                  {reviewsModal.editingId === rev.id ? (
-                    // Edit mode
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-2">
-                        <input type="text" value={(reviewsModal.editData as any).customer_name ?? rev.customer_name}
-                          onChange={(e) => setReviewsModal(m => ({ ...m, editData: { ...m.editData, customer_name: e.target.value } }))}
-                          className={inputCls} placeholder="Name" />
-                        <input type="date" value={(reviewsModal.editData as any).review_date ?? rev.review_date}
-                          onChange={(e) => setReviewsModal(m => ({ ...m, editData: { ...m.editData, review_date: e.target.value } }))}
-                          className={inputCls} />
+                <div className="text-center py-10">
+                  <p className="text-2xl mb-2">📝</p>
+                  <p className="text-sm text-gray-400">No reviews yet for this product.</p>
+                  <p className="text-xs text-gray-300 mt-1">Use "Add Review" to add one, or wait for customers to submit.</p>
+                </div>
+              ) : (
+                <>
+                  {/* ── PENDING SECTION ── */}
+                  {pendingRevs.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-600">⏳ Pending Approval</span>
+                        <span className="h-px flex-1 bg-amber-200" />
+                        <span className="text-xs text-amber-500 font-medium">{pendingRevs.length} waiting</span>
                       </div>
-                      <div className="flex gap-1">
-                        {[1,2,3,4,5].map(s => (
-                          <button key={s} type="button"
-                            onClick={() => setReviewsModal(m => ({ ...m, editData: { ...m.editData, rating: s } }))}
-                            style={{ fontSize: "20px", background: "none", border: "none", cursor: "pointer", color: s <= ((reviewsModal.editData as any).rating ?? rev.rating) ? "#C9A84C" : "#D8D8D8" }}>★</button>
+                      <div className="space-y-2">
+                        {pendingRevs.map(rev => (
+                          <div key={rev.id} className="rounded-xl p-4 border-2 border-amber-200 bg-amber-50">
+                            {reviewsModal.editingId === rev.id ? (
+                              <ReviewEditForm rev={rev} reviewsModal={reviewsModal} setReviewsModal={setReviewsModal} saveAdminReviewEdit={saveAdminReviewEdit} inputCls={inputCls} />
+                            ) : (
+                              <div className="flex items-start gap-3">
+                                <div className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: "34px", height: "34px", background: "#D97706", color: "#fff", fontSize: "13px", fontWeight: 700 }}>
+                                  {rev.customer_name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-sm font-semibold text-gray-800">{rev.customer_name}</span>
+                                    <span style={{ color: "#C9A84C", fontSize: "12px" }}>{"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}</span>
+                                    <span className="text-xs text-gray-400">{new Date(rev.review_date).toLocaleDateString("en-IN")}</span>
+                                    <span className="text-[10px] bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wide">Pending</span>
+                                  </div>
+                                  {rev.review_text && <p className="text-xs text-gray-600 mt-1">{rev.review_text}</p>}
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                  <button onClick={() => toggleAdminReviewActive(rev.id, true)} disabled={reviewsModal.saving}
+                                    className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50">
+                                    ✓ Approve
+                                  </button>
+                                  <button onClick={() => setReviewsModal(m => ({ ...m, editingId: rev.id, editData: {} }))}
+                                    className="p-1.5 hover:bg-amber-100 rounded text-gray-400 hover:text-[#3B5373] transition-colors">
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button onClick={() => deleteAdminReview(rev.id)} disabled={reviewsModal.saving}
+                                    className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition-colors">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         ))}
-                      </div>
-                      <textarea rows={2} value={(reviewsModal.editData as any).review_text ?? rev.review_text}
-                        onChange={(e) => setReviewsModal(m => ({ ...m, editData: { ...m.editData, review_text: e.target.value } }))}
-                        className={inputCls} placeholder="Review text" />
-                      <div className="flex items-center gap-3">
-                        <button onClick={() => saveAdminReviewEdit(rev.id)} disabled={reviewsModal.saving}
-                          className="px-3 py-1.5 bg-[#3B5373] text-white rounded-lg text-xs font-medium disabled:opacity-50">
-                          {reviewsModal.saving ? "Saving…" : "Save"}
-                        </button>
-                        <button onClick={() => setReviewsModal(m => ({ ...m, editingId: null, editData: {} }))}
-                          className="px-3 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-500">Cancel</button>
-                      </div>
-                    </div>
-                  ) : (
-                    // View mode
-                    <div className="flex items-start gap-3">
-                      <div className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: "32px", height: "32px", background: "#3B5373", color: "#fff", fontSize: "13px", fontWeight: 600 }}>
-                        {rev.customer_name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-700">{rev.customer_name}</span>
-                          <span style={{ color: "#C9A84C", fontSize: "12px" }}>{"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}</span>
-                          <span className="text-xs text-gray-400">{new Date(rev.review_date).toLocaleDateString("en-IN")}</span>
-                        </div>
-                        {rev.review_text && <p className="text-xs text-gray-500 mt-1">{rev.review_text}</p>}
-                      </div>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <label className="flex items-center gap-1 cursor-pointer" title={rev.active ? "Active" : "Inactive"}>
-                          <input type="checkbox" checked={rev.active} onChange={(e) => toggleAdminReviewActive(rev.id, e.target.checked)} className="w-3.5 h-3.5 accent-[#3B5373]" />
-                          <span className="text-xs text-gray-400">{rev.active ? "Live" : "Hidden"}</span>
-                        </label>
-                        <button onClick={() => setReviewsModal(m => ({ ...m, editingId: rev.id, editData: {} }))}
-                          className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#3B5373] transition-colors">
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => deleteAdminReview(rev.id)} disabled={reviewsModal.saving}
-                          className="p-1 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition-colors">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
                       </div>
                     </div>
                   )}
-                </div>
-              ))}
+
+                  {/* ── LIVE SECTION ── */}
+                  {liveRevs.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">✓ Live on Product Page</span>
+                        <span className="h-px flex-1 bg-emerald-100" />
+                        <span className="text-xs text-emerald-500 font-medium">{liveRevs.length} visible</span>
+                      </div>
+                      <div className="space-y-2">
+                        {liveRevs.map(rev => (
+                          <div key={rev.id} className="rounded-xl p-4 border border-gray-100 bg-white">
+                            {reviewsModal.editingId === rev.id ? (
+                              <ReviewEditForm rev={rev} reviewsModal={reviewsModal} setReviewsModal={setReviewsModal} saveAdminReviewEdit={saveAdminReviewEdit} inputCls={inputCls} />
+                            ) : (
+                              <div className="flex items-start gap-3">
+                                <div className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: "34px", height: "34px", background: "#3B5373", color: "#fff", fontSize: "13px", fontWeight: 700 }}>
+                                  {rev.customer_name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-sm font-semibold text-gray-800">{rev.customer_name}</span>
+                                    <span style={{ color: "#C9A84C", fontSize: "12px" }}>{"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}</span>
+                                    <span className="text-xs text-gray-400">{new Date(rev.review_date).toLocaleDateString("en-IN")}</span>
+                                  </div>
+                                  {rev.review_text && <p className="text-xs text-gray-500 mt-1">{rev.review_text}</p>}
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                  <button onClick={() => toggleAdminReviewActive(rev.id, false)} disabled={reviewsModal.saving}
+                                    title="Hide this review"
+                                    className="flex items-center gap-1 px-2 py-1 border border-gray-200 rounded-lg text-xs text-gray-500 hover:border-amber-300 hover:text-amber-600 transition-colors disabled:opacity-50">
+                                    Hide
+                                  </button>
+                                  <button onClick={() => setReviewsModal(m => ({ ...m, editingId: rev.id, editData: {} }))}
+                                    className="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-[#3B5373] transition-colors">
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button onClick={() => deleteAdminReview(rev.id)} disabled={reviewsModal.saving}
+                                    className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition-colors">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* ══════════════════════════════════════════════════
           DELETE CONFIRM — SLIDE
