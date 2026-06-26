@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { products, getProductBySlugFromDB, getProductsFromDB, getTabProductsFromDB, Product } from "@/lib/products";
 import ProductDetailClient from "./ProductDetailClient";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 export interface ProductReview {
