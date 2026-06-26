@@ -571,7 +571,7 @@ export default function ProductDetailClient({
         <div style={{ borderTop: "1px solid #E8E3DD" }}>
           {[
             { id: "description",  label: "Description",  content: product.description },
-            { id: "key-features", label: "Key Features",  content: product.key_features || `Signature handcrafted detailing | Classie Comfort cushioned insole | Premium material finish | Anti-slip durable sole | Refined quality construction.` },
+            { id: "key-features", label: "Key Features",  content: product.key_features || `Signature handcrafted detailing. Classie Comfort cushioned insole. Premium material finish. Anti-slip durable sole. Refined quality construction.` },
             { id: "other-info",   label: "Other Info",    content: product.other_info || `Clean with a soft, dry cloth only. Avoid contact with water, perfumes, or harsh chemicals. Store in a dust bag or box to preserve the finish.` },
           ].map((acc) => (
             <div key={acc.id} style={{ borderBottom: "1px solid #E8E3DD" }}>

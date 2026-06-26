@@ -8430,8 +8430,8 @@ export default function AdminPage() {
                 <textarea rows={3} value={productModal.data.description} onChange={(e) => setProductField("description", e.target.value)} className={inputCls} placeholder="Product description…" />
               </div>
               <div>
-                <label className={labelCls}>✨ Key Features <span className="text-gray-400 font-normal normal-case">(use | to separate points)</span></label>
-                <textarea rows={3} value={productModal.data.key_features ?? ""} onChange={(e) => setProductField("key_features", e.target.value)} className={inputCls} placeholder="Classie Comfort cushioned insole | Premium material finish | Anti-slip sole | …" />
+                <label className={labelCls}>✨ Key Features</label>
+                <textarea rows={4} value={productModal.data.key_features ?? ""} onChange={(e) => setProductField("key_features", e.target.value)} className={inputCls} placeholder="Write key features here… e.g. 3-inch block heel. Premium supreme suede. Soft cushioned insole. Anti-slip sole." />
               </div>
               <div>
                 <label className={labelCls}>ℹ️ Other Info <span className="text-gray-400 font-normal normal-case">(care, storage, etc.)</span></label>
