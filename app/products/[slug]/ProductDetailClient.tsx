@@ -670,7 +670,7 @@ export default function ProductDetailClient({
       </div>
 
       {/* ── Feature Tiles ── */}
-      <div style={{ background: "#f7f7f7", padding: "60px 0" }}>
+      <div style={{ background: "#f7f7f7", padding: "40px 0" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           <h2 className="font-serif text-center" style={{ fontSize: "28px", color: "#3B5373", marginBottom: "32px" }}>
             Designed for Every Moment
@@ -688,7 +688,7 @@ export default function ProductDetailClient({
       </div>
 
       {/* ── Shop the Full Collection ── */}
-      <div style={{ padding: "60px 0 80px" }}>
+      <div style={{ padding: "40px 0 60px" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           {/* Header */}
           <div className="text-center" style={{ marginBottom: "32px" }}>
@@ -752,7 +752,7 @@ export default function ProductDetailClient({
       </div>
 
       {/* ── Customer Reviews ── */}
-      <div id="reviews" ref={reviewsRef} style={{ background: "#f7f7f7", padding: "60px 0" }}>
+      <div id="reviews" ref={reviewsRef} style={{ background: "#f7f7f7", padding: reviews.length > 0 ? "40px 0" : "24px 0" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           {/* Header: score + bars */}
           {(() => {
