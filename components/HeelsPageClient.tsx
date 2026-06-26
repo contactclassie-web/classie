@@ -179,7 +179,7 @@ function HeelCard({ product }: { product: HeelProduct }) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
-      <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
+      <div className="relative overflow-hidden" style={{ aspectRatio: "1/1" }}>
         <Image
           src={product.image}
           alt={product.title}

@@ -16,7 +16,7 @@ export default function ProductCard({ product, cardStyle }: { product: Product; 
       <div
         className={`relative overflow-hidden bg-[#faf8f6] ${cardStyle?.borderRadius || ""}`}
         style={{
-          aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "4/5"),
+          aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "1/1"),
           height: cardStyle?.height ? `${cardStyle.height}px` : undefined,
         }}
       >

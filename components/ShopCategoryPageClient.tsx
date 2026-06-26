@@ -215,7 +215,7 @@ function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; car
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
-      <div className={`relative overflow-hidden ${cardStyle?.borderRadius || ""}`} style={{ aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "3/4"), height: cardStyle?.height ? `${cardStyle.height}px` : undefined }}>
+      <div className={`relative overflow-hidden ${cardStyle?.borderRadius || ""}`} style={{ aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "1/1"), height: cardStyle?.height ? `${cardStyle.height}px` : undefined }}>
         <Image
           src={product.image}
           alt={product.title}
@@ -306,7 +306,7 @@ export default function ShopCategoryPageClient({
   const [advMobile,  setAdvMobile]  = useState(2);
   const [advDesktop, setAdvDesktop] = useState(4);
   const [advGap,     setAdvGap]     = useState(12);
-  const [advAspect,  setAdvAspect]  = useState("3/4");
+  const [advAspect,  setAdvAspect]  = useState("1/1");
   const [advRadius,  setAdvRadius]  = useState("sharp");
   const [advCardH,   setAdvCardH]   = useState(0);
 
