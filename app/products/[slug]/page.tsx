@@ -189,11 +189,15 @@ export default async function ProductPage({ params }: Props) {
     bestsellerProducts = related;
   }
 
-  // Fetch active reviews for this product
+  // Fetch active reviews for this product — direct Supabase to avoid siteUrl issues
   let initialReviews: ProductReview[] = [];
   try {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const reviewsRes = await fetch(`${siteUrl}/api/reviews?slug=${slug}`, { cache: "no-store" });
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://hrjvxwqvxvibtwyfoyca.supabase.co";
+    const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z";
+    const reviewsRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/product_reviews?product_slug=eq.${encodeURIComponent(slug)}&active=eq.true&order=review_date.desc,created_at.desc`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, cache: "no-store" }
+    );
     if (reviewsRes.ok) {
       initialReviews = await reviewsRes.json();
     }
