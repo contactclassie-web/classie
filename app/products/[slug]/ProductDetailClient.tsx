@@ -94,9 +94,9 @@ export default function ProductDetailClient({
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
-  // Gallery images: main + additional (up to 4), plus optional video
+  // Gallery images: main + additional (up to 10), plus optional video
   const rawImages = [product.image, ...(product.images ?? [])].filter(Boolean);
-  const galleryImages = rawImages.length >= 4 ? rawImages.slice(0, 4) : [...rawImages, ...Array(4 - rawImages.length).fill(product.image)];
+  const galleryImages = rawImages.slice(0, 10);
   const hasVideo = !!product.video_url;
   const [mainImage, setMainImage] = useState(galleryImages[0]);
   const [showVideo, setShowVideo] = useState(false);
@@ -176,7 +176,7 @@ export default function ProductDetailClient({
           {/* LEFT — Image Column */}
           <div className="pr-0 md:pr-12 mb-8 md:mb-0">
             {/* Main image / video */}
-            <div className="relative rounded-[4px] overflow-hidden mb-3" style={{ aspectRatio: "3/4", background: "#F0EBE4" }}>
+            <div className="relative rounded-[4px] overflow-hidden mb-3" style={{ aspectRatio: "1/1", background: "#F9F9F9" }}>
               {showVideo && product.video_url ? (
                 <video
                   src={product.video_url}
@@ -189,7 +189,7 @@ export default function ProductDetailClient({
                   src={mainImage}
                   alt={product.title}
                   fill
-                  className="object-cover object-center"
+                  className="object-contain object-center"
                   sizes="(max-width: 768px) 100vw, 52vw"
                   priority
                 />
@@ -201,23 +201,23 @@ export default function ProductDetailClient({
               )}
             </div>
 
-            {/* Thumbnails — 4 images + optional video */}
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${hasVideo ? 5 : 4}, 1fr)`, gap: "8px" }}>
+            {/* Thumbnails — up to 10 images + optional video, scrollable */}
+            <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
               {galleryImages.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => { setShowVideo(false); setMainImage(img); }}
-                  className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer"
-                  style={{ aspectRatio: "3/4", border: `2px solid ${!showVideo && mainImage === img ? "#3B5373" : "transparent"}`, background: "#EDE8E1", transition: "border-color 0.2s" }}
+                  className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer flex-shrink-0"
+                  style={{ width: "72px", height: "72px", aspectRatio: "1/1", border: `2px solid ${!showVideo && mainImage === img ? "#3B5373" : "transparent"}`, background: "#F9F9F9", transition: "border-color 0.2s" }}
                 >
-                  <Image src={img} alt={`View ${i + 1}`} fill className="object-cover object-center" sizes="100px" />
+                  <Image src={img} alt={`View ${i + 1}`} fill className="object-contain object-center" sizes="72px" />
                 </button>
               ))}
               {hasVideo && (
                 <button
                   onClick={() => setShowVideo(true)}
-                  className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer flex items-center justify-center"
-                  style={{ aspectRatio: "3/4", border: `2px solid ${showVideo ? "#3B5373" : "transparent"}`, background: "#1a1a1a", transition: "border-color 0.2s" }}
+                  className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer flex items-center justify-center flex-shrink-0"
+                  style={{ width: "72px", height: "72px", aspectRatio: "1/1", border: `2px solid ${showVideo ? "#3B5373" : "transparent"}`, background: "#1a1a1a", transition: "border-color 0.2s" }}
                   title="Play video"
                 >
                   <span style={{ fontSize: "22px" }}>▶</span>
