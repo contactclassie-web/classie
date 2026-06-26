@@ -78,6 +78,14 @@ export default function ProductDetailClient({
       if (v.product_slug !== product.slug) router.prefetch(`/products/${v.product_slug}`);
     });
   }, [colorVariants, product.slug, router]);
+
+  // Preload all gallery images for instant switching
+  useEffect(() => {
+    const imgs = [product.image, ...(product.images ?? [])].filter(Boolean).slice(0, 10);
+    imgs.forEach(src => {
+      if (src) { const img = new window.Image(); img.src = src; }
+    });
+  }, [product.image, product.images]);
   const [selectedVariant, setSelectedVariant] = useState(product.variants.options[0] ?? "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -249,7 +257,7 @@ export default function ProductDetailClient({
                       position: "relative",
                     }}
                   >
-                    <img src={img} alt={`Image ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+                    <img src={img} alt={`Image ${i + 1}`} loading="eager" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
                   </button>
                 ))}
                 {hasVideo && product.video_url && (
