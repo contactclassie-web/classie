@@ -1026,6 +1026,8 @@ export default function AdminPage() {
     showAddForm: false, saving: false,
   });
 
+  const [pendingReviewsCount, setPendingReviewsCount] = useState<number>(0);
+
   const [slidePageFilter, setSlidePageFilter] = useState<string>("all");
   // Hero Slides
   const [slides, setSlides] = useState<HeroSlide[]>([]);
@@ -2648,6 +2650,11 @@ export default function AdminPage() {
     if (!authed) return;
     fetchOrders();
     fetchProducts();
+    // Fetch global pending reviews count for dashboard
+    fetch("/api/reviews/admin/pending-count")
+      .then(r => r.json())
+      .then(d => { if (typeof d.count === "number") setPendingReviewsCount(d.count); })
+      .catch(() => {});
   }, [authed, fetchOrders, fetchProducts]);
 
   useEffect(() => {
@@ -3653,6 +3660,7 @@ export default function AdminPage() {
                     color: "text-amber-600",
                     bg: "bg-amber-50",
                     sub: "Awaiting processing",
+                    alert: false,
                   },
                 ].map(({ label, value, icon: Icon, color, bg, sub }) => (
                   <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
@@ -3666,6 +3674,20 @@ export default function AdminPage() {
                     <p className="text-xs text-gray-400 mt-1">{sub}</p>
                   </div>
                 ))}
+                {/* Pending Reviews tile */}
+                <div className={`rounded-2xl p-5 border shadow-sm ${pendingReviewsCount > 0 ? "bg-orange-50 border-orange-200" : "bg-white border-gray-100"}`}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${pendingReviewsCount > 0 ? "bg-orange-100" : "bg-gray-50"}`}>
+                      <span style={{ fontSize: "18px" }}>⭐</span>
+                    </div>
+                    {pendingReviewsCount > 0 && (
+                      <span className="text-xs font-semibold bg-orange-500 text-white px-2 py-0.5 rounded-full">New!</span>
+                    )}
+                  </div>
+                  <p className={`text-2xl font-bold ${pendingReviewsCount > 0 ? "text-orange-600" : "text-gray-800"}`}>{pendingReviewsCount}</p>
+                  <p className="text-sm font-medium text-gray-600 mt-0.5">Pending Reviews</p>
+                  <p className="text-xs text-gray-400 mt-1">{pendingReviewsCount > 0 ? "Go to Products → 📝 to approve" : "No pending reviews"}</p>
+                </div>
               </div>
 
               {/* Recent Orders */}
