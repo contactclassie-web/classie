@@ -7,6 +7,18 @@ import ProductDetailClient from "./ProductDetailClient";
 export const revalidate = 60;
 export const dynamicParams = true;
 
+export interface ProductReview {
+  id: string;
+  product_slug: string;
+  product_id?: string;
+  customer_name: string;
+  rating: number;
+  review_text: string;
+  review_date: string;
+  active: boolean;
+  created_at: string;
+}
+
 // Server-side Supabase client (no-store)
 function serverSupabase() {
   return createClient(
@@ -177,6 +189,18 @@ export default async function ProductPage({ params }: Props) {
     bestsellerProducts = related;
   }
 
+  // Fetch active reviews for this product
+  let initialReviews: ProductReview[] = [];
+  try {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const reviewsRes = await fetch(`${siteUrl}/api/reviews?slug=${slug}`, { cache: "no-store" });
+    if (reviewsRes.ok) {
+      initialReviews = await reviewsRes.json();
+    }
+  } catch {
+    // silent fail
+  }
+
   return (
     <ProductDetailClient
       product={product}
@@ -186,6 +210,7 @@ export default async function ProductPage({ params }: Props) {
       latestProducts={latestProducts}
       bestsellerProducts={bestsellerProducts}
       colorVariants={colorVariants}
+      initialReviews={initialReviews}
     />
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,9 +9,11 @@ import { Product } from "@/lib/products";
 import { useCart } from "@/components/CartContext";
 import ProductCard from "@/components/ProductCard";
 import { supabase } from "@/lib/supabase";
-import { BundleOfferWithProduct, FeatureTile, ColorVariant } from "./page";
+import { BundleOfferWithProduct, FeatureTile, ColorVariant, ProductReview } from "./page";
 
 // ── Types ──────────────────────────────────────────────────────────────────
+
+const GOLD = "#C9A84C";
 
 const DEFAULT_FEATURE_TILES: FeatureTile[] = [
   { icon: "🤍", title: "Made with Care", desc: "Handcrafted details for lasting elegance" },
@@ -45,11 +47,6 @@ const FEATURE_CHECKS = [
   "High Quality Product",
 ];
 
-const STATIC_REVIEWS = [
-  { name: "Akshita", date: "05/04/2026", rating: 5, text: "Loved the heels and the wine colour. Very comfortable for long wear and quality is exactly as shown.", initial: "A" },
-  { name: "Priya",   date: "12/04/2026", rating: 5, text: "Beautiful design, fits perfectly. Got so many compliments at the wedding. Delivery was fast too!", initial: "P" },
-];
-
 // ── Component ─────────────────────────────────────────────────────────────
 
 export default function ProductDetailClient({
@@ -60,6 +57,7 @@ export default function ProductDetailClient({
   latestProducts = [],
   bestsellerProducts = [],
   colorVariants = [],
+  initialReviews = [],
 }: {
   product: Product;
   related: Product[];
@@ -68,6 +66,7 @@ export default function ProductDetailClient({
   latestProducts?: Product[];
   bestsellerProducts?: Product[];
   colorVariants?: ColorVariant[];
+  initialReviews?: ProductReview[];
 }) {
   const { addToCart } = useCart();
   const router = useRouter();
@@ -86,6 +85,14 @@ export default function ProductDetailClient({
   const [bundleVariants, setBundleVariants] = useState<Record<string, string>>({});
   const [openAcc, setOpenAcc] = useState<string | null>("description");
   const [collTab, setCollTab] = useState<"latest" | "bestseller">("latest");
+
+  // ── Reviews state ──────────────────────────────────────────────────────
+  const [reviews, setReviews] = useState<ProductReview[]>(initialReviews);
+  const [showWriteReview, setShowWriteReview] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ name: "", rating: 5, text: "" });
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const reviewsRef = useRef<HTMLDivElement>(null);
 
   // Gallery images: main + additional (up to 4), plus optional video
   const rawImages = [product.image, ...(product.images ?? [])].filter(Boolean);
@@ -236,11 +243,21 @@ export default function ProductDetailClient({
               {product.category === "heels" ? "Premium Heel Collection" : "Accessory Collection"}
             </p>
 
-            {/* Stars */}
-            <div className="flex items-center gap-2" style={{ marginBottom: "18px" }}>
-              <span style={{ color: "#D4A843", fontSize: "14px", letterSpacing: "2px" }}>★★★★★</span>
-              <span style={{ fontSize: "12px", color: "#888", textDecoration: "underline", cursor: "pointer" }}>5.0 · 2 reviews</span>
-            </div>
+            {/* Stars — dynamic from reviews */}
+            {reviews.length > 0 && (() => {
+              const avg = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+              return (
+                <div className="flex items-center gap-2" style={{ marginBottom: "18px" }}>
+                  <span style={{ color: GOLD, fontSize: "14px", letterSpacing: "2px" }}>{"★".repeat(Math.round(avg))}{"☆".repeat(5 - Math.round(avg))}</span>
+                  <button
+                    onClick={() => reviewsRef.current?.scrollIntoView({ behavior: "smooth" })}
+                    style={{ fontSize: "12px", color: "#888", textDecoration: "underline", cursor: "pointer", background: "none", border: "none", padding: 0 }}
+                  >
+                    {avg.toFixed(1)} · {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Price row */}
             <div className="flex items-baseline gap-3" style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #E8E3DD" }}>
@@ -676,58 +693,178 @@ export default function ProductDetailClient({
       </div>
 
       {/* ── Customer Reviews ── */}
-      <div style={{ background: "#f7f7f7", padding: "60px 0" }}>
+      <div id="reviews" ref={reviewsRef} style={{ background: "#f7f7f7", padding: "60px 0" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           {/* Header: score + bars */}
-          <div className="flex gap-10 items-start" style={{ marginBottom: "32px", flexWrap: "wrap" }}>
-            <div>
-              <h2 className="font-serif" style={{ fontSize: "26px", color: "#3B5373", marginBottom: "8px" }}>Customer Reviews</h2>
-              <div style={{ fontSize: "48px", fontWeight: 700, color: "#1a1a1a", lineHeight: 1 }}>5.0</div>
-              <div style={{ color: "#D4A843", fontSize: "18px", margin: "4px 0" }}>★★★★★</div>
-              <div style={{ fontSize: "13px", color: "#888" }}>{STATIC_REVIEWS.length} reviews</div>
-              <button
-                style={{ marginTop: "12px", padding: "12px 28px", border: "1.5px solid #3B5373", color: "#3B5373", background: "#fff", borderRadius: "4px", fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer" }}
-              >
-                Write a Review
-              </button>
-            </div>
-            <div style={{ flex: 1, minWidth: "200px" }}>
-              {[5, 4, 3, 2, 1].map((star) => {
-                const count = star === 5 ? STATIC_REVIEWS.length : 0;
-                const pct = STATIC_REVIEWS.length > 0 ? (count / STATIC_REVIEWS.length) * 100 : 0;
-                return (
-                  <div key={star} className="flex items-center gap-2.5" style={{ marginBottom: "6px" }}>
-                    <span style={{ fontSize: "12px", width: "24px", textAlign: "right" }}>{star} ★</span>
-                    <div style={{ flex: 1, height: "6px", background: "#E8E3DD", borderRadius: "3px", overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: `${pct}%`, background: "#D4A843", borderRadius: "3px" }} />
-                    </div>
-                    <span style={{ fontSize: "12px", color: "#888", width: "16px" }}>{count}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Review cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
-            {STATIC_REVIEWS.map((rev) => (
-              <div key={rev.name} style={{ background: "#fff", borderRadius: "8px", padding: "24px", border: "1px solid #E8E3DD" }}>
-                <div className="flex items-center gap-3" style={{ marginBottom: "8px" }}>
-                  <div className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: "36px", height: "36px", background: "#3B5373", color: "#fff", fontSize: "14px", fontWeight: 600 }}>
-                    {rev.initial}
-                  </div>
+          {(() => {
+            const total = reviews.length;
+            const avg = total > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / total : 0;
+            const starCounts = [5, 4, 3, 2, 1].map(star => ({ star, count: reviews.filter(r => r.rating === star).length }));
+            return (
+              <>
+                <div className="flex gap-10 items-start" style={{ marginBottom: "32px", flexWrap: "wrap" }}>
                   <div>
-                    <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>{rev.name}</div>
-                    <div style={{ fontSize: "11px", color: "#888" }}>{rev.date}</div>
+                    <h2 className="font-serif" style={{ fontSize: "26px", color: "#3B5373", marginBottom: "8px" }}>Customer Reviews</h2>
+                    {total > 0 ? (
+                      <>
+                        <div style={{ fontSize: "48px", fontWeight: 700, color: "#1a1a1a", lineHeight: 1 }}>{avg.toFixed(1)}</div>
+                        <div style={{ color: GOLD, fontSize: "18px", margin: "4px 0" }}>{"★".repeat(Math.round(avg))}{"☆".repeat(5 - Math.round(avg))}</div>
+                        <div style={{ fontSize: "13px", color: "#888" }}>{total} {total === 1 ? "review" : "reviews"}</div>
+                      </>
+                    ) : (
+                      <p style={{ fontSize: "13px", color: "#888", marginTop: "8px" }}>Be the first to review this product!</p>
+                    )}
+                    <button
+                      onClick={() => setShowWriteReview(true)}
+                      style={{ marginTop: "14px", padding: "12px 28px", border: "1.5px solid #3B5373", color: "#3B5373", background: "#fff", borderRadius: "4px", fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer" }}
+                    >
+                      Write a Review
+                    </button>
                   </div>
-                  <div style={{ color: "#D4A843", fontSize: "12px", marginLeft: "auto" }}>{"★".repeat(rev.rating)}</div>
+                  {total > 0 && (
+                    <div style={{ flex: 1, minWidth: "200px" }}>
+                      {starCounts.map(({ star, count }) => {
+                        const pct = total > 0 ? (count / total) * 100 : 0;
+                        return (
+                          <div key={star} className="flex items-center gap-2.5" style={{ marginBottom: "6px" }}>
+                            <span style={{ fontSize: "12px", width: "24px", textAlign: "right" }}>{star} ★</span>
+                            <div style={{ flex: 1, height: "6px", background: "#E8E3DD", borderRadius: "3px", overflow: "hidden" }}>
+                              <div style={{ height: "100%", width: `${pct}%`, background: GOLD, borderRadius: "3px" }} />
+                            </div>
+                            <span style={{ fontSize: "12px", color: "#888", width: "16px" }}>{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-                <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>{rev.text}</p>
-              </div>
-            ))}
-          </div>
+
+                {/* Review cards */}
+                {reviews.length > 0 && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
+                    {reviews.map((rev) => {
+                      const dateStr = rev.review_date
+                        ? new Date(rev.review_date).toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" })
+                        : "";
+                      return (
+                        <div key={rev.id} style={{ background: "#fff", borderRadius: "8px", padding: "24px", border: "1px solid #E8E3DD" }}>
+                          <div className="flex items-center gap-3" style={{ marginBottom: "8px" }}>
+                            <div className="flex items-center justify-center rounded-full flex-shrink-0" style={{ width: "36px", height: "36px", background: "#3B5373", color: "#fff", fontSize: "14px", fontWeight: 600 }}>
+                              {rev.customer_name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>{rev.customer_name}</div>
+                              <div style={{ fontSize: "11px", color: "#888" }}>{dateStr}</div>
+                            </div>
+                            <div style={{ color: GOLD, fontSize: "12px", marginLeft: "auto" }}>{"★".repeat(rev.rating)}{"☆".repeat(5 - rev.rating)}</div>
+                          </div>
+                          {rev.review_text && <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.7 }}>{rev.review_text}</p>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       </div>
+
+      {/* ── Write a Review Modal ── */}
+      {showWriteReview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(2px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowWriteReview(false); }}
+        >
+          <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", width: "100%", maxWidth: "480px", margin: "16px", position: "relative" }}>
+            <button
+              onClick={() => { setShowWriteReview(false); setReviewSubmitted(false); setReviewForm({ name: "", rating: 5, text: "" }); }}
+              style={{ position: "absolute", top: "16px", right: "16px", background: "none", border: "none", fontSize: "22px", cursor: "pointer", color: "#888" }}
+            >×</button>
+            <h3 className="font-serif" style={{ fontSize: "20px", color: "#3B5373", marginBottom: "20px" }}>Write a Review</h3>
+            {reviewSubmitted ? (
+              <div style={{ textAlign: "center", padding: "24px 0" }}>
+                <div style={{ fontSize: "40px", marginBottom: "12px" }}>🌟</div>
+                <p style={{ fontSize: "15px", color: "#3B5373", fontWeight: 600 }}>Thank you!</p>
+                <p style={{ fontSize: "13px", color: "#888", marginTop: "6px" }}>Your review will appear after approval.</p>
+                <button
+                  onClick={() => { setShowWriteReview(false); setReviewSubmitted(false); setReviewForm({ name: "", rating: 5, text: "" }); }}
+                  style={{ marginTop: "20px", padding: "10px 28px", background: "#3B5373", color: "#fff", border: "none", borderRadius: "100px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!reviewForm.name.trim()) return;
+                setReviewSubmitting(true);
+                try {
+                  const res = await fetch("/api/reviews", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      product_slug: product.slug,
+                      customer_name: reviewForm.name.trim(),
+                      rating: reviewForm.rating,
+                      review_text: reviewForm.text.trim(),
+                    }),
+                  });
+                  if (res.ok) setReviewSubmitted(true);
+                } finally {
+                  setReviewSubmitting(false);
+                }
+              }}>
+                {/* Name */}
+                <div style={{ marginBottom: "16px" }}>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#888", marginBottom: "6px" }}>Your Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={reviewForm.name}
+                    onChange={(e) => setReviewForm(f => ({ ...f, name: e.target.value }))}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #E8E3DD", borderRadius: "8px", fontSize: "13px", outline: "none" }}
+                    placeholder="e.g. Priya S."
+                  />
+                </div>
+                {/* Rating */}
+                <div style={{ marginBottom: "16px" }}>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#888", marginBottom: "8px" }}>Rating *</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setReviewForm(f => ({ ...f, rating: star }))}
+                        style={{ fontSize: "28px", background: "none", border: "none", cursor: "pointer", padding: "0", color: star <= reviewForm.rating ? GOLD : "#D8D8D8", transition: "color 0.15s" }}
+                      >★</button>
+                    ))}
+                  </div>
+                </div>
+                {/* Review text */}
+                <div style={{ marginBottom: "24px" }}>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#888", marginBottom: "6px" }}>Review</label>
+                  <textarea
+                    rows={4}
+                    value={reviewForm.text}
+                    onChange={(e) => setReviewForm(f => ({ ...f, text: e.target.value }))}
+                    style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #E8E3DD", borderRadius: "8px", fontSize: "13px", resize: "vertical", outline: "none" }}
+                    placeholder="Share your experience with this product…"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={reviewSubmitting}
+                  style={{ width: "100%", height: "48px", background: "#3B5373", color: "#fff", border: "none", borderRadius: "100px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: reviewSubmitting ? "not-allowed" : "pointer", opacity: reviewSubmitting ? 0.7 : 1 }}
+                >
+                  {reviewSubmitting ? "Submitting…" : "Submit Review"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Related Products (You May Also Like) — hidden ── */}
     </>
