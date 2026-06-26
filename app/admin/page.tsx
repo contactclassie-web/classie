@@ -1027,6 +1027,7 @@ export default function AdminPage() {
   });
 
   const [pendingReviewsCount, setPendingReviewsCount] = useState<number>(0);
+  const [pendingReviewsList, setPendingReviewsList] = useState<{ id: string; product_slug: string; customer_name: string; rating: number }[]>([]);
 
   const [slidePageFilter, setSlidePageFilter] = useState<string>("all");
   // Hero Slides
@@ -2653,7 +2654,7 @@ export default function AdminPage() {
     // Fetch global pending reviews count for dashboard
     fetch("/api/reviews/admin/pending-count")
       .then(r => r.json())
-      .then(d => { if (typeof d.count === "number") setPendingReviewsCount(d.count); })
+      .then(d => { if (typeof d.count === "number") { setPendingReviewsCount(d.count); setPendingReviewsList(d.pending || []); } })
       .catch(() => {});
   }, [authed, fetchOrders, fetchProducts]);
 
@@ -3686,7 +3687,21 @@ export default function AdminPage() {
                   </div>
                   <p className={`text-2xl font-bold ${pendingReviewsCount > 0 ? "text-orange-600" : "text-gray-800"}`}>{pendingReviewsCount}</p>
                   <p className="text-sm font-medium text-gray-600 mt-0.5">Pending Reviews</p>
-                  <p className="text-xs text-gray-400 mt-1">{pendingReviewsCount > 0 ? "Go to Products → 📝 to approve" : "No pending reviews"}</p>
+                  {pendingReviewsCount > 0 ? (
+                    <div className="mt-2 space-y-1">
+                      {pendingReviewsList.slice(0, 3).map(r => (
+                        <p key={r.id} className="text-xs text-orange-700 font-medium truncate">
+                          {"⭐".repeat(r.rating)} <span className="font-semibold">{r.product_slug}</span> — {r.customer_name}
+                        </p>
+                      ))}
+                      {pendingReviewsList.length > 3 && (
+                        <p className="text-xs text-orange-400">+{pendingReviewsList.length - 3} more…</p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">Products → 📝 to approve</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-1">No pending reviews</p>
+                  )}
                 </div>
               </div>
 
