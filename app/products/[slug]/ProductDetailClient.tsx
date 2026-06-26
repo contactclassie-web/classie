@@ -98,8 +98,12 @@ export default function ProductDetailClient({
   const rawImages = [product.image, ...(product.images ?? [])].filter(Boolean);
   const galleryImages = rawImages.slice(0, 10);
   const hasVideo = !!product.video_url;
-  const [mainImage, setMainImage] = useState(galleryImages[0]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const mainImage = galleryImages[currentIndex] ?? galleryImages[0];
   const [showVideo, setShowVideo] = useState(false);
+
+  const goPrev = () => { setShowVideo(false); setCurrentIndex(i => (i - 1 + galleryImages.length) % galleryImages.length); };
+  const goNext = () => { setShowVideo(false); setCurrentIndex(i => (i + 1) % galleryImages.length); };
 
   // Adv related grid settings
   const [advDesktop, setAdvDesktop] = useState(4);
@@ -175,7 +179,7 @@ export default function ProductDetailClient({
 
           {/* LEFT — Image Column */}
           <div className="pr-0 md:pr-12 mb-8 md:mb-0">
-            {/* Main image / video */}
+            {/* Main image carousel with left/right arrows */}
             <div className="relative rounded-[4px] overflow-hidden mb-3" style={{ aspectRatio: "1/1", background: "#F9F9F9" }}>
               {showVideo && product.video_url ? (
                 <video
@@ -199,29 +203,45 @@ export default function ProductDetailClient({
                   -{discount}% OFF
                 </span>
               )}
-            </div>
-
-            {/* Thumbnails — up to 10 images + optional video, scrollable */}
-            <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
-              {galleryImages.map((img, i) => (
+              {/* Left arrow */}
+              {(galleryImages.length > 1 || hasVideo) && !showVideo && (
                 <button
-                  key={i}
-                  onClick={() => { setShowVideo(false); setMainImage(img); }}
-                  className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer flex-shrink-0"
-                  style={{ width: "72px", height: "72px", aspectRatio: "1/1", border: `2px solid ${!showVideo && mainImage === img ? "#3B5373" : "transparent"}`, background: "#F9F9F9", transition: "border-color 0.2s" }}
+                  onClick={goPrev}
+                  aria-label="Previous image"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center"
+                  style={{ width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.85)", border: "1px solid #e0e0e0", boxShadow: "0 1px 6px rgba(0,0,0,0.10)", cursor: "pointer", zIndex: 10, transition: "background 0.2s" }}
                 >
-                  <Image src={img} alt={`View ${i + 1}`} fill className="object-contain object-center" sizes="72px" />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
-              ))}
-              {hasVideo && (
+              )}
+              {/* Right arrow */}
+              {(galleryImages.length > 1 || hasVideo) && !showVideo && (
                 <button
-                  onClick={() => setShowVideo(true)}
-                  className="relative overflow-hidden rounded-[4px] p-0 m-0 cursor-pointer flex items-center justify-center flex-shrink-0"
-                  style={{ width: "72px", height: "72px", aspectRatio: "1/1", border: `2px solid ${showVideo ? "#3B5373" : "transparent"}`, background: "#1a1a1a", transition: "border-color 0.2s" }}
-                  title="Play video"
+                  onClick={hasVideo && currentIndex === galleryImages.length - 1 ? () => setShowVideo(true) : goNext}
+                  aria-label="Next image"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center"
+                  style={{ width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.85)", border: "1px solid #e0e0e0", boxShadow: "0 1px 6px rgba(0,0,0,0.10)", cursor: "pointer", zIndex: 10, transition: "background 0.2s" }}
                 >
-                  <span style={{ fontSize: "22px" }}>▶</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
+              )}
+              {/* Dot indicators */}
+              {galleryImages.length > 1 && !showVideo && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-[5px]" style={{ zIndex: 10 }}>
+                  {galleryImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setShowVideo(false); setCurrentIndex(i); }}
+                      style={{ width: i === currentIndex ? "18px" : "6px", height: "6px", borderRadius: "3px", background: i === currentIndex ? "#3B5373" : "rgba(255,255,255,0.7)", border: "none", padding: 0, cursor: "pointer", transition: "all 0.25s" }}
+                    />
+                  ))}
+                  {hasVideo && (
+                    <button
+                      onClick={() => setShowVideo(true)}
+                      style={{ width: showVideo ? "18px" : "6px", height: "6px", borderRadius: "3px", background: showVideo ? "#3B5373" : "rgba(255,255,255,0.7)", border: "none", padding: 0, cursor: "pointer", transition: "all 0.25s" }}
+                    />
+                  )}
+                </div>
               )}
             </div>
           </div>
