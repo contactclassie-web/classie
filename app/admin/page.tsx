@@ -8506,18 +8506,12 @@ export default function AdminPage() {
                   <input type="text" value={productModal.data.image} onChange={(e) => setProductField("image", e.target.value)} className={inputCls} placeholder="https://…" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelCls}>Image 2</label>
-                    <input type="text" value={productModal.data.images?.[0] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[0] = e.target.value; setProductField("images", arr.filter((_, i) => i < 3 || e.target.value)); }} className={inputCls} placeholder="https://…" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Image 3</label>
-                    <input type="text" value={productModal.data.images?.[1] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[1] = e.target.value; setProductField("images", arr); }} className={inputCls} placeholder="https://…" />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Image 4</label>
-                    <input type="text" value={productModal.data.images?.[2] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[2] = e.target.value; setProductField("images", arr); }} className={inputCls} placeholder="https://…" />
-                  </div>
+                  {[1,2,3,4,5,6,7,8,9].map((i) => (
+                    <div key={i}>
+                      <label className={labelCls}>Image {i + 1}</label>
+                      <input type="text" value={productModal.data.images?.[i - 1] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[i - 1] = e.target.value; setProductField("images", arr); }} className={inputCls} placeholder="https://…" />
+                    </div>
+                  ))}
                   <div>
                     <label className={labelCls}>🎬 Video URL (mp4 / YouTube)</label>
                     <input type="text" value={productModal.data.video_url ?? ""} onChange={(e) => setProductField("video_url", e.target.value)} className={inputCls} placeholder="https://… or youtube.com/…" />
