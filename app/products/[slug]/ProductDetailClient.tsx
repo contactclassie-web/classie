@@ -459,10 +459,12 @@ export default function ProductDetailClient({
               ))}
             </div>
 
-            {/* Free shipping */}
-            <p className="flex items-center gap-1.5" style={{ fontSize: "12.5px", color: "#3B5373", fontWeight: 500, marginBottom: "16px" }}>
-              🚚 Free Shipping Included
-            </p>
+            {/* Promo line — admin editable */}
+            {product.promo_line && (
+              <p className="flex items-center gap-1.5" style={{ fontSize: "12.5px", color: "#3B5373", fontWeight: 500, marginBottom: "16px" }}>
+                {product.promo_line}
+              </p>
+            )}
 
             {/* Qty + Add to Cart */}
             <div className="flex items-center gap-2.5" style={{ marginBottom: "10px" }}>

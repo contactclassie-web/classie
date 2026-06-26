@@ -54,6 +54,7 @@ interface DbProduct {
   specs?: Array<{label: string; value: string}>;
   feature_checks?: string;
   variant_label?: string;
+  promo_line?: string;
   cod_available: boolean;
   free_shipping: boolean;
   is_featured: boolean;
@@ -346,7 +347,7 @@ const EMPTY_PRODUCT: DbProduct = {
   category: "heels", description: "", image: "", images: [], video_url: "",
   variant_type: "none", variants: [], heel_type: "", toe_style: "",
   heel_height: "", ankle_strap: false, shoe_fit: "", tags: [],
-  key_features: "", other_info: "", specs: [], feature_checks: "", variant_label: "",
+  key_features: "", other_info: "", specs: [], feature_checks: "", variant_label: "", promo_line: "",
   cod_available: true, free_shipping: false, is_featured: false, featured_tab: null, active: true,
 };
 
@@ -8617,6 +8618,10 @@ export default function AdminPage() {
               <div>
                 <label className={labelCls}>✨ Key Features</label>
                 <textarea rows={4} value={productModal.data.key_features ?? ""} onChange={(e) => setProductField("key_features", e.target.value)} className={inputCls} placeholder="Write key features here… e.g. 3-inch block heel. Premium supreme suede. Soft cushioned insole. Anti-slip sole." />
+              </div>
+              <div>
+                <label className={labelCls}>🏷️ Promo Line <span className="text-gray-400 font-normal normal-case">(shown near Add to Cart — e.g. "🚚 Free Shipping" or "10% off today")</span></label>
+                <input type="text" value={productModal.data.promo_line ?? ""} onChange={(e) => setProductField("promo_line", e.target.value)} className={inputCls} placeholder="e.g. 🚚 Free Shipping Included  or  🎁 10% off on first order" />
               </div>
               <div>
                 <label className={labelCls}>ℹ️ Other Info <span className="text-gray-400 font-normal normal-case">(care, storage, etc.)</span></label>
