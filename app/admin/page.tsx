@@ -2735,6 +2735,23 @@ export default function AdminPage() {
       if (rest.specs) rest.specs = rest.specs.filter((r: {label:string;value:string}) => r.label.trim() || r.value.trim());
       // Clean images — remove empty strings
       if (rest.images) rest.images = rest.images.filter((img: string) => img.trim());
+      // Convert key_features plain text → array (handles bullet points, newlines, plain text)
+      if (typeof rest.key_features === "string" && rest.key_features.trim()) {
+        const raw = rest.key_features.trim();
+        // Try parsing as JSON array first
+        if (raw.startsWith("[")) {
+          try { rest.key_features = JSON.parse(raw); } catch { /* fall through */ }
+        }
+        // If still a string, split by newline or bullet
+        if (typeof rest.key_features === "string") {
+          rest.key_features = raw
+            .split(/\n|•|·/)
+            .map((s: string) => s.replace(/^[-–—*\s]+/, "").trim())
+            .filter((s: string) => s.length > 0);
+        }
+      } else if (typeof rest.key_features === "string" && !rest.key_features.trim()) {
+        rest.key_features = [];
+      }
       let saveError;
       if (productModal.mode === "add") {
         const { error } = await supabase.from("products").insert([rest]);
@@ -8617,7 +8634,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <label className={labelCls}>✨ Key Features</label>
-                <textarea rows={4} value={productModal.data.key_features ?? ""} onChange={(e) => setProductField("key_features", e.target.value)} className={inputCls} placeholder="Write key features here… e.g. 3-inch block heel. Premium supreme suede. Soft cushioned insole. Anti-slip sole." />
+                <textarea rows={4} value={Array.isArray(productModal.data.key_features) ? (productModal.data.key_features as string[]).join("\n") : (productModal.data.key_features ?? "")} onChange={(e) => setProductField("key_features", e.target.value)} className={inputCls} placeholder={"Write one feature per line:\n3-Inch Block Heel — Comfort all day\nCushioned Insole — Soft on feet\nAnti-Slip Sole — Confident steps"} />
               </div>
               <div>
                 <label className={labelCls}>🏷️ Promo Line <span className="text-gray-400 font-normal normal-case">(shown near Add to Cart — e.g. "🚚 Free Shipping" or "10% off today")</span></label>
