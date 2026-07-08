@@ -49,7 +49,7 @@ interface DbProduct {
   ankle_strap?: boolean;
   shoe_fit?: string;
   tags?: string[];
-  key_features?: string;
+  key_features?: string | string[] | null;
   other_info?: string;
   specs?: Array<{label: string; value: string}>;
   feature_checks?: string;
