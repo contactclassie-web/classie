@@ -2735,22 +2735,30 @@ export default function AdminPage() {
       if (rest.specs) rest.specs = rest.specs.filter((r: {label:string;value:string}) => r.label.trim() || r.value.trim());
       // Clean images — remove empty strings
       if (rest.images) rest.images = rest.images.filter((img: string) => img.trim());
-      // Convert key_features plain text → array (handles bullet points, newlines, plain text)
-      if (typeof rest.key_features === "string" && rest.key_features.trim()) {
-        const raw = rest.key_features.trim();
-        // Try parsing as JSON array first
-        if (raw.startsWith("[")) {
-          try { rest.key_features = JSON.parse(raw); } catch { /* fall through */ }
+      // Convert key_features plain text → array (handles all formats)
+      {
+        const kf = rest.key_features;
+        if (Array.isArray(kf)) {
+          // already an array — keep as is, filter empty
+          rest.key_features = kf.filter((s: string) => String(s).trim());
+        } else if (typeof kf === "string" && kf.trim()) {
+          const raw = kf.trim();
+          let parsed: string[] | null = null;
+          // Try JSON array
+          if (raw.startsWith("[")) { try { parsed = JSON.parse(raw); } catch { parsed = null; } }
+          if (parsed && Array.isArray(parsed)) {
+            rest.key_features = parsed.filter((s: string) => String(s).trim());
+          } else {
+            // Split by newline or bullet
+            rest.key_features = raw
+              .split(/\r?\n|•|·/)
+              .map((s: string) => s.replace(/^[-–—*\s]+/, "").trim())
+              .filter((s: string) => s.length > 0);
+          }
+        } else {
+          // empty string, null, undefined → null (safe for Postgres text[])
+          rest.key_features = null;
         }
-        // If still a string, split by newline or bullet
-        if (typeof rest.key_features === "string") {
-          rest.key_features = raw
-            .split(/\n|•|·/)
-            .map((s: string) => s.replace(/^[-–—*\s]+/, "").trim())
-            .filter((s: string) => s.length > 0);
-        }
-      } else if (typeof rest.key_features === "string" && !rest.key_features.trim()) {
-        rest.key_features = [];
       }
       let saveError;
       if (productModal.mode === "add") {
