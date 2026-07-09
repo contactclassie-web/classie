@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendOrderEmails } from "@/lib/emails";
 
 function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -63,6 +64,22 @@ export async function POST(req: NextRequest) {
       console.error("Supabase insert error:", error);
       return NextResponse.json({ error: "Failed to save order" }, { status: 500 });
     }
+
+    // Send emails (non-blocking)
+    sendOrderEmails({
+      orderId: data.id,
+      customerName: customer_name,
+      customerEmail: customer_email || undefined,
+      customerPhone: customer_phone,
+      address,
+      city,
+      state,
+      pincode,
+      items,
+      totalAmount: total_amount,
+      paymentMethod: payment_method || 'cod',
+      paymentId: payment_id || undefined,
+    })
 
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
