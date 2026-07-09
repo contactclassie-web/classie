@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                 <Field label="Full Name *" name="customer_name" value={form.customer_name} onChange={handleChange} required />
                 <Field label="Phone Number *" name="customer_phone" value={form.customer_phone} onChange={handleChange} type="tel" required pattern="[0-9]{10}" placeholder="10-digit mobile number" />
                 <div className="sm:col-span-2">
-                  <Field label="Email (Optional)" name="customer_email" value={form.customer_email} onChange={handleChange} type="email" />
+                  <Field label="Email Address *" name="customer_email" value={form.customer_email} onChange={handleChange} type="email" required />
                 </div>
               </div>
             </section>
