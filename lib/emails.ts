@@ -164,8 +164,8 @@ function adminEmailHtml(data: OrderEmailData): string {
 
 // ── Send both emails ──────────────────────────────────────────────────────────
 export async function sendOrderEmails(data: OrderEmailData) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'orders@classie.co.in'
-  const fromEmail = process.env.FROM_EMAIL || 'orders@classie.co.in'
+  const adminEmail = process.env.ADMIN_EMAIL || 'contact.classie@gmail.com'
+  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'
 
   const promises = []
 
