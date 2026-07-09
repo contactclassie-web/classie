@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const {
       customer_name, customer_email, customer_phone,
       address, city, state, pincode,
-      items, total_amount, payment_method,
+      items, total_amount, payment_method, payment_id,
     } = body;
 
     // Validation
@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
         total_amount,
         status: "pending",
         payment_method: payment_method || "cod",
+        payment_id: payment_id || null,
       }])
       .select("id, status")
       .single();

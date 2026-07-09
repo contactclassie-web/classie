@@ -27,6 +27,7 @@ interface Order {
   total_amount: number;
   status: string;
   payment_method: string;
+  payment_id?: string;
   created_at: string;
 }
 
@@ -3882,6 +3883,11 @@ export default function AdminPage() {
                             <td className="px-5 py-4">
                               <p className="font-semibold text-gray-800">₹{order.total_amount.toLocaleString("en-IN")}</p>
                               <p className="text-[10px] uppercase text-gray-400 mt-0.5">{order.payment_method}</p>
+                              {order.payment_id && (
+                                <p className="text-[10px] text-green-600 font-mono mt-0.5 truncate max-w-[120px]" title={order.payment_id}>
+                                  🔒 {order.payment_id.slice(0, 14)}…
+                                </p>
+                              )}
                             </td>
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-1.5 mb-2">
