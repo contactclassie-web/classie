@@ -411,6 +411,33 @@ export default function ShopCategoryPageClient({
         />
       )}
 
+      {/* ── Shoe Charms Sub-Category Columns (clips page only) ── */}
+      {settingsPrefix === "clips" && (
+        <div className="border-b border-[#e5e5e5] overflow-hidden" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
+          {[
+            { label: "Rhinestone Shoe Charms", filter: "Rhinestone" },
+            { label: "Flower Shoe Charms", filter: "Flower" },
+            { label: "Bow Shoe Charms", filter: "Bow" },
+          ].map((item, idx) => (
+            <button
+              key={item.label}
+              onClick={() => setSelectedFilterTypes([item.filter])}
+              className="group flex flex-col justify-center px-7 py-5 border-r border-[#e5e5e5] last:border-r-0 transition-all duration-300 text-left"
+              style={{ background: selectedFilterTypes.includes(item.filter) ? "#3B5373" : "white" }}
+            >
+              <p className="font-sans text-[10px] tracking-[0.15em] mb-1.5 transition-colors"
+                style={{ color: selectedFilterTypes.includes(item.filter) ? "rgba(255,255,255,0.6)" : "#9ca3af" }}>
+                0{idx + 1}
+              </p>
+              <p className="font-serif transition-colors"
+                style={{ fontSize: "1.1rem", fontWeight: 600, letterSpacing: "0.01em", color: selectedFilterTypes.includes(item.filter) ? "#ffffff" : "#1a1a1a" }}>
+                {item.label}
+              </p>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* ── Clip Type Pill Filter (clips page only) ── */}
       {settingsPrefix === "clips" && filterTypes.length > 0 && (
         <section className="py-8 bg-white border-b border-gray-100">
