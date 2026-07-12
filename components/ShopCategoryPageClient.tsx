@@ -420,9 +420,14 @@ export default function ShopCategoryPageClient({
       {settingsPrefix === "clips" && (
         <section className="py-8 bg-white border-b border-gray-100">
           <div className="max-w-[1280px] mx-auto px-4 md:px-10 text-center">
-            <p className="font-serif mb-6" style={{ fontSize: "1.35rem", fontWeight: 600, color: "#1a1a1a", letterSpacing: "0.02em" }}>
-              Shoe Charms
+            <p className="font-serif mb-6" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 600, color: "#3B5373", letterSpacing: "0.04em" }}>
+              {initialSettings["clips_charm_heading"] || "Shoe Charms"}
             </p>
+            {initialSettings["clips_charm_subheading"] && (
+              <p className="font-sans mb-4" style={{ fontSize: "13px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                {initialSettings["clips_charm_subheading"]}
+              </p>
+            )}
             <div className="flex flex-wrap justify-center gap-3">
               {[
                 { label: "View All", tags: [] },

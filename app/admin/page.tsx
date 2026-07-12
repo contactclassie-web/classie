@@ -4842,6 +4842,32 @@ export default function AdminPage() {
                     </div>
                   </div>
 
+                  {/* Shoe Charms Section Heading */}
+                  <div>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold text-gray-800">✨ Shoe Charms Section Heading</h2>
+                      <p className="text-xs text-gray-400 mt-0.5">Pill filters ke upar dikhne wala heading aur subheading.</p>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+                      <div>
+                        <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block mb-1">Main Heading</label>
+                        <input type="text"
+                          defaultValue="Shoe Charms"
+                          onBlur={async (e) => { await upsertSettings([{ key: "clips_charm_heading", value: e.target.value }]); }}
+                          className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"
+                          placeholder="e.g. Shoe Charms" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block mb-1">Subheading (optional)</label>
+                        <input type="text"
+                          defaultValue=""
+                          onBlur={async (e) => { await upsertSettings([{ key: "clips_charm_subheading", value: e.target.value }]); }}
+                          className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#3B5373] rounded-lg"
+                          placeholder="e.g. Transform your look instantly" />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Filter types */}
                   <div>
                     <div className="mb-4">
