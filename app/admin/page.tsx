@@ -3467,7 +3467,7 @@ export default function AdminPage() {
       header: "SHOP PAGES",
       items: [
         { id: "heels",             label: "Heels",           icon: Layers },
-        { id: "clips-page",        label: "Clip-ons",        icon: Sparkles },
+        { id: "clips-page",        label: "Shoe Charms",     icon: Sparkles },
         { id: "bow-page",          label: "Bow Collection",  icon: Star },
         { id: "collections-page",  label: "Collections",     icon: Grid3x3 },
         { id: "style-ideas-page",  label: "Style Ideas",     icon: Camera },
@@ -3598,7 +3598,7 @@ export default function AdminPage() {
                mainSection === "homepage" ? "Homepage" :
                mainSection === "catalog" ? "Catalog" :
                mainSection === "heels" ? "Heels Page" :
-               mainSection === "clips-page" ? "Clips Page" :
+               mainSection === "clips-page" ? "Shoe Charms Page" :
                mainSection === "bow-page" ? "Bow Page" :
                mainSection === "collections-page" ? "Collections Page" :
                mainSection === "style-ideas-page" ? "Style Ideas Page" :
