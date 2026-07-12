@@ -342,9 +342,9 @@ export default function ProductDetailClient({
                     const circle = (
                       <div style={{
                         width: "64px", height: "64px", borderRadius: "50%", overflow: "hidden",
-                        border: isActive ? "2px solid #3B5373" : "1.5px solid #D8D8D8",
+                        border: isActive ? "3px solid #3B5373" : "1.5px solid #D8D8D8",
                         background: "#F5F5F5", flexShrink: 0,
-                        boxShadow: isActive ? "0 0 0 3px #fff, 0 0 0 5px #3B5373" : "none",
+                        boxShadow: "none",
                         cursor: isActive ? "default" : "pointer",
                         transition: "box-shadow 0.15s",
                       }}>
