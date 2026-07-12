@@ -421,7 +421,7 @@ export default function ShopCategoryPageClient({
         <section className="py-14 bg-white border-b border-gray-100">
           <div className="max-w-[1280px] mx-auto px-4 md:px-10 text-center">
             <h2 style={{ fontFamily: "'Cormorant Garamond', 'Cormorant', Georgia, serif", fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 400, color: "#1a1a1a", letterSpacing: "0.01em", marginBottom: "8px", lineHeight: 1.3, fontStyle: "normal" }}>
-              {initialSettings["clips_charm_heading"] || <>Shop <em style={{ color: "#3B5373", fontStyle: "italic" }}>CLASSIE</em> Shoe Charms</>}
+              {initialSettings["clips_charm_heading"] || "Shoe Charms"}
             </h2>
             {initialSettings["clips_charm_subheading"] && (
               <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "12px", color: "#888", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
