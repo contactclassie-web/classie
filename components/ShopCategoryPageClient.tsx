@@ -416,60 +416,50 @@ export default function ShopCategoryPageClient({
         />
       )}
 
-      {/* ── Shoe Charms Sub-Category Columns (clips page only) ── */}
+      {/* ── Shoe Charms Pill Filter (clips page only) ── */}
       {settingsPrefix === "clips" && (
-        <div className="border-b border-[#e5e5e5] overflow-hidden" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
-          {/* View All */}
-          <button
-            onClick={() => setSelectedFilterTypes([])}
-            className="flex flex-col justify-center px-7 py-5 border-r border-[#e5e5e5] transition-all duration-300 text-left"
-            style={{ background: selectedFilterTypes.length === 0 ? "#3B5373" : "white" }}
-          >
-            <p className="font-sans text-[10px] tracking-[0.15em] mb-1.5"
-              style={{ color: selectedFilterTypes.length === 0 ? "rgba(255,255,255,0.6)" : "#9ca3af" }}>00</p>
-            <p className="font-serif transition-colors"
-              style={{ fontSize: "1.1rem", fontWeight: 600, letterSpacing: "0.01em", color: selectedFilterTypes.length === 0 ? "#ffffff" : "#1a1a1a" }}>
-              View All
+        <section className="py-8 bg-white border-b border-gray-100">
+          <div className="max-w-[1280px] mx-auto px-4 md:px-10 text-center">
+            <p className="font-serif mb-6" style={{ fontSize: "1.35rem", fontWeight: 600, color: "#1a1a1a", letterSpacing: "0.02em" }}>
+              Shoe Charms
             </p>
-          </button>
-          {/* Rhinestone */}
-          <button
-            onClick={() => setSelectedFilterTypes(["rhinestone","crystal"])}
-            className="flex flex-col justify-center px-7 py-5 border-r border-[#e5e5e5] transition-all duration-300 text-left"
-            style={{ background: selectedFilterTypes.includes("rhinestone") ? "#3B5373" : "white" }}
-          >
-            <p className="font-sans text-[10px] tracking-[0.15em] mb-1.5"
-              style={{ color: selectedFilterTypes.includes("rhinestone") ? "rgba(255,255,255,0.6)" : "#9ca3af" }}>01</p>
-            <p className="font-serif transition-colors"
-              style={{ fontSize: "1.1rem", fontWeight: 600, letterSpacing: "0.01em", color: selectedFilterTypes.includes("rhinestone") ? "#ffffff" : "#1a1a1a" }}>
-              Rhinestone Shoe Charms
-            </p>
-          </button>
-          {/* Flower */}
-          <button
-            onClick={() => setSelectedFilterTypes(["flower"])}
-            className="flex flex-col justify-center px-7 py-5 border-r border-[#e5e5e5] transition-all duration-300 text-left"
-            style={{ background: selectedFilterTypes.includes("flower") ? "#3B5373" : "white" }}
-          >
-            <p className="font-sans text-[10px] tracking-[0.15em] mb-1.5"
-              style={{ color: selectedFilterTypes.includes("flower") ? "rgba(255,255,255,0.6)" : "#9ca3af" }}>02</p>
-            <p className="font-serif transition-colors"
-              style={{ fontSize: "1.1rem", fontWeight: 600, letterSpacing: "0.01em", color: selectedFilterTypes.includes("flower") ? "#ffffff" : "#1a1a1a" }}>
-              Flower Shoe Charms
-            </p>
-          </button>
-          {/* Bow → link to /shop/bow */}
-          <a href="/shop/bow"
-            className="flex flex-col justify-center px-7 py-5 transition-all duration-300 text-left no-underline"
-            style={{ background: "white" }}
-          >
-            <p className="font-sans text-[10px] tracking-[0.15em] mb-1.5" style={{ color: "#9ca3af" }}>03</p>
-            <p className="font-serif transition-colors"
-              style={{ fontSize: "1.1rem", fontWeight: 600, letterSpacing: "0.01em", color: "#1a1a1a" }}>
-              Bow Shoe Charms
-            </p>
-          </a>
-        </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              {[
+                { label: "View All", tags: [] },
+                { label: "Rhinestone Shoe Charms", tags: ["rhinestone","crystal"] },
+                { label: "Flower Shoe Charms", tags: ["flower"] },
+                { label: "Bow Shoe Charms", tags: ["bow"] },
+                { label: "Pearl Anklet", tags: ["pearl","anklet"] },
+              ].map((item) => {
+                const isActive = item.tags.length === 0
+                  ? selectedFilterTypes.length === 0
+                  : item.tags.some(t => selectedFilterTypes.includes(t));
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => setSelectedFilterTypes(item.tags)}
+                    className="transition-all duration-200"
+                    style={{
+                      padding: "10px 22px",
+                      borderRadius: "999px",
+                      border: `1.5px solid #3B5373`,
+                      background: isActive ? "#3B5373" : "transparent",
+                      color: isActive ? "#ffffff" : "#3B5373",
+                      fontSize: "12px",
+                      fontFamily: "'Poppins', sans-serif",
+                      fontWeight: 500,
+                      letterSpacing: "0.04em",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
       )}
 
       {/* ── Clip Type Pill Filter (clips page only) ── */}
