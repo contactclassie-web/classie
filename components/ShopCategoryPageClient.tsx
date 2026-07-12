@@ -418,13 +418,13 @@ export default function ShopCategoryPageClient({
 
       {/* ── Shoe Charms Pill Filter (clips page only) ── */}
       {settingsPrefix === "clips" && (
-        <section className="py-8 bg-white border-b border-gray-100">
+        <section className="py-14 bg-white border-b border-gray-100">
           <div className="max-w-[1280px] mx-auto px-4 md:px-10 text-center">
-            <p className="font-serif mb-6" style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 600, color: "#3B5373", letterSpacing: "0.04em" }}>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', 'Cormorant', Georgia, serif", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 600, color: "#1a1a1a", letterSpacing: "0.02em", marginBottom: "8px", lineHeight: 1.2 }}>
               {initialSettings["clips_charm_heading"] || "Shoe Charms"}
-            </p>
+            </h2>
             {initialSettings["clips_charm_subheading"] && (
-              <p className="font-sans mb-4" style={{ fontSize: "13px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+              <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "12px", color: "#888", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
                 {initialSettings["clips_charm_subheading"]}
               </p>
             )}
