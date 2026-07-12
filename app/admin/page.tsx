@@ -8669,6 +8669,31 @@ export default function AdminPage() {
                     className="text-xs text-[#3B5373] font-medium hover:underline"
                   >+ Add Row</button>
                 </div>
+                {/* Copy specs from another product */}
+                <div className="flex gap-2 items-center">
+                  <select
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373] bg-white"
+                    defaultValue=""
+                    onChange={(e) => {
+                      const pid = e.target.value;
+                      if (!pid) return;
+                      const src = dbProducts.find(p => p.id === pid);
+                      if (src && src.specs && src.specs.length > 0) {
+                        if (window.confirm(`Copy specs from "${src.title}"? This will replace current specs.`)) {
+                          setProductField("specs", JSON.parse(JSON.stringify(src.specs)));
+                        }
+                      } else {
+                        alert("That product has no specs to copy.");
+                      }
+                      e.target.value = "";
+                    }}
+                  >
+                    <option value="">📋 Copy specs from another product…</option>
+                    {dbProducts.filter(p => p.id !== productModal.data.id && p.specs && p.specs.length > 0).map(p => (
+                      <option key={p.id} value={p.id}>{p.title} ({p.specs?.length} rows)</option>
+                    ))}
+                  </select>
+                </div>
                 {(productModal.data.specs || []).length === 0 && (
                   <p className="text-xs text-gray-400">No rows yet. Click &quot;+ Add Row&quot; to add specs.</p>
                 )}
