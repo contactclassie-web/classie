@@ -102,8 +102,18 @@ export default function ProductDetailClient({
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const reviewsRef = useRef<HTMLDivElement>(null);
 
-  // Gallery images: main + additional (up to 10), plus optional video
-  const rawImages = [product.image, ...(product.images ?? [])].filter(Boolean);
+  // ── Color-aware gallery ──
+  // variants.options can be string[] (legacy) OR {name,hex,images}[] (rich)
+  const richColorOptions: Array<{name:string;hex:string;images:string[]}> =
+    Array.isArray(product.variants.options) && product.variants.options.length > 0 && typeof product.variants.options[0] === "object"
+      ? (product.variants.options as unknown as Array<{name:string;hex:string;images:string[]}>)
+      : [];
+  const selectedColorObj = richColorOptions.find(c => c.name === selectedVariant);
+
+  // Gallery images: use per-color images if available, else product.images
+  const rawImages = selectedColorObj?.images?.length
+    ? selectedColorObj.images.filter(Boolean)
+    : [product.image, ...(product.images ?? [])].filter(Boolean);
   const galleryImages = rawImages.slice(0, 10);
   const hasVideo = !!product.video_url;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -376,31 +386,49 @@ export default function ProductDetailClient({
             {product.variants.type === "color" && (
               <div style={{ marginBottom: "20px" }}>
                 <p style={{ fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#1a1a1a", marginBottom: "10px" }}>
-                  Available in
+                  Available in — <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "#555" }}>{selectedVariant || ""}</span>
                 </p>
                 <div className="flex gap-2.5 flex-wrap">
-                  {product.variants.options.map((col) => (
-                    <button
-                      key={col}
-                      onClick={() => setSelectedVariant(col)}
-                      title={col}
-                      className="flex flex-col items-center gap-1 p-0 bg-transparent border-0 cursor-pointer"
-                    >
-                      <span
-                        className="relative overflow-hidden"
-                        style={{
-                          width: "56px", height: "56px", borderRadius: "4px", display: "block",
-                          border: `2px solid ${selectedVariant === col ? "#3B5373" : "transparent"}`,
-                          background: "#EDE8E1",
-                          transform: selectedVariant === col ? "scale(1.05)" : "scale(1)",
-                          transition: "all 0.2s",
-                        }}
-                      >
-                        <Image src={product.image} alt={col} fill className="object-cover object-center" sizes="56px" />
-                      </span>
-                      <span style={{ fontSize: "10px", color: "#888" }}>{col}</span>
-                    </button>
-                  ))}
+                  {richColorOptions.length > 0
+                    ? richColorOptions.map((col) => (
+                        <button
+                          key={col.name}
+                          onClick={() => { setSelectedVariant(col.name); setCurrentIndex(0); setShowVideo(false); }}
+                          title={col.name}
+                          className="flex flex-col items-center gap-1 p-0 bg-transparent border-0 cursor-pointer"
+                        >
+                          <span className="relative overflow-hidden" style={{
+                            width: "56px", height: "56px", borderRadius: "4px", display: "block",
+                            border: `2px solid ${selectedVariant === col.name ? "#3B5373" : "transparent"}`,
+                            background: col.hex || "#EDE8E1",
+                            transform: selectedVariant === col.name ? "scale(1.05)" : "scale(1)",
+                            transition: "all 0.2s",
+                          }}>
+                            {col.images?.[0] && <Image src={col.images[0]} alt={col.name} fill className="object-cover object-center" sizes="56px" />}
+                          </span>
+                          <span style={{ fontSize: "10px", color: "#888" }}>{col.name}</span>
+                        </button>
+                      ))
+                    : (product.variants.options as string[]).map((col) => (
+                        <button
+                          key={col}
+                          onClick={() => { setSelectedVariant(col); setCurrentIndex(0); setShowVideo(false); }}
+                          title={col}
+                          className="flex flex-col items-center gap-1 p-0 bg-transparent border-0 cursor-pointer"
+                        >
+                          <span className="relative overflow-hidden" style={{
+                            width: "56px", height: "56px", borderRadius: "4px", display: "block",
+                            border: `2px solid ${selectedVariant === col ? "#3B5373" : "transparent"}`,
+                            background: "#EDE8E1",
+                            transform: selectedVariant === col ? "scale(1.05)" : "scale(1)",
+                            transition: "all 0.2s",
+                          }}>
+                            <Image src={product.image} alt={col} fill className="object-cover object-center" sizes="56px" />
+                          </span>
+                          <span style={{ fontSize: "10px", color: "#888" }}>{col}</span>
+                        </button>
+                      ))
+                  }
                 </div>
               </div>
             )}
