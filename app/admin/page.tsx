@@ -3985,7 +3985,7 @@ export default function AdminPage() {
                               <p className="text-[10px] text-gray-400 line-through">₹{p.compare_price.toLocaleString("en-IN")}</p>
                             </td>
                             <td className="px-5 py-4 text-xs text-gray-400">
-                              {p.variant_type !== "none" ? `${p.variant_type}: ${p.variants?.join(", ")}` : "—"}
+                              {p.variant_type !== "none" ? `${p.variant_type}: ${Array.isArray(p.variants) ? p.variants.map((v: unknown) => typeof v === "object" && v !== null ? (v as {name?:string}).name || "" : String(v)).filter(Boolean).join(", ") : "—"}` : "—"}
                             </td>
                             <td className="px-5 py-4">
                               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${p.active ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
@@ -8801,7 +8801,7 @@ export default function AdminPage() {
                   <label className={labelCls}>Variants (comma separated)</label>
                   <input
                     type="text"
-                    value={productModal.data.variants?.join(", ") ?? ""}
+                    value={Array.isArray(productModal.data.variants) ? productModal.data.variants.map((v: unknown) => typeof v === "object" && v !== null ? (v as {name?:string}).name || "" : String(v)).filter(Boolean).join(", ") : ""}
                     onChange={(e) => setProductField("variants", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
                     className={inputCls} placeholder="35,36,37 or Black,Brown"
                   />
