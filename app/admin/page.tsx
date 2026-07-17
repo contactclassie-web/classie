@@ -8815,57 +8815,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* ── Per-Color Images (when variant_type = color) ── */}
-              {productModal.data.variant_type === "color" && (() => {
-                const rawOpts = productModal.data.variants ?? [];
-                // Detect rich format vs legacy strings
-                const isRich = rawOpts.length > 0 && typeof rawOpts[0] === "object";
-                const richOpts: Array<{name:string;hex:string;images:string[]}> = isRich
-                  ? rawOpts as unknown as Array<{name:string;hex:string;images:string[]}>
-                  : (rawOpts as string[]).map((n:string) => ({ name: n, hex: "#cccccc", images: [] }));
 
-                const updateRich = (updated: typeof richOpts) => {
-                  setProductField("variants", updated as unknown as string[]);
-                };
-
-                return (
-                  <div className="border border-[#3B5373]/20 rounded-xl overflow-hidden mt-1">
-                    <div className="flex items-center gap-2 px-4 py-3 bg-[#3B5373]/5 border-b border-[#3B5373]/10">
-                      <span className="text-base">🎨</span>
-                      <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Per-Colour Images</p>
-                      <p className="text-[10px] text-gray-400 ml-1">— Each colour can have its own photos</p>
-                    </div>
-                    <div className="p-4 space-y-4">
-                      {richOpts.map((col, ci) => (
-                        <div key={ci} className="border border-gray-100 rounded-lg p-3 bg-gray-50 space-y-2">
-                          <div className="flex items-center gap-3">
-                            <input type="color" value={col.hex || "#cccccc"}
-                              onChange={e => { const u=[...richOpts]; u[ci]={...u[ci],hex:e.target.value}; updateRich(u); }}
-                              className="w-9 h-9 rounded cursor-pointer border border-gray-200" title="Pick colour" />
-                            <input type="text" value={col.name}
-                              onChange={e => { const u=[...richOpts]; u[ci]={...u[ci],name:e.target.value}; updateRich(u); }}
-                              className="flex-1 border border-gray-200 text-sm px-3 py-1.5 rounded focus:outline-none focus:border-[#3B5373]"
-                              placeholder="Colour name e.g. Gold" />
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Images for {col.name || "this colour"} (one URL per line)</p>
-                            <textarea rows={3}
-                              value={(col.images||[]).join("\n")}
-                              onChange={e => { const u=[...richOpts]; u[ci]={...u[ci],images:e.target.value.split("\n").map(x=>x.trim()).filter(Boolean)}; updateRich(u); }}
-                              className="w-full border border-gray-200 text-xs px-3 py-2 rounded focus:outline-none focus:border-[#3B5373] font-mono"
-                              placeholder={"https://res.cloudinary.com/...\nhttps://res.cloudinary.com/..."} />
-                            <p className="text-[10px] text-gray-400 mt-1">Cloudinary pe upload karo → URL copy karo → yahan paste karo</p>
-                          </div>
-                        </div>
-                      ))}
-                      <button onClick={() => updateRich([...richOpts, {name:"",hex:"#cccccc",images:[]}])}
-                        className="w-full py-2 border border-dashed border-[#3B5373]/40 text-[#3B5373] text-xs rounded-lg hover:bg-[#3B5373]/5 transition-colors">
-                        + Add Colour Option
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
 
               {productModal.data.category === "heels" && (
                 <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50">
