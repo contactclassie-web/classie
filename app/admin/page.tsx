@@ -2766,7 +2766,10 @@ export default function AdminPage() {
         const { error } = await supabase.from("products").insert([rest]);
         saveError = error;
       } else {
-        const { error } = await supabase.from("products").update(rest).eq("id", id);
+        // Remove slug from update payload — changing slug breaks FK constraints
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { slug: _slug, ...restWithoutSlug } = rest;
+        const { error } = await supabase.from("products").update(restWithoutSlug).eq("id", id);
         saveError = error;
       }
       if (saveError) { alert("Save failed: " + saveError.message); return; }
