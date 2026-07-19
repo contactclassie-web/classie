@@ -5387,29 +5387,67 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              {/* ── Testimonial ───────────────────────────────────── */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-                <div className="flex items-center justify-between mb-1">
-                  <div>
-                    <h2 className="text-base font-semibold text-gray-800">Testimonial</h2>
-                    <p className="text-xs text-gray-400 mt-0.5">Customer quote section below brand strip.</p>
+              {/* ── Testimonials Carousel ─────────────────────────── */}
+              {(() => {
+                // Parse multi-testimonial JSON stored in coll_testimonial_text
+                // Format: JSON array [{quote,author},...] or legacy single string
+                let items: {quote:string;author:string}[] = [];
+                try { const p = JSON.parse(collTestText); if(Array.isArray(p)) items = p; } catch { items = []; }
+                if (!items.length) items = [{ quote: collTestText || "", author: collTestAuthor || "" }];
+                // Pad to at least 1
+                if (!items.length) items = [{ quote: "", author: "" }];
+
+                const updateItems = (newItems: typeof items) => {
+                  setCollTestText(JSON.stringify(newItems));
+                  if (newItems.length === 1) setCollTestAuthor(newItems[0].author);
+                };
+
+                return (
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+                    <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-800">Testimonials Carousel</h2>
+                        <p className="text-xs text-gray-400 mt-0.5">Auto-slides every 5 sec. Shows on Collections + Homepage.</p>
+                      </div>
+                      <button onClick={saveCollTest} disabled={collTestSaving}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white text-xs rounded-lg hover:bg-[#2c4159] disabled:opacity-50 transition-colors">
+                        <Save className="w-4 h-4"/>{collTestSaving ? "Saving…" : "Save All"}
+                      </button>
+                    </div>
+
+                    {items.map((item, idx) => (
+                      <div key={idx} className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-semibold text-[#3B5373] uppercase tracking-wider">Testimonial {idx + 1}</p>
+                          {items.length > 1 && (
+                            <button onClick={() => updateItems(items.filter((_,i)=>i!==idx))}
+                              className="text-[10px] text-red-400 hover:text-red-600 transition-colors">✕ Remove</button>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Quote</label>
+                          <textarea value={item.quote} onChange={e=>{ const u=[...items]; u[idx]={...u[idx],quote:e.target.value}; updateItems(u); }} rows={3}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373] resize-none bg-white"
+                            placeholder='"I bought two pairs and love them!"' />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Author</label>
+                          <input value={item.author} onChange={e=>{ const u=[...items]; u[idx]={...u[idx],author:e.target.value}; updateItems(u); }}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373] bg-white"
+                            placeholder="— Priya S., Mumbai" />
+                        </div>
+                      </div>
+                    ))}
+
+                    {items.length < 5 && (
+                      <button onClick={() => updateItems([...items, { quote: "", author: "" }])}
+                        className="w-full py-2.5 border border-dashed border-[#3B5373]/40 text-[#3B5373] text-xs rounded-xl hover:bg-[#3B5373]/5 transition-colors">
+                        + Add Testimonial (max 5)
+                      </button>
+                    )}
                   </div>
-                  <button onClick={saveCollTest} disabled={collTestSaving}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#3B5373] text-white text-xs rounded-lg hover:bg-[#2c4159] disabled:opacity-50 transition-colors">
-                    <Save className="w-4 h-4"/>{collTestSaving ? "Saving…" : "Save Testimonial"}
-                  </button>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Quote Text</label>
-                  <textarea value={collTestText} onChange={e=>setCollTestText(e.target.value)} rows={3}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373] resize-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Author</label>
-                  <input value={collTestAuthor} onChange={e=>setCollTestAuthor(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#3B5373]" placeholder="— Priya S., Mumbai" />
-                </div>
-              </div>
+                );
+              })()}
 
             </div>
           )}

@@ -30,6 +30,12 @@ const config: Config = {
       borderRadius: {
         pill: "24px",
       },
+      keyframes: {
+        "fade-in": { "0%": { opacity: "0", transform: "translateY(6px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
+      },
+      animation: {
+        "fade-in": "fade-in 0.5s ease both",
+      },
     },
   },
   plugins: [],

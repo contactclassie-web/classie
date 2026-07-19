@@ -10,6 +10,7 @@ import TrustBand from "@/components/TrustBand";
 import CategoryLinks from "@/components/CategoryLinks";
 import PhilosophySection from "@/components/PhilosophySection";
 import StyleInspoSection from "@/components/StyleInspoSection";
+import TestimonialCarousel from "@/components/TestimonialCarousel";
 import {
   Product,
   CURATED_COLLECTIONS,
@@ -149,11 +150,12 @@ export default async function HomePage() {
   const NL_KEYS = [
     "nl_eyebrow","nl_heading","nl_heading_italic","nl_subtext","nl_placeholder","nl_btn_text","nl_success_text",
   ];
+  const TEST_KEYS = ["coll_testimonial_text", "coll_testimonial_author"];
 
   const { data: settingsRows } = await sb
     .from("site_settings")
     .select("key,value")
-    .in("key", [...HERO_KEYS, ...PHIL_KEYS, ...IG_KEYS, ...CAT_KEYS, ...FP_KEYS, ...NL_KEYS]);
+    .in("key", [...HERO_KEYS, ...PHIL_KEYS, ...IG_KEYS, ...CAT_KEYS, ...FP_KEYS, ...NL_KEYS, ...TEST_KEYS]);
 
   const cfg: Record<string, string> = {};
   (settingsRows ?? []).forEach((r: { key: string; value: string }) => {
@@ -267,7 +269,17 @@ export default async function HomePage() {
       {/* ══ 7. STYLE INSPO ════════════════════════════════════════════════ */}
       <StyleInspoSection initialImages={igImages} initialSettings={cfg} />
 
-      {/* ══ 8. NEWSLETTER ═════════════════════════════════════════════════ */}
+      {/* ══ 8. TESTIMONIALS CAROUSEL ══════════════════════════════════════ */}
+      {(() => {
+        const rawText   = cfg["coll_testimonial_text"] || "";
+        const rawAuthor = cfg["coll_testimonial_author"] || "";
+        let items: { quote: string; author: string }[] = [];
+        try { const p = JSON.parse(rawText); if (Array.isArray(p)) items = p; } catch { items = []; }
+        if (!items.length && rawText) items = [{ quote: rawText, author: rawAuthor }];
+        return items.length > 0 ? <TestimonialCarousel items={items} intervalMs={5000} /> : null;
+      })()}
+
+      {/* ══ 9. NEWSLETTER ═════════════════════════════════════════════════ */}
       <NewsletterSection initialSettings={nlSettings} />
     </>
   );

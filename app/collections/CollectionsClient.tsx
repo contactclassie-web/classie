@@ -6,6 +6,7 @@ import Image from "next/image";
 import { SlidersHorizontal, ChevronDown, Heart, ShieldCheck, Layers, TrendingUp } from "lucide-react";
 import { Product } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
+import TestimonialCarousel from "@/components/TestimonialCarousel";
 
 interface Category {
   name: string;
@@ -379,17 +380,13 @@ export default function CollectionsClient({ initialProducts, categories }: Props
         </section>
       )}
 
-      {/* ── TESTIMONIAL — hidden if blank ─────────────────────────────────── */}
-      {showTest && (
-        <section className="bg-[#faf9f7] border-t border-[#e8e0d5] py-20 text-center">
-          <div className="max-w-[560px] mx-auto px-6">
-            <p className="font-serif text-[56px] text-[#e8e0d5] leading-[0.5] mb-5">"</p>
-            <p className="text-[#3B5373] text-sm tracking-[3px] mb-5">★★★★★</p>
-            <p className="font-serif text-[21px] italic text-[#1a1a1a] leading-[1.55] mb-4 font-light">{testText}</p>
-            {testAuthor && <p className="text-[10px] tracking-[0.18em] uppercase text-gray-400">{testAuthor}</p>}
-          </div>
-        </section>
-      )}
+      {/* ── TESTIMONIALS CAROUSEL ─────────────────────────────────────────── */}
+      {(() => {
+        let items: {quote:string;author:string}[] = [];
+        try { const p = JSON.parse(testText); if(Array.isArray(p)) items = p; } catch { items = []; }
+        if (!items.length && testText) items = [{ quote: testText, author: testAuthor || "" }];
+        return items.length > 0 ? <TestimonialCarousel items={items} intervalMs={5000} /> : null;
+      })()}
 
     </main>
   );
