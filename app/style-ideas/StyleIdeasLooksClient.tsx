@@ -94,7 +94,7 @@ function LookCard({ look, showTag = true, aspect = "3/4", radius = "rounded-none
       {/* Media */}
       <div className={`relative overflow-hidden bg-[#f5f5f5] ${radius}`}
         style={{ aspectRatio: cardH > 0 ? undefined : aspect, height: cardH > 0 ? `${cardH}px` : undefined }}>
-        {look.media_type === "video" ? (
+        {(look.media_type === "video" || look.image_url?.match(/\.(mp4|webm|mov)(\?|$)/i) || look.image_url?.includes("/video/")) ? (
           <video
             src={look.image_url}
             autoPlay muted loop playsInline
