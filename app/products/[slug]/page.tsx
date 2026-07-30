@@ -148,11 +148,12 @@ export default async function ProductPage({ params }: Props) {
   // Color variants
   let colorVariants: ColorVariant[] = [];
   try {
-    const { data: myRow } = await supabase
+    const { data: myRows } = await supabase
       .from("product_color_variants")
       .select("*")
       .eq("product_slug", slug)
-      .maybeSingle();
+      .limit(1);
+    const myRow = myRows?.[0] ?? null;
     if (myRow) {
       const { data: groupRows } = await supabase
         .from("product_color_variants")
