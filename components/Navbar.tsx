@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabase";
 // Static nav links (non-category)
 const leftLinks = [
   { label: "Style Ideas", href: "/style-ideas" },
+  { label: "Journal", href: "/blog" },
 ];
 const rightLinks = [
   { label: "Hot Deals", href: "/hot-deals" },

@@ -8,7 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home, Layout, Tag, Ruler,
+  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -299,6 +299,27 @@ const EMPTY_STYLE_INSPO: StyleInspo = {
   description: "", media_type: "image", look_number: 0,
 };
 
+interface BlogPost {
+  id?: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  cover_image: string;
+  category: string;
+  author: string;
+  published_at: string;
+  active: boolean;
+  is_featured: boolean;
+}
+
+const EMPTY_BLOG_POST: BlogPost = {
+  slug: "", title: "", excerpt: "", content: "", cover_image: "",
+  category: "Style Guide", author: "CLASSIE Team",
+  published_at: new Date().toISOString().split("T")[0],
+  active: true, is_featured: false,
+};
+
 interface BundleOffer {
   id?: string;
   main_product_slug: string;
@@ -365,8 +386,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -431,6 +452,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "settings":       "settings",
   "footer":         "footer",
   "messages":       "messages",
+  "blog":           "blog",
 };
 
 const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
@@ -509,6 +531,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   settings: [],
   footer:   [],
   messages: [],
+  blog:     [{ id: "blog", label: "Blog Posts" }],
 };
 
 // ── ReviewEditForm (inline helper) ───────────────────────────────────────
@@ -1221,6 +1244,15 @@ export default function AdminPage() {
   });
   const [styleInspoSaving, setStyleInspoSaving] = useState(false);
   const [deleteStyleInspoConfirm, setDeleteStyleInspoConfirm] = useState<string | null>(null);
+
+  // Blog Posts
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [blogLoading, setBlogLoading] = useState(false);
+  const [blogModal, setBlogModal] = useState<{ open: boolean; mode: "add" | "edit"; data: BlogPost }>({
+    open: false, mode: "add", data: { ...EMPTY_BLOG_POST },
+  });
+  const [blogSaving, setBlogSaving] = useState(false);
+  const [deleteBlogConfirm, setDeleteBlogConfirm] = useState<string | null>(null);
 
   // Footer link editors
   const DEFAULT_FOOTER_SHOP: FooterLinkItem[] = [
@@ -2115,6 +2147,15 @@ export default function AdminPage() {
     finally { setStyleInspoLoading(false); }
   }, []);
 
+  const fetchBlogPosts = useCallback(async () => {
+    setBlogLoading(true);
+    try {
+      const { data, error } = await supabase.from("blog_posts").select("*").order("published_at", { ascending: false });
+      if (!error && data) setBlogPosts(data as BlogPost[]);
+    } catch { /* ignore */ }
+    finally { setBlogLoading(false); }
+  }, []);
+
   const fetchAdvSettings = useCallback(async () => {
     const keys = ["adv_shop_mobile","adv_shop_desktop","adv_shop_gap","adv_coll_mobile","adv_coll_desktop","adv_coll_gap","adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_inspo_desktop","adv_inspo_gap","adv_related_mobile","adv_related_desktop","adv_related_gap","adv_shop_aspect","adv_shop_radius","adv_shop_card_h","adv_coll_aspect","adv_coll_radius","adv_coll_card_h","adv_picks_aspect","adv_picks_radius","adv_picks_card_h","adv_inspo_aspect","adv_inspo_radius","adv_inspo_card_h","adv_related_aspect","adv_related_radius","adv_related_card_h"];
     const { data } = await supabase.from("site_settings").select("key,value").in("key", keys);
@@ -2705,7 +2746,8 @@ export default function AdminPage() {
     if (tab === "testimonials") fetchTestimonials();
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
+    if (tab === "blog") fetchBlogPosts();
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -3574,6 +3616,7 @@ export default function AdminPage() {
       items: [
         { id: "homepage",   label: "Homepage",  icon: Home },
         { id: "hot-deals",  label: "Hot Deals", icon: Tag },
+        { id: "blog",       label: "Blog",      icon: BookOpen },
       ],
     },
     {
@@ -3648,6 +3691,7 @@ export default function AdminPage() {
               if (id === "shipping-policy") return "sp-hero";
               if (id === "size-guide") return "sg-hero";
               if (id === "returns") return "re-hero";
+              if (id === "blog") return "blog";
               return (SECTION_SUBTABS[id as keyof typeof SECTION_SUBTABS][0]?.id ?? "dashboard");
             };
             return (
@@ -8774,8 +8818,326 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* ══════════════════════════════════════
+              BLOG POSTS
+          ══════════════════════════════════════ */}
+          {tab === "blog" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Blog Posts</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">{blogPosts.length} posts · <a href="/blog" target="_blank" className="text-[#3B5373] hover:underline">View Journal ↗</a></p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={fetchBlogPosts} disabled={blogLoading}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-400 hover:text-[#3B5373] border border-gray-200 rounded-xl transition-colors">
+                    <RefreshCw className={`w-3.5 h-3.5 ${blogLoading ? "animate-spin" : ""}`} />Refresh
+                  </button>
+                  <button
+                    onClick={() => setBlogModal({ open: true, mode: "add", data: { ...EMPTY_BLOG_POST, published_at: new Date().toISOString().split("T")[0] } })}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] transition-colors">
+                    <Plus className="w-3.5 h-3.5" />New Post
+                  </button>
+                </div>
+              </div>
+
+              {blogLoading ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400 text-sm">Loading…</div>
+              ) : blogPosts.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                  <BookOpen className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm">No blog posts yet.</p>
+                  <p className="text-gray-300 text-xs mt-1">Make sure you ran the SQL migration in Supabase dashboard first.</p>
+                  <a href="https://hrjvxwqvxvibtwyfoyca.supabase.co" target="_blank"
+                    className="inline-block mt-3 text-xs text-[#3B5373] hover:underline">Open Supabase Dashboard ↗</a>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-100 bg-gray-50">
+                        <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Cover</th>
+                        <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Title</th>
+                        <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Category</th>
+                        <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Date</th>
+                        <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Featured</th>
+                        <th className="text-center text-xs text-gray-400 font-medium px-4 py-3">Active</th>
+                        <th className="text-right text-xs text-gray-400 font-medium px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {blogPosts.map((post) => (
+                        <tr key={post.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                          <td className="px-4 py-3">
+                            {post.cover_image ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={post.cover_image} alt="" className="w-12 h-8 object-cover rounded" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                            ) : (
+                              <div className="w-12 h-8 bg-gray-100 rounded flex items-center justify-center">
+                                <BookOpen className="w-4 h-4 text-gray-300" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="text-xs font-medium text-gray-800 line-clamp-2 max-w-[200px]">{post.title}</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5">{post.slug}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="text-[10px] font-medium text-[#3B5373] bg-[#3B5373]/10 px-2 py-0.5 rounded">{post.category}</span>
+                          </td>
+                          <td className="px-4 py-3 text-xs text-gray-500">
+                            {new Date(post.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              onClick={async () => {
+                                await supabase.from("blog_posts").update({ is_featured: !post.is_featured }).eq("id", post.id!);
+                                setBlogPosts(prev => prev.map(p => p.id === post.id ? { ...p, is_featured: !p.is_featured } : p));
+                              }}
+                              className={`text-xs px-2 py-0.5 rounded transition-colors ${post.is_featured ? "bg-amber-100 text-amber-700 hover:bg-amber-200" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}
+                            >
+                              {post.is_featured ? "⭐ Yes" : "No"}
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              onClick={async () => {
+                                await supabase.from("blog_posts").update({ active: !post.active }).eq("id", post.id!);
+                                setBlogPosts(prev => prev.map(p => p.id === post.id ? { ...p, active: !p.active } : p));
+                              }}
+                              className={`text-xs px-2 py-0.5 rounded transition-colors ${post.active ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}
+                            >
+                              {post.active ? "Live" : "Off"}
+                            </button>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <a href={`/blog/${post.slug}`} target="_blank"
+                                className="p-1.5 text-gray-400 hover:text-[#3B5373] hover:bg-gray-50 rounded-lg transition-colors">
+                                <Eye className="w-3.5 h-3.5" />
+                              </a>
+                              <button
+                                onClick={() => setBlogModal({ open: true, mode: "edit", data: { ...post, published_at: post.published_at ? post.published_at.split("T")[0] : new Date().toISOString().split("T")[0] } as BlogPost })}
+                                className="p-1.5 text-gray-400 hover:text-[#3B5373] hover:bg-gray-50 rounded-lg transition-colors">
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => setDeleteBlogConfirm(post.id!)}
+                                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Delete confirm */}
+              {deleteBlogConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                  <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
+                    <p className="font-semibold text-gray-800 mb-2">Delete this blog post?</p>
+                    <p className="text-xs text-gray-400 mb-4">This cannot be undone.</p>
+                    <div className="flex gap-3 justify-center">
+                      <button onClick={() => setDeleteBlogConfirm(null)} className="px-5 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">Cancel</button>
+                      <button onClick={async () => {
+                        await supabase.from("blog_posts").delete().eq("id", deleteBlogConfirm);
+                        await revalidateSite();
+                        setDeleteBlogConfirm(null);
+                        await fetchBlogPosts();
+                      }} className="px-5 py-2 text-sm bg-red-500 text-white rounded-xl hover:bg-red-600">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </main>
+
+      {/* ══════════════════════════════════════════════════
+          BLOG MODAL
+      ══════════════════════════════════════════════════ */}
+      {blogModal.open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-2xl my-8 shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="font-semibold text-gray-800">
+                {blogModal.mode === "add" ? "New Blog Post" : "Edit Blog Post"}
+              </h2>
+              <button onClick={() => setBlogModal(m => ({ ...m, open: false }))} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4 max-h-[75vh] overflow-y-auto">
+              {/* Title */}
+              <div>
+                <label className={labelCls}>Title *</label>
+                <input
+                  type="text"
+                  value={blogModal.data.title}
+                  onChange={(e) => {
+                    const title = e.target.value;
+                    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+                    setBlogModal(m => ({ ...m, data: { ...m.data, title, ...(m.mode === "add" ? { slug } : {}) } }));
+                  }}
+                  className={inputCls}
+                  placeholder="e.g. 5 Ways to Style Block Heels"
+                />
+              </div>
+              {/* Slug */}
+              <div>
+                <label className={labelCls}>Slug *</label>
+                <input
+                  type="text"
+                  value={blogModal.data.slug}
+                  onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, slug: e.target.value } }))}
+                  className={inputCls}
+                  placeholder="e.g. 5-ways-to-style-block-heels"
+                />
+              </div>
+              {/* Category */}
+              <div>
+                <label className={labelCls}>Category</label>
+                <select
+                  value={blogModal.data.category}
+                  onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, category: e.target.value } }))}
+                  className={inputCls}
+                >
+                  {["Style Guide","Trend Report","How To Style","Care Guide","Brand Story"].map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Cover Image */}
+              <div>
+                <label className={labelCls}>Cover Image URL</label>
+                <input
+                  type="text"
+                  value={blogModal.data.cover_image}
+                  onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, cover_image: e.target.value } }))}
+                  className={inputCls}
+                  placeholder="https://..."
+                />
+                {blogModal.data.cover_image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={blogModal.data.cover_image} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                )}
+              </div>
+              {/* Excerpt */}
+              <div>
+                <label className={labelCls}>Excerpt</label>
+                <textarea
+                  rows={3}
+                  value={blogModal.data.excerpt}
+                  onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, excerpt: e.target.value } }))}
+                  className={inputCls + " resize-y"}
+                  placeholder="Short description shown in blog listing…"
+                />
+              </div>
+              {/* Content */}
+              <div>
+                <label className={labelCls}>Content <span className="font-normal text-gray-400 normal-case">(HTML supported)</span></label>
+                <textarea
+                  rows={10}
+                  value={blogModal.data.content}
+                  onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, content: e.target.value } }))}
+                  className={inputCls + " resize-y font-mono text-xs"}
+                  placeholder="<p>Your blog content here...</p>"
+                />
+              </div>
+              {/* Author */}
+              <div>
+                <label className={labelCls}>Author</label>
+                <input
+                  type="text"
+                  value={blogModal.data.author}
+                  onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, author: e.target.value } }))}
+                  className={inputCls}
+                  placeholder="CLASSIE Team"
+                />
+              </div>
+              {/* Published Date */}
+              <div>
+                <label className={labelCls}>Published Date</label>
+                <input
+                  type="date"
+                  value={blogModal.data.published_at}
+                  onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, published_at: e.target.value } }))}
+                  className={inputCls}
+                />
+              </div>
+              {/* Toggles */}
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={blogModal.data.is_featured}
+                    onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, is_featured: e.target.checked } }))}
+                    className="w-4 h-4 accent-[#3B5373]"
+                  />
+                  Featured post (shown at top of /blog)
+                </label>
+                <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={blogModal.data.active}
+                    onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, active: e.target.checked } }))}
+                    className="w-4 h-4 accent-[#3B5373]"
+                  />
+                  Active (visible on site)
+                </label>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3">
+              <button onClick={() => setBlogModal(m => ({ ...m, open: false }))}
+                className="px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50">
+                Cancel
+              </button>
+              <button
+                disabled={blogSaving}
+                onClick={async () => {
+                  setBlogSaving(true);
+                  try {
+                    const d = blogModal.data;
+                    const payload = {
+                      slug: d.slug,
+                      title: d.title,
+                      excerpt: d.excerpt,
+                      content: d.content,
+                      cover_image: d.cover_image,
+                      category: d.category,
+                      author: d.author,
+                      published_at: d.published_at ? new Date(d.published_at).toISOString() : new Date().toISOString(),
+                      active: d.active,
+                      is_featured: d.is_featured,
+                    };
+                    if (blogModal.mode === "add") {
+                      await supabase.from("blog_posts").insert([payload]);
+                    } else {
+                      await supabase.from("blog_posts").update(payload).eq("id", d.id!);
+                    }
+                    await revalidateSite();
+                    setBlogModal(m => ({ ...m, open: false }));
+                    await fetchBlogPosts();
+                  } finally {
+                    setBlogSaving(false);
+                  }
+                }}
+                className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-xl hover:bg-[#2d3f4f] disabled:opacity-60 transition-colors"
+              >
+                <Save className="w-4 h-4" />
+                {blogSaving ? "Saving…" : blogModal.mode === "add" ? "Publish Post" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════
           PRODUCT MODAL
