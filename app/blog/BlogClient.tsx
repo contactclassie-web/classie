@@ -37,54 +37,6 @@ export default function BlogClient({ posts, categories: propCategories }: { post
 
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif", background: "#fff", color: "#1a1a1a" }}>
-      {/* ── Hero / Journal Header ── */}
-      <div
-        style={{
-          textAlign: "center",
-          padding: "64px 60px 40px",
-          borderBottom: "1px solid #e5e5e5",
-        }}
-      >
-        <p
-          style={{
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: "0.65rem",
-            fontWeight: 500,
-            letterSpacing: "0.25em",
-            textTransform: "uppercase",
-            color: "#888",
-            marginBottom: "12px",
-          }}
-        >
-          THE CLASSIE JOURNAL
-        </p>
-        <h1
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "3.4rem",
-            fontWeight: 400,
-            color: "#1a1a1a",
-            letterSpacing: "0.02em",
-            lineHeight: 1.1,
-            marginBottom: "14px",
-            fontStyle: "italic",
-          }}
-        >
-          Style. Stories. Soul.
-        </h1>
-        <p
-          style={{
-            fontFamily: "'Poppins', sans-serif",
-            fontSize: "0.8rem",
-            color: "#888",
-            fontWeight: 300,
-            letterSpacing: "0.04em",
-          }}
-        >
-          Discover styling tips, trend reports, and stories from the world of CLASSIE.
-        </p>
-      </div>
-
       {/* ── Main Content ── */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 40px" }}>
 
