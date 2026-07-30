@@ -467,8 +467,8 @@ export default function ShopCategoryPageClient({
         </section>
       )}
 
-      {/* ── Clip Type Pill Filter (clips page only) ── */}
-      {settingsPrefix === "clips" && filterTypes.length > 0 && (
+      {/* ── Clip Type Pill Filter (clips page only) — hidden when charm filter section is shown above ── */}
+      {false && settingsPrefix === "clips" && filterTypes.length > 0 && (
         <section className="py-8 bg-white border-b border-gray-100">
           <div className="max-w-[1280px] mx-auto px-4 md:px-10">
             <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-[#3B5373] text-center mb-5">
