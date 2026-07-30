@@ -29,9 +29,9 @@ interface Props {
 }
 
 export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, showTag = true, heading = "Shop the Look", mobileCols = 2, gap = 16, aspect = "3/4", radius = "sharp", cardH = 0 }: Props) {
-  const [activeTab, setActiveTab] = useState("All Looks");
+  const [activeTab, setActiveTab] = useState(occasions[0] || "");
 
-  const filtered = activeTab === "All Looks"
+  const filtered = activeTab === ""
     ? looks
     : looks.filter(l => l.tag === activeTab);
 
