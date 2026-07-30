@@ -8710,6 +8710,22 @@ export default function AdminPage() {
                   </select>
                 </div>
               </div>
+              {productModal.data.category === "shoe-charms" && (
+                <div>
+                  <label className={labelCls}>🏷️ Tag — Shoe Charm Type <span className="text-gray-400 font-normal normal-case">(used for website filter)</span></label>
+                  <select
+                    value={productModal.data.tags?.[0] ?? ""}
+                    onChange={(e) => setProductField("tags", e.target.value ? [e.target.value] : [])}
+                    className={inputCls}
+                  >
+                    <option value="">— Select tag —</option>
+                    <option value="Rhinestone Shoe Charms">Rhinestone Shoe Charms</option>
+                    <option value="Bow Shoe Charms">Bow Shoe Charms</option>
+                    <option value="Flower Shoe Charms">Flower Shoe Charms</option>
+                    <option value="Pearl Anklet">Pearl Anklet</option>
+                  </select>
+                </div>
+              )}
               <div>
                 <label className={labelCls}>Description</label>
                 <textarea rows={3} value={productModal.data.description} onChange={(e) => setProductField("description", e.target.value)} className={inputCls} placeholder="Product description…" />
