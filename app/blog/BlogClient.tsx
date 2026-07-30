@@ -24,9 +24,9 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-export default function BlogClient({ posts }: { posts: BlogPost[] }) {
+export default function BlogClient({ posts, categories: propCategories }: { posts: BlogPost[]; categories?: string[] }) {
   const featured = posts.find((p) => p.is_featured) || posts[0] || null;
-  const categories = ["All", ...Array.from(new Set(posts.map((p) => p.category)))];
+  const categories = ["All", ...(propCategories ?? Array.from(new Set(posts.map((p) => p.category))))];
   const [activeFilter, setActiveFilter] = useState("All");
 
   const latestPosts = posts.filter((p) => p.id !== featured?.id);

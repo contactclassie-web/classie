@@ -32,7 +32,19 @@ async function getPosts() {
   }
 }
 
+async function getCategories(): Promise<string[]> {
+  try {
+    const sb = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data } = await sb.from("site_settings").select("value").eq("key", "blog_categories").maybeSingle();
+    if (data?.value) { const parsed = JSON.parse(data.value); if (Array.isArray(parsed)) return parsed; }
+  } catch { /* ignore */ }
+  return ["Style Guide", "Trend Report", "How To Style", "Care Guide", "Brand Story"];
+}
+
 export default async function BlogPage() {
-  const posts = await getPosts();
-  return <BlogClient posts={posts} />;
+  const [posts, categories] = await Promise.all([getPosts(), getCategories()]);
+  return <BlogClient posts={posts} categories={categories} />;
 }

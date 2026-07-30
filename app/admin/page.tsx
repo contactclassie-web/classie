@@ -1248,6 +1248,9 @@ export default function AdminPage() {
   // Blog Posts
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [blogLoading, setBlogLoading] = useState(false);
+  const [blogCategories, setBlogCategories] = useState<string[]>(["Style Guide","Trend Report","How To Style","Care Guide","Brand Story"]);
+  const [newBlogCategory, setNewBlogCategory] = useState("");
+  const [blogCatSaving, setBlogCatSaving] = useState(false);
   const [blogModal, setBlogModal] = useState<{ open: boolean; mode: "add" | "edit"; data: BlogPost }>({
     open: false, mode: "add", data: { ...EMPTY_BLOG_POST },
   });
@@ -2150,8 +2153,12 @@ export default function AdminPage() {
   const fetchBlogPosts = useCallback(async () => {
     setBlogLoading(true);
     try {
-      const { data, error } = await supabase.from("blog_posts").select("*").order("published_at", { ascending: false });
+      const [{ data, error }, { data: catRow }] = await Promise.all([
+        supabase.from("blog_posts").select("*").order("published_at", { ascending: false }),
+        supabase.from("site_settings").select("value").eq("key", "blog_categories").maybeSingle(),
+      ]);
       if (!error && data) setBlogPosts(data as BlogPost[]);
+      if (catRow?.value) { try { const parsed = JSON.parse(catRow.value); if (Array.isArray(parsed)) setBlogCategories(parsed); } catch { /* ignore */ } }
     } catch { /* ignore */ }
     finally { setBlogLoading(false); }
   }, []);
@@ -8936,6 +8943,59 @@ export default function AdminPage() {
               )}
 
               {/* Delete confirm */}
+              {/* ── Blog Category Manager ─────────────────────── */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <h3 className="text-sm font-semibold text-gray-800 mb-1">🏷️ Manage Categories</h3>
+                <p className="text-xs text-gray-400 mb-4">Add or remove blog categories. These appear as filter pills on the blog page and in the post editor.</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {blogCategories.map((cat) => (
+                    <span key={cat} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#3B5373]/10 text-[#3B5373] text-xs rounded-full font-medium">
+                      {cat}
+                      <button
+                        onClick={async () => {
+                          const updated = blogCategories.filter(c => c !== cat);
+                          setBlogCategories(updated);
+                          await supabase.from("site_settings").upsert({ key: "blog_categories", value: JSON.stringify(updated) });
+                        }}
+                        className="w-4 h-4 rounded-full bg-[#3B5373]/20 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition-colors text-[10px] font-bold"
+                      >×</button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newBlogCategory}
+                    onChange={e => setNewBlogCategory(e.target.value)}
+                    onKeyDown={async e => {
+                      if (e.key === "Enter" && newBlogCategory.trim()) {
+                        const updated = [...blogCategories, newBlogCategory.trim()];
+                        setBlogCategories(updated);
+                        setNewBlogCategory("");
+                        await supabase.from("site_settings").upsert({ key: "blog_categories", value: JSON.stringify(updated) });
+                      }
+                    }}
+                    placeholder="New category name..."
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-[#3B5373]"
+                  />
+                  <button
+                    disabled={!newBlogCategory.trim() || blogCatSaving}
+                    onClick={async () => {
+                      if (!newBlogCategory.trim()) return;
+                      setBlogCatSaving(true);
+                      const updated = [...blogCategories, newBlogCategory.trim()];
+                      setBlogCategories(updated);
+                      setNewBlogCategory("");
+                      await supabase.from("site_settings").upsert({ key: "blog_categories", value: JSON.stringify(updated) });
+                      setBlogCatSaving(false);
+                    }}
+                    className="px-4 py-2 bg-[#3B5373] text-white rounded-xl text-xs font-medium hover:bg-[#2d3f4f] disabled:opacity-40 transition-colors"
+                  >
+                    + Add
+                  </button>
+                </div>
+              </div>
+
               {deleteBlogConfirm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
                   <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
@@ -9008,7 +9068,7 @@ export default function AdminPage() {
                   onChange={(e) => setBlogModal(m => ({ ...m, data: { ...m.data, category: e.target.value } }))}
                   className={inputCls}
                 >
-                  {["Style Guide","Trend Report","How To Style","Care Guide","Brand Story"].map(c => (
+                  {blogCategories.map(c => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
