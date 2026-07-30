@@ -9,6 +9,16 @@ const nextConfig = {
       { protocol: 'https', hostname: 'classie-eta.vercel.app', pathname: '/**' },
     ],
   },
+  async redirects() {
+    return [
+      // /shop/bow → /shop/clips (bow products moved to shoe-charms)
+      {
+        source: '/shop/bow',
+        destination: '/shop/clips',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
