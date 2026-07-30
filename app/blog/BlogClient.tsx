@@ -160,47 +160,6 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                 )}
 
                 {/* Meta */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "16px",
-                    marginBottom: "36px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontSize: "0.62rem",
-                      fontWeight: 600,
-                      letterSpacing: "0.18em",
-                      textTransform: "uppercase",
-                      color: "#3B5373",
-                    }}
-                  >
-                    {featured.category}
-                  </span>
-                  <span
-                    style={{
-                      width: "3px",
-                      height: "3px",
-                      borderRadius: "50%",
-                      background: "#888",
-                      opacity: 0.5,
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontFamily: "'Poppins', sans-serif",
-                      fontSize: "0.72rem",
-                      color: "#888",
-                      fontWeight: 300,
-                    }}
-                  >
-                    {formatDate(featured.published_at)}
-                  </span>
-                </div>
-
                 {/* Read Story button */}
                 <Link
                   href={`/blog/${featured.slug}`}
@@ -250,25 +209,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                       className="object-cover"
                       sizes="(max-width: 900px) 100vw, 55vw"
                     />
-                    {/* Category badge */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: "18px",
-                        left: "18px",
-                        background: "#fff",
-                        color: "#3B5373",
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: "0.6rem",
-                        fontWeight: 600,
-                        letterSpacing: "0.18em",
-                        textTransform: "uppercase",
-                        padding: "6px 14px",
-                        borderRadius: "20px",
-                      }}
-                    >
-                      {featured.category}
-                    </div>
+
                   </div>
                 ) : (
                   <div
