@@ -348,8 +348,8 @@ export default function ProductDetailClient({
               )}
             </div>
 
-            {/* ── Color Variants ── */}
-            {colorVariants.length > 1 && (
+            {/* ── Color Variants (cross-product navigation — heels only) ── */}
+            {colorVariants.length > 1 && colorVariants.some(v => v.product_slug !== product.slug) && (
               <div style={{ marginBottom: "20px" }}>
                 <p style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", marginBottom: "2px" }}>Available in</p>
                 <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#888", marginBottom: "12px" }}>
