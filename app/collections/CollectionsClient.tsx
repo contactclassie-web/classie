@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SlidersHorizontal, ChevronDown, Heart, ShieldCheck, Layers, TrendingUp } from "lucide-react";
+import { useWishlist } from "@/components/WishlistContext";
 import { Product } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
 import TestimonialCarousel from "@/components/TestimonialCarousel";
@@ -394,7 +395,8 @@ export default function CollectionsClient({ initialProducts, categories }: Props
 
 /* ── Product Card ────────────────────────────────────────────────────────── */
 function ProductCard({ product }: { product: Product }) {
-  const [wished, setWished] = useState(false);
+  const { isWished, toggle } = useWishlist();
+  const wished = isWished(product.slug);
   const discount = product.comparePrice > product.price
     ? Math.round((1 - product.price / product.comparePrice) * 100)
     : 0;
@@ -418,7 +420,7 @@ function ProductCard({ product }: { product: Product }) {
         )}
 
         <button
-          onClick={(e) => { e.preventDefault(); setWished(!wished); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(product.slug); }}
           className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 scale-[0.85] group-hover:scale-100 transition-all duration-[250ms]">
           <Heart className={`w-[14px] h-[14px] transition-colors ${wished ? "fill-red-500 stroke-red-500" : "stroke-gray-400"}`} strokeWidth={1.8} />
         </button>

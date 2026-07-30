@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/components/CartContext";
+import { WishlistProvider } from "@/components/WishlistContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@supabase/supabase-js";
@@ -82,9 +83,11 @@ export default async function RootLayout({
       </head>
       <body>
         <CartProvider>
-          <Navbar initialSettings={cfg} initialCategories={siteCategories ?? []} />
-          <main className="min-h-screen">{children}</main>
-          <Footer initialSettings={cfg} />
+          <WishlistProvider>
+            <Navbar initialSettings={cfg} initialCategories={siteCategories ?? []} />
+            <main className="min-h-screen">{children}</main>
+            <Footer initialSettings={cfg} />
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

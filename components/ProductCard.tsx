@@ -2,10 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Heart } from "lucide-react";
 import { Product } from "@/lib/products";
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import { useWishlist } from "@/components/WishlistContext";
 
 export default function ProductCard({ product, cardStyle }: { product: Product; cardStyle?: { aspectRatio?: string; borderRadius?: string; height?: number } }) {
+  const { isWished, toggle } = useWishlist();
+  const wished = isWished(product.slug);
   const discount =
     product.comparePrice > product.price
       ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
@@ -13,7 +17,7 @@ export default function ProductCard({ product, cardStyle }: { product: Product; 
 
   return (
     <Link href={`/products/${product.slug}`} className="group block">
-      {/* ── Image container — 4:5 editorial ratio */}
+      {/* ── Image container */}
       <div
         className={`relative overflow-hidden bg-[#faf8f6] ${cardStyle?.borderRadius || ""}`}
         style={{
@@ -29,8 +33,20 @@ export default function ProductCard({ product, cardStyle }: { product: Product; 
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* ── Subtle hover overlay — no text */}
+        {/* ── Subtle hover overlay */}
         <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* ── Wishlist heart button */}
+        <button
+          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(product.slug); }}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 hover:bg-white"
+        >
+          <Heart
+            className={`w-4 h-4 transition-colors ${wished ? "fill-red-500 stroke-red-500" : "stroke-gray-500"}`}
+            strokeWidth={1.8}
+          />
+        </button>
       </div>
 
       {/* ── Product info */}

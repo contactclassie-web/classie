@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ShoppingBag, Menu, X, Search, Heart } from "lucide-react";
+import { useWishlist } from "@/components/WishlistContext";
 import { useState, useEffect } from "react";
 import { useCart } from "./CartContext";
 import AnnouncementBar from "./AnnouncementBar";
@@ -34,6 +35,7 @@ const DEFAULT_CATS: Category[] = [
 
 export default function Navbar({ initialSettings, initialCategories }: NavbarProps) {
   const { count } = useCart();
+  const { count: wishCount } = useWishlist();
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [logoUrl, setLogoUrl]   = useState(initialSettings?.logo_image_url || LOGO_FALLBACK);
@@ -168,9 +170,14 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
             <button aria-label="Search" className="text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
               <Search className="w-[18px] h-[18px]" strokeWidth={1.6} />
             </button>
-            <button aria-label="Wishlist" className="text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
+            <Link href="/wishlist" aria-label="Wishlist" className="relative text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
               <Heart className="w-[18px] h-[18px]" strokeWidth={1.6} />
-            </button>
+              {wishCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 bg-red-400 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                  {wishCount > 9 ? "9+" : wishCount}
+                </span>
+              )}
+            </Link>
             <Link href="/cart" aria-label="Cart" className="relative text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
               <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.6} />
               {count > 0 && (
