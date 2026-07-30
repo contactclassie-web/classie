@@ -73,142 +73,121 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const supabase = serverSupabase();
   const { slug } = params;
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://hrjvxwqvxvibtwyfoyca.supabase.co";
+  const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z";
 
   const product = await getProductBySlugFromDB(slug);
   if (!product) notFound();
 
-  // Related products (same collection, exclude self)
-  const allProducts = await getProductsFromDB({ active: true });
+  // ── Round 1: All independent queries in parallel ──────────────────────
+  const [
+    allProducts,
+    offerRowsResult,
+    settingRowResult,
+    colorVariantFirstResult,
+    latestProductsRaw,
+    bestsellerProductsRaw,
+    reviewsRes,
+  ] = await Promise.all([
+    getProductsFromDB({ active: true }),
+    supabase.from("product_bundle_offers").select("*").eq("main_product_slug", slug).eq("active", true).order("sort_order"),
+    supabase.from("site_settings").select("value").eq("key", "feature_tiles").maybeSingle(),
+    supabase.from("product_color_variants").select("*").eq("product_slug", slug).limit(1),
+    getTabProductsFromDB("latest").catch(() => [] as Product[]),
+    getTabProductsFromDB("bestseller").catch(() => [] as Product[]),
+    fetch(
+      `${SUPABASE_URL}/rest/v1/product_reviews?product_slug=eq.${encodeURIComponent(slug)}&active=eq.true&order=review_date.desc,created_at.desc`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, next: { revalidate: 300 } }
+    ).catch(() => null),
+  ]);
+
   const related = allProducts
     .filter((p) => p.collection === product.collection && p.slug !== product.slug)
     .slice(0, 4);
 
+  // ── Round 2: Dependent queries in parallel ────────────────────────────
+  const offerRows = offerRowsResult.data ?? [];
+  const myRow = colorVariantFirstResult.data?.[0] ?? null;
+
+  const [accessoryRowsResult, colorGroupResult] = await Promise.all([
+    offerRows.length > 0
+      ? supabase.from("products").select("*").in("slug", offerRows.map((r: any) => r.accessory_slug)).eq("active", true)
+      : Promise.resolve({ data: [] }),
+    myRow
+      ? supabase.from("product_color_variants").select("*").eq("group_id", myRow.group_id).order("sort_order")
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  // ── Round 3: Final dependent query (product images for color variants) ─
+  const groupRows = colorGroupResult.data ?? [];
+  let variantProductRows: any[] = [];
+  if (groupRows.length > 0) {
+    const variantSlugs = groupRows.map((r: any) => r.product_slug);
+    const { data } = await supabase.from("products").select("slug,image").in("slug", variantSlugs);
+    variantProductRows = data ?? [];
+  }
+
+  // ── Assemble results ──────────────────────────────────────────────────
+
   // Bundle offers
   let bundleOffers: BundleOfferWithProduct[] = [];
   try {
-    const { data: offerRows } = await supabase
-      .from("product_bundle_offers")
-      .select("*")
-      .eq("main_product_slug", slug)
-      .eq("active", true)
-      .order("sort_order");
-
-    if (offerRows && offerRows.length > 0) {
-      const slugs = offerRows.map((r: any) => r.accessory_slug);
-      const { data: accessoryRows } = await supabase
-        .from("products")
-        .select("*")
-        .in("slug", slugs)
-        .eq("active", true);
-
-      if (accessoryRows) {
-        bundleOffers = offerRows
-          .map((offer: any) => {
-            const acc = (accessoryRows as any[]).find((p) => p.slug === offer.accessory_slug);
-            if (!acc) return null;
-            const p: Product = {
-              slug: acc.slug,
-              title: acc.title,
-              price: Number(acc.price),
-              comparePrice: Number(acc.compare_price),
-              category: acc.category,
-              collection: acc.category === "heels" ? "heels" : acc.slug.includes("fauxbow") || acc.slug.includes("satin-swirl") || acc.slug.includes("glitzknot") ? "bow" : "clips",
-              variants: { type: acc.variant_type ?? "none", options: Array.isArray(acc.variants) ? acc.variants : [] },
-              image: acc.image,
-              images: Array.isArray(acc.images) ? acc.images : [],
-              description: acc.description,
-            };
-            return { id: offer.id, accessory_slug: offer.accessory_slug, discount_type: offer.discount_type, discount_value: Number(offer.discount_value), custom_label: offer.custom_label || "", product: p };
-          })
-          .filter(Boolean) as BundleOfferWithProduct[];
-      }
+    const accessoryRows = accessoryRowsResult.data ?? [];
+    if (offerRows.length > 0 && accessoryRows.length > 0) {
+      bundleOffers = offerRows
+        .map((offer: any) => {
+          const acc = (accessoryRows as any[]).find((p) => p.slug === offer.accessory_slug);
+          if (!acc) return null;
+          const p: Product = {
+            slug: acc.slug,
+            title: acc.title,
+            price: Number(acc.price),
+            comparePrice: Number(acc.compare_price),
+            category: acc.category,
+            collection: acc.category === "heels" ? "heels" : acc.slug.includes("fauxbow") || acc.slug.includes("satin-swirl") || acc.slug.includes("glitzknot") ? "bow" : "clips",
+            variants: { type: acc.variant_type ?? "none", options: Array.isArray(acc.variants) ? acc.variants : [] },
+            image: acc.image,
+            images: Array.isArray(acc.images) ? acc.images : [],
+            description: acc.description,
+          };
+          return { id: offer.id, accessory_slug: offer.accessory_slug, discount_type: offer.discount_type, discount_value: Number(offer.discount_value), custom_label: offer.custom_label || "", product: p };
+        })
+        .filter(Boolean) as BundleOfferWithProduct[];
     }
-  } catch {
-    // silent fail
-  }
+  } catch { /* silent fail */ }
 
-  // Feature tiles from site_settings
+  // Feature tiles
   let featureTiles: FeatureTile[] = [];
   try {
-    const { data: settingRow } = await supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", "feature_tiles")
-      .maybeSingle();
-    if (settingRow?.value) {
-      const parsed = JSON.parse(settingRow.value);
+    if (settingRowResult.data?.value) {
+      const parsed = JSON.parse(settingRowResult.data.value);
       if (Array.isArray(parsed)) featureTiles = parsed;
     }
-  } catch {
-    // silent fail — use defaults in client
-  }
+  } catch { /* silent fail */ }
 
   // Color variants
   let colorVariants: ColorVariant[] = [];
   try {
-    const { data: myRows } = await supabase
-      .from("product_color_variants")
-      .select("*")
-      .eq("product_slug", slug)
-      .limit(1);
-    const myRow = myRows?.[0] ?? null;
-    if (myRow) {
-      const { data: groupRows } = await supabase
-        .from("product_color_variants")
-        .select("*")
-        .eq("group_id", myRow.group_id)
-        .order("sort_order");
-      if (groupRows && groupRows.length > 0) {
-        // Fetch product images for each variant
-        const slugs = groupRows.map((r: any) => r.product_slug);
-        const { data: productRows } = await supabase
-          .from("products")
-          .select("slug,image")
-          .in("slug", slugs);
-        const imageMap: Record<string, string> = {};
-        (productRows || []).forEach((p: any) => { imageMap[p.slug] = p.image; });
-        colorVariants = groupRows.map((r: any) => {
-          // For shoe-charm products, the DB `image` field contains a JSON array of image URLs — preserve it.
-          // For heels, use the product's main image from the products table as the swatch thumbnail.
-          const dbImage = r.image;
-          const productImage = imageMap[r.product_slug] || "";
-          return { ...r, image: (dbImage && typeof dbImage === "string" && dbImage.startsWith("[")) ? dbImage : productImage };
-        });
-      }
+    if (groupRows.length > 0) {
+      const imageMap: Record<string, string> = {};
+      variantProductRows.forEach((p: any) => { imageMap[p.slug] = p.image; });
+      colorVariants = groupRows.map((r: any) => {
+        const dbImage = r.image;
+        const productImage = imageMap[r.product_slug] || "";
+        return { ...r, image: (dbImage && typeof dbImage === "string" && dbImage.startsWith("[")) ? dbImage : productImage };
+      });
     }
-  } catch {
-    // silent fail
-  }
+  } catch { /* silent fail */ }
 
-  // Collection products for "Shop the Full Collection"
-  let latestProducts: Product[] = [];
-  let bestsellerProducts: Product[] = [];
-  try {
-    latestProducts = await getTabProductsFromDB("latest");
-    bestsellerProducts = await getTabProductsFromDB("bestseller");
-    // If no DB data, use related as fallback
-    if (latestProducts.length === 0) latestProducts = related;
-    if (bestsellerProducts.length === 0) bestsellerProducts = related;
-  } catch {
-    latestProducts = related;
-    bestsellerProducts = related;
-  }
+  // Tab products
+  const latestProducts = latestProductsRaw.length > 0 ? latestProductsRaw : related;
+  const bestsellerProducts = bestsellerProductsRaw.length > 0 ? bestsellerProductsRaw : related;
 
-  // Fetch active reviews for this product — direct Supabase to avoid siteUrl issues
+  // Reviews
   let initialReviews: ProductReview[] = [];
   try {
-    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://hrjvxwqvxvibtwyfoyca.supabase.co";
-    const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z";
-    const reviewsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/product_reviews?product_slug=eq.${encodeURIComponent(slug)}&active=eq.true&order=review_date.desc,created_at.desc`,
-      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, next: { revalidate: 300 } }
-    );
-    if (reviewsRes.ok) {
-      initialReviews = await reviewsRes.json();
-    }
-  } catch {
-    // silent fail
-  }
+    if (reviewsRes?.ok) initialReviews = await reviewsRes.json();
+  } catch { /* silent fail */ }
 
   return (
     <ProductDetailClient

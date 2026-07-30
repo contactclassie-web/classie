@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 import { useRouter } from "next/navigation";
 import { ShoppingBag, Check, ChevronRight, Plus, Minus } from "lucide-react";
 import { Product } from "@/lib/products";
@@ -217,7 +218,7 @@ export default function ProductDetailClient({
                 />
               ) : (
                 <Image
-                  src={mainImage}
+                  src={optimizeCloudinary(mainImage, 900)}
                   alt={product.title}
                   fill
                   className="object-contain object-center"
@@ -276,7 +277,7 @@ export default function ProductDetailClient({
                       position: "relative",
                     }}
                   >
-                    <img src={img} alt={`Image ${i + 1}`} loading="eager" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+                    <img src={optimizeCloudinary(img, 150)} alt={`Image ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
                   </button>
                 ))}
                 {hasVideo && product.video_url && (

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/products";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 export default function ProductCard({ product, cardStyle }: { product: Product; cardStyle?: { aspectRatio?: string; borderRadius?: string; height?: number } }) {
   const discount =
@@ -21,7 +22,7 @@ export default function ProductCard({ product, cardStyle }: { product: Product; 
         }}
       >
         <Image
-          src={product.image}
+          src={optimizeCloudinary(product.image, 600)}
           alt={product.title}
           fill
           className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
