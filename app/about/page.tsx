@@ -167,15 +167,10 @@ export default async function AboutPage() {
             <div className="space-y-4">{renderText(s1Text)}</div>
           </div>
           {/* Image */}
-          <div className="relative h-[360px] rounded-2xl overflow-hidden">
+          <div className="rounded-2xl overflow-hidden bg-[#f9f9f9]">
             {s1Img ? (
-              <Image
-                src={s1Img}
-                alt={s1Heading}
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={s1Img} alt={s1Heading} className="w-full h-auto block" />
             ) : (
               <StoryImgPlaceholder />
             )}
@@ -189,15 +184,10 @@ export default async function AboutPage() {
       <section className="bg-[#f7f7f7] py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Image */}
-          <div className="relative h-[360px] rounded-2xl overflow-hidden order-2 md:order-1">
+          <div className="rounded-2xl overflow-hidden order-2 md:order-1 bg-[#f9f9f9]">
             {s2Img ? (
-              <Image
-                src={s2Img}
-                alt={s2Heading}
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={s2Img} alt={s2Heading} className="w-full h-auto block" />
             ) : (
               <StoryImgPlaceholder />
             )}
@@ -231,15 +221,10 @@ export default async function AboutPage() {
             <div className="space-y-4">{renderText(s3Text)}</div>
           </div>
           {/* Image */}
-          <div className="relative h-[360px] rounded-2xl overflow-hidden">
+          <div className="rounded-2xl overflow-hidden bg-[#f9f9f9]">
             {s3Img ? (
-              <Image
-                src={s3Img}
-                alt={s3Heading}
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={s3Img} alt={s3Heading} className="w-full h-auto block" />
             ) : (
               <StoryImgPlaceholder />
             )}
