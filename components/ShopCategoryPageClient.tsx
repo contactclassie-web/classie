@@ -431,10 +431,10 @@ export default function ShopCategoryPageClient({
             <div className="flex flex-wrap justify-center gap-3">
               {[
                 { label: "View All", tags: [] },
-                { label: "Rhinestone Shoe Charms", tags: ["rhinestone","crystal"] },
-                { label: "Flower Shoe Charms", tags: ["flower"] },
-                { label: "Bow Shoe Charms", tags: ["bow"] },
-                { label: "Pearl Anklet", tags: ["pearl","anklet"] },
+                { label: "Rhinestone Shoe Charms", tags: ["Rhinestone Shoe Charms"] },
+                { label: "Flower Shoe Charms", tags: ["Flower Shoe Charms"] },
+                { label: "Bow Shoe Charms", tags: ["Bow Shoe Charms"] },
+                { label: "Pearl Anklet", tags: ["Pearl Anklet"] },
               ].map((item) => {
                 const isActive = item.tags.length === 0
                   ? selectedFilterTypes.length === 0
