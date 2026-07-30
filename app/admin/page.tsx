@@ -8938,13 +8938,35 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className={labelCls}>Variants (comma separated)</label>
-                  <input
-                    type="text"
-                    value={Array.isArray(productModal.data.variants) ? productModal.data.variants.map((v: unknown) => typeof v === "object" && v !== null ? (v as {name?:string}).name || "" : String(v)).filter(Boolean).join(", ") : ""}
-                    onChange={(e) => setProductField("variants", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
-                    className={inputCls} placeholder="35,36,37 or Black,Brown"
-                  />
+                  <label className={labelCls}>Variants</label>
+                  {/* Tag-style input — press Enter or comma to add */}
+                  <div className="flex flex-wrap gap-2 p-2 border border-gray-200 rounded-lg bg-white min-h-[40px] items-center">
+                    {(Array.isArray(productModal.data.variants) ? productModal.data.variants.map((v: unknown) => typeof v === "object" && v !== null ? (v as {name?:string}).name || "" : String(v)).filter(Boolean) : []).map((v: string) => (
+                      <span key={v} className="flex items-center gap-1 bg-[#f0ecff] text-[#3B5373] text-xs font-medium px-2 py-1 rounded-full">
+                        {v}
+                        <button type="button" onClick={() => {
+                          const cur = Array.isArray(productModal.data.variants) ? productModal.data.variants.map((x: unknown) => typeof x === "object" && x !== null ? (x as {name?:string}).name || "" : String(x)).filter(Boolean) : [];
+                          setProductField("variants", cur.filter((x: string) => x !== v));
+                        }} className="text-[#3B5373] hover:text-red-500 font-bold leading-none">×</button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      placeholder="Type color & press Enter (e.g. Silver)"
+                      className="flex-1 min-w-[140px] outline-none text-sm text-gray-700 bg-transparent"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === ",") {
+                          e.preventDefault();
+                          const val = (e.target as HTMLInputElement).value.trim().replace(/,/g, "");
+                          if (!val) return;
+                          const cur = Array.isArray(productModal.data.variants) ? productModal.data.variants.map((x: unknown) => typeof x === "object" && x !== null ? (x as {name?:string}).name || "" : String(x)).filter(Boolean) : [];
+                          if (!cur.includes(val)) setProductField("variants", [...cur, val]);
+                          (e.target as HTMLInputElement).value = "";
+                        }
+                      }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-1">Type a color name and press Enter to add. Tap × to remove.</p>
                 </div>
                 <div className="col-span-2">
                   <label className={labelCls}>Variant Label <span className="text-gray-400 font-normal normal-case">(shown above size/color selector)</span></label>
