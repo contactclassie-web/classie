@@ -86,6 +86,24 @@ export default function ProductDetailClient({
       if (src) { const img = new window.Image(); img.src = src; }
     });
   }, [product.image, product.images]);
+
+  // Initialize activeImages from first same-product color variant (shoe-charms)
+  useEffect(() => {
+    if (colorVariants.length > 0) {
+      const selfVariants = colorVariants.filter(v => v.product_slug === product.slug);
+      if (selfVariants.length > 0 && selfVariants[0].image && selfVariants[0].image.startsWith("[")) {
+        try {
+          const imgs = JSON.parse(selfVariants[0].image);
+          if (Array.isArray(imgs) && imgs.length > 0) {
+            setActiveImages(imgs);
+            setSelectedVariant(selfVariants[0].color_name);
+            setCurrentIndex(0);
+          }
+        } catch {}
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colorVariants]);
   const [selectedVariant, setSelectedVariant] = useState(product.variants.options[0] ?? "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -103,8 +121,9 @@ export default function ProductDetailClient({
   const reviewsRef = useRef<HTMLDivElement>(null);
 
   // Gallery images: main + additional (up to 10), plus optional video
-  const rawImages = [product.image, ...(product.images ?? [])].filter(Boolean);
-  const galleryImages = rawImages.slice(0, 10);
+  const allImages = [product.image, ...(product.images ?? [])].filter(Boolean);
+  const [activeImages, setActiveImages] = useState<string[]>(allImages);
+  const galleryImages = activeImages.slice(0, 10);
   const hasVideo = !!product.video_url;
   const [currentIndex, setCurrentIndex] = useState(0);
   const mainImage = galleryImages[currentIndex] ?? galleryImages[0];
@@ -379,28 +398,56 @@ export default function ProductDetailClient({
                   Available in
                 </p>
                 <div className="flex gap-2.5 flex-wrap">
-                  {product.variants.options.map((col) => (
-                    <button
-                      key={col}
-                      onClick={() => setSelectedVariant(col)}
-                      title={col}
-                      className="flex flex-col items-center gap-1 p-0 bg-transparent border-0 cursor-pointer"
-                    >
-                      <span
-                        className="relative overflow-hidden"
-                        style={{
-                          width: "56px", height: "56px", borderRadius: "4px", display: "block",
-                          border: `2px solid ${selectedVariant === col ? "#3B5373" : "transparent"}`,
-                          background: "#EDE8E1",
-                          transform: selectedVariant === col ? "scale(1.05)" : "scale(1)",
-                          transition: "all 0.2s",
+                  {product.variants.options.map((col) => {
+                    // Find same-product color variant for image swap (shoe-charms)
+                    const colorVariant = colorVariants.find(v => v.product_slug === product.slug && v.color_name === col);
+                    // Determine swatch thumbnail — use first image from JSON array if available
+                    let swatchSrc = product.image;
+                    if (colorVariant?.image && colorVariant.image.startsWith("[")) {
+                      try {
+                        const imgs = JSON.parse(colorVariant.image);
+                        if (Array.isArray(imgs) && imgs[0]) swatchSrc = imgs[0];
+                      } catch {}
+                    }
+                    return (
+                      <button
+                        key={col}
+                        onClick={() => {
+                          // Shoe-charm: swap gallery images instantly
+                          if (colorVariant?.image && colorVariant.image.startsWith("[")) {
+                            try {
+                              const imgs = JSON.parse(colorVariant.image);
+                              if (Array.isArray(imgs) && imgs.length > 0) {
+                                setActiveImages(imgs);
+                                setCurrentIndex(0);
+                                setShowVideo(false);
+                              }
+                            } catch {}
+                            setSelectedVariant(col);
+                            return;
+                          }
+                          // Default: just update selected variant (no image swap)
+                          setSelectedVariant(col);
                         }}
+                        title={col}
+                        className="flex flex-col items-center gap-1 p-0 bg-transparent border-0 cursor-pointer"
                       >
-                        <Image src={product.image} alt={col} fill className="object-cover object-center" sizes="56px" />
-                      </span>
-                      <span style={{ fontSize: "10px", color: "#888" }}>{col}</span>
-                    </button>
-                  ))}
+                        <span
+                          className="relative overflow-hidden"
+                          style={{
+                            width: "56px", height: "56px", borderRadius: "4px", display: "block",
+                            border: `2px solid ${selectedVariant === col ? "#3B5373" : "transparent"}`,
+                            background: "#EDE8E1",
+                            transform: selectedVariant === col ? "scale(1.05)" : "scale(1)",
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          <Image src={swatchSrc} alt={col} fill className="object-cover object-center" sizes="56px" />
+                        </span>
+                        <span style={{ fontSize: "10px", color: "#888" }}>{col}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

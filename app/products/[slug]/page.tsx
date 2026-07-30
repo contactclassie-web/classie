@@ -168,7 +168,13 @@ export default async function ProductPage({ params }: Props) {
           .in("slug", slugs);
         const imageMap: Record<string, string> = {};
         (productRows || []).forEach((p: any) => { imageMap[p.slug] = p.image; });
-        colorVariants = groupRows.map((r: any) => ({ ...r, image: imageMap[r.product_slug] || "" }));
+        colorVariants = groupRows.map((r: any) => {
+          // For shoe-charm products, the DB `image` field contains a JSON array of image URLs — preserve it.
+          // For heels, use the product's main image from the products table as the swatch thumbnail.
+          const dbImage = r.image;
+          const productImage = imageMap[r.product_slug] || "";
+          return { ...r, image: (dbImage && typeof dbImage === "string" && dbImage.startsWith("[")) ? dbImage : productImage };
+        });
       }
     }
   } catch {

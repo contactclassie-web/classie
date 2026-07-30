@@ -587,11 +587,14 @@ export default function AdminPage() {
   const [bundleOfferSaving, setBundleOfferSaving] = useState(false);
 
   // Color Variants (inside product modal)
-  const [colorVariants, setColorVariants] = useState<Array<{id:string;group_id:string;product_slug:string;color_name:string;color_hex:string;sort_order:number}>>([]);
+  const [colorVariants, setColorVariants] = useState<Array<{id:string;group_id:string;product_slug:string;color_name:string;color_hex:string;sort_order:number;image?:string|null}>>([]);
   const [colorVariantsLoading, setColorVariantsLoading] = useState(false);
   const [colorVariantSaving, setColorVariantSaving] = useState(false);
   const [newColorVariant, setNewColorVariant] = useState({ product_slug: "", color_name: "", color_hex: "#000000" });
   const [myColorInfo, setMyColorInfo] = useState({ color_name: "", color_hex: "#000000" });
+  // Shoe-charm per-color image sets
+  const [shoeCharmColorData, setShoeCharmColorData] = useState<Record<string, { hex: string; images: string[] }>>({});
+  const [shoeCharmSaving, setShoeCharmSaving] = useState(false);
 
   // Feature tiles (product page settings)
   const [featureTiles, setFeatureTiles] = useState<FeatureTileItem[]>(DEFAULT_FEATURE_TILES_ADMIN);
@@ -2845,17 +2848,96 @@ export default function AdminPage() {
   const loadColorVariants = async (slug: string) => {
     setColorVariantsLoading(true);
     try {
-      const { data: myRow } = await supabase.from("product_color_variants").select("*").eq("product_slug", slug).maybeSingle();
+      // Use limit instead of maybeSingle to support shoe-charm products that have
+      // multiple rows per product_slug (one per color variant).
+      const { data: slugRows } = await supabase.from("product_color_variants").select("*").eq("product_slug", slug).order("sort_order").limit(20);
+      const myRow = slugRows && slugRows.length > 0 ? slugRows[0] : null;
       if (myRow) {
         setMyColorInfo({ color_name: myRow.color_name, color_hex: myRow.color_hex });
         const { data: groupRows } = await supabase.from("product_color_variants").select("*").eq("group_id", myRow.group_id).order("sort_order");
-        setColorVariants(groupRows || []);
+        const allRows = groupRows || [];
+        setColorVariants(allRows);
+        // Populate shoe-charm color data (rows where product_slug === slug)
+        const selfRows = allRows.filter((r: any) => r.product_slug === slug);
+        if (selfRows.length > 0) {
+          const data: Record<string, { hex: string; images: string[] }> = {};
+          selfRows.forEach((r: any) => {
+            let images: string[] = ["", "", "", "", "", ""];
+            if (r.image && typeof r.image === "string" && r.image.startsWith("[")) {
+              try {
+                const parsed = JSON.parse(r.image);
+                if (Array.isArray(parsed)) {
+                  images = [...parsed.slice(0, 6), ...Array(Math.max(0, 6 - parsed.length)).fill("")];
+                }
+              } catch {}
+            }
+            data[r.color_name] = { hex: r.color_hex || "#888888", images };
+          });
+          setShoeCharmColorData(data);
+        } else {
+          setShoeCharmColorData({});
+        }
       } else {
         setMyColorInfo({ color_name: "", color_hex: "#000000" });
         setColorVariants([]);
+        setShoeCharmColorData({});
       }
     } finally {
       setColorVariantsLoading(false);
+    }
+  };
+
+  // Default swatch hex for common color names
+  const defaultColorHex = (colorName: string): string => {
+    const l = colorName.toLowerCase();
+    if (l === "silver") return "#C0C0C0";
+    if (l === "gold") return "#FFD700";
+    if (l === "rose gold") return "#B76E79";
+    if (l === "black") return "#1a1a1a";
+    if (l === "white" || l === "ivory") return "#FFFFF0";
+    if (l === "pink") return "#FFB6C1";
+    if (l === "red") return "#DC143C";
+    if (l === "blue") return "#4169E1";
+    if (l === "brown") return "#8B4513";
+    if (l === "wine" || l === "maroon") return "#800020";
+    return "#888888";
+  };
+
+  // Save shoe-charm per-color image sets
+  const saveShoeCharmColorImages = async () => {
+    if (!productModal.data?.slug) return;
+    const slug = productModal.data.slug;
+    const colors: string[] = Array.isArray(productModal.data.variants) ? productModal.data.variants : [];
+    if (colors.length === 0) { alert("No colors found in Variants. Add colors first."); return; }
+    setShoeCharmSaving(true);
+    try {
+      // Get existing rows for this product_slug
+      const { data: existingRows } = await supabase.from("product_color_variants").select("*").eq("product_slug", slug);
+      // Determine shared group_id
+      let groupId: string;
+      if (existingRows && existingRows.length > 0) {
+        groupId = existingRows[0].group_id;
+      } else {
+        groupId = crypto.randomUUID();
+      }
+      // Upsert each color
+      for (let i = 0; i < colors.length; i++) {
+        const colorName = colors[i];
+        const colorData = shoeCharmColorData[colorName] || { hex: defaultColorHex(colorName), images: [] };
+        const urls = (colorData.images || []).filter((u: string) => u.trim() !== "");
+        const imageJson = JSON.stringify(urls);
+        const hex = colorData.hex || defaultColorHex(colorName);
+        const existing = (existingRows || []).find((r: any) => r.color_name === colorName);
+        if (existing) {
+          await supabase.from("product_color_variants").update({ color_hex: hex, image: imageJson }).eq("id", existing.id);
+        } else {
+          await supabase.from("product_color_variants").insert({ group_id: groupId, product_slug: slug, color_name: colorName, color_hex: hex, image: imageJson, sort_order: i });
+        }
+      }
+      await loadColorVariants(slug);
+      alert("✅ Color images saved!");
+    } finally {
+      setShoeCharmSaving(false);
     }
   };
 
@@ -9054,7 +9136,65 @@ export default function AdminPage() {
                   <div className="p-4 space-y-3">
                     {colorVariantsLoading ? (
                       <p className="text-xs text-gray-400 text-center py-2">Loading…</p>
+                    ) : productModal.data?.category === "shoe-charms" ? (
+                      /* ── Shoe-charm: per-color image sets ── */
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">🎨 Color Image Sets</p>
+                          <p className="text-xs text-gray-400 mt-0.5">Add image sets per color. Images swap when user clicks color on product page.</p>
+                        </div>
+                        {(Array.isArray(productModal.data.variants) ? productModal.data.variants as string[] : []).length === 0 ? (
+                          <p className="text-xs text-gray-400 italic">No colors found. Add colors in the Variants field above first.</p>
+                        ) : (
+                          <>
+                            {(Array.isArray(productModal.data.variants) ? productModal.data.variants as string[] : []).map((colorName: string) => {
+                              const colorData = shoeCharmColorData[colorName] || { hex: defaultColorHex(colorName), images: ["", "", "", "", "", ""] };
+                              const updateHex = (hex: string) => setShoeCharmColorData(prev => ({ ...prev, [colorName]: { ...colorData, hex } }));
+                              const updateImage = (idx: number, url: string) => {
+                                const newImgs = [...(colorData.images || ["","","","","",""])];
+                                newImgs[idx] = url;
+                                setShoeCharmColorData(prev => ({ ...prev, [colorName]: { ...colorData, images: newImgs } }));
+                              };
+                              return (
+                                <div key={colorName} className="border border-gray-200 rounded-xl p-4 space-y-3">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-5 h-5 rounded-full border border-gray-200 flex-shrink-0" style={{ background: colorData.hex }} />
+                                    <span className="text-sm font-semibold text-gray-800">{colorName}</span>
+                                    <input type="color" value={colorData.hex} onChange={(e) => updateHex(e.target.value)}
+                                      className="ml-auto w-8 h-7 rounded border border-gray-200 cursor-pointer p-0.5" title="Swatch color" />
+                                  </div>
+                                  <div className="space-y-1.5">
+                                    {[0,1,2,3,4,5].map(idx => (
+                                      <div key={idx} className="flex items-center gap-2">
+                                        <span className="text-[10px] text-gray-400 w-12 flex-shrink-0">Image {idx+1}</span>
+                                        <input
+                                          type="text"
+                                          value={colorData.images?.[idx] || ""}
+                                          onChange={(e) => updateImage(idx, e.target.value)}
+                                          placeholder={`Image ${idx+1} URL`}
+                                          className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#3B5373]"
+                                        />
+                                        {colorData.images?.[idx] && (
+                                          <img src={colorData.images[idx]} alt="" className="w-8 h-8 rounded object-cover border border-gray-200 flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            <button
+                              onClick={saveShoeCharmColorImages}
+                              disabled={shoeCharmSaving}
+                              className="w-full py-2.5 bg-[#3B5373] text-white text-xs font-semibold rounded-xl disabled:opacity-50"
+                            >
+                              {shoeCharmSaving ? "Saving…" : "💾 Save Color Images"}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     ) : (
+                      /* ── Heels / other: existing color variant linking UI ── */
                       <>
                         <div>
                           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">This product&apos;s color</p>
