@@ -3,9 +3,11 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Heart } from "lucide-react";
 import { HeelProduct, HeelsSettings } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
 import OccasionFilterSection from "./OccasionFilterSection";
+import { useWishlist } from "@/components/WishlistContext";
 
 // ── Why Choose Section (reads settings from DB) ───────────────────────
 const WHY_DEFAULTS = {
@@ -172,6 +174,7 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
 
 // ── Product card matching homepage Featured Picks style ───────────────
 function HeelCard({ product }: { product: HeelProduct }) {
+  const { isWished, toggle } = useWishlist();
   const discount =
     product.comparePrice > product.price
       ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
@@ -206,12 +209,10 @@ function HeelCard({ product }: { product: HeelProduct }) {
             </span>
           )}
           <button
-            onClick={(e) => { e.preventDefault(); }}
-            className="w-7 h-7 bg-white/20 hover:bg-white/90 rounded-full flex items-center justify-center transition-all duration-200 mt-1"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(product.slug); }}
+            className="w-7 h-7 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 mt-1 shadow-sm"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white hover:text-[#3B5373]">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
+            <Heart className={`w-3.5 h-3.5 transition-colors ${isWished(product.slug) ? "fill-red-500 stroke-red-500" : "stroke-gray-500"}`} strokeWidth={1.8} />
           </button>
         </div>
 
