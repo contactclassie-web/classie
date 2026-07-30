@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import StyleIdeasHero from "./StyleIdeasHero";
 import StyleIdeasLooksClient from "./StyleIdeasLooksClient";
+import ReelCard from "./ReelCard";
 
 type FeaturedLookData = {
   label: string; heading: string; desc: string;
@@ -17,8 +18,6 @@ function StyleReels({ reels: r }: { reels: ReelsData }) {
   const desktopCols: Record<number,string> = { 3:"sm:grid-cols-3", 4:"sm:grid-cols-4", 5:"sm:grid-cols-5", 6:"sm:grid-cols-6" };
   const mobileCols:  Record<number,string> = { 1:"grid-cols-1", 2:"grid-cols-2", 3:"grid-cols-3" };
   const colClass = `${mobileCols[r.mobileCols]||"grid-cols-2"} ${desktopCols[r.cols]||"sm:grid-cols-4"}`;
-  const radiusClass: Record<string,string> = { sharp:"rounded-none", slight:"rounded", rounded:"rounded-xl", pill:"rounded-3xl" };
-  const aspectStyle = r.aspect !== "none" ? { aspectRatio: r.aspect } : {};
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -32,32 +31,7 @@ function StyleReels({ reels: r }: { reels: ReelsData }) {
           className={r.cardW > 0 ? "flex flex-wrap justify-center" : `grid ${colClass}`}
           style={{ gap: `${r.gap}px` }}>
           {r.cards.map((card, i) => (
-            <div key={i}
-              className={`relative bg-[#1a1a1a] overflow-hidden group flex-shrink-0 ${radiusClass[r.radius]||"rounded-none"}`}
-              style={{ height: r.aspect === "none" ? `${r.cardH}px` : undefined, width: r.cardW > 0 ? `${r.cardW}px` : undefined, ...aspectStyle }}>
-              {card.media_type === "video" && card.media_url
-                ? <video src={card.media_url} autoPlay muted loop playsInline className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
-                : card.media_url
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={card.media_url} alt={card.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
-                : <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-white/20 text-4xl">▶</span>
-                  </div>
-              }
-              {/* Play icon for video */}
-              {card.media_type === "video" && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-white/50 text-3xl group-hover:text-white/70 transition-colors">▶</span>
-                </div>
-              )}
-              {/* Bottom overlay */}
-              {(card.title || card.tag) && (
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
-                  {card.title && <p className="text-white text-[11px] font-medium leading-tight">{card.title}</p>}
-                  {card.tag && <p className="text-white/60 text-[9px] tracking-widest uppercase mt-0.5">{card.tag}</p>}
-                </div>
-              )}
-            </div>
+            <ReelCard key={i} card={card} cardH={r.cardH} cardW={r.cardW} aspect={r.aspect} radius={r.radius} />
           ))}
         </div>
       </div>
