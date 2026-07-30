@@ -3940,8 +3940,6 @@ export default function AdminPage() {
                     <option value="heels">Heels</option>
                     <option value="shoe-charms">Shoe Charms</option>
                     <option value="accessories">Accessories</option>
-                    <option value="clips">Clips</option>
-                    <option value="bow">Bow</option>
                   </select>
                   <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="Search products..." className="border border-gray-200 text-xs px-3 py-1.5 text-gray-600 focus:outline-none focus:border-[#3B5373] w-44" />
                 </div>
@@ -8708,7 +8706,7 @@ export default function AdminPage() {
                 <div>
                   <label className={labelCls}>Category</label>
                   <select value={productModal.data.category} onChange={(e) => setProductField("category", e.target.value)} className={inputCls}>
-                    {["heels","shoe-charms","accessories","bow","clips"].map((c) => <option key={c} value={c}>{c}</option>)}
+                    {["heels","shoe-charms","accessories"].map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
               </div>
