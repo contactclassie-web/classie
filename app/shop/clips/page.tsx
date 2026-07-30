@@ -18,7 +18,7 @@ function mapRow(row: Record<string, unknown>) {
     title: row.title as string,
     price: Number(row.price),
     comparePrice: Number(row.compare_price ?? 0),
-    category: (row.category === "clips" || row.category === "bow" ? "accessories" : row.category) as "heels" | "accessories",
+    category: (row.category === "clips" || row.category === "bow" || row.category === "shoe-charms" ? "accessories" : row.category) as "heels" | "accessories",
     collection: "clips" as "heels" | "clips" | "bow",
     variants: { type: "none" as const, options: [] },
     image: row.image as string ?? "",
@@ -30,7 +30,8 @@ function mapRow(row: Record<string, unknown>) {
 }
 
 export default async function ClipsPage() {
-  const [clipsRes, bowRes, settings, collectionsData] = await Promise.all([
+  const [shoeCharmsRes, clipsRes, bowRes, settings, collectionsData] = await Promise.all([
+    sb.from("products").select("*").eq("category", "shoe-charms").eq("active", true),
     sb.from("products").select("*").eq("category", "clips").eq("active", true),
     sb.from("products").select("*").eq("category", "bow").eq("active", true),
     getShopCategorySettings("clips"),
@@ -38,6 +39,7 @@ export default async function ClipsPage() {
   ]);
 
   const allProducts = [
+    ...(shoeCharmsRes.data ?? []).map(mapRow),
     ...(clipsRes.data ?? []).map(mapRow),
     ...(bowRes.data ?? []).map(mapRow),
   ];

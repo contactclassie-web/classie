@@ -1387,10 +1387,12 @@ export default function AdminPage() {
     setClipsPageLoading(true);
     try {
       const settingsKeys = ["clips_filter_types","clips_hero_bg_type","clips_hero_bg_url","clips_hero_slides","clips_hero_text_pos","clips_hero_eyebrow","clips_hero_title","clips_hero_subtitle","clips_hero_show_stats","clips_hero_stat1_val","clips_hero_stat1_label","clips_hero_stat2_val","clips_hero_stat2_label","clips_hero_stat3_val","clips_hero_stat3_label","clips_why_heading","clips_why_heading_italic","clips_why_card1_icon","clips_why_card1_title","clips_why_card1_desc","clips_why_card2_icon","clips_why_card2_title","clips_why_card2_desc","clips_why_card3_icon","clips_why_card3_title","clips_why_card3_desc","clips_why_footer_text","clips_why_visible"];
-      const [{ data }, { data: settings }] = await Promise.all([
+      const [{ data: shoeCharmsData }, { data: clipsData }, { data: settings }] = await Promise.all([
+        supabase.from("products").select("*").eq("category", "shoe-charms").order("created_at", { ascending: false }),
         supabase.from("products").select("*").eq("category", "clips").order("created_at", { ascending: false }),
         supabase.from("site_settings").select("key,value").in("key", settingsKeys),
       ]);
+      const data = [...(shoeCharmsData ?? []), ...(clipsData ?? [])];
       if (data) setClipsPageProducts(data as DbProduct[]);
       const m: Record<string,string> = {};
       (settings ?? []).forEach(({key,value}) => { m[key]=value; });
@@ -3936,6 +3938,7 @@ export default function AdminPage() {
                   <select value={productCategoryFilter} onChange={e => setProductCategoryFilter(e.target.value)} className="border border-gray-200 text-xs px-3 py-1.5 text-gray-600 focus:outline-none focus:border-[#3B5373]">
                     <option value="all">All Categories</option>
                     <option value="heels">Heels</option>
+                    <option value="shoe-charms">Shoe Charms</option>
                     <option value="accessories">Accessories</option>
                     <option value="clips">Clips</option>
                     <option value="bow">Bow</option>
@@ -8705,7 +8708,7 @@ export default function AdminPage() {
                 <div>
                   <label className={labelCls}>Category</label>
                   <select value={productModal.data.category} onChange={(e) => setProductField("category", e.target.value)} className={inputCls}>
-                    {["heels","accessories","bow","clips"].map((c) => <option key={c} value={c}>{c}</option>)}
+                    {["heels","shoe-charms","accessories","bow","clips"].map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
               </div>
