@@ -196,7 +196,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                 alignItems: "center",
                 gap: "14px",
                 flexWrap: "wrap",
-                paddingBottom: "28px",
+                paddingBottom: "16px",
               }}
             >
               <span
@@ -240,14 +240,14 @@ export default function BlogClient({ posts, categories: propCategories }: { post
         )}
 
         {/* ── Latest Stories ── */}
-        <section style={{ padding: "64px 0 80px" }}>
+        <section style={{ padding: "24px 0 60px" }}>
           {/* Heading + line */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: "20px",
-              marginBottom: "44px",
+              marginBottom: "32px",
             }}
           >
             <span
