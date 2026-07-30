@@ -8,6 +8,8 @@ import { HeelProduct, HeelsSettings } from "@/lib/products";
 import { supabase } from "@/lib/supabase";
 import OccasionFilterSection from "./OccasionFilterSection";
 import { useWishlist } from "@/components/WishlistContext";
+import { useCart } from "@/components/CartContext";
+import { useRouter } from "next/navigation";
 
 interface Props {
   initialProducts: HeelProduct[];
@@ -211,6 +213,19 @@ function CategoryHero({
 // ── Product card ──────────────────────────────────────────────────────
 function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; cardStyle?: { aspectRatio?: string; borderRadius?: string; height?: number } }) {
   const { isWished, toggle } = useWishlist();
+  const { addToCart } = useCart();
+  const router = useRouter();
+  const hasVariants = product.variants?.options && product.variants.options.length > 0;
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (hasVariants) {
+      router.push(`/products/${product.slug}`);
+    } else {
+      addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: 1 });
+    }
+  };
   const discount =
     product.comparePrice > product.price
       ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
@@ -252,11 +267,11 @@ function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; car
 
         <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
           <button
-            onClick={(e) => { e.preventDefault(); }}
+            onClick={handleQuickAdd}
             className="w-full bg-[#3B5373] text-white text-[11px] tracking-[0.2em] uppercase py-3 font-medium hover:bg-[#2d3f4f] transition-colors"
             style={{ fontFamily: "'Poppins', sans-serif" }}
           >
-            Quick Add
+            {hasVariants ? "Select Size →" : "Quick Add"}
           </button>
         </div>
       </div>
