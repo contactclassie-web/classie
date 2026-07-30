@@ -36,7 +36,7 @@ function StyleReels({ reels: r }: { reels: ReelsData }) {
               className={`relative bg-[#1a1a1a] overflow-hidden group flex-shrink-0 ${radiusClass[r.radius]||"rounded-none"}`}
               style={{ height: r.aspect === "none" ? `${r.cardH}px` : undefined, width: r.cardW > 0 ? `${r.cardW}px` : undefined, ...aspectStyle }}>
               {card.media_type === "video" && card.media_url
-                ? <video src={card.media_url} muted loop playsInline className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
+                ? <video src={card.media_url} autoPlay muted loop playsInline className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
                 : card.media_url
                 // eslint-disable-next-line @next/next/no-img-element
                 ? <img src={card.media_url} alt={card.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"/>
