@@ -8876,6 +8876,22 @@ export default function AdminPage() {
                   </div>
                 </div>
               )}
+              {productModal.data.category === "shoe-charms" && (
+                <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Shoe Charm Details</p>
+                  <div>
+                    <label className={labelCls}>Tags (comma separated) — used for Shoe Charms filter</label>
+                    <input
+                      type="text"
+                      value={productModal.data.tags?.join(", ") ?? ""}
+                      onChange={(e) => setProductField("tags", e.target.value.split(",").map((x) => x.trim()).filter(Boolean))}
+                      className={inputCls}
+                      placeholder="e.g. Rhinestone Shoe Charms, Bow Shoe Charms, Flower Shoe Charms, Pearl Anklet"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1">Options: Rhinestone Shoe Charms | Bow Shoe Charms | Flower Shoe Charms | Pearl Anklet</p>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-3">
                 {([
                   ["cod_available",  "COD Available"],
