@@ -15,8 +15,8 @@ export default function PrivacyPolicyPage() {
           ["Data Storage", "Your order data is stored securely in Supabase (a GDPR-compliant database platform). We implement industry-standard security measures to protect your information."],
           ["Cookies", "We use cookies to remember your cart and preferences. You can disable cookies in your browser settings, though this may affect site functionality."],
           ["Third-Party Services", "We use trusted third-party services for delivery logistics and analytics. These partners have their own privacy policies and are bound by data processing agreements."],
-          ["Your Rights", "You have the right to access, correct, or delete your personal data. To exercise these rights, email us at hello@classie.co.in."],
-          ["Contact", "Privacy-related queries: hello@classie.co.in | WhatsApp: +91 99999 99999"],
+          ["Your Rights", "You have the right to access, correct, or delete your personal data. To exercise these rights, email us at contact.classie@gmail.com."],
+          ["Contact", "Privacy-related queries: contact.classie@gmail.com | WhatsApp: +91 9468147781"],
         ].map(([title, body]) => (
           <div key={title as string}>
             <h2 className="font-serif text-2xl text-classie-black mb-3">{title}</h2>
