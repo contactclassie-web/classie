@@ -14,11 +14,12 @@ export const metadata: Metadata = {
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 export default async function HeelsPage() {
-  const [products, settings, collectionsData, filterSettingData] = await Promise.all([
+  const [products, settings, collectionsData, filterSettingData, collectionProductsData] = await Promise.all([
     getHeelsForPageFromDB(),
     getHeelsSettings(),
     sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true }),
     sb.from("site_settings").select("value").eq("key", "heels_filter_heel_types").maybeSingle(),
+    sb.from("collection_products").select("collection_id, product_slug"),
   ]);
 
   const initialOccasions = (collectionsData.data ?? []).map((c) => ({
@@ -29,6 +30,17 @@ export default async function HeelsPage() {
     image_position: c.image_position ?? "50% 50%",
   }));
 
+  // Build map: collection_slug → product_slugs[]
+  const collectionSlugMap: Record<string, string[]> = {};
+  const collectionIdToSlug: Record<string, string> = {};
+  (collectionsData.data ?? []).forEach((c: any) => { collectionIdToSlug[c.id] = c.slug; });
+  (collectionProductsData.data ?? []).forEach((row: any) => {
+    const slug = collectionIdToSlug[row.collection_id];
+    if (!slug) return;
+    if (!collectionSlugMap[slug]) collectionSlugMap[slug] = [];
+    collectionSlugMap[slug].push(row.product_slug);
+  });
+
   let initialFilterTypes: string[] | undefined;
   if (filterSettingData.data?.value) {
     try {
@@ -37,5 +49,5 @@ export default async function HeelsPage() {
     } catch { /* ignore */ }
   }
 
-  return <HeelsPageClient initialProducts={products} initialSettings={settings} initialOccasions={initialOccasions} initialFilterTypes={initialFilterTypes} />;
+  return <HeelsPageClient initialProducts={products} initialSettings={settings} initialOccasions={initialOccasions} initialFilterTypes={initialFilterTypes} collectionSlugMap={collectionSlugMap} />;
 }

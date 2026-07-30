@@ -258,7 +258,7 @@ function HeelCard({ product }: { product: HeelProduct }) {
 }
 
 // ── Main client component ─────────────────────────────────────────────────
-export default function HeelsPageClient({ initialProducts, initialSettings = {}, initialOccasions, initialFilterTypes }: { initialProducts: HeelProduct[]; initialSettings?: HeelsSettings; initialOccasions?: { title: string; slug: string; image: string; tag_label?: string; image_position?: string }[]; initialFilterTypes?: string[] }) {
+export default function HeelsPageClient({ initialProducts, initialSettings = {}, initialOccasions, initialFilterTypes, collectionSlugMap = {} }: { initialProducts: HeelProduct[]; initialSettings?: HeelsSettings; initialOccasions?: { title: string; slug: string; image: string; tag_label?: string; image_position?: string }[]; initialFilterTypes?: string[]; collectionSlugMap?: Record<string, string[]> }) {
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const [selectedHeelTypes, setSelectedHeelTypes] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState<number>(9999);
@@ -291,11 +291,17 @@ export default function HeelsPageClient({ initialProducts, initialSettings = {},
   const filtered = useMemo(() => {
     let result = [...initialProducts];
 
-    // Occasion filter: check product tags contain the occasion slug
+    // Occasion/collection filter: use collection_products mapping if available, else fall back to tags
     if (activeOccasion) {
-      result = result.filter((p) =>
-        p.tags.some((t) => t.toLowerCase().includes(activeOccasion.toLowerCase()))
-      );
+      const collectionSlugs = collectionSlugMap[activeOccasion];
+      if (collectionSlugs && collectionSlugs.length > 0) {
+        result = result.filter((p) => collectionSlugs.includes(p.slug));
+      } else {
+        // fallback: tag-based filter
+        result = result.filter((p) =>
+          p.tags.some((t) => t.toLowerCase().includes(activeOccasion.toLowerCase()))
+        );
+      }
     }
 
     // Heel type filter
