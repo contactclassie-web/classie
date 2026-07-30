@@ -138,17 +138,16 @@ export default async function AboutPage() {
       {/* ══════════════════════════════════════════
           SECTION 2 — Full-width Banner
       ══════════════════════════════════════════ */}
-      <div className="relative w-full h-[400px] overflow-hidden">
+      <div className="w-full">
         {bannerImg ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={bannerImg}
             alt="Classie banner"
-            fill
-            className="object-cover object-center"
-            sizes="100vw"
+            className="w-full h-auto block"
           />
         ) : (
-          <div className="w-full h-full" style={{ background: "#3B5373" }} />
+          <div className="w-full h-[400px]" style={{ background: "#3B5373" }} />
         )}
       </div>
 
