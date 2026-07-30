@@ -3,10 +3,8 @@ import { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { products, getProductBySlugFromDB, getProductsFromDB, getTabProductsFromDB, Product } from "@/lib/products";
 import ProductDetailClient from "./ProductDetailClient";
-export const revalidate = 300; // 5 min cache — admin revalidation busts this
-
-export const dynamic = "force-dynamic";
-export const dynamicParams = true;
+export const revalidate = 300; // ISR: rebuild every 5 min, admin revalidation busts instantly
+export const dynamicParams = true; // allow new DB products not in generateStaticParams
 
 export interface ProductReview {
   id: string;
@@ -55,6 +53,16 @@ interface Props {
 }
 
 export async function generateStaticParams() {
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "https://hrjvxwqvxvibtwyfoyca.supabase.co",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z"
+    );
+    const { data } = await sb.from("products").select("slug").eq("active", true);
+    if (data && data.length > 0) return data.map((p: { slug: string }) => ({ slug: p.slug }));
+  } catch { /* fall through */ }
+  // Fallback to hardcoded list
   return products.map((p) => ({ slug: p.slug }));
 }
 
