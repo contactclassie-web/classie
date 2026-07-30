@@ -2937,12 +2937,12 @@ export default function AdminPage() {
         if (selfRows.length > 0) {
           const data: Record<string, { hex: string; images: string[] }> = {};
           selfRows.forEach((r: any) => {
-            let images: string[] = ["", "", "", "", "", ""];
+            let images: string[] = Array(10).fill("");
             if (r.image && typeof r.image === "string" && r.image.startsWith("[")) {
               try {
                 const parsed = JSON.parse(r.image);
                 if (Array.isArray(parsed)) {
-                  images = [...parsed.slice(0, 6), ...Array(Math.max(0, 6 - parsed.length)).fill("")];
+                  images = [...parsed.slice(0, 10), ...Array(Math.max(0, 10 - parsed.length)).fill("")];
                 }
               } catch {}
             }
