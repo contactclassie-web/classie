@@ -3,14 +3,14 @@ import { getShopCategorySettings } from "@/lib/products";
 import ShopCategoryPageClient from "@/components/ShopCategoryPageClient";
 import { createClient } from "@supabase/supabase-js";
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Shoe Charms — Classie",
   description: "Shop CLASSIE Shoe Charms — Rhinestone, Flower, Bow & Pearl Anklets.",
 };
 
-const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
+const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 function mapRow(row: Record<string, unknown>) {
   return {

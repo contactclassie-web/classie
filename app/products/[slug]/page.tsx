@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { products, getProductBySlugFromDB, getProductsFromDB, getTabProductsFromDB, Product } from "@/lib/products";
 import ProductDetailClient from "./ProductDetailClient";
+export const revalidate = 300; // 5 min cache — admin revalidation busts this
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -22,10 +23,7 @@ export interface ProductReview {
 // Server-side Supabase client (no-store)
 function serverSupabase() {
   return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } }
-  );
+    process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 }
 
 export interface BundleOfferWithProduct {
@@ -203,7 +201,7 @@ export default async function ProductPage({ params }: Props) {
     const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z";
     const reviewsRes = await fetch(
       `${SUPABASE_URL}/rest/v1/product_reviews?product_slug=eq.${encodeURIComponent(slug)}&active=eq.true&order=review_date.desc,created_at.desc`,
-      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, cache: "no-store" }
+      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, next: { revalidate: 300 } }
     );
     if (reviewsRes.ok) {
       initialReviews = await reviewsRes.json();
@@ -225,3 +223,4 @@ export default async function ProductPage({ params }: Props) {
     />
   );
 }
+

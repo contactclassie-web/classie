@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 
-export const revalidate = 0;
+export const revalidate = 3600;
 export const metadata: Metadata = { title: "Returns & Exchanges – Classie" };
 
 export default async function ReturnsPage() {
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
   const { data } = await sb
     .from("site_settings")
     .select("key,value")

@@ -47,10 +47,7 @@ export default async function HomePage() {
   const { createClient } = await import("@supabase/supabase-js");
   // cache: 'no-store' prevents Next.js from caching Supabase fetch calls
   const sb = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } }
-  );
+    process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
   // ── Hero Slides ───────────────────────────────────────────────────────
   const { data: heroSlides } = await sb

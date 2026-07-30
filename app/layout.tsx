@@ -33,10 +33,7 @@ export default async function RootLayout({
 }>) {
   // Fetch all layout-level settings server-side — eliminates Navbar/Footer/AnnouncementBar blink
   const sb = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } }
-  );
+    process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
   const LAYOUT_KEYS = [
     // Logo

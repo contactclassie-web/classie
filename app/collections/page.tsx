@@ -2,10 +2,10 @@ import { getProductsFromDB } from "@/lib/products";
 import { createClient } from "@supabase/supabase-js";
 import CollectionsClient from "./CollectionsClient";
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 async function getCategories() {
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
   const { data } = await sb
     .from("site_categories")
     .select("name,slug,image_url,description")

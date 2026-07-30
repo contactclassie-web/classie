@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
 
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "About Us — CLASSIE",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { global: { fetch: (url: RequestInfo | URL, options?: RequestInit) => fetch(url, { ...options, cache: "no-store" }) } });
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
   const { data } = await sb
     .from("site_settings")
     .select("key,value")
