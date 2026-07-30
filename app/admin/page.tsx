@@ -9211,10 +9211,10 @@ export default function AdminPage() {
                         ) : (
                           <>
                             {(Array.isArray(productModal.data.variants) ? productModal.data.variants as string[] : []).map((colorName: string) => {
-                              const colorData = shoeCharmColorData[colorName] || { hex: defaultColorHex(colorName), images: ["", "", "", "", "", ""] };
+                              const colorData = shoeCharmColorData[colorName] || { hex: defaultColorHex(colorName), images: ["","","","","","","","","",""] };
                               const updateHex = (hex: string) => setShoeCharmColorData(prev => ({ ...prev, [colorName]: { ...colorData, hex } }));
                               const updateImage = (idx: number, url: string) => {
-                                const newImgs = [...(colorData.images || ["","","","","",""])];
+                                const newImgs = [...(colorData.images || ["","","","","","","","","",""])];
                                 newImgs[idx] = url;
                                 setShoeCharmColorData(prev => ({ ...prev, [colorName]: { ...colorData, images: newImgs } }));
                               };
@@ -9227,7 +9227,7 @@ export default function AdminPage() {
                                       className="ml-auto w-8 h-7 rounded border border-gray-200 cursor-pointer p-0.5" title="Swatch color" />
                                   </div>
                                   <div className="space-y-1.5">
-                                    {[0,1,2,3,4,5].map(idx => (
+                                    {[0,1,2,3,4,5,6,7,8,9].map(idx => (
                                       <div key={idx} className="flex items-center gap-2">
                                         <span className="text-[10px] text-gray-400 w-12 flex-shrink-0">Image {idx+1}</span>
                                         <input
