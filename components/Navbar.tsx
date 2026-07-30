@@ -14,7 +14,7 @@ const leftLinks = [
 ];
 const rightLinks = [
   { label: "Hot Deals", href: "/hot-deals" },
-  { label: "About",     href: "/about" },
+  { label: "About Us",  href: "/about" },
 ];
 
 const NAV_LINK_CLS = "text-[11px] font-normal text-[#1a1a1a] hover:text-[#3B5373] transition-colors tracking-[0.14em] uppercase relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[1px] after:bg-[#3B5373] hover:after:w-full after:transition-all after:duration-300";
