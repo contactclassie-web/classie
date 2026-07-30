@@ -587,6 +587,7 @@ export default function AdminPage() {
   const [bundleOfferSaving, setBundleOfferSaving] = useState(false);
 
   // Color Variants (inside product modal)
+  const [productCollectionId, setProductCollectionId] = useState<string>(""); // collection assigned to current product in modal
   const [colorVariants, setColorVariants] = useState<Array<{id:string;group_id:string;product_slug:string;color_name:string;color_hex:string;sort_order:number;image?:string|null}>>([]);
   const [colorVariantsLoading, setColorVariantsLoading] = useState(false);
   const [colorVariantSaving, setColorVariantSaving] = useState(false);
@@ -2658,12 +2659,13 @@ export default function AdminPage() {
     if (!authed) return;
     fetchOrders();
     fetchProducts();
+    fetchCollections(); // needed for product modal collection dropdown
     // Fetch global pending reviews count for dashboard
     fetch("/api/reviews/admin/pending-count")
       .then(r => r.json())
       .then(d => { if (typeof d.count === "number") { setPendingReviewsCount(d.count); setPendingReviewsList(d.pending || []); } })
       .catch(() => {});
-  }, [authed, fetchOrders, fetchProducts]);
+  }, [authed, fetchOrders, fetchProducts, fetchCollections]);
 
   useEffect(() => {
     if (!authed) return;
@@ -2729,8 +2731,18 @@ export default function AdminPage() {
 
   // ── Product actions ───────────────────────────────────────────────────────
 
-  const openAddProduct = () => { setBundleOffers([]); setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } }); };
-  const openEditProduct = (p: DbProduct) => { setProductModal({ open: true, mode: "edit", data: { ...p } }); if (p.slug) { loadBundleOffers(p.slug); loadColorVariants(p.slug); } };
+  const openAddProduct = () => { setBundleOffers([]); setProductCollectionId(""); setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } }); };
+  const openEditProduct = (p: DbProduct) => {
+    setProductModal({ open: true, mode: "edit", data: { ...p } });
+    setProductCollectionId("");
+    if (p.slug) {
+      loadBundleOffers(p.slug);
+      loadColorVariants(p.slug);
+      // Load which collection this product belongs to
+      supabase.from("collection_products").select("collection_id").eq("product_slug", p.slug).maybeSingle()
+        .then(({ data }) => { setProductCollectionId(data?.collection_id ?? ""); });
+    }
+  };
   const closeProductModal = () => setProductModal((m) => ({ ...m, open: false }));
 
   const handleProductSave = async () => {
@@ -2778,6 +2790,20 @@ export default function AdminPage() {
         saveError = error;
       }
       if (saveError) { alert("Save failed: " + saveError.message); return; }
+
+      // ── Save collection mapping (heels only) ──────────────────────────
+      const productSlug = productModal.data.slug;
+      if (productModal.data.category === "heels" && productSlug) {
+        // Remove from all collections first
+        await supabase.from("collection_products").delete().eq("product_slug", productSlug);
+        // Then add to selected collection (if any)
+        if (productCollectionId) {
+          const maxOrder = await supabase.from("collection_products").select("display_order").eq("collection_id", productCollectionId).order("display_order", { ascending: false }).limit(1);
+          const nextOrder = ((maxOrder.data?.[0] as any)?.display_order ?? 0) + 1;
+          await supabase.from("collection_products").insert({ collection_id: productCollectionId, product_slug: productSlug, display_order: nextOrder });
+        }
+      }
+
       await fetchProducts();
       closeProductModal();
       await revalidateSite();
@@ -8805,6 +8831,21 @@ export default function AdminPage() {
                     <option value="Bow Shoe Charms">Bow Shoe Charms</option>
                     <option value="Flower Shoe Charms">Flower Shoe Charms</option>
                     <option value="Pearl Anklet">Pearl Anklet</option>
+                  </select>
+                </div>
+              )}
+              {productModal.data.category === "heels" && (
+                <div>
+                  <label className={labelCls}>🗂️ Collection <span className="text-gray-400 font-normal normal-case">(assign to a curated collection)</span></label>
+                  <select
+                    value={productCollectionId}
+                    onChange={(e) => setProductCollectionId(e.target.value)}
+                    className={inputCls}
+                  >
+                    <option value="">— No Collection —</option>
+                    {collections.map((c) => (
+                      <option key={c.id} value={c.id}>{c.title}</option>
+                    ))}
                   </select>
                 </div>
               )}
