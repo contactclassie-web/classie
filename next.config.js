@@ -17,6 +17,12 @@ const nextConfig = {
         destination: '/shop/clips',
         permanent: true,
       },
+      // /shipping-policy → /shipping
+      {
+        source: '/shipping-policy',
+        destination: '/shipping',
+        permanent: true,
+      },
     ];
   },
 }

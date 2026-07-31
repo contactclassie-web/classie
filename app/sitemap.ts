@@ -17,8 +17,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/size-guide`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
-    { url: `${base}/shipping-policy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
+    { url: `${base}/shipping`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
     { url: `${base}/returns`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
+    { url: `${base}/privacy-policy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
+    { url: `${base}/refund-policy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
   ];
 
   // Dynamic product pages
