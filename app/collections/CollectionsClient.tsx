@@ -102,10 +102,15 @@ export default function CollectionsClient({ initialProducts, categories }: Props
     })();
   }, []);
 
+  // Map category slugs to product category values (site_categories uses "clips", products use "shoe-charms")
+  const categoryAliases: Record<string, string> = { clips: "shoe-charms" };
   const filtered = useMemo(() => {
     let list = activeCategory === "all"
       ? initialProducts
-      : initialProducts.filter((p) => p.category === activeCategory);
+      : initialProducts.filter((p) => {
+          const mapped = categoryAliases[activeCategory] ?? activeCategory;
+          return p.category === mapped || p.category === activeCategory;
+        });
     if (sort === "price_asc")  list = [...list].sort((a, b) => a.price - b.price);
     if (sort === "price_desc") list = [...list].sort((a, b) => b.price - a.price);
     return list;
@@ -291,7 +296,8 @@ export default function CollectionsClient({ initialProducts, categories }: Props
                 </span>
               </button>
               {categories.map((cat) => {
-                const count = initialProducts.filter((p) => p.category === cat.slug).length;
+                const mapped = categoryAliases[cat.slug] ?? cat.slug;
+                const count = initialProducts.filter((p) => p.category === mapped || p.category === cat.slug).length;
                 return (
                   <button key={cat.slug}
                     onClick={() => setActiveCategory(cat.slug)}
