@@ -452,7 +452,7 @@ export default function ShopCategoryPageClient({
                 {initialSettings["clips_charm_subheading"]}
               </p>
             )}
-            <div className="flex flex-wrap justify-center gap-3">
+            <div className="flex overflow-x-auto gap-2 pb-1 justify-start md:justify-center" style={{ scrollbarWidth: "none" }}>
               {[
                 { label: "View All", tags: [] },
                 { label: "Rhinestone Shoe Charms", tags: ["Rhinestone Shoe Charms"] },
