@@ -148,7 +148,7 @@ function CategoryHero({
         backgroundColor: "#F5F5F5",
         backgroundImage: bgType === "image" && bgUrl ? `url(${bgUrl})` : undefined,
         backgroundSize: "cover",
-        backgroundPosition: "left center",
+        backgroundPosition: "right center",
         backgroundRepeat: "no-repeat",
       }}>
       {bgType === "image" && false && bgUrl && (
