@@ -224,7 +224,7 @@ export default function CollectionsClient({ initialProducts, categories }: Props
               </a>
             )}
             {cta2Text && (
-              <Link href="/shop/heels"
+              <Link href="/size-guide"
                 className="px-6 py-3.5 text-[10px] tracking-[0.18em] uppercase border-[1.5px] border-gray-200 text-gray-500 hover:border-[#3B5373] hover:text-[#3B5373] transition-all duration-200 rounded-sm">
                 {cta2Text}
               </Link>
