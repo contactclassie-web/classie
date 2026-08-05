@@ -382,7 +382,7 @@ function ProductCard({ product }: { product: Product }) {
     : 0;
 
   return (
-    <Link href={`/product/${product.slug}`}
+    <Link href={`/products/${product.slug}`}
       className="group block bg-white rounded-sm overflow-hidden shadow-[0_1px_8px_rgba(59,83,115,0.07)] hover:shadow-[0_14px_40px_rgba(59,83,115,0.13)] hover:-translate-y-[5px] transition-all duration-[380ms]">
       <div className="relative overflow-hidden bg-[#f8f7ff]" style={{ aspectRatio: "3/4" }}>
         {product.image ? (
