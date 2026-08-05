@@ -325,6 +325,7 @@ export default function ShopCategoryPageClient({
   const [advAspect,  setAdvAspect]  = useState("1/1");
   const [advRadius,  setAdvRadius]  = useState("sharp");
   const [advCardH,   setAdvCardH]   = useState(0);
+  const [isDesktop,  setIsDesktop]  = useState(false);
 
   const radiusMap: Record<string,string> = { sharp: "", slight: "rounded", rounded: "rounded-xl", pill: "rounded-3xl" };
 
@@ -358,6 +359,13 @@ export default function ShopCategoryPageClient({
         if (m.adv_coll_radius)  setAdvRadius(m.adv_coll_radius);
         if (m.adv_coll_card_h)  setAdvCardH(parseInt(m.adv_coll_card_h) || 0);
       });
+
+    // Responsive grid detection
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
 
     // Skip filter_types fetch if already provided via SSR initialSettings
     if (!initialSettings[`${settingsPrefix}_filter_types`]) {
@@ -641,7 +649,7 @@ export default function ShopCategoryPageClient({
               ) : (
                 <div
                   className="grid"
-                  style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}
+                  style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${isDesktop ? advDesktop : advMobile}, minmax(0, 1fr))` }}
                 >
                   {filtered.map((product) => (
                     <CategoryProductCard key={product.slug} product={product} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />

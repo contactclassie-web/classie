@@ -28,8 +28,17 @@ function ShopContent() {
   const [advAspect,  setAdvAspect]  = useState("4/5");
   const [advRadius,  setAdvRadius]  = useState("sharp");
   const [advCardH,   setAdvCardH]   = useState(0);
+  const [isDesktop,  setIsDesktop]  = useState(false);
 
   const radiusMap: Record<string,string> = { sharp: "", slight: "rounded", rounded: "rounded-xl", pill: "rounded-3xl" };
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     supabase.from("site_settings").select("key,value")
@@ -118,7 +127,7 @@ function ShopContent() {
       ) : (
         <div
           className="grid"
-          style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}
+          style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${isDesktop ? advDesktop : advMobile}, minmax(0, 1fr))` }}
         >
           {filtered.map((p) => (
             <ProductCard key={p.slug} product={p} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />
