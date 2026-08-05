@@ -257,13 +257,13 @@ export default function CollectionsClient({ initialProducts, categories }: Props
 
       {/* ── FILTER BAR ────────────────────────────────────────────────────── */}
       <div id="products" className="sticky top-[68px] z-30 bg-white/97 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className="max-w-screen-xl mx-auto px-10">
+        <div className="max-w-screen-xl mx-auto px-3 md:px-10">
           <div className="flex items-center justify-between" style={{ height: "60px" }}>
             {/* Tabs */}
-            <div className="flex items-center overflow-x-auto no-scrollbar">
+            <div className="flex items-center overflow-x-auto no-scrollbar flex-1 min-w-0">
               <button
                 onClick={() => setActiveCategory("all")}
-                className={`flex items-center gap-2 px-5 h-[60px] text-[9.5px] tracking-[0.18em] uppercase border-b-2 transition-all whitespace-nowrap font-medium ${
+                className={`flex items-center gap-1.5 px-3 md:px-5 h-[60px] text-[9.5px] tracking-[0.15em] uppercase border-b-2 transition-all whitespace-nowrap font-medium ${
                   activeCategory === "all"
                     ? "border-[#3B5373] text-[#3B5373]"
                     : "border-transparent text-gray-400 hover:text-[#3B5373]"
@@ -279,7 +279,7 @@ export default function CollectionsClient({ initialProducts, categories }: Props
                 return (
                   <button key={cat.slug}
                     onClick={() => setActiveCategory(cat.slug)}
-                    className={`flex items-center gap-2 px-5 h-[60px] text-[9.5px] tracking-[0.18em] uppercase border-b-2 transition-all whitespace-nowrap font-medium ${
+                    className={`flex items-center gap-1.5 px-3 md:px-5 h-[60px] text-[9.5px] tracking-[0.15em] uppercase border-b-2 transition-all whitespace-nowrap font-medium ${
                       activeCategory === cat.slug
                         ? "border-[#3B5373] text-[#3B5373]"
                         : "border-transparent text-gray-400 hover:text-[#3B5373]"
@@ -294,11 +294,11 @@ export default function CollectionsClient({ initialProducts, categories }: Props
             </div>
 
             {/* Sort */}
-            <div className="relative flex-shrink-0 ml-4">
+            <div className="relative flex-shrink-0 ml-2">
               <button onClick={() => setSortOpen(!sortOpen)}
-                className="flex items-center gap-2 px-5 py-2 text-[9.5px] tracking-[0.14em] uppercase text-gray-500 border border-gray-200 hover:border-[#3B5373] hover:text-[#3B5373] transition-all rounded-full">
+                className="flex items-center gap-1.5 px-3 md:px-5 py-2 text-[9.5px] tracking-[0.14em] uppercase text-gray-500 border border-gray-200 hover:border-[#3B5373] hover:text-[#3B5373] transition-all rounded-full">
                 <SlidersHorizontal className="w-3 h-3" />
-                {sortLabel}
+                <span className="hidden sm:inline">{sortLabel}</span>
                 <ChevronDown className={`w-3 h-3 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
               </button>
               {sortOpen && (
