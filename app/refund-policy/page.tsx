@@ -16,7 +16,7 @@ export default function RefundPolicyPage() {
           ["Partial Refunds", "In some cases, only partial refunds may be granted — for example, if the item shows signs of use or is missing original tags/packaging."],
           ["Non-Refundable Situations", "Shipping charges are non-refundable. Items purchased during final sale events are not eligible for refunds."],
           ["Damaged or Wrong Items", "If you received a damaged or incorrect item, please contact us within 48 hours of delivery with photos. We'll replace or refund at no extra cost."],
-          ["Contact", "Email: hello@classie.co.in | WhatsApp: +91 99999 99999"],
+          ["Contact", "Email: contact.classie@gmail.com | WhatsApp: +91 94681 47781"],
         ].map(([title, body]) => (
           <div key={title as string}>
             <h2 className="font-serif text-2xl text-classie-black mb-3">{title}</h2>

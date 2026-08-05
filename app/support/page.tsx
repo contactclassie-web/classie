@@ -16,8 +16,8 @@ export default function SupportPage() {
         {/* Contact options */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-14">
           {[
-            { icon: MessageCircle, label: "WhatsApp", sub: "Fastest response", href: "https://wa.me/919999999999", cta: "Chat Now", color: "#25D366" },
-            { icon: Mail, label: "Email", sub: "hello@classie.co.in", href: "mailto:hello@classie.co.in", cta: "Send Email", color: "#3B5373" },
+            { icon: MessageCircle, label: "WhatsApp", sub: "Fastest response", href: "https://wa.me/919468147781", cta: "Chat Now", color: "#25D366" },
+            { icon: Mail, label: "Email", sub: "contact.classie@gmail.com", href: "mailto:contact.classie@gmail.com", cta: "Send Email", color: "#3B5373" },
             { icon: Instagram, label: "Instagram", sub: "@_classie_in", href: "https://www.instagram.com/_classie_in/", cta: "DM Us", color: "#E1306C" },
           ].map(({ icon: Icon, label, sub, href, cta, color }) => (
             <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center text-center bg-[#faf8f6] rounded-2xl p-7 border border-classie-border hover:border-[#3B5373] transition-all hover:shadow-md">

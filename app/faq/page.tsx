@@ -18,7 +18,7 @@ const faqs = [
     section: "Returns & Exchanges",
     items: [
       { q: "What is your return policy?", a: "We accept returns within 7 days of delivery. Products must be unused, unworn, and in original packaging." },
-      { q: "How do I initiate a return?", a: "WhatsApp us at +91 99999 99999 or email hello@classie.co.in with your order ID and reason. We'll arrange a pickup." },
+      { q: "How do I initiate a return?", a: "WhatsApp us at +91 94681 47781 or email contact.classie@gmail.com with your order ID and reason. We'll arrange a pickup." },
       { q: "When will I get my refund?", a: "Refunds are processed within 5–7 business days after we receive and inspect the returned product." },
       { q: "Can I exchange for a different size?", a: "Yes! Size exchanges are free of charge within 7 days of delivery, subject to availability." },
     ],

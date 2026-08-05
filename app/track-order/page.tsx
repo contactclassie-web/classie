@@ -133,11 +133,11 @@ export default function TrackOrderPage() {
 
         <p className="text-center text-xs text-classie-gray mt-8">
           Need help?{" "}
-          <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-[#3B5373] underline">
+          <a href="https://wa.me/919468147781" target="_blank" rel="noopener noreferrer" className="text-[#3B5373] underline">
             WhatsApp us
           </a>{" "}
           or{" "}
-          <a href="mailto:hello@classie.co.in" className="text-[#3B5373] underline">
+          <a href="mailto:contact.classie@gmail.com" className="text-[#3B5373] underline">
             email us
           </a>
         </p>
