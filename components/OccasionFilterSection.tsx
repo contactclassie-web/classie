@@ -63,7 +63,7 @@ function OccasionFilterCard({
       {active && (
         <div className="absolute inset-0 bg-[#3B5373]/20 pointer-events-none" />
       )}
-      <div className="absolute bottom-0 left-0 p-6 pb-7">
+      <div className="absolute bottom-0 left-0 p-4 pb-5 md:p-6 md:pb-7">
         <p
           style={{
             fontFamily: "var(--font-poppins)",
@@ -152,17 +152,17 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick,
           </p>
         </div>
 
-        {/* 3-col grid */}
-        <div className="grid gap-[3px]" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+        {/* Desktop: 3-col grid | Mobile: horizontal scroll */}
+        <div className="hidden md:grid gap-[3px]" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
           {show.map((occ) => (
-            <OccasionFilterCard
-              key={occ.slug}
-              occ={occ}
-              active={activeOccasion === occ.slug}
-              onClick={() =>
-                onOccasionClick(activeOccasion === occ.slug ? null : occ.slug)
-              }
-            />
+            <OccasionFilterCard key={occ.slug} occ={occ} active={activeOccasion === occ.slug} onClick={() => onOccasionClick(activeOccasion === occ.slug ? null : occ.slug)} />
+          ))}
+        </div>
+        <div className="flex md:hidden gap-2 overflow-x-auto snap-x snap-mandatory pb-1" style={{ scrollbarWidth: "none" }}>
+          {show.map((occ) => (
+            <div key={occ.slug} className="snap-start flex-shrink-0" style={{ width: "78vw" }}>
+              <OccasionFilterCard occ={occ} active={activeOccasion === occ.slug} onClick={() => onOccasionClick(activeOccasion === occ.slug ? null : occ.slug)} />
+            </div>
           ))}
         </div>
 
