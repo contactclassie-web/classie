@@ -144,8 +144,12 @@ function CategoryHero({
                     "px-6";
 
   return (
-    <section className="relative overflow-hidden" style={{ background: "#F5F5F5" }}>
-      {bgType === "image" && bgUrl && (
+    <section className="relative overflow-hidden" style={{
+        background: bgType === "image" && bgUrl
+          ? `url(${bgUrl}) center/cover no-repeat`
+          : "#F5F5F5"
+      }}>
+      {bgType === "image" && false && bgUrl && (
         <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-100" />
       )}
       {bgType === "slider" && slides.length > 0 && (
