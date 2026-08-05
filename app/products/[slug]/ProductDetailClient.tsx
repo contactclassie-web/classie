@@ -224,6 +224,7 @@ export default function ProductDetailClient({
                 />
               ) : (
                 <Image
+                  key={currentIndex}
                   src={optimizeCloudinary(mainImage, 900)}
                   alt={product.title}
                   fill
