@@ -145,9 +145,11 @@ function CategoryHero({
 
   return (
     <section className="relative overflow-hidden" style={{
-        background: bgType === "image" && bgUrl
-          ? `url(${bgUrl}) center/cover no-repeat`
-          : "#F5F5F5"
+        backgroundColor: "#F5F5F5",
+        backgroundImage: bgType === "image" && bgUrl ? `url(${bgUrl})` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "left center",
+        backgroundRepeat: "no-repeat",
       }}>
       {bgType === "image" && false && bgUrl && (
         <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-100" />
