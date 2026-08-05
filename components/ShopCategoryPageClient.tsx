@@ -454,11 +454,11 @@ export default function ShopCategoryPageClient({
             )}
             <div className="flex overflow-x-auto gap-2 pb-1 justify-start md:justify-center" style={{ scrollbarWidth: "none" }}>
               {[
-                { label: "All", tags: [] },
-                { label: "Rhinestone", tags: ["Rhinestone Shoe Charms"] },
-                { label: "Flower", tags: ["Flower Shoe Charms"] },
-                { label: "Bow", tags: ["Bow Shoe Charms"] },
-                { label: "Anklet", tags: ["Pearl Anklet"] },
+                { label: "View All", tags: [] },
+                { label: "Rhinestone Shoe Charms", tags: ["Rhinestone Shoe Charms"] },
+                { label: "Flower Shoe Charms", tags: ["Flower Shoe Charms"] },
+                { label: "Bow Shoe Charms", tags: ["Bow Shoe Charms"] },
+                { label: "Pearl Anklet", tags: ["Pearl Anklet"] },
               ].map((item) => {
                 const isActive = item.tags.length === 0
                   ? selectedFilterTypes.length === 0
@@ -469,7 +469,7 @@ export default function ShopCategoryPageClient({
                     onClick={() => setSelectedFilterTypes(item.tags)}
                     className="transition-all duration-200"
                     style={{
-                      padding: "8px 14px",
+                      padding: "10px 20px",
                       borderRadius: "999px",
                       border: `1.5px solid #3B5373`,
                       background: isActive ? "#3B5373" : "transparent",
