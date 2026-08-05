@@ -217,7 +217,7 @@ export default function CheckoutPage() {
           email: form.customer_email || "",
           contact: form.customer_phone,
         },
-        theme: { color: "#1a1a1a" },
+        theme: { color: "#3B5373" },
         handler: async (response: RazorpayResponse) => {
           try {
             // Verify payment
@@ -365,7 +365,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("online")}
                   className={`w-full border-2 rounded-lg px-5 py-4 flex items-center gap-4 transition-all ${
                     paymentMethod === "online"
-                      ? "border-classie-black bg-classie-black text-white"
+                      ? "border-[#3B5373] bg-[#3B5373] text-white"
                       : "border-classie-border bg-white text-classie-black hover:border-classie-black"
                   }`}
                 >
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("cod")}
                   className={`w-full border-2 rounded-lg px-5 py-4 flex items-center gap-4 transition-all ${
                     paymentMethod === "cod"
-                      ? "border-classie-black bg-classie-black text-white"
+                      ? "border-[#3B5373] bg-[#3B5373] text-white"
                       : "border-classie-border bg-white text-classie-black hover:border-classie-black"
                   }`}
                 >
@@ -425,7 +425,7 @@ export default function CheckoutPage() {
                   <div key={`${item.slug}-${item.variant}`} className="flex gap-3">
                     <div className="relative w-14 h-14 flex-shrink-0 rounded overflow-hidden bg-classie-light">
                       <Image src={item.image} alt={item.title} fill className="object-cover" sizes="56px" />
-                      <span className="absolute -top-1 -right-1 bg-classie-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 bg-[#3B5373] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                         {item.quantity}
                       </span>
                     </div>
@@ -477,7 +477,7 @@ export default function CheckoutPage() {
                         type="button"
                         onClick={applyCoupon}
                         disabled={couponLoading || !couponCode.trim()}
-                        className="px-4 py-2.5 bg-classie-black text-white text-xs font-semibold uppercase tracking-wider hover:bg-classie-gray transition-colors disabled:opacity-50 flex-shrink-0"
+                        className="px-4 py-2.5 bg-[#3B5373] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#2a3d55] transition-colors disabled:opacity-50 flex-shrink-0"
                       >
                         {couponLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
                       </button>
@@ -524,7 +524,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-classie-black text-white text-sm font-semibold tracking-widest uppercase flex items-center justify-center gap-3 hover:bg-classie-gray transition-colors disabled:opacity-60"
+                className="w-full py-4 bg-[#3B5373] text-white text-sm font-semibold tracking-widest uppercase flex items-center justify-center gap-3 hover:bg-[#2a3d55] transition-colors disabled:opacity-60"
               >
                 {loading ? (
                   <>
