@@ -106,7 +106,7 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
                     "px-6";
 
   return (
-    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", aspectRatio: "16/5", minHeight: "160px" }}>
+    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", minHeight: "280px" }}>
       {/* Background */}
       {bgType === "image" && bgUrl && (
         <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-100" />
@@ -136,7 +136,7 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
       )}
 
       {/* Text */}
-      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-6 md:py-20`} style={{ minHeight: "100%" }}>
+      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-8 md:py-20`} style={{ minHeight: "280px" }}>
         <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
           <div className="w-8 h-px bg-[#3B5373]/50" />
           <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "'Poppins', sans-serif" }}>
