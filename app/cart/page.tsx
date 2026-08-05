@@ -5,12 +5,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import { useState, useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
+import type { Product } from "@/lib/products";
 
-const suggested = products.slice(0, 4);
+function useSuggestedProducts() {
+  const [suggested, setSuggested] = useState<Product[]>([]);
+  useEffect(() => {
+    const sb = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    sb.from("products")
+      .select("slug,title,price,compare_price,image,collection,category,featured_tab")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .limit(8)
+      .then(({ data }) => {
+        if (data) setSuggested(data.map((p: any) => ({
+          ...p,
+          comparePrice: p.compare_price ?? 0,
+          description: "",
+          images: [],
+          variants: { options: [] },
+        })));
+      });
+  }, []);
+  return suggested;
+}
 
 export default function CartPage() {
   const { items, count, total, updateQuantity, removeFromCart } = useCart();
+  const suggested = useSuggestedProducts();
 
   const shipping   = total >= 999 ? 0 : 99;
   const grandTotal = total + shipping;
