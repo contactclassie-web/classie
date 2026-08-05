@@ -28,9 +28,11 @@ export async function POST(request: NextRequest) {
       revalidatePath(path);
     }
 
-    // Also revalidate dynamic product pages
+    // Also revalidate dynamic product + blog pages
     revalidatePath("/products/[slug]", "page");
     revalidatePath("/shop/[category]", "page");
+    revalidatePath("/blog", "page");
+    revalidatePath("/blog/[slug]", "page");
 
     return NextResponse.json({ revalidated: true, paths });
   } catch (err) {
