@@ -139,6 +139,7 @@ export default function ProductDetailClient({
   const [advAspect, setAdvAspect] = useState("4/5");
   const [advRadius, setAdvRadius] = useState("sharp");
   const [advCardH, setAdvCardH] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
   const radiusMap: Record<string, string> = { sharp: "", slight: "rounded", rounded: "rounded-xl", pill: "rounded-3xl" };
 
   useEffect(() => {
@@ -154,6 +155,11 @@ export default function ProductDetailClient({
         if (m.adv_related_radius)  setAdvRadius(m.adv_related_radius);
         if (m.adv_related_card_h)  setAdvCardH(parseInt(m.adv_related_card_h) || 0);
       });
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
   const discount = product.comparePrice > product.price
@@ -187,7 +193,7 @@ export default function ProductDetailClient({
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <>
+    <div className="overflow-x-hidden">
       {/* ── Breadcrumb ── */}
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14 pt-5 pb-0">
         <nav className="flex items-center gap-2 text-xs flex-wrap" style={{ color: "#888" }}>
@@ -723,7 +729,7 @@ export default function ProductDetailClient({
           <h2 className="font-serif text-center" style={{ fontSize: "28px", color: "#3B5373", marginBottom: "32px" }}>
             Designed for Every Moment
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${isDesktop ? 4 : 2}, 1fr)`, gap: "12px" }}>
             {tiles.map((tile, i) => (
               <div key={i} className="text-center" style={{ padding: "28px 20px", border: "1.5px solid #3B5373", borderRadius: "8px", background: "#fff" }}>
                 <div style={{ fontSize: "30px", marginBottom: "12px" }}>{tile.icon}</div>
@@ -766,7 +772,7 @@ export default function ProductDetailClient({
 
           {/* Product grid */}
           {collProducts.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: `${advGap}px` }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${isDesktop ? advDesktop : 2}, minmax(0, 1fr))`, gap: `${advGap}px` }}>
               {collProducts.slice(0, 4).map((p) => (
                 <ProductCard
                   key={p.slug}
@@ -780,7 +786,7 @@ export default function ProductDetailClient({
               ))}
             </div>
           ) : related.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: `${advGap}px` }}>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${isDesktop ? advDesktop : 2}, minmax(0, 1fr))`, gap: `${advGap}px` }}>
               {related.slice(0, 4).map((p) => (
                 <ProductCard
                   key={p.slug}
@@ -974,6 +980,6 @@ export default function ProductDetailClient({
       )}
 
       {/* ── Related Products (You May Also Like) — hidden ── */}
-    </>
+    </div>
   );
 }
