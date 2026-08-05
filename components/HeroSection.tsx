@@ -112,7 +112,7 @@ export default function HeroSection({ heroSlides, heroImageUrl, initialSettings 
           </div>
         )}
 
-        <h1 className="font-serif text-[clamp(36px,6.2vw,94px)] font-light leading-[1.02] text-[#1a1a1a] mb-6 md:mb-8">
+        <h1 className="font-serif text-[clamp(28px,6.2vw,94px)] font-light leading-[1.05] text-[#1a1a1a] mb-4 md:mb-8 break-words overflow-hidden">
           {line1}
           <br />
           <em className="italic text-[#3B5373]">{italic}</em>
@@ -126,7 +126,7 @@ export default function HeroSection({ heroSlides, heroImageUrl, initialSettings 
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-6 mb-16">
+        <div className="flex flex-wrap items-center gap-3 mb-8 md:mb-16">
           {cta1Text && (
             <Link href={cta1Url} className="bg-[#3B5373] text-white px-10 py-4 text-[10px] font-light tracking-[0.28em] uppercase border border-[#3B5373] hover:bg-[#1a1a1a] hover:border-[#1a1a1a] transition-all duration-300">
               {cta1Text}
