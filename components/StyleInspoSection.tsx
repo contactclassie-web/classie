@@ -35,6 +35,14 @@ export default function StyleInspoSection({ initialImages, initialSettings }: Pr
   const [cfg, setCfg] = useState<IgSettings>(buildCfg(initialSettings));
   const [advDesktop, setAdvDesktop] = useState(initialSettings?.adv_inspo_desktop ? parseInt(initialSettings.adv_inspo_desktop) || 4 : 4);
   const [advGap,     setAdvGap]     = useState(initialSettings?.adv_inspo_gap ? parseInt(initialSettings.adv_inspo_gap) || 4 : 4);
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     // Skip if server provided data
@@ -72,10 +80,10 @@ export default function StyleInspoSection({ initialImages, initialSettings }: Pr
   const normal = parts.join(" ");
 
   return (
-    <section className="py-20 bg-white border-t border-gray-100 px-6 md:px-20">
+    <section className="py-10 md:py-20 bg-white border-t border-gray-100 px-4 md:px-20">
       <div>
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-6 md:mb-12">
           <div className="flex items-center justify-center gap-4 mb-4">
             <div className="w-8 h-px bg-[#3B5373]" />
             <span className="font-sans text-[10px] font-light tracking-[0.36em] uppercase text-[#3B5373]">{cfg.handle}</span>
@@ -89,7 +97,7 @@ export default function StyleInspoSection({ initialImages, initialSettings }: Pr
 
         {/* Grid — 3 cols on mobile, configurable on desktop */}
         {/* Using inline style for gridTemplateColumns to avoid Tailwind purge issues with dynamic classes */}
-        <div className="grid grid-cols-3" style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}>
+        <div className="grid" style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${isDesktop ? advDesktop : 3}, minmax(0, 1fr))` }}>
           {images.map((item, i) => (
             <a key={i} href={item.link_url || "#"} target="_blank" rel="noopener noreferrer"
               className="group relative overflow-hidden bg-[#c8d6e5]" style={{ aspectRatio: "1 / 1" }}>

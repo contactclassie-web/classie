@@ -69,9 +69,9 @@ export default function PhilosophySection({ initialSettings }: Props) {
   const bodyParagraphs = d.body.split("\n\n").filter(Boolean);
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2" style={{ minHeight: "80vh" }}>
+    <section className="grid grid-cols-1 md:grid-cols-2" style={{ minHeight: "auto" }}>
       {/* Left: blue gradient + ghost C */}
-      <div className="relative overflow-hidden" style={{ minHeight: "400px", background: "linear-gradient(145deg, #3B5373 0%, #5a7a9a 60%, #7a9ab5 100%)" }}>
+      <div className="relative overflow-hidden" style={{ minHeight: "250px", background: "linear-gradient(145deg, #3B5373 0%, #5a7a9a 60%, #7a9ab5 100%)" }}>
         {d.imageUrl ? (
           <Image src={d.imageUrl} alt="Philosophy" fill className="object-cover" />
         ) : (
@@ -85,7 +85,7 @@ export default function PhilosophySection({ initialSettings }: Props) {
       </div>
 
       {/* Right: white content */}
-      <div className="bg-white flex flex-col justify-center px-8 md:px-16 py-16">
+      <div className="bg-white flex flex-col justify-center px-6 md:px-16 py-8 md:py-16">
         {/* Eyebrow */}
         <p className="font-sans text-[10px] tracking-[0.28em] uppercase text-[#3B5373] mb-6">{d.eyebrow}</p>
 
@@ -117,7 +117,7 @@ export default function PhilosophySection({ initialSettings }: Props) {
         )}
 
         {/* Features 2-col */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 md:mb-8">
           {[{ t: d.f1Title, desc: d.f1Desc }, { t: d.f2Title, desc: d.f2Desc }].map((f, i) => (
             <div key={i} className="flex items-start gap-3">
               <span className="text-[#3B5373] text-base mt-0.5 flex-shrink-0">{i === 0 ? "✦" : "⬡"}</span>
