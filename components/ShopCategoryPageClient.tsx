@@ -178,7 +178,7 @@ function CategoryHero({
           className="absolute inset-0 w-full h-full opacity-30 pointer-events-none scale-[1.4]" allow="autoplay" />
       )}
 
-      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-10 md:py-20`} style={{ minHeight: "320px" }}>
+      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-4 md:py-20`} style={{ minHeight: "320px" }}>
         <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
           <div className="w-8 h-px bg-white/40" />
           <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -460,11 +460,11 @@ export default function ShopCategoryPageClient({
             )}
             <div className="flex overflow-x-auto gap-2 pb-1 justify-start md:justify-center" style={{ scrollbarWidth: "none" }}>
               {[
-                { label: "View All", tags: [] },
-                { label: "Rhinestone Shoe Charms", tags: ["Rhinestone Shoe Charms"] },
-                { label: "Flower Shoe Charms", tags: ["Flower Shoe Charms"] },
-                { label: "Bow Shoe Charms", tags: ["Bow Shoe Charms"] },
-                { label: "Pearl Anklet", tags: ["Pearl Anklet"] },
+                { label: "All", tags: [] },
+                { label: "Rhinestone", tags: ["Rhinestone Shoe Charms"] },
+                { label: "Flower", tags: ["Flower Shoe Charms"] },
+                { label: "Bow", tags: ["Bow Shoe Charms"] },
+                { label: "Anklet", tags: ["Pearl Anklet"] },
               ].map((item) => {
                 const isActive = item.tags.length === 0
                   ? selectedFilterTypes.length === 0
@@ -475,7 +475,7 @@ export default function ShopCategoryPageClient({
                     onClick={() => setSelectedFilterTypes(item.tags)}
                     className="transition-all duration-200"
                     style={{
-                      padding: "10px 22px",
+                      padding: "8px 14px",
                       borderRadius: "999px",
                       border: `1.5px solid #3B5373`,
                       background: isActive ? "#3B5373" : "transparent",
