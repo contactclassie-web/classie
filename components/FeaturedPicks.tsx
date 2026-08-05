@@ -110,7 +110,7 @@ function ProductCard({ product, isNew, cardStyle }: { product: Product; isNew?: 
           )}
           {/* Heart */}
           <button className="w-9 h-9 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all duration-200 mt-1 shadow-sm touch-manipulation"
-            onClick={e => { e.stopPropagation(); e.preventDefault(); toggle(product.slug); }}>
+            onClick={e => { e.stopPropagation(); e.preventDefault(); toggle(product.slug); }} onTouchEnd={e => { e.stopPropagation(); e.preventDefault(); toggle(product.slug); }}>
             <Heart className={`w-3.5 h-3.5 transition-colors ${isWished(product.slug) ? "fill-red-500 stroke-red-500" : "stroke-gray-500"}`} strokeWidth={1.8} />
           </button>
         </div>
