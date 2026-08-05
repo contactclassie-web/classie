@@ -39,14 +39,14 @@ export default function TrackOrderPage() {
   const stepIdx = order ? STATUS_STEPS.indexOf(order.status) : -1;
 
   return (
-    <>
-      <div className="bg-[#faf8f6] py-12 text-center border-b border-classie-border">
+    <div className="overflow-x-hidden">
+      <div className="bg-[#faf8f6] py-10 text-center border-b border-classie-border px-4">
         <p className="text-[11px] tracking-[0.5em] uppercase text-classie-gray mb-2">Real-time tracking</p>
-        <h1 className="font-serif text-5xl md:text-6xl text-classie-black">Track My Order</h1>
+        <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl text-classie-black">Track My Order</h1>
       </div>
 
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-14">
-        <form onSubmit={handleTrack} className="flex gap-3 mb-8">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-10">
+        <form onSubmit={handleTrack} className="flex flex-col sm:flex-row gap-3 mb-8">
           <input
             type="text"
             value={orderId}
@@ -142,6 +142,6 @@ export default function TrackOrderPage() {
           </a>
         </p>
       </div>
-    </>
+    </div>
   );
 }
