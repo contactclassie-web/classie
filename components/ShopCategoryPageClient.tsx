@@ -144,9 +144,9 @@ function CategoryHero({
                     "px-6";
 
   return (
-    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", aspectRatio: "16/5" }}>
+    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", aspectRatio: "16/5", minHeight: "160px" }}>
       {bgType === "image" && bgUrl && (
-        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-contain opacity-100" />
+        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-100" />
       )}
       {bgType === "slider" && slides.length > 0 && (
         <>
@@ -172,7 +172,7 @@ function CategoryHero({
           className="absolute inset-0 w-full h-full opacity-30 pointer-events-none scale-[1.4]" allow="autoplay" />
       )}
 
-      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-20`} style={{ minHeight: "320px" }}>
+      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-6 md:py-20`} style={{ minHeight: "100%" }}>
         <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
           <div className="w-8 h-px bg-white/40" />
           <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "'Poppins', sans-serif" }}>
