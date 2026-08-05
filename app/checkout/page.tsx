@@ -488,6 +488,26 @@ export default function CheckoutPage() {
                         <p className="text-xs text-red-600">{couponResult.error}</p>
                       </div>
                     )}
+                    {/* Available coupon chips */}
+                    <div className="mt-3">
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5">Available Offers</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { code: "FIRST10", label: "10% OFF", sub: "No minimum" },
+                          { code: "CLASSIE15", label: "15% OFF", sub: "Min ₹2,000" },
+                        ].map((c) => (
+                          <button
+                            key={c.code}
+                            type="button"
+                            onClick={() => { setCouponCode(c.code); setCouponResult(null); setAppliedCouponId(null); setCouponDiscount(0); }}
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 border border-dashed border-[#3B5373] rounded text-[11px] text-[#3B5373] hover:bg-[#3B5373] hover:text-white transition-colors"
+                          >
+                            <span className="font-mono font-semibold">{c.code}</span>
+                            <span className="text-[10px] opacity-70">• {c.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
