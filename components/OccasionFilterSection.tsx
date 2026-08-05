@@ -138,9 +138,9 @@ export default function OccasionFilterSection({ activeOccasion, onOccasionClick,
   const show = occasions.slice(0, 3);
 
   return (
-    <section className={compact ? "py-6 bg-white" : "py-12 bg-white"}>
+    <section className={compact ? "py-4 bg-white" : "py-6 md:py-12 bg-white"}>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10">
-        <div className={compact ? "text-center mb-5" : "text-center mb-10"}>
+        <div className={compact ? "text-center mb-4" : "text-center mb-4 md:mb-10"}>
           {!compact && <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
             Curated Edits
           </span>}
