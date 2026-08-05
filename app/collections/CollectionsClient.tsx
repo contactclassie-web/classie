@@ -213,29 +213,7 @@ export default function CollectionsClient({ initialProducts, categories }: Props
             </div>
           )}
 
-          {/* Category pills */}
-          <div className="flex gap-2 flex-wrap mb-9">
-            <button
-              onClick={() => setActiveCategory("all")}
-              className={`px-5 py-2.5 rounded-full text-[9.5px] tracking-[0.14em] uppercase border-[1.5px] transition-all duration-200 font-medium ${
-                activeCategory === "all"
-                  ? "bg-[#3B5373] border-[#3B5373] text-white"
-                  : "border-gray-200 text-gray-500 hover:border-[#3B5373] hover:text-[#3B5373]"
-              }`}>
-              All Products
-            </button>
-            {categories.map((cat) => (
-              <button key={cat.slug}
-                onClick={() => setActiveCategory(cat.slug)}
-                className={`px-5 py-2.5 rounded-full text-[9.5px] tracking-[0.14em] uppercase border-[1.5px] transition-all duration-200 font-medium ${
-                  activeCategory === cat.slug
-                    ? "bg-[#3B5373] border-[#3B5373] text-white"
-                    : "border-gray-200 text-gray-500 hover:border-[#3B5373] hover:text-[#3B5373]"
-                }`}>
-                {cat.name}
-              </button>
-            ))}
-          </div>
+          {/* Category pills removed — tab bar below handles filtering */}
 
           {/* CTA buttons */}
           <div className="flex gap-3 items-center flex-wrap">
