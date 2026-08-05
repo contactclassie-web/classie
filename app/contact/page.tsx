@@ -57,7 +57,7 @@ export default async function ContactPage() {
       {/* ── Section 1: Hero + Form ── */}
       <section className="flex flex-col md:flex-row" style={{ minHeight: "520px" }}>
         {/* Left — image or navy */}
-        <div className="w-full md:w-[40%] relative flex items-center justify-center" style={{ minHeight: "280px" }}>
+        <div className="w-full md:w-[40%] relative flex items-center justify-center" style={{ minHeight: "200px" }}>
           {heroImg ? (
             <div className="absolute inset-0" style={{ backgroundImage: `url(${heroImg})`, backgroundSize: "cover", backgroundPosition: "center" }} />
           ) : (

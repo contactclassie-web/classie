@@ -51,7 +51,7 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {status === "error" && <p className="text-red-500 text-sm">{errorMsg}</p>}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <BottomBorderField icon="👤" name="first_name" placeholder="First Name" value={form.first_name} onChange={handleChange} required />
         <BottomBorderField icon="" name="last_name" placeholder="Last Name" value={form.last_name} onChange={handleChange} />
       </div>
