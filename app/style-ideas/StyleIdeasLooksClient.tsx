@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface LookCard {
@@ -30,12 +30,20 @@ interface Props {
 
 export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, showTag = true, heading = "Shop the Look", mobileCols = 2, gap = 16, aspect = "3/4", radius = "sharp", cardH = 0 }: Props) {
   const [activeTab, setActiveTab] = useState(occasions[0] || "");
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const filtered = activeTab === ""
     ? looks
     : looks.filter(l => l.tag === activeTab);
 
-  const mobileColMap: Record<number,string> = { 1:"grid-cols-1", 2:"grid-cols-2", 3:"grid-cols-3" };
   const radiusMap: Record<string,string> = { sharp:"rounded-none", slight:"rounded", rounded:"rounded-xl", pill:"rounded-3xl" };
 
   return (
@@ -47,14 +55,14 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, s
           <h2 className="font-serif text-3xl md:text-4xl text-center text-[#1a1a1a] font-light mb-10">{heading}</h2>
         )}
 
-        {/* Occasion Tabs */}
+        {/* Occasion Tabs — horizontal scroll on mobile */}
         {occasions.length > 1 && (
-          <div className="flex gap-2 flex-wrap mb-10 justify-center">
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-8 justify-start md:justify-center" style={{ scrollbarWidth: "none" }}>
             {occasions.map(occ => (
               <button
                 key={occ}
                 onClick={() => setActiveTab(occ)}
-                className={`px-5 py-2 text-xs font-medium tracking-widest uppercase border transition-all ${
+                className={`flex-shrink-0 px-4 py-2 text-xs font-medium tracking-widest uppercase border transition-all whitespace-nowrap ${
                   activeTab === occ
                     ? "bg-[#3B5373] text-white border-[#3B5373]"
                     : "border-gray-200 text-[#888] hover:border-[#3B5373] hover:text-[#3B5373]"
@@ -70,7 +78,7 @@ export default function StyleIdeasLooksClient({ looks, occasions, cardsPerRow, s
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-[#888] text-sm">No looks in this category yet.</div>
         ) : (
-          <div className={`grid ${mobileColMap[mobileCols]||"grid-cols-2"}`} style={{ gap: `${gap}px`, gridTemplateColumns: `repeat(${cardsPerRow}, minmax(0, 1fr))` }}>
+          <div className="grid" style={{ gap: `${gap}px`, gridTemplateColumns: `repeat(${isDesktop ? cardsPerRow : mobileCols}, minmax(0, 1fr))` }}>
             {filtered.map((look) => (
               <LookCard key={look.id} look={look} showTag={showTag} aspect={aspect} radius={radiusMap[radius]||"rounded-none"} cardH={cardH} />
             ))}
