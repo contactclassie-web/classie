@@ -33,7 +33,7 @@ export default async function ContactPage() {
   const subtext   = cfg.ct_subtext   || "Your perfect look deserves the perfect heel. Whether you need help with sizing, styling, orders, or customisation — our team is here to assist you.\n\nDrop us a message and we'll get back to you within 24–48 hours.";
   const heroImg   = cfg.ct_hero_img  || "";
   const trackText = cfg.ct_track_text || "Log in to check the status of your order.";
-  const trackUrl  = cfg.ct_track_url  || "/track";
+  const trackUrl  = cfg.ct_track_url  || "/track-order";
   const retText   = cfg.ct_return_text || "We make it easy to return and exchange styles.";
   const retUrl    = cfg.ct_return_url  || "/returns";
   const faqHeading  = cfg.ct_faq_heading  || "Popular Searched Questions";
