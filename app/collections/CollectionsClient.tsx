@@ -320,7 +320,7 @@ export default function CollectionsClient({ initialProducts, categories }: Props
       </div>
 
       {/* ── PRODUCT GRID ──────────────────────────────────────────────────── */}
-      <section className="max-w-screen-xl mx-auto px-10 py-14 pb-24">
+      <section className="max-w-screen-xl mx-auto px-4 md:px-10 py-8 pb-10">
         {sectionLbl && (
           <div className="flex items-center gap-4 mb-10">
             <span className="text-[9.5px] tracking-[0.24em] uppercase text-gray-400">{sectionLbl}</span>
@@ -341,11 +341,7 @@ export default function CollectionsClient({ initialProducts, categories }: Props
           </div>
         )}
 
-        {filtered.length > 0 && (
-          <p className="text-center text-[9px] tracking-[0.2em] uppercase text-gray-300 mt-14">
-            Showing {filtered.length} {filtered.length === 1 ? "product" : "products"}
-          </p>
-        )}
+        {/* "Showing X products" removed */}
       </section>
 
       {/* ── BRAND STRIP — hidden if all titles blank ──────────────────────── */}
