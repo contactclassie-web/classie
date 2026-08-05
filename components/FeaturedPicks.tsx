@@ -175,6 +175,14 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
   const [saleProducts,   setSaleProducts]      = useState<Product[]>(_s ?? []);
   const [advMobile,  setAdvMobile]  = useState(() => initialSettings?.adv_picks_mobile  ? parseInt(initialSettings.adv_picks_mobile)  || 2 : 2);
   const [advDesktop, setAdvDesktop] = useState(() => initialSettings?.adv_picks_desktop ? parseInt(initialSettings.adv_picks_desktop) || 4 : 4);
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
   const [advGap,     setAdvGap]     = useState(() => initialSettings?.adv_picks_gap     ? parseInt(initialSettings.adv_picks_gap)     || 12 : 12);
   const [advAspect,  setAdvAspect]  = useState(() => initialSettings?.adv_picks_aspect  || "4/5");
   const [advRadius,  setAdvRadius]  = useState(() => initialSettings?.adv_picks_radius  || "sharp");
@@ -275,7 +283,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
         {/* Grid */}
         <div
           className="grid"
-          style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${advDesktop}, minmax(0, 1fr))` }}
+          style={{ gap: advGap + "px", gridTemplateColumns: `repeat(${isDesktop ? advDesktop : advMobile}, minmax(0, 1fr))` }}
         >
           {products.map((product, idx) => (
             <ProductCard key={product.slug} product={product} isNew={activeTab === "latest" && idx === 0} cardStyle={{ aspectRatio: advAspect !== "none" ? advAspect : undefined, borderRadius: radiusMap[advRadius] || "", height: advCardH || undefined }} />

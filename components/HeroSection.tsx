@@ -100,9 +100,9 @@ export default function HeroSection({ heroSlides, heroImageUrl, initialSettings 
   ];
 
   return (
-    <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[calc(100vh-72px)]">
+    <section className="grid grid-cols-1 md:grid-cols-[42%_58%] min-h-[50vh] md:min-h-[calc(100vh-72px)]">
       {/* Left: text */}
-      <div className="flex flex-col justify-center px-6 md:px-20 py-16 md:py-24 bg-[#f7f7f7] relative">
+      <div className="flex flex-col justify-center px-6 md:px-20 py-10 md:py-24 bg-[#f7f7f7] relative order-2 md:order-1">
 
 
         {eyebrow && (
@@ -112,7 +112,7 @@ export default function HeroSection({ heroSlides, heroImageUrl, initialSettings 
           </div>
         )}
 
-        <h1 className="font-serif text-[clamp(52px,6.2vw,94px)] font-light leading-[1.02] text-[#1a1a1a] mb-8">
+        <h1 className="font-serif text-[clamp(36px,6.2vw,94px)] font-light leading-[1.02] text-[#1a1a1a] mb-6 md:mb-8">
           {line1}
           <br />
           <em className="italic text-[#3B5373]">{italic}</em>
@@ -152,7 +152,7 @@ export default function HeroSection({ heroSlides, heroImageUrl, initialSettings 
       </div>
 
       {/* Right: image */}
-      <div className="relative overflow-hidden bg-[#f7f7f7] min-h-[400px]">
+      <div className="relative overflow-hidden bg-[#f7f7f7] min-h-[300px] md:min-h-[400px] order-1 md:order-2">
         <HeroImageSlider slides={heroSlides} fallbackUrl={heroImageUrl} />
         {chipCode && (
           <div className="absolute bottom-12 left-0 bg-white px-7 py-5 border-l-[3px] border-[#3B5373] shadow-xl">
