@@ -6,7 +6,7 @@ import CollectionsClient from "./CollectionsClient";
 export const metadata: Metadata = {
   title: "All Collections — Shoe Clips, Bow Clips & Accessories",
   description: "Browse all CLASSIE collections — shoe clips, bow clips, rhinestone clips, crystal clips and festive accessories for women. Shop the full range.",
-  alternates: { canonical: "https://classie.co.in/collections" },
+  alternates: { canonical: "https://www.classie.co.in/collections" },
 };
 
 export const revalidate = 3600;

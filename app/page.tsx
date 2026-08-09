@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "CLASSIE — Shoe Clips & Accessories for Women",
     description: "Shop handcrafted shoe clips, bow clips & rhinestone accessories for women in India.",
   },
-  alternates: { canonical: "https://classie.co.in" },
+  alternates: { canonical: "https://www.classie.co.in" },
 };
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionSection from "@/components/OccasionSection";
