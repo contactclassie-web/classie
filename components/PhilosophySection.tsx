@@ -14,7 +14,7 @@ interface PhilData {
 
 const D: PhilData = {
   eyebrow: "Our Philosophy",
-  headLine1: "One Heel.", headItalic: "Endless", headLine2: "Possibilities.",
+  headLine1: "One Clip.", headItalic: "Endless", headLine2: "Possibilities.",
   body: "Classie was born from a simple belief — every woman deserves to feel powerful in her heels. Comfort-first design, premium materials, and the freedom to switch your story with a single clip.\n\nDesigned and crafted in India, each pair is an invitation to move through the world on your own terms.",
   ctaText: "Read Our Story", ctaUrl: "/about", imageUrl: "",
   stat1n: "10K+", stat1l: "Happy Customers",

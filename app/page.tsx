@@ -221,7 +221,7 @@ export default async function HomePage() {
   // Philosophy
   const philEyebrow = cfg["philosophy_eyebrow"] || "Our Philosophy";
   const philHeadline =
-    cfg["philosophy_headline"] || "One Heel. Endless Possibilities.";
+    cfg["philosophy_headline"] || "One Clip. Endless Possibilities.";
   const philBody =
     cfg["philosophy_body"] ||
     "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way. From morning coffee to midnight celebrations, there's a Classie for every chapter of your day.";

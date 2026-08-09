@@ -12,7 +12,7 @@ const sb = createClient(
 
 const DEFAULTS = {
   hero_eyebrow:         "New Collection",
-  hero_heading_line1:   "One Heel.",
+  hero_heading_line1:   "One Clip.",
   hero_heading_italic:  "Endless",
   hero_heading_line3:   "Looks.",
   hero_subtitle:        "",

@@ -65,7 +65,7 @@ function parseLinks(json: string, fallback: FooterLink[]): FooterLink[] {
 
 const DEFAULT_DATA: FooterData = {
   footer_logo_url: "",
-  footer_tagline: "One Heel. Endless Looks.",
+  footer_tagline: "One Clip. Endless Looks.",
   footer_desc: "Premium heels crafted for the modern woman. Made with ♥ in India.",
   footer_ig_url: "https://www.instagram.com/_classie_in/",
   footer_tiktok_url: "", footer_fb_url: "", footer_pinterest_url: "", footer_whatsapp_url: "",
