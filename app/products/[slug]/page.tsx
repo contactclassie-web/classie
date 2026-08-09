@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return { title: "Product Not Found" };
 
   const isHeel = product.category === "heels";
-  const isCharm = product.category === "shoe-charms";
+  const isCharm = !isHeel; // accessories / shoe-charms
 
   // SEO-optimized title by category (layout adds "| CLASSIE" via template)
   const seoTitle = isHeel
