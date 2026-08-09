@@ -23,6 +23,18 @@ const nextConfig = {
         destination: '/shipping',
         permanent: true,
       },
+      // /products → /collections (old Shopify URL)
+      {
+        source: '/products',
+        destination: '/collections',
+        permanent: true,
+      },
+      // /collections/the-festive-edit/Heel+heel → /collections/the-festive-edit
+      {
+        source: '/collections/the-festive-edit/:tag',
+        destination: '/collections/the-festive-edit',
+        permanent: true,
+      },
     ];
   },
 }
