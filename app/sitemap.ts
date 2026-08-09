@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = "https://classie.co.in";
+  const base = "https://www.classie.co.in";
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
