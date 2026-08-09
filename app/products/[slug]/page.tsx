@@ -73,12 +73,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isHeel = product.category === "heels";
   const isCharm = product.category === "shoe-charms";
 
-  // SEO-optimized title by category
+  // SEO-optimized title by category (layout adds "| CLASSIE" via template)
   const seoTitle = isHeel
-    ? `Buy ${product.title} for Women India | CLASSIE`
+    ? `Buy ${product.title} for Women India`
     : isCharm
-    ? `Buy ${product.title} | Shoe Clips & Accessories | CLASSIE`
-    : `${product.title} | CLASSIE`;
+    ? `${product.title} — Shoe Clip Accessories`
+    : product.title;
 
   // Clean 155-char description
   const rawDesc = (product.description || "").replace(/\n/g, " ").trim();
@@ -96,14 +96,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: seoDesc,
     keywords,
     openGraph: {
-      title: seoTitle,
+      title: `${seoTitle} | CLASSIE`,
       description: seoDesc,
       images: [{ url: product.image || "" }],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: seoTitle,
+      title: `${seoTitle} | CLASSIE`,
       description: seoDesc,
     },
   };
