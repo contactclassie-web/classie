@@ -6,8 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Shoe Charms — Classie",
-  description: "Shop CLASSIE Shoe Charms — Rhinestone, Flower, Bow & Pearl Anklets.",
+  title: "Shoe Clips for Women — Rhinestone, Crystal & Bow Clips",
+  description: "Shop CLASSIE shoe clips for women — rhinestone clips, crystal clips, bow clips and floral clips. Instantly transform any shoe. Free shipping above ₹499.",
 };
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);

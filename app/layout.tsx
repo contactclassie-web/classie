@@ -18,17 +18,17 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Classie — Premium Women's Heels & Accessories",
-    template: "%s | Classie",
+    default: "CLASSIE — Shoe Clips, Bow Clips & Accessories for Women",
+    template: "%s | CLASSIE",
   },
   description:
-    "Shop premium women's heels, block heels, stilettos and shoe accessories. Free shipping above ₹999. COD available. Shop Classie — where comfort meets luxury.",
-  keywords: ["women heels", "block heels", "shoe clips", "accessories", "classie"],
+    "Shop handcrafted shoe clips, bow clips, rhinestone clips and shoe accessories for women in India. Transform any pair of heels, flats or sandals instantly. Free shipping above ₹499. COD available.",
+  keywords: ["shoe clips", "bow clips", "bow clips for shoes", "rhinestone shoe clips", "shoe accessories for women", "shoe clips india", "classie"],
   openGraph: {
-    title: "Classie — Premium Women's Heels & Accessories",
-    description: "Shop premium women's heels and shoe accessories. Free shipping above ₹999.",
+    title: "CLASSIE — Shoe Clips & Accessories for Women",
+    description: "Handcrafted shoe clips, bow clips & rhinestone accessories. Transform any shoe instantly.",
     url: "https://classie.co.in",
-    siteName: "Classie",
+    siteName: "CLASSIE",
     type: "website",
   },
 };

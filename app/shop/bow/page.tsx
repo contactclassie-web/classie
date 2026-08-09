@@ -6,8 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Bow Collection — Classie",
-  description: "Shop Classie's Bow Collection — romance in every step.",
+  title: "Bow Clips for Shoes — Satin, Jute & Pearl Bow Shoe Clips",
+  description: "Shop CLASSIE bow clips for shoes — handcrafted satin, jute and pearl bow shoe clips for women. Perfect for heels, flats and sandals. Free shipping above ₹499.",
 };
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);

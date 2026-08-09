@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Block admin and internal pages
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /order-success
+Disallow: /checkout
+Disallow: /cart
+
+Sitemap: https://classie.co.in/sitemap.xml

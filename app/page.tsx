@@ -1,6 +1,28 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Instagram } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "CLASSIE — Shoe Clips, Bow Clips & Rhinestone Accessories for Women",
+  description: "Shop handcrafted shoe clips, bow clips, rhinestone clips and shoe accessories for women in India. Transform any pair of heels, flats or sandals instantly. Free shipping above ₹499.",
+  keywords: ["shoe clips", "bow clips for shoes", "rhinestone shoe clips", "shoe accessories for women", "shoe clips india", "shoe clip pair"],
+  openGraph: {
+    title: "CLASSIE — Shoe Clips & Accessories",
+    description: "Handcrafted shoe clips, bow clips & rhinestone accessories. Transform any shoe instantly.",
+    url: "https://classie.co.in",
+    siteName: "CLASSIE",
+    images: [{ url: "https://res.cloudinary.com/dbzt3soyi/image/upload/v1782380055/f5d0052f-6be6-4ac9-bee2-ffa893f3d4a3_je39kw.png", width: 1200, height: 630 }],
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CLASSIE — Shoe Clips & Accessories for Women",
+    description: "Shop handcrafted shoe clips, bow clips & rhinestone accessories for women in India.",
+  },
+  alternates: { canonical: "https://classie.co.in" },
+};
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionSection from "@/components/OccasionSection";
 import FeaturedPicks from "@/components/FeaturedPicks";
