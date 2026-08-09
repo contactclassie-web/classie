@@ -69,11 +69,42 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getProductBySlugFromDB(params.slug);
   if (!product) return { title: "Product Not Found" };
+
+  const isHeel = product.category === "heels";
+  const isCharm = product.category === "shoe-charms";
+
+  // SEO-optimized title by category
+  const seoTitle = isHeel
+    ? `Buy ${product.title} for Women India | CLASSIE`
+    : isCharm
+    ? `Buy ${product.title} | Shoe Clips & Accessories | CLASSIE`
+    : `${product.title} | CLASSIE`;
+
+  // Clean 155-char description
+  const rawDesc = (product.description || "").replace(/\n/g, " ").trim();
+  const seoDesc = rawDesc.length > 155 ? rawDesc.substring(0, 152) + "..." : rawDesc;
+
+  // Keywords by category
+  const keywords = isHeel
+    ? `${product.title}, heels for women, block heels india, women heels, buy heels online india, CLASSIE heels`
+    : isCharm
+    ? `${product.title}, shoe clips india, shoe accessories, shoe charms, CLASSIE clips`
+    : `${product.title}, CLASSIE india`;
+
   return {
-    title: product.title,
-    description: product.description,
+    title: seoTitle,
+    description: seoDesc,
+    keywords,
     openGraph: {
-      images: [{ url: product.image }],
+      title: seoTitle,
+      description: seoDesc,
+      images: [{ url: product.image || "" }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoTitle,
+      description: seoDesc,
     },
   };
 }
