@@ -60,10 +60,12 @@ export async function generateStaticParams() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z"
     );
     const { data } = await sb.from("products").select("slug").eq("active", true);
-    if (data && data.length > 0) return data.map((p: { slug: string }) => ({ slug: p.slug }));
+    if (data && data.length > 0) return data
+      .filter((p: { slug: string }) => p.slug && p.slug.trim().length > 0)
+      .map((p: { slug: string }) => ({ slug: p.slug }));
   } catch { /* fall through */ }
   // Fallback to hardcoded list
-  return products.map((p) => ({ slug: p.slug }));
+  return products.filter((p) => p.slug && p.slug.trim().length > 0).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
