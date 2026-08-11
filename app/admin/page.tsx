@@ -2853,9 +2853,25 @@ export default function AdminPage() {
         }
       }
 
+      const wasAdd = productModal.mode === "add";
+      const savedSlug = productModal.data.slug;
       await fetchProducts();
-      closeProductModal();
       await revalidateSite();
+      if (wasAdd && savedSlug) {
+        // Re-open in edit mode so color variants section is accessible
+        const { data: savedRow } = await supabase
+          .from("products")
+          .select("*")
+          .eq("slug", savedSlug)
+          .single();
+        if (savedRow) {
+          openEditProduct(savedRow as DbProduct);
+        } else {
+          closeProductModal();
+        }
+      } else {
+        closeProductModal();
+      }
     } catch (e: any) { alert("Save error: " + (e?.message || String(e))); }
     finally { setProductSaving(false); }
   };
