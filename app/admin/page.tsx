@@ -9644,11 +9644,15 @@ export default function AdminPage() {
                           <p className="text-sm font-semibold text-gray-800">🎨 Color Image Sets</p>
                           <p className="text-xs text-gray-400 mt-0.5">Add image sets per color. Images swap when user clicks color on product page.</p>
                         </div>
-                        {(Array.isArray(productModal.data.variants) ? productModal.data.variants as string[] : []).length === 0 ? (
+                        {(() => {
+                          const variantColors = (Array.isArray(productModal.data.variants) ? productModal.data.variants : [])
+                            .map((x: unknown) => typeof x === "object" && x !== null ? (x as {name?: string}).name || "" : String(x))
+                            .filter(Boolean);
+                          return variantColors.length === 0 ? (
                           <p className="text-xs text-gray-400 italic">No colors found. Add colors in the Variants field above first.</p>
                         ) : (
                           <>
-                            {(Array.isArray(productModal.data.variants) ? productModal.data.variants as string[] : []).map((colorName: string) => {
+                            {variantColors.map((colorName: string) => {
                               const colorData = shoeCharmColorData[colorName] || { hex: defaultColorHex(colorName), images: ["","","","","","","","","",""] };
                               const updateHex = (hex: string) => setShoeCharmColorData(prev => ({ ...prev, [colorName]: { ...colorData, hex } }));
                               const updateImage = (idx: number, url: string) => {
@@ -9692,7 +9696,7 @@ export default function AdminPage() {
                               {shoeCharmSaving ? "Saving…" : "💾 Save Color Images"}
                             </button>
                           </>
-                        )}
+                        ); })()}
                       </div>
                     ) : (
                       /* ── Heels / other: existing color variant linking UI ── */
