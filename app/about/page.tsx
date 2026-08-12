@@ -5,8 +5,17 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "About Us — CLASSIE",
-  description: "The Classie story — where fashion meets freedom, designed for the modern woman.",
+  title: "About CLASSIE — Women's Heels & Shoe Clips Brand India",
+  description: "CLASSIE is India's premium women's heels and shoe clips brand — handcrafted block heels, slingback heels, rhinestone shoe clips and charms. Made for the modern Indian woman. Free shipping. COD available.",
+  alternates: { canonical: "https://www.classie.co.in/about" },
+  keywords: ["classie brand", "women's heels india brand", "shoe clips india brand", "classie founder", "classie story", "handcrafted heels india"],
+  openGraph: {
+    title: "About CLASSIE — Women's Heels & Shoe Clips Brand India",
+    description: "CLASSIE is India's premium women's heels and shoe clips brand — handcrafted block heels, slingback heels, rhinestone shoe clips and charms.",
+    url: "https://www.classie.co.in/about",
+    type: "website",
+    siteName: "CLASSIE",
+  },
 };
 
 export default async function AboutPage() {
@@ -109,6 +118,24 @@ export default async function AboutPage() {
 
   return (
     <>
+      {/* Organization Schema */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "CLASSIE",
+        "url": "https://www.classie.co.in",
+        "logo": "https://www.classie.co.in/logo.png",
+        "description": "CLASSIE is India's premium women's heels and shoe clips brand — handcrafted block heels, slingback heels, rhinestone shoe clips and shoe charms for the modern Indian woman.",
+        "founder": { "@type": "Person", "name": "Ishika Garg" },
+        "foundingDate": "2024",
+        "areaServed": "IN",
+        "contactPoint": { "@type": "ContactPoint", "contactType": "Customer Service", "availableLanguage": ["English", "Hindi"] },
+        "sameAs": [
+          "https://www.instagram.com/classie.co.in",
+          "https://www.classie.co.in"
+        ]
+      }) }} />
+
       {/* ══════════════════════════════════════════
           SECTION 1 — Hero Split
       ══════════════════════════════════════════ */}
