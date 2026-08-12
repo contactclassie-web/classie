@@ -62,28 +62,27 @@ export default async function ShoeCharmsPage() {
       />
 
       {/* SEO Content Block */}
-      <section className="max-w-4xl mx-auto px-6 py-16 text-center">
-        <h2 className="text-2xl font-serif font-light text-[#1a1a1a] mb-6">Buy Shoe Charms Online in India</h2>
-        <p className="text-sm text-gray-600 leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          CLASSIE offers India&apos;s most beautiful collection of <strong>shoe charms online</strong> — handcrafted <strong>crystal shoe charms</strong>, <strong>rhinestone shoe charms</strong>, <strong>bow charms</strong>, <strong>flower charms</strong>, and pearl anklet clips. Our shoe charms clip on instantly to any pair of heels, flats, or sandals — transforming your shoes in seconds.
-        </p>
-        <p className="text-sm text-gray-600 leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          Looking for <strong>shoe charms for wedding</strong>? Our bridal collection includes ivory pearl bows, starburst crystals, and celestial wings — perfect for brides and wedding guests. For everyday styling, our <strong>bow shoe clips</strong> and <strong>satin charms</strong> in black, beige and rose are the perfect finishing touch.
-        </p>
-        <p className="text-sm text-gray-600 leading-relaxed mb-8" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          All CLASSIE shoe charms also work as <strong>bag charms</strong>, <strong>dupatta clips</strong>, and <strong>hair accessories</strong> — making them the most versatile accessory in your wardrobe. Free shipping above ₹499, COD available across India.
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          {[
-            { label: "Crystal Charms", href: "/shop/shoe-charms" },
-            { label: "Bow Clips", href: "/shop/shoe-charms" },
-            { label: "Bridal Charms", href: "/shop/shoe-charms" },
-            { label: "Flower Clips", href: "/shop/shoe-charms" },
-          ].map((item) => (
-            <a key={item.label} href={item.href} className="text-xs tracking-widest uppercase text-[#3B5373] border border-[#3B5373]/30 px-3 py-2 hover:bg-[#3B5373]/5 transition-colors" style={{ fontFamily: "'Poppins', sans-serif" }}>
-              {item.label}
-            </a>
-          ))}
+      <section style={{ background: "#fafafa", borderTop: "1px solid #e8e8e8", borderBottom: "1px solid #e8e8e8" }}>
+        <div style={{ maxWidth: "760px", margin: "0 auto", padding: "64px 24px", textAlign: "center" }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "2rem", fontWeight: 400, color: "#1a1a1a", marginBottom: "28px", letterSpacing: "0.02em" }}>
+            Buy Shoe Charms Online in India
+          </h2>
+          <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.82rem", color: "#555", lineHeight: 1.9, marginBottom: "16px", fontWeight: 300 }}>
+            CLASSIE offers India&apos;s finest collection of <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>shoe charms online</strong> — handcrafted <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>crystal shoe charms</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>rhinestone charms</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>bow charms</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>flower charms</strong>, and pearl anklet clips. Our shoe charms clip on instantly to any pair of heels, flats, or sandals — no tools, no damage.
+          </p>
+          <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.82rem", color: "#555", lineHeight: 1.9, marginBottom: "16px", fontWeight: 300 }}>
+            Looking for <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>shoe charms for wedding</strong>? Our bridal collection — Ivory Pearl Bow, Starburst Crystal, Celestial Wings — is perfect for brides and wedding guests. For everyday styling, our <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>bow shoe clips</strong> and <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>satin charms</strong> in black, beige and rose are the finishing touch every outfit needs.
+          </p>
+          <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.82rem", color: "#555", lineHeight: 1.9, marginBottom: "40px", fontWeight: 300 }}>
+            All CLASSIE shoe charms also work as <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>bag charms</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>dupatta clips</strong>, and <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>hair accessories</strong> — one clip, endless possibilities. Free shipping above ₹499, COD across India.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center" }}>
+            {["Crystal Charms", "Bow Clips", "Bridal Charms", "Flower Clips"].map((label) => (
+              <a key={label} href="/shop/shoe-charms" style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.65rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "#3B5373", border: "1px solid #3B5373", padding: "8px 20px", textDecoration: "none" }}>
+                {label}
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 

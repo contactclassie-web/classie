@@ -59,11 +59,7 @@ function WhyChooseSection({ m }: { m: HeelsSettings }) {
           </div>
         ))}
       </div>
-      {cfg.footerText && (
-        <p className="text-sm text-[#1a1a1a] leading-loose max-w-[680px] mx-auto" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          {cfg.footerText}
-        </p>
-      )}
+      {/* footerText hidden — replaced by SEO content block below product grid */}
     </section>
   );
 }
