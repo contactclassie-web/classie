@@ -6,8 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Shoe Charms — Classie",
-  description: "Shop CLASSIE Shoe Charms — Rhinestone, Flower, Bow & Pearl Anklets.",
+  title: "Buy Shoe Charms Online India — Crystal, Rhinestone, Flower & Bow Charms | CLASSIE",
+  description: "Shop CLASSIE shoe charms online in India — rhinestone shoe charms, crystal flower charms, bow charms, pearl anklet clips & more. Perfect for weddings, parties & everyday styling. Free shipping above ₹499.",
 };
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);

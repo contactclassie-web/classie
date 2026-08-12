@@ -4,9 +4,9 @@ import Image from "next/image";
 import { Instagram } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "CLASSIE — Shoe Clips, Bow Clips & Rhinestone Accessories for Women",
-  description: "Shop handcrafted shoe clips, bow clips, rhinestone clips and shoe accessories for women in India. Transform any pair of heels, flats or sandals instantly. Free shipping above ₹499.",
-  keywords: ["shoe clips", "bow clips for shoes", "rhinestone shoe clips", "shoe accessories for women", "shoe clips india", "shoe clip pair"],
+  title: "CLASSIE — Women's Heels, Shoe Clips & Accessories Online India",
+  description: "Shop CLASSIE — premium women's heels, shoe clips, bow clips, rhinestone clips & accessories online in India. Block heels, slingback heels, crystal shoe charms & more. Free shipping above ₹499. COD available.",
+  keywords: ["women's heels india", "shoe clips india", "buy heels online india", "bow clips for shoes", "rhinestone shoe clips", "shoe charms india", "block heels women india", "shoe accessories for women"],
   openGraph: {
     title: "CLASSIE — Shoe Clips & Accessories",
     description: "Handcrafted shoe clips, bow clips & rhinestone accessories. Transform any shoe instantly.",

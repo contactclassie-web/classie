@@ -6,8 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Shoe Clips for Women — Rhinestone, Crystal & Bow Clips",
-  description: "Shop CLASSIE shoe clips for women — rhinestone clips, crystal clips, bow clips and floral clips. Instantly transform any shoe. Free shipping above ₹499.",
+  title: "Buy Shoe Clips Online India — Rhinestone, Crystal & Bow Clips for Women | CLASSIE",
+  description: "Shop CLASSIE shoe clips online in India — rhinestone shoe clips, crystal clips, bow clips, floral clips & more. Instantly transform any pair of heels or flats. Free shipping above ₹499. COD available.",
 };
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);

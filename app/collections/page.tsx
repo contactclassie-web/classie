@@ -4,8 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 import CollectionsClient from "./CollectionsClient";
 
 export const metadata: Metadata = {
-  title: "All Collections — Shoe Clips, Bow Clips & Accessories",
-  description: "Browse all CLASSIE collections — shoe clips, bow clips, rhinestone clips, crystal clips and festive accessories for women. Shop the full range.",
+  title: "Shop All Collections — Women's Heels, Shoe Clips & Accessories India | CLASSIE",
+  description: "Browse all CLASSIE collections — women's heels, shoe clips, bow clips, rhinestone clips, crystal clips and festive accessories for women in India. Shop the full range with free shipping.",
   alternates: { canonical: "https://www.classie.co.in/collections" },
 };
 

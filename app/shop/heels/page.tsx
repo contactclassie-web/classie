@@ -6,9 +6,9 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Women's Heels — Classie",
+  title: "Buy Women's Heels Online India — Block, Slingback & Sculpted Heels | CLASSIE",
   description:
-    "Shop Classie's premium collection of women's heels — block heels, sculpted heels, slim heels, slingbacks & more. Free shipping above ₹999. COD available.",
+    "Shop CLASSIE women's heels online in India — block heels, slingback heels, sculpted heels, slim heels & more. Premium quality, free shipping above ₹999, COD available. Buy heels for wedding, office, party & everyday wear.",
 };
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
