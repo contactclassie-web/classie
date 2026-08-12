@@ -6,6 +6,25 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@supabase/supabase-js";
 import Script from "next/script";
+import { Cormorant_Garamond, Poppins } from "next/font/google";
+
+// Self-hosted fonts — zero render-blocking, loaded at build time
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
+  display: "swap",
+  preload: true,
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-poppins",
+  display: "swap",
+  preload: true,
+});
 
 // Always fetch fresh — ensures admin saves are instantly visible
 export const dynamic = "force-dynamic";
@@ -77,21 +96,11 @@ export default async function RootLayout({
           gtag('js', new Date());
           gtag('config', 'G-YMZB85JRX4');
         `}</Script>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://hrjvxwqvxvibtwyfoyca.supabase.co" />
-        {/* Fonts loaded non-blocking — swap prevents render-blocking */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Poppins:wght@300;400;500;600&display=swap"
-          rel="stylesheet"
-          media="print"
-          // @ts-ignore
-          onLoad="this.media='all'"
-        />
       </head>
-      <body>
+      <body className={`${cormorant.variable} ${poppins.variable}`}>
         <CartProvider>
           <WishlistProvider>
             <Navbar initialSettings={cfg} initialCategories={siteCategories ?? []} />
