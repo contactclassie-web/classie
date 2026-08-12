@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 
+function optimizeHeroImage(url: string): string {
+  if (!url || !url.includes("res.cloudinary.com")) return url;
+  if (url.includes("f_auto")) return url;
+  // For hero: f_auto (WebP/AVIF), q_auto (smart compression), w_1400 (max desktop width)
+  return url.replace("/upload/", "/upload/f_auto,q_auto,w_1400/");
+}
+
 interface Slide {
   image_url: string;
 }
@@ -73,9 +80,12 @@ export default function HeroImageSlider({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={i}
-            src={src}
+            src={optimizeHeroImage(src)}
             alt="Classie"
             className="absolute inset-0 w-full h-full object-cover object-center"
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "auto"}
+            decoding={i === 0 ? "sync" : "async"}
             style={{
               opacity: i === current ? 1 : 0,
               transition: "opacity 0.8s ease-in-out",
