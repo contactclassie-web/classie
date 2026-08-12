@@ -93,20 +93,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${product.title}, shoe clips india, shoe accessories, shoe charms, CLASSIE clips`
     : `${product.title}, CLASSIE india`;
 
+  const canonicalUrl = `https://www.classie.co.in/products/${params.slug}`;
   return {
     title: seoTitle,
     description: seoDesc,
     keywords,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title: `${seoTitle} | CLASSIE`,
       description: seoDesc,
-      images: [{ url: product.image || "" }],
+      images: product.image ? [{ url: product.image, width: 800, height: 800 }] : undefined,
       type: "website",
+      url: canonicalUrl,
+      siteName: "CLASSIE",
     },
     twitter: {
       card: "summary_large_image",
       title: `${seoTitle} | CLASSIE`,
       description: seoDesc,
+      images: product.image ? [product.image] : undefined,
     },
   };
 }
@@ -230,17 +235,52 @@ export default async function ProductPage({ params }: Props) {
     if (reviewsRes?.ok) initialReviews = await reviewsRes.json();
   } catch { /* silent fail */ }
 
+  const productCanonical = `https://www.classie.co.in/products/${slug}`;
+  const isHeel = product.category === "heels";
+
   return (
-    <ProductDetailClient
-      product={product}
-      related={related}
-      bundleOffers={bundleOffers}
-      featureTiles={featureTiles}
-      latestProducts={latestProducts}
-      bestsellerProducts={bestsellerProducts}
-      colorVariants={colorVariants}
-      initialReviews={initialReviews}
-    />
+    <>
+      {/* Product Schema (JSON-LD) */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.title,
+        "description": product.description || "",
+        "image": product.image || "",
+        "url": productCanonical,
+        "brand": { "@type": "Brand", "name": "CLASSIE" },
+        "offers": {
+          "@type": "Offer",
+          "url": productCanonical,
+          "priceCurrency": "INR",
+          "price": product.price,
+          "availability": "https://schema.org/InStock",
+          "seller": { "@type": "Organization", "name": "CLASSIE" },
+          "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "INR" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" } }
+        },
+        "category": isHeel ? "Women's Heels" : "Shoe Clips & Accessories",
+      }) }} />
+      {/* Breadcrumb Schema */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.classie.co.in" },
+          { "@type": "ListItem", "position": 2, "name": isHeel ? "Heels" : "Shoe Clips", "item": isHeel ? "https://www.classie.co.in/shop/heels" : "https://www.classie.co.in/shop/clips" },
+          { "@type": "ListItem", "position": 3, "name": product.title, "item": productCanonical },
+        ]
+      }) }} />
+      <ProductDetailClient
+        product={product}
+        related={related}
+        bundleOffers={bundleOffers}
+        featureTiles={featureTiles}
+        latestProducts={latestProducts}
+        bestsellerProducts={bestsellerProducts}
+        colorVariants={colorVariants}
+        initialReviews={initialReviews}
+      />
+    </>
   );
 }
 

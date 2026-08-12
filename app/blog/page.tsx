@@ -5,9 +5,10 @@ import BlogClient from "./BlogClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "The CLASSIE Journal — Style. Stories. Soul.",
-  description:
-    "Discover styling tips, trend reports, and stories from the world of CLASSIE footwear.",
+  title: "Heels & Shoe Clips Style Guide — The CLASSIE Journal | India",
+  description: "Explore CLASSIE's style guides for women's heels and shoe clips in India — how to wear black heels, heels with saree, shoe clips for weddings, block heels, office heels and more.",
+  alternates: { canonical: "https://www.classie.co.in/blog" },
+  keywords: ["heels style guide india", "shoe clips guide", "how to wear heels india", "block heels tips", "shoe clips for saree", "heels for indian wedding"],
 };
 
 async function getPosts() {
@@ -46,5 +47,15 @@ async function getCategories(): Promise<string[]> {
 
 export default async function BlogPage() {
   const [posts, categories] = await Promise.all([getPosts(), getCategories()]);
-  return <BlogClient posts={posts} categories={categories} />;
+  return (
+    <>
+      <BlogClient posts={posts} categories={categories} />
+      <section className="max-w-4xl mx-auto px-6 py-12 text-center border-t border-gray-100">
+        <h2 className="text-xl font-serif font-light text-[#1a1a1a] mb-4">Style Guides for Heels &amp; Shoe Clips in India</h2>
+        <p className="text-sm text-gray-500 leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          The CLASSIE Journal covers everything you need to know about <strong>women&apos;s heels in India</strong> — from <strong>how to wear block heels</strong> and <strong>slingback heels</strong> to complete guides on <strong>heels with saree</strong>, <strong>heels for Indian weddings</strong>, and <strong>office heels</strong>. We also cover <strong>shoe clips</strong>, <strong>bow clips</strong>, <strong>shoe charms</strong> and how to style them for every occasion.
+        </p>
+      </section>
+    </>
+  );
 }
