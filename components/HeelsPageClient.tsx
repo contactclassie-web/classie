@@ -198,7 +198,7 @@ function HeelCard({ product }: { product: HeelProduct }) {
       <div className="relative overflow-hidden" style={{ aspectRatio: "1/1" }}>
         <Image
           src={product.image}
-          alt={product.title}
+          alt={`${product.title} — Women's Heels India | CLASSIE`}
           fill
           className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"

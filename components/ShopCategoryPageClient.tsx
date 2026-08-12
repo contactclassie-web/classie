@@ -232,7 +232,7 @@ function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; car
       <div className={`relative overflow-hidden ${cardStyle?.borderRadius || ""}`} style={{ aspectRatio: cardStyle?.height ? undefined : (cardStyle?.aspectRatio || "1/1"), height: cardStyle?.height ? `${cardStyle.height}px` : undefined }}>
         <Image
           src={product.image}
-          alt={product.title}
+          alt={`${product.title} — Shoe Clips & Charms India | CLASSIE`}
           fill
           className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"

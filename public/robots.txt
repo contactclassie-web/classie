@@ -9,4 +9,4 @@ Disallow: /order-success
 Disallow: /checkout
 Disallow: /cart
 
-Sitemap: https://classie.co.in/sitemap.xml
+Sitemap: https://www.classie.co.in/sitemap.xml
