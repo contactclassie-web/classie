@@ -300,6 +300,31 @@ export default async function HomePage() {
 
       {/* ══ 9. NEWSLETTER ═════════════════════════════════════════════════ */}
       <NewsletterSection initialSettings={nlSettings} />
+
+      {/* ══ SEO CONTENT BLOCK ══════════════════════════════════════════════ */}
+      <section className="max-w-4xl mx-auto px-6 py-12 text-center border-t border-gray-100">
+        <h2 className="text-2xl font-serif font-light text-[#1a1a1a] mb-6">Women&apos;s Heels, Shoe Clips &amp; Accessories Online India</h2>
+        <p className="text-sm text-gray-500 leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          CLASSIE is India&apos;s premium destination for <strong>women&apos;s heels online</strong> and <strong>shoe clips</strong>. Shop a curated collection of <strong>block heels</strong>, <strong>slingback heels</strong>, <strong>sculpted heels</strong>, <strong>rhinestone shoe clips</strong>, <strong>bow clips</strong>, <strong>crystal shoe charms</strong> and more — all designed for Indian women who love style without compromise.
+        </p>
+        <p className="text-sm text-gray-500 leading-relaxed mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          Whether you&apos;re looking for <strong>heels for an Indian wedding</strong>, <strong>office heels</strong>, <strong>shoe clips for saree</strong>, or <strong>shoe charms for bridal wear</strong> — CLASSIE has the perfect pick. Free shipping above ₹499. COD available pan-India.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {[
+            { label: "Block Heels", href: "/shop/heels" },
+            { label: "Slingback Heels", href: "/shop/heels" },
+            { label: "Shoe Clips", href: "/shop/clips" },
+            { label: "Shoe Charms", href: "/shop/shoe-charms" },
+            { label: "Wedding Heels", href: "/shop/heels" },
+            { label: "Bow Clips", href: "/shop/clips" },
+          ].map((item) => (
+            <a key={item.label} href={item.href} className="text-xs tracking-widest uppercase text-[#3B5373] border border-[#3B5373]/20 px-4 py-2 hover:bg-[#3B5373]/5 transition-colors" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </section>
     </>
   );
 }
