@@ -37,18 +37,29 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "CLASSIE — Shoe Clips, Bow Clips & Accessories for Women",
+    default: "CLASSIE — Women's Heels, Shoe Clips & Accessories India",
     template: "%s | CLASSIE",
   },
   description:
-    "Shop handcrafted shoe clips, bow clips, rhinestone clips and shoe accessories for women in India. Transform any pair of heels, flats or sandals instantly. Free shipping above ₹499. COD available.",
-  keywords: ["shoe clips", "bow clips", "bow clips for shoes", "rhinestone shoe clips", "shoe accessories for women", "shoe clips india", "classie"],
+    "Shop CLASSIE — premium women's heels and shoe clips online in India. Block heels, slingback heels, rhinestone shoe clips, bow clips and shoe charms. Free shipping above ₹499. COD available.",
+  keywords: ["shoe clips", "bow clips", "women's heels india", "block heels", "shoe charms india", "shoe accessories for women", "shoe clips india", "classie"],
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "512x512", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/icon.png",
+  },
   openGraph: {
-    title: "CLASSIE — Shoe Clips & Accessories for Women",
-    description: "Handcrafted shoe clips, bow clips & rhinestone accessories. Transform any shoe instantly.",
-    url: "https://classie.co.in",
+    title: "CLASSIE — Women's Heels & Shoe Clips India",
+    description: "Premium women's heels and shoe clips online in India. Free shipping. COD available.",
+    url: "https://www.classie.co.in",
     siteName: "CLASSIE",
     type: "website",
+    images: [{ url: "https://www.classie.co.in/icon.png", width: 512, height: 512 }],
   },
 };
 
