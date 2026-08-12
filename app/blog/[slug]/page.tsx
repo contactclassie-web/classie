@@ -199,7 +199,7 @@ export default async function BlogPostPage({
             fontWeight: 500,
             letterSpacing: "0.1em",
             textTransform: "uppercase",
-            color: "#888",
+            color: "#666",
             textDecoration: "none",
             marginBottom: "32px",
             transition: "color 0.2s",
@@ -236,7 +236,7 @@ export default async function BlogPostPage({
             style={{
               fontFamily: "'Poppins', sans-serif",
               fontSize: "0.72rem",
-              color: "#888",
+              color: "#666",
               fontWeight: 300,
             }}
           >
@@ -264,7 +264,7 @@ export default async function BlogPostPage({
           style={{
             fontFamily: "'Poppins', sans-serif",
             fontSize: "0.78rem",
-            color: "#888",
+            color: "#666",
             fontWeight: 300,
             marginBottom: "32px",
           }}
@@ -313,7 +313,7 @@ export default async function BlogPostPage({
                   fontWeight: 600,
                   letterSpacing: "0.28em",
                   textTransform: "uppercase",
-                  color: "#888",
+                  color: "#666",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -404,7 +404,7 @@ export default async function BlogPostPage({
                     style={{
                       fontFamily: "'Poppins', sans-serif",
                       fontSize: "0.65rem",
-                      color: "#888",
+                      color: "#666",
                       fontWeight: 300,
                     }}
                   >

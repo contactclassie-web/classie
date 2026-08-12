@@ -87,7 +87,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
             {/* Collections mega-menu */}
             {dropdownLinks.length > 0 && (
               <div className="relative group">
-                <button className={`${NAV_LINK_CLS} flex items-center gap-1 bg-transparent border-none cursor-pointer`}>
+                <button aria-label="Collections menu" className={`${NAV_LINK_CLS} flex items-center gap-1 bg-transparent border-none cursor-pointer`}>
                   Collections
                   <svg className="w-3 h-3 mt-[1px] transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
@@ -203,7 +203,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
             )}
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/cart" className="relative text-[#1a1a1a]">
+            <Link href="/cart" aria-label="Cart" className="relative text-[#1a1a1a]">
               <ShoppingBag className="w-5 h-5" strokeWidth={1.6} />
               {count > 0 && (
                 <span className="absolute -top-1.5 -right-2 bg-[#3B5373] text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">
@@ -222,7 +222,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
       <div className={`lg:hidden fixed inset-y-0 right-0 w-72 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
           <span className="text-sm tracking-[0.3em] uppercase font-light text-[#3B5373]">Menu</span>
-          <button onClick={() => setOpen(false)} className="text-[#1a1a1a]"><X className="w-5 h-5" /></button>
+          <button aria-label="Close menu" onClick={() => setOpen(false)} className="text-[#1a1a1a]"><X className="w-5 h-5" /></button>
         </div>
         <nav className="flex flex-col px-6 py-4">
           {/* Direct category links */}
