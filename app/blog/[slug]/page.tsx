@@ -95,12 +95,26 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const post = await getPost(params.slug);
   if (!post) return { title: "Post Not Found" };
+  const canonicalUrl = `https://www.classie.co.in/blog/${post.slug}`;
   return {
-    title: `${post.title} — The CLASSIE Journal`,
+    title: `${post.title} | CLASSIE`,
     description: post.excerpt || undefined,
-    openGraph: post.cover_image
-      ? { images: [{ url: post.cover_image }] }
-      : undefined,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title: `${post.title} | CLASSIE`,
+      description: post.excerpt || undefined,
+      url: canonicalUrl,
+      type: "article",
+      publishedTime: post.published_at,
+      images: post.cover_image ? [{ url: post.cover_image, width: 1200, height: 630 }] : undefined,
+      siteName: "CLASSIE",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${post.title} | CLASSIE`,
+      description: post.excerpt || undefined,
+      images: post.cover_image ? [post.cover_image] : undefined,
+    },
   };
 }
 
@@ -114,8 +128,34 @@ export default async function BlogPostPage({
 
   const morePosts = await getMorePosts(post.category, post.id);
 
+  const canonicalUrl = `https://www.classie.co.in/blog/${post.slug}`;
+
   return (
     <div style={{ fontFamily: "'Poppins', sans-serif", background: "#fff", color: "#1a1a1a" }}>
+      {/* Article Schema */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.title,
+        "description": post.excerpt || "",
+        "image": post.cover_image || "",
+        "datePublished": post.published_at,
+        "dateModified": post.published_at,
+        "author": { "@type": "Person", "name": post.author || "CLASSIE" },
+        "publisher": { "@type": "Organization", "name": "CLASSIE", "logo": { "@type": "ImageObject", "url": "https://www.classie.co.in/logo.png" } },
+        "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
+        "url": canonicalUrl,
+      }) }} />
+      {/* Breadcrumb Schema */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.classie.co.in" },
+          { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.classie.co.in/blog" },
+          { "@type": "ListItem", "position": 3, "name": post.title, "item": canonicalUrl },
+        ]
+      }) }} />
       {/* Cover image — full width */}
       {post.cover_image && (
         <div
