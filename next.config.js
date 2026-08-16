@@ -3,7 +3,7 @@ const nextConfig = {
   images: {
     formats: ['image/webp'],
     minimumCacheTTL: 86400,
-    deviceSizes: [375, 640, 750, 828, 1080, 1200],
+    deviceSizes: [375, 640, 750, 828, 1080, 1200, 1440, 1920],
     imageSizes: [64, 128, 256, 384],
     remotePatterns: [
       { protocol: 'https', hostname: 'cdn.shopify.com', pathname: '/**' },
