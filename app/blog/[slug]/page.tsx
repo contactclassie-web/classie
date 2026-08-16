@@ -162,8 +162,9 @@ export default async function BlogPostPage({
           style={{
             position: "relative",
             width: "100%",
-            height: "420px",
+            aspectRatio: "16/5",
             overflow: "hidden",
+            backgroundColor: "#F5F5F5",
           }}
         >
           <Image
@@ -172,7 +173,7 @@ export default async function BlogPostPage({
             fill
             priority
             quality={90}
-            className="object-cover"
+            className="object-contain"
             sizes="100vw"
           />
         </div>
