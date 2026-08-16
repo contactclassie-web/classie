@@ -160,6 +160,8 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                       fill
                       className="object-cover"
                       sizes="(max-width: 900px) 100vw, 55vw"
+                      quality={95}
+                      unoptimized
                     />
 
                   </div>
@@ -313,6 +315,8 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                         fill
                         className="object-cover blog-card-img"
                         sizes="(max-width: 900px) 50vw, 33vw"
+                        quality={95}
+                        unoptimized
                       />
                     ) : (
                       <div

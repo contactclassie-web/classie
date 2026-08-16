@@ -172,7 +172,8 @@ export default async function BlogPostPage({
             alt={post.title}
             fill
             priority
-            quality={90}
+            quality={95}
+            unoptimized
             className="object-contain"
             sizes="100vw"
           />
