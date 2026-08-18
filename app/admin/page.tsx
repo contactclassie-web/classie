@@ -2882,6 +2882,19 @@ export default function AdminPage() {
     setDeleteConfirm(null);
   };
 
+  const duplicateProduct = async (p: DbProduct) => {
+    const { id, created_at, ...rest } = p as any;
+    const newSlug = (rest.slug || "product") + "-copy-" + Date.now().toString().slice(-4);
+    const newTitle = (rest.title || "Product") + " (Copy)";
+    const { data, error } = await supabase.from("products").insert([{ ...rest, slug: newSlug, title: newTitle, active: false }]).select().single();
+    if (!error && data) {
+      setDbProducts((prev) => [data as DbProduct, ...prev]);
+      alert("Product duplicated! Edit the copy to update title, slug & images.");
+    } else {
+      alert("Error duplicating: " + (error?.message || "unknown"));
+    }
+  };
+
   const toggleProductActive = async (p: DbProduct) => {
     await supabase.from("products").update({ active: !p.active }).eq("id", p.id);
     setDbProducts((prev) => prev.map((x) => (x.id === p.id ? { ...x, active: !x.active } : x)));
@@ -4181,6 +4194,10 @@ export default function AdminPage() {
                                 <button onClick={() => openReviewsModal(p)} title="Reviews"
                                   className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
                                   <span style={{ fontSize: "14px" }}>📝</span>
+                                </button>
+                                <button onClick={() => duplicateProduct(p)} title="Duplicate Product"
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
+                                  <span style={{ fontSize: "14px" }}>📋</span>
                                 </button>
                                 <button onClick={() => openEditProduct(p)} title="Edit"
                                   className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#3B5373] transition-colors">
