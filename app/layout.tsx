@@ -99,6 +99,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Pinterest Domain Verification */}
+        <meta name="p:domain_verify" content="732fb204a223225d01894e59b6f6cfce" />
         {/* Google Analytics */}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-YMZB85JRX4" strategy="afterInteractive" />
         <Script id="ga-init" strategy="afterInteractive">{`
