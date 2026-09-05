@@ -3198,6 +3198,7 @@ export default function AdminPage() {
         }
       }
       await loadColorVariants(slug);
+      await revalidateSite();
       alert("✅ Color images saved!");
     } finally {
       setShoeCharmSaving(false);
@@ -3217,6 +3218,7 @@ export default function AdminPage() {
         await supabase.from("product_color_variants").insert({ group_id: newGroupId, product_slug: slug, color_name: myColorInfo.color_name, color_hex: myColorInfo.color_hex, sort_order: 0 });
       }
       await loadColorVariants(slug);
+      await revalidateSite();
     } finally {
       setColorVariantSaving(false);
     }
@@ -3243,6 +3245,7 @@ export default function AdminPage() {
       }
       setNewColorVariant({ product_slug: "", color_name: "", color_hex: "#000000" });
       await loadColorVariants(slug);
+      await revalidateSite();
     } finally {
       setColorVariantSaving(false);
     }
@@ -3252,6 +3255,7 @@ export default function AdminPage() {
     if (!productModal.data?.slug) return;
     await supabase.from("product_color_variants").delete().eq("id", id);
     await loadColorVariants(productModal.data.slug);
+    await revalidateSite();
   };
 
   // ── Feature Tiles actions ──────────────────────────────────────────────────
@@ -3519,6 +3523,7 @@ export default function AdminPage() {
       );
     }
     setManageCategoryProductsModal(m => ({ ...m, open: false, saving: false }));
+    await revalidateSite();
   };
 
   const openManageProducts = async (c: Collection) => {
