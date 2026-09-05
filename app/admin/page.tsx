@@ -1247,6 +1247,7 @@ export default function AdminPage() {
   type TrackerActivity = { id: string; event_type: string; path: string | null; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActivity, setTrackerActivity] = useState<TrackerActivity[]>([]);
   const [trackerActivityPage, setTrackerActivityPage] = useState(1);
+  const [trackerActivityFilter, setTrackerActivityFilter] = useState<"all" | "page_view" | "add_to_cart" | "begin_checkout" | "purchase">("all");
   const [trackerAvailable, setTrackerAvailable] = useState(true);
 
   // Shipping Rates (site_settings: shipping_tiers + shipping_default_fee)
@@ -8131,20 +8132,36 @@ export default function AdminPage() {
 
                   {/* Recent activity — who did what */}
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Recent Activity — who viewed/added/bought what, and from where</h3>
-                    {trackerActivity.length === 0 ? (
-                      <p className="text-sm text-gray-400">No activity in this range yet.</p>
-                    ) : (() => {
-                      const PAGE_SIZE = 15;
-                      const totalPages = Math.max(1, Math.ceil(trackerActivity.length / PAGE_SIZE));
-                      const page = Math.min(trackerActivityPage, totalPages);
-                      const pageRows = trackerActivity.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+                    <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+                      <h3 className="text-sm font-semibold text-gray-700">Recent Activity — who viewed/added/bought what, and from where</h3>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {([
+                          ["all", "All"], ["page_view", "Page Views"], ["add_to_cart", "Add to Cart"],
+                          ["begin_checkout", "Checkout"], ["purchase", "Purchases"],
+                        ] as const).map(([val, label]) => (
+                          <button key={val}
+                            onClick={() => { setTrackerActivityFilter(val); setTrackerActivityPage(1); }}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                              trackerActivityFilter === val ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373]"
+                            }`}>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {(() => {
                       const ACTION_LABELS: Record<string, string> = {
                         page_view: "👁️ Viewed page",
                         add_to_cart: "🛒 Added to cart",
                         begin_checkout: "🔒 Started checkout",
                         purchase: "✅ Purchased",
                       };
+                      const filtered = trackerActivityFilter === "all" ? trackerActivity : trackerActivity.filter((a) => a.event_type === trackerActivityFilter);
+                      if (filtered.length === 0) return <p className="text-sm text-gray-400">No matching activity in this range yet.</p>;
+                      const PAGE_SIZE = 15;
+                      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+                      const page = Math.min(trackerActivityPage, totalPages);
+                      const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
                       return (
                         <>
                           <div className="overflow-x-auto">
@@ -8174,7 +8191,7 @@ export default function AdminPage() {
                             </table>
                           </div>
                           <div className="flex items-center justify-between mt-4 text-xs text-gray-500">
-                            <span>Page {page} of {totalPages} · {trackerActivity.length} events</span>
+                            <span>Page {page} of {totalPages} · {filtered.length} events</span>
                             <div className="flex items-center gap-2">
                               <button onClick={() => setTrackerActivityPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
                                 className="px-3 py-1.5 border border-gray-200 rounded-lg disabled:opacity-40 hover:border-[#3B5373] transition-colors">
