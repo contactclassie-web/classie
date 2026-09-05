@@ -118,6 +118,11 @@ function customerEmailHtml(data: OrderEmailData): string {
   `
 }
 
+function customerEmailText(data: OrderEmailData): string {
+  const items = data.items.map(i => `${i.quantity}x ${i.title}${i.variant ? ` (${i.variant})` : ''} - Rs.${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n')
+  return `Hi ${data.customerName},\n\nThank you for your order! We're getting it ready for you.\n\nOrder ID: ${data.orderId}\n\nItems ordered:\n${items}\n\nTotal: Rs.${data.totalAmount.toLocaleString('en-IN')}\nPayment: ${data.paymentMethod === 'online' ? 'Paid Online' : 'Cash on Delivery'}\n\nDelivery address:\n${data.address}, ${data.city}, ${data.state} - ${data.pincode}\n\nQuestions? Reply to this email or contact us at hello@classie.co.in\n\nCLASSIE - classie.co.in`
+}
+
 // ── Admin notification email ──────────────────────────────────────────────────
 function adminEmailHtml(data: OrderEmailData): string {
   const itemsText = data.items.map(i => `${i.quantity}× ${i.title}${i.variant ? ` (${i.variant})` : ''} — ₹${(i.price * i.quantity).toLocaleString('en-IN')}`).join('<br>')
@@ -170,6 +175,11 @@ function adminEmailHtml(data: OrderEmailData): string {
   `
 }
 
+function adminEmailText(data: OrderEmailData): string {
+  const items = data.items.map(i => `${i.quantity}x ${i.title}${i.variant ? ` (${i.variant})` : ''} - Rs.${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n')
+  return `New order received on classie.co.in\n\nOrder ID: ${data.orderId}\nCustomer: ${data.customerName}\nPhone: ${data.customerPhone}\n${data.customerEmail ? `Email: ${data.customerEmail}\n` : ''}Address: ${data.address}, ${data.city}, ${data.state} - ${data.pincode}\n\nItems:\n${items}\n\nTotal: Rs.${data.totalAmount.toLocaleString('en-IN')}\nPayment: ${data.paymentMethod === 'online' ? `Paid Online - ${data.paymentId || ''}` : 'COD'}`
+}
+
 // ── Send both emails ──────────────────────────────────────────────────────────
 export async function sendOrderEmails(data: OrderEmailData) {
   const client = getResend()
@@ -190,6 +200,7 @@ export async function sendOrderEmails(data: OrderEmailData) {
       to: [adminEmail],
       subject: `🛍️ New Order — ${data.customerName} — ₹${data.totalAmount.toLocaleString('en-IN')}`,
       html: adminEmailHtml(data),
+      text: adminEmailText(data),
     })
   )
 
@@ -201,6 +212,7 @@ export async function sendOrderEmails(data: OrderEmailData) {
         to: [data.customerEmail],
         subject: `Your CLASSIE™ order is confirmed! #${data.orderId.slice(0, 8).toUpperCase()}`,
         html: customerEmailHtml(data),
+        text: customerEmailText(data),
       })
     )
   }
@@ -248,6 +260,7 @@ export async function sendContactNotification(data: ContactSubmissionData) {
           <p style="white-space:pre-wrap;background:#f9f9f9;padding:12px;border-radius:4px;">${data.message}</p>
         </div>
       `,
+      text: `New contact form submission\n\nName: ${data.firstName} ${data.lastName || ''}\nEmail: ${data.email}\n${data.phone ? `Phone: ${data.phone}\n` : ''}\nMessage:\n${data.message}`,
     })
   } catch (err) {
     console.error('Contact notification email error:', err)
