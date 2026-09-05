@@ -180,6 +180,11 @@ export default function ProductDetailClient({
     setTimeout(() => setAdded(false), 2500);
   };
 
+  const doBuyNow = () => {
+    addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined });
+    router.push("/checkout");
+  };
+
   const addBundleItem = (offer: BundleOfferWithProduct) => {
     const discountedPrice = offer.discount_type === "percentage"
       ? Math.round(offer.product.price * (1 - offer.discount_value / 100))
@@ -556,7 +561,7 @@ export default function ProductDetailClient({
 
             {/* Buy Now */}
             <button
-              onClick={doAdd}
+              onClick={doBuyNow}
               className="w-full transition-all duration-200 hover:bg-[#3B5373] hover:text-white"
               style={{
                 height: "52px", borderRadius: "100px",
