@@ -386,8 +386,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -453,6 +453,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "footer":         "footer",
   "messages":       "messages",
   "live-tracker":   "live-tracker",
+  "shipping-rates": "shipping-rates",
   "blog":           "blog",
 };
 
@@ -533,6 +534,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   footer:   [],
   messages: [],
   "live-tracker": [],
+  "shipping-rates": [],
   blog:     [{ id: "blog", label: "Blog Posts" }],
 };
 
@@ -1245,6 +1247,12 @@ export default function AdminPage() {
   type TrackerActivity = { id: string; event_type: string; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActivity, setTrackerActivity] = useState<TrackerActivity[]>([]);
   const [trackerAvailable, setTrackerAvailable] = useState(true);
+
+  // Shipping Rates (site_settings: shipping_tiers + shipping_default_fee)
+  const [shipTiers, setShipTiers] = useState<{ threshold: number; fee: number }[]>([{ threshold: 999, fee: 99 }]);
+  const [shipDefaultFee, setShipDefaultFee] = useState(0);
+  const [shipLoading, setShipLoading] = useState(false);
+  const [shipSaving, setShipSaving] = useState(false);
 
   // Testimonials
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -2101,6 +2109,40 @@ export default function AdminPage() {
   }, []);
 
   // "Active now" is always real-time (last 5 min) — independent of the selected date range.
+  const fetchShippingRates = useCallback(async () => {
+    setShipLoading(true);
+    try {
+      const { data } = await supabase.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee"]);
+      const m: Record<string, string> = {};
+      (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+      if (m.shipping_tiers) {
+        try {
+          const parsed = JSON.parse(m.shipping_tiers);
+          if (Array.isArray(parsed) && parsed.length > 0) setShipTiers([...parsed].sort((a, b) => a.threshold - b.threshold));
+        } catch { /* keep current */ }
+      }
+      if (m.shipping_default_fee !== undefined) setShipDefaultFee(Number(m.shipping_default_fee) || 0);
+    } finally {
+      setShipLoading(false);
+    }
+  }, []);
+
+  const saveShippingRates = async () => {
+    setShipSaving(true);
+    try {
+      const cleaned = shipTiers
+        .filter((t) => t.threshold > 0)
+        .sort((a, b) => a.threshold - b.threshold);
+      await upsertSettings([
+        { key: "shipping_tiers", value: JSON.stringify(cleaned) },
+        { key: "shipping_default_fee", value: String(shipDefaultFee) },
+      ]);
+      setShipTiers(cleaned);
+    } finally {
+      setShipSaving(false);
+    }
+  };
+
   const fetchActiveNow = useCallback(async () => {
     try {
       const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
@@ -2876,6 +2918,7 @@ export default function AdminPage() {
     if (tab === "footer") { fetchSettings(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
     if (tab === "live-tracker") { fetchAnalytics(trackerRange, trackerCustomFrom, trackerCustomTo); }
+    if (tab === "shipping-rates") { fetchShippingRates(); }
     if (tab === "collections") fetchCollections();
     if (tab === "heels-page") fetchHeelsPage();
     if (tab === "clips-page") fetchClipsPage();
@@ -2907,7 +2950,7 @@ export default function AdminPage() {
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
     if (tab === "blog") fetchBlogPosts();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchAnalytics, trackerRange, trackerCustomFrom, trackerCustomTo, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchAnalytics, trackerRange, trackerCustomFrom, trackerCustomTo, fetchShippingRates, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
 
   // Keep "active right now" genuinely live while the tab is open, without re-fetching
   // the whole (potentially large) date-range query every few seconds.
@@ -3862,6 +3905,7 @@ export default function AdminPage() {
         { id: "advanced-settings", label: "Advanced",  icon: Palette },
         { id: "messages",          label: "Messages",  icon: MessageSquare, badge: messages.length },
         { id: "live-tracker",      label: "Live Tracker", icon: Activity },
+        { id: "shipping-rates",    label: "Shipping Rates", icon: IndianRupee },
       ],
     },
   ];
@@ -3893,6 +3937,7 @@ export default function AdminPage() {
               if (id === "footer") return "footer";
               if (id === "messages") return "messages";
               if (id === "live-tracker") return "live-tracker";
+              if (id === "shipping-rates") return "shipping-rates";
               if (id === "clips-page") return "clips-page";
               if (id === "bow-page") return "bow-page";
               if (id === "collections-page") return "collections-page";
@@ -3981,7 +4026,8 @@ export default function AdminPage() {
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" :
-               mainSection === "live-tracker" ? "Live Tracker" : "Messages"}
+               mainSection === "live-tracker" ? "Live Tracker" :
+               mainSection === "shipping-rates" ? "Shipping Rates" : "Messages"}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">Classie Admin Panel</p>
           </div>
@@ -7774,6 +7820,68 @@ export default function AdminPage() {
           {/* ══════════════════════════════════════
               MESSAGES TAB
           ══════════════════════════════════════ */}
+          {tab === "shipping-rates" && (
+            <div className="space-y-5 max-w-2xl">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">Shipping Rates</h2>
+                <p className="text-sm text-gray-400 mt-0.5">
+                  Set the shipping fee by order value. Checkout charges the fee for the first tier the order total is below;
+                  above every tier&apos;s threshold, the fee below applies (usually ₹0 for free shipping).
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+                {shipLoading ? (
+                  <p className="text-sm text-gray-400">Loading…</p>
+                ) : (
+                  <>
+                    {shipTiers.map((t, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="text-sm text-gray-500 whitespace-nowrap">Order below ₹</span>
+                        <input type="number" value={t.threshold}
+                          onChange={(e) => setShipTiers((rows) => rows.map((r, idx) => idx === i ? { ...r, threshold: Number(e.target.value) || 0 } : r))}
+                          className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                        <span className="text-sm text-gray-500 whitespace-nowrap">→ shipping ₹</span>
+                        <input type="number" value={t.fee}
+                          onChange={(e) => setShipTiers((rows) => rows.map((r, idx) => idx === i ? { ...r, fee: Number(e.target.value) || 0 } : r))}
+                          className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                        <button onClick={() => setShipTiers((rows) => rows.filter((_, idx) => idx !== i))}
+                          className="ml-auto text-red-400 hover:text-red-600 p-1.5" title="Remove tier">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={() => setShipTiers((rows) => [...rows, { threshold: (rows[rows.length - 1]?.threshold ?? 0) + 500, fee: 0 }])}
+                      className="flex items-center gap-1.5 text-xs text-[#3B5373] font-medium hover:underline"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add tier
+                    </button>
+
+                    <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+                      <span className="text-sm text-gray-500 whitespace-nowrap">Above all tiers → shipping ₹</span>
+                      <input type="number" value={shipDefaultFee}
+                        onChange={(e) => setShipDefaultFee(Number(e.target.value) || 0)}
+                        className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                      <span className="text-xs text-gray-400">(0 = free shipping)</span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <button onClick={saveShippingRates} disabled={shipSaving || shipLoading}
+                className="flex items-center gap-2 px-6 py-2.5 bg-[#3B5373] text-white rounded-xl text-sm font-medium hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                <Save className="w-4 h-4" />{shipSaving ? "Saving…" : "Save Shipping Rates"}
+              </button>
+
+              <p className="text-xs text-gray-400">
+                Note: marketing text like the announcement bar and homepage &quot;Free Shipping&quot; badge are separate,
+                admin-editable copy — update those in Homepage/Footer if you change these numbers.
+              </p>
+            </div>
+          )}
+
           {tab === "live-tracker" && (
             <div className="space-y-5">
               <div className="flex items-center justify-between flex-wrap gap-3">

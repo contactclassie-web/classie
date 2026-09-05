@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
+import { supabase } from "@/lib/supabase";
 import { track } from "@/lib/analytics";
 import { gtagEvent } from "@/lib/gtag";
 import { Loader2, Lock, Tag, CheckCircle, XCircle, CreditCard, Truck } from "lucide-react";
@@ -52,6 +53,30 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("online");
 
+  // Shipping tiers — admin-configurable (Admin > Shipping Rates). Defaults match the
+  // old hardcoded behavior (free above ₹999, ₹99 below) until settings load or if
+  // the admin hasn't set any up yet.
+  const [shippingTiers, setShippingTiers] = useState<{ threshold: number; fee: number }[]>([{ threshold: 999, fee: 99 }]);
+  const [shippingDefaultFee, setShippingDefaultFee] = useState(0);
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee"])
+      .then(({ data }) => {
+        if (!data) return;
+        const m: Record<string, string> = {};
+        data.forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+        if (m.shipping_tiers) {
+          try {
+            const parsed = JSON.parse(m.shipping_tiers);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setShippingTiers([...parsed].sort((a, b) => a.threshold - b.threshold));
+            }
+          } catch { /* keep defaults */ }
+        }
+        if (m.shipping_default_fee !== undefined) setShippingDefaultFee(Number(m.shipping_default_fee) || 0);
+      });
+  }, []);
+
   useEffect(() => {
     if (items.length === 0) return;
     track({ type: "begin_checkout", value: total });
@@ -93,7 +118,7 @@ export default function CheckoutPage() {
           code: couponCode,
           phone: form.customer_phone || undefined,
           email: form.customer_email || undefined,
-          order_value: total + (total >= 999 ? 0 : 99),
+          order_value: total + shipping,
         }),
       });
       const data = await res.json();
@@ -119,7 +144,8 @@ export default function CheckoutPage() {
     setCouponDiscount(0);
   };
 
-  const shipping = total >= 999 ? 0 : 99;
+  const matchedTier = shippingTiers.find((t) => total < t.threshold);
+  const shipping = matchedTier ? matchedTier.fee : shippingDefaultFee;
   const grandTotal = Math.max(0, total + shipping - couponDiscount);
 
   const [form, setForm] = useState({
