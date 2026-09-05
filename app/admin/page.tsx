@@ -1229,7 +1229,7 @@ export default function AdminPage() {
 
   // Live Tracker (analytics_events)
   const [trackerLoading, setTrackerLoading] = useState(false);
-  const [trackerRange, setTrackerRange] = useState<"today" | 7 | 30 | "custom">("today");
+  const [trackerRange, setTrackerRange] = useState<"1h" | "today" | 7 | 30 | "custom">("today");
   const [trackerCustomFrom, setTrackerCustomFrom] = useState("");
   const [trackerCustomTo, setTrackerCustomTo] = useState("");
   const [trackerCounts, setTrackerCounts] = useState<Record<string, number>>({});
@@ -1238,6 +1238,7 @@ export default function AdminPage() {
   const [trackerSources, setTrackerSources] = useState<{ source: string; count: number }[]>([]);
   const [trackerPages, setTrackerPages] = useState<{ path: string; count: number; unique: number }[]>([]);
   const [trackerDevices, setTrackerDevices] = useState<{ device: string; count: number }[]>([]);
+  const [trackerLocations, setTrackerLocations] = useState<{ location: string; unique: number }[]>([]);
   type ActiveNowRow = { session_id: string; path: string; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActiveNow, setTrackerActiveNow] = useState<ActiveNowRow[]>([]);
   const [trackerErrors, setTrackerErrors] = useState<{ id: string; message: string; path: string; created_at: string }[]>([]);
@@ -2124,13 +2125,15 @@ export default function AdminPage() {
     } catch { /* non-fatal — active-now is a bonus widget */ }
   }, []);
 
-  const fetchAnalytics = useCallback(async (range: "today" | 7 | 30 | "custom", customFrom?: string, customTo?: string) => {
+  const fetchAnalytics = useCallback(async (range: "1h" | "today" | 7 | 30 | "custom", customFrom?: string, customTo?: string) => {
     setTrackerLoading(true);
     fetchActiveNow();
     try {
       let since: string;
       let until: string | null = null;
-      if (range === "today") {
+      if (range === "1h") {
+        since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      } else if (range === "today") {
         const start = new Date(); start.setHours(0, 0, 0, 0);
         since = start.toISOString();
       } else if (range === "custom") {
@@ -2159,6 +2162,7 @@ export default function AdminPage() {
       const deviceMap: Record<string, number> = {};
       const pageMap: Record<string, number> = {};
       const pageSessionMap: Record<string, Set<string>> = {};
+      const locationSessionMap: Record<string, Set<string>> = {};
       const sessionTimes: Record<string, { min: number; max: number }> = {};
       const uniqueSessions = new Set<string>();
       const errors: { id: string; message: string; path: string; created_at: string }[] = [];
@@ -2177,6 +2181,11 @@ export default function AdminPage() {
           }
         }
         if (row.device) deviceMap[row.device] = (deviceMap[row.device] ?? 0) + 1;
+        if (row.event_type === "page_view" && row.session_id && (row.city || row.country)) {
+          const loc = [row.city, row.country].filter(Boolean).join(", ");
+          if (!locationSessionMap[loc]) locationSessionMap[loc] = new Set();
+          locationSessionMap[loc].add(row.session_id);
+        }
         if (row.session_id) {
           uniqueSessions.add(row.session_id);
           const t = new Date(row.created_at).getTime();
@@ -2205,6 +2214,7 @@ export default function AdminPage() {
       setTrackerSources(Object.entries(sourceMap).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count).slice(0, 8));
       setTrackerPages(Object.entries(pageMap).map(([path, count]) => ({ path, count, unique: pageSessionMap[path]?.size ?? 0 })).sort((a, b) => b.count - a.count).slice(0, 10));
       setTrackerDevices(Object.entries(deviceMap).map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count));
+      setTrackerLocations(Object.entries(locationSessionMap).map(([location, sessions]) => ({ location, unique: sessions.size })).sort((a, b) => b.unique - a.unique).slice(0, 10));
       setTrackerErrors(errors);
       setTrackerActivity(activity);
     } catch {
@@ -7767,7 +7777,7 @@ export default function AdminPage() {
                   <p className="text-sm text-gray-400 mt-0.5">Real visitors on classie.co.in — traffic, cart activity, purchases &amp; errors</p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  {([["today", "Today"], [7, "7d"], [30, "30d"], ["custom", "Custom"]] as const).map(([val, label]) => (
+                  {([["1h", "Last 1h"], ["today", "Today"], [7, "7d"], [30, "30d"], ["custom", "Custom"]] as const).map(([val, label]) => (
                     <button key={label} onClick={() => setTrackerRange(val)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                         trackerRange === val ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373]"
@@ -7889,7 +7899,7 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
                     {/* Top pages */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                       <h3 className="text-sm font-semibold text-gray-700 mb-4">Top Pages</h3>
@@ -7933,6 +7943,29 @@ export default function AdminPage() {
                                   <div className="h-full bg-[#3B5373] rounded-full" style={{ width: `${(count / max) * 100}%` }} />
                                 </div>
                                 <p className="text-xs font-semibold text-gray-700 w-8 text-right flex-shrink-0">{count}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Top locations */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-4">Where Visitors Are From</h3>
+                      {trackerLocations.length === 0 ? (
+                        <p className="text-sm text-gray-400">No location data in this range yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {trackerLocations.map(({ location, unique }) => {
+                            const max = trackerLocations[0]?.unique || 1;
+                            return (
+                              <div key={location} className="flex items-center gap-3">
+                                <p className="text-xs text-gray-600 w-24 truncate flex-shrink-0" title={location}>{location}</p>
+                                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-full bg-[#1f9d55] rounded-full" style={{ width: `${(unique / max) * 100}%` }} />
+                                </div>
+                                <p className="text-xs font-semibold text-gray-700 w-8 text-right flex-shrink-0">{unique}</p>
                               </div>
                             );
                           })}
