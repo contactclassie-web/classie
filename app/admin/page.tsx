@@ -1243,6 +1243,7 @@ export default function AdminPage() {
   const [trackerLocations, setTrackerLocations] = useState<{ location: string; unique: number }[]>([]);
   type ActiveNowRow = { session_id: string; path: string; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActiveNow, setTrackerActiveNow] = useState<ActiveNowRow[]>([]);
+  const [trackerTotalUsers, setTrackerTotalUsers] = useState<number | null>(null);
   const [trackerErrors, setTrackerErrors] = useState<{ id: string; message: string; path: string; created_at: string }[]>([]);
   type TrackerActivity = { id: string; event_type: string; path: string | null; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActivity, setTrackerActivity] = useState<TrackerActivity[]>([]);
@@ -2145,6 +2146,22 @@ export default function AdminPage() {
     }
   };
 
+  // All-time distinct visitors — independent of the date range picker above,
+  // unlike "Unique Visitors" which is scoped to the selected range.
+  const fetchTotalUsers = useCallback(async () => {
+    try {
+      const { data } = await supabase
+        .from("analytics_events")
+        .select("session_id")
+        .eq("event_type", "page_view")
+        .not("path", "like", "/admin%")
+        .not("session_id", "is", null)
+        .limit(20000);
+      const unique = new Set((data ?? []).map((r: { session_id: string }) => r.session_id));
+      setTrackerTotalUsers(unique.size);
+    } catch { /* non-fatal — bonus stat */ }
+  }, []);
+
   const fetchActiveNow = useCallback(async () => {
     try {
       const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
@@ -2172,6 +2189,7 @@ export default function AdminPage() {
   const fetchAnalytics = useCallback(async (range: "1h" | "today" | 7 | 30 | "custom", customFrom?: string, customTo?: string) => {
     setTrackerLoading(true);
     fetchActiveNow();
+    fetchTotalUsers();
     try {
       let since: string;
       let until: string | null = null;
@@ -2267,7 +2285,7 @@ export default function AdminPage() {
     } finally {
       setTrackerLoading(false);
     }
-  }, [fetchActiveNow]);
+  }, [fetchActiveNow, fetchTotalUsers]);
 
   // Sync footer link editor state when settings are fetched
   useEffect(() => {
@@ -7967,10 +7985,11 @@ export default function AdminPage() {
                   </div>
 
                   {/* Stat cards */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
                     {[
                       { label: "Page Views",     value: trackerCounts.page_view ?? 0,     icon: Eye,          color: "#3B5373", suffix: "" },
                       { label: "Unique Visitors",value: trackerUnique,                     icon: Users,        color: "#3B5373", suffix: "" },
+                      { label: "Total Users (All-Time)", value: trackerTotalUsers ?? 0,    icon: Users,        color: "#0891b2", suffix: "" },
                       { label: "Avg Time on Site", value: trackerAvgDuration,              icon: Clock,        color: "#8a6d3b", suffix: "s", formatDuration: true },
                       { label: "Add to Cart",    value: trackerCounts.add_to_cart ?? 0,   icon: ShoppingCart, color: "#b58a4a", suffix: "" },
                       { label: "Began Checkout", value: trackerCounts.begin_checkout ?? 0, icon: Lock,         color: "#6b5ca5", suffix: "" },
