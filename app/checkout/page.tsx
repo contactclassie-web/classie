@@ -204,6 +204,7 @@ export default function CheckoutPage() {
     const scriptLoaded = await loadRazorpayScript();
     if (!scriptLoaded) {
       setError("Payment gateway failed to load. Please try again.");
+      track({ type: "error", message: "Razorpay script failed to load", path: "/checkout" });
       setLoading(false);
       return;
     }
@@ -249,7 +250,9 @@ export default function CheckoutPage() {
             clearCart();
             router.push(`/order-success?id=${data.id}&method=online&amount=${grandTotal}`);
           } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : "Payment verified but order failed. Contact support.");
+            const msg = err instanceof Error ? err.message : "Payment verified but order failed. Contact support.";
+            setError(msg);
+            track({ type: "error", message: `Payment succeeded but order failed: ${msg}`, path: "/checkout" });
             setLoading(false);
           }
         },
@@ -262,7 +265,9 @@ export default function CheckoutPage() {
 
       rzp.open();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
+      const msg = err instanceof Error ? err.message : "Payment failed. Please try again.";
+      setError(msg);
+      track({ type: "error", message: `Online payment failed: ${msg}`, path: "/checkout" });
       setLoading(false);
     }
   };
@@ -277,7 +282,9 @@ export default function CheckoutPage() {
       clearCart();
       router.push(`/order-success?id=${data.id}&method=cod&amount=${grandTotal}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setError(msg);
+      track({ type: "error", message: `COD order failed: ${msg}`, path: "/checkout" });
       setLoading(false);
     }
   };
