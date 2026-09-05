@@ -1238,6 +1238,8 @@ export default function AdminPage() {
   const [trackerSources, setTrackerSources] = useState<{ source: string; count: number }[]>([]);
   const [trackerPages, setTrackerPages] = useState<{ path: string; count: number }[]>([]);
   const [trackerDevices, setTrackerDevices] = useState<{ device: string; count: number }[]>([]);
+  type ActiveNowRow = { session_id: string; path: string; device: string | null; city: string | null; country: string | null; created_at: string };
+  const [trackerActiveNow, setTrackerActiveNow] = useState<ActiveNowRow[]>([]);
   const [trackerErrors, setTrackerErrors] = useState<{ id: string; message: string; path: string; created_at: string }[]>([]);
   type TrackerActivity = { id: string; event_type: string; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActivity, setTrackerActivity] = useState<TrackerActivity[]>([]);
@@ -2097,8 +2099,33 @@ export default function AdminPage() {
     finally { setSubsLoading(false); }
   }, []);
 
+  // "Active now" is always real-time (last 5 min) — independent of the selected date range.
+  const fetchActiveNow = useCallback(async () => {
+    try {
+      const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data } = await supabase
+        .from("analytics_events")
+        .select("session_id, path, device, city, country, created_at")
+        .eq("event_type", "page_view")
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(300);
+
+      const seen = new Set<string>();
+      const rows: ActiveNowRow[] = [];
+      (data ?? []).forEach((row: { session_id?: string; path?: string; device?: string; city?: string; country?: string; created_at: string }) => {
+        const sid = row.session_id || `anon-${row.created_at}`;
+        if (seen.has(sid)) return; // keep only each session's most recent page (data is desc-ordered)
+        seen.add(sid);
+        rows.push({ session_id: sid, path: row.path || "—", device: row.device ?? null, city: row.city ?? null, country: row.country ?? null, created_at: row.created_at });
+      });
+      setTrackerActiveNow(rows);
+    } catch { /* non-fatal — active-now is a bonus widget */ }
+  }, []);
+
   const fetchAnalytics = useCallback(async (range: "today" | 7 | 30 | "custom", customFrom?: string, customTo?: string) => {
     setTrackerLoading(true);
+    fetchActiveNow();
     try {
       let since: string;
       let until: string | null = null;
@@ -2176,7 +2203,7 @@ export default function AdminPage() {
     } finally {
       setTrackerLoading(false);
     }
-  }, []);
+  }, [fetchActiveNow]);
 
   // Sync footer link editor state when settings are fetched
   useEffect(() => {
@@ -2862,6 +2889,14 @@ export default function AdminPage() {
     if (tab === "style-inspo") fetchStyleInspos();
     if (tab === "blog") fetchBlogPosts();
   }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchAnalytics, trackerRange, trackerCustomFrom, trackerCustomTo, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
+
+  // Keep "active right now" genuinely live while the tab is open, without re-fetching
+  // the whole (potentially large) date-range query every few seconds.
+  useEffect(() => {
+    if (!authed || tab !== "live-tracker") return;
+    const id = setInterval(fetchActiveNow, 20000);
+    return () => clearInterval(id);
+  }, [authed, tab, fetchActiveNow]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -7757,6 +7792,45 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <>
+                  {/* Active right now — real-time, independent of the date range above */}
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                      </span>
+                      <h3 className="text-sm font-semibold text-gray-700">
+                        {trackerActiveNow.length} {trackerActiveNow.length === 1 ? "person" : "people"} active right now
+                      </h3>
+                      <span className="text-[11px] text-gray-400">(last 5 minutes)</span>
+                    </div>
+                    {trackerActiveNow.length === 0 ? (
+                      <p className="text-sm text-gray-400">No one on the site in the last 5 minutes.</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-100">
+                              {["Page", "Device", "Location", "Since"].map((h) => (
+                                <th key={h} className="text-left px-3 py-1.5 text-[11px] uppercase tracking-wide text-gray-400 font-semibold">{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {trackerActiveNow.map((r) => (
+                              <tr key={r.session_id} className="border-b border-gray-50 last:border-0">
+                                <td className="px-3 py-2 text-gray-700 truncate max-w-[220px]">{r.path}</td>
+                                <td className="px-3 py-2 text-gray-500 capitalize">{r.device || "—"}</td>
+                                <td className="px-3 py-2 text-gray-500">{[r.city, r.country].filter(Boolean).join(", ") || "—"}</td>
+                                <td className="px-3 py-2 text-gray-400 text-xs">{new Date(r.created_at).toLocaleTimeString("en-IN")}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Stat cards */}
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                     {[
