@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     // Also revalidate dynamic product + blog pages
     revalidatePath("/products/[slug]", "page");
-    revalidatePath("/shop/[category]", "page");
+    revalidatePath("/shop/[slug]", "page");
     revalidatePath("/blog", "page");
     revalidatePath("/blog/[slug]", "page");
 

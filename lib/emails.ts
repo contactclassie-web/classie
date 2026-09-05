@@ -1,6 +1,14 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy singleton — constructing Resend with a missing/invalid key throws immediately,
+// which previously crashed the whole /api/orders module at import time (blocking every
+// order, COD included) whenever RESEND_API_KEY wasn't set.
+let resend: Resend | null = null
+function getResend(): Resend | null {
+  if (!process.env.RESEND_API_KEY) return null
+  if (!resend) resend = new Resend(process.env.RESEND_API_KEY)
+  return resend
+}
 
 interface OrderItem {
   title: string
@@ -164,6 +172,12 @@ function adminEmailHtml(data: OrderEmailData): string {
 
 // ── Send both emails ──────────────────────────────────────────────────────────
 export async function sendOrderEmails(data: OrderEmailData) {
+  const client = getResend()
+  if (!client) {
+    console.error('RESEND_API_KEY not set — skipping order emails (order was still placed)')
+    return
+  }
+
   const adminEmail = process.env.ADMIN_EMAIL || 'contact.classie@gmail.com'
   const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'
 
@@ -171,7 +185,7 @@ export async function sendOrderEmails(data: OrderEmailData) {
 
   // Admin notification — always send
   promises.push(
-    resend.emails.send({
+    client.emails.send({
       from: `CLASSIE Orders <${fromEmail}>`,
       to: [adminEmail],
       subject: `🛍️ New Order — ${data.customerName} — ₹${data.totalAmount.toLocaleString('en-IN')}`,
@@ -182,7 +196,7 @@ export async function sendOrderEmails(data: OrderEmailData) {
   // Customer confirmation — only if email provided
   if (data.customerEmail) {
     promises.push(
-      resend.emails.send({
+      client.emails.send({
         from: `CLASSIE™ <${fromEmail}>`,
         to: [data.customerEmail],
         subject: `Your CLASSIE™ order is confirmed! #${data.orderId.slice(0, 8).toUpperCase()}`,

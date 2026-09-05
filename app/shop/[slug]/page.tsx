@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import CollectionGrid from "@/components/CollectionGrid";
-import { getProductsFromDB } from "@/lib/products";
+import { getProductsFromDB, getProductsByCategorySlugFromDB } from "@/lib/products";
 
 export const revalidate = 60;
 
@@ -20,16 +20,29 @@ async function getCollectionData(slug: string) {
     .eq("slug", slug)
     .single();
 
-  if (!col) return null;
+  if (col) {
+    // Get linked product slugs
+    const { data: links } = await sb
+      .from("collection_products")
+      .select("product_slug, display_order")
+      .eq("collection_id", col.id)
+      .order("display_order", { ascending: true });
 
-  // Get linked product slugs
-  const { data: links } = await sb
-    .from("collection_products")
-    .select("product_slug, display_order")
-    .eq("collection_id", col.id)
-    .order("display_order", { ascending: true });
+    return { col, productSlugs: (links ?? []).map((l: { product_slug: string }) => l.product_slug) };
+  }
 
-  return { col, productSlugs: (links ?? []).map((l: { product_slug: string }) => l.product_slug) };
+  // Fallback: admin "Shop by Category" entries (site_categories) don't live in the
+  // collections table — without this, any category added there 404s on click.
+  const { data: cat } = await sb
+    .from("site_categories")
+    .select("*")
+    .eq("slug", slug)
+    .eq("active", true)
+    .single();
+
+  if (!cat) return null;
+
+  return { col: { title: cat.name, description: cat.description ?? null }, productSlugs: [], categoryId: cat.id };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -49,7 +62,9 @@ export default async function DynamicCollectionPage({ params }: Props) {
 
   // Get all active products then filter by linked slugs
   const allProducts = await getProductsFromDB({ active: true });
-  const products = productSlugs.length > 0
+  const products = "categoryId" in data
+    ? await getProductsByCategorySlugFromDB(params.slug, async () => allProducts)
+    : productSlugs.length > 0
     ? productSlugs
         .map((s) => allProducts.find((p) => p.slug === s))
         .filter(Boolean) as typeof allProducts
