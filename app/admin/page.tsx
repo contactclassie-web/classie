@@ -1222,10 +1222,15 @@ export default function AdminPage() {
 
   // Live Tracker (analytics_events)
   const [trackerLoading, setTrackerLoading] = useState(false);
-  const [trackerRange, setTrackerRange] = useState<1 | 7 | 30>(1);
+  const [trackerRange, setTrackerRange] = useState<"today" | 7 | 30 | "custom">("today");
+  const [trackerCustomFrom, setTrackerCustomFrom] = useState("");
+  const [trackerCustomTo, setTrackerCustomTo] = useState("");
   const [trackerCounts, setTrackerCounts] = useState<Record<string, number>>({});
   const [trackerSources, setTrackerSources] = useState<{ source: string; count: number }[]>([]);
+  const [trackerDevices, setTrackerDevices] = useState<{ device: string; count: number }[]>([]);
   const [trackerErrors, setTrackerErrors] = useState<{ id: string; message: string; path: string; created_at: string }[]>([]);
+  type TrackerActivity = { id: string; event_type: string; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
+  const [trackerActivity, setTrackerActivity] = useState<TrackerActivity[]>([]);
   const [trackerAvailable, setTrackerAvailable] = useState(true);
 
   // Testimonials
@@ -2082,37 +2087,64 @@ export default function AdminPage() {
     finally { setSubsLoading(false); }
   }, []);
 
-  const fetchAnalytics = useCallback(async (days: 1 | 7 | 30) => {
+  const fetchAnalytics = useCallback(async (range: "today" | 7 | 30 | "custom", customFrom?: string, customTo?: string) => {
     setTrackerLoading(true);
     try {
-      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
-      const { data, error } = await supabase
+      let since: string;
+      let until: string | null = null;
+      if (range === "today") {
+        const start = new Date(); start.setHours(0, 0, 0, 0);
+        since = start.toISOString();
+      } else if (range === "custom") {
+        if (!customFrom) { setTrackerLoading(false); return; }
+        since = new Date(customFrom).toISOString();
+        until = customTo ? new Date(new Date(customTo).getTime() + 24 * 60 * 60 * 1000).toISOString() : null;
+      } else {
+        since = new Date(Date.now() - range * 24 * 60 * 60 * 1000).toISOString();
+      }
+
+      let query = supabase
         .from("analytics_events")
-        .select("event_type, source, message, path, created_at")
+        .select("event_type, source, message, path, product_title, value, device, country, city, created_at")
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(5000);
+      if (until) query = query.lt("created_at", until);
+      const { data, error } = await query;
 
       if (error) { setTrackerAvailable(false); return; }
       setTrackerAvailable(true);
 
       const counts: Record<string, number> = { page_view: 0, add_to_cart: 0, begin_checkout: 0, purchase: 0, error: 0 };
       const sourceMap: Record<string, number> = {};
+      const deviceMap: Record<string, number> = {};
       const errors: { id: string; message: string; path: string; created_at: string }[] = [];
+      const activity: TrackerActivity[] = [];
 
-      (data ?? []).forEach((row: { event_type: string; source?: string; message?: string; path?: string; created_at: string }, i: number) => {
+      (data ?? []).forEach((row: { event_type: string; source?: string; message?: string; path?: string; product_title?: string; value?: number; device?: string; country?: string; city?: string; created_at: string }, i: number) => {
         counts[row.event_type] = (counts[row.event_type] ?? 0) + 1;
         if (row.event_type === "page_view" && row.source) {
           sourceMap[row.source] = (sourceMap[row.source] ?? 0) + 1;
         }
+        if (row.device) deviceMap[row.device] = (deviceMap[row.device] ?? 0) + 1;
         if (row.event_type === "error" && errors.length < 25) {
           errors.push({ id: String(i), message: row.message || "Unknown error", path: row.path || "—", created_at: row.created_at });
+        }
+        if (["add_to_cart", "begin_checkout", "purchase"].includes(row.event_type) && activity.length < 30) {
+          activity.push({
+            id: String(i), event_type: row.event_type,
+            product_title: row.product_title ?? null, value: row.value ?? null,
+            device: row.device ?? null, city: row.city ?? null, country: row.country ?? null,
+            created_at: row.created_at,
+          });
         }
       });
 
       setTrackerCounts(counts);
       setTrackerSources(Object.entries(sourceMap).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count).slice(0, 8));
+      setTrackerDevices(Object.entries(deviceMap).map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count));
       setTrackerErrors(errors);
+      setTrackerActivity(activity);
     } catch {
       setTrackerAvailable(false);
     } finally {
@@ -2771,7 +2803,7 @@ export default function AdminPage() {
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "footer") { fetchSettings(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
-    if (tab === "live-tracker") { fetchAnalytics(trackerRange); }
+    if (tab === "live-tracker") { fetchAnalytics(trackerRange, trackerCustomFrom, trackerCustomTo); }
     if (tab === "collections") fetchCollections();
     if (tab === "heels-page") fetchHeelsPage();
     if (tab === "clips-page") fetchClipsPage();
@@ -2803,7 +2835,7 @@ export default function AdminPage() {
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
     if (tab === "blog") fetchBlogPosts();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchAnalytics, trackerRange, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchAnalytics, trackerRange, trackerCustomFrom, trackerCustomTo, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -7656,16 +7688,25 @@ export default function AdminPage() {
                   <h2 className="text-lg font-semibold text-gray-800">Live Tracker</h2>
                   <p className="text-sm text-gray-400 mt-0.5">Real visitors on classie.co.in — traffic, cart activity, purchases &amp; errors</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  {([1, 7, 30] as const).map((d) => (
-                    <button key={d} onClick={() => setTrackerRange(d)}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {([["today", "Today"], [7, "7d"], [30, "30d"], ["custom", "Custom"]] as const).map(([val, label]) => (
+                    <button key={label} onClick={() => setTrackerRange(val)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        trackerRange === d ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373]"
+                        trackerRange === val ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373]"
                       }`}>
-                      {d === 1 ? "24h" : `${d}d`}
+                      {label}
                     </button>
                   ))}
-                  <button onClick={() => fetchAnalytics(trackerRange)}
+                  {trackerRange === "custom" && (
+                    <>
+                      <input type="date" value={trackerCustomFrom} onChange={(e) => setTrackerCustomFrom(e.target.value)}
+                        className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-600" />
+                      <span className="text-xs text-gray-400">to</span>
+                      <input type="date" value={trackerCustomTo} onChange={(e) => setTrackerCustomTo(e.target.value)}
+                        className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-600" />
+                    </>
+                  )}
+                  <button onClick={() => fetchAnalytics(trackerRange, trackerCustomFrom, trackerCustomTo)}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
                     <RefreshCw className={`w-3.5 h-3.5 ${trackerLoading ? "animate-spin" : ""}`} /> Refresh
                   </button>
@@ -7727,7 +7768,7 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                     {/* Top sources */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                       <h3 className="text-sm font-semibold text-gray-700 mb-4">Where Visitors Came From</h3>
@@ -7739,9 +7780,32 @@ export default function AdminPage() {
                             const max = trackerSources[0]?.count || 1;
                             return (
                               <div key={source} className="flex items-center gap-3">
-                                <p className="text-xs text-gray-600 w-28 truncate flex-shrink-0">{source}</p>
+                                <p className="text-xs text-gray-600 w-24 truncate flex-shrink-0">{source}</p>
                                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                                   <div className="h-full bg-[#3B5373] rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+                                </div>
+                                <p className="text-xs font-semibold text-gray-700 w-8 text-right flex-shrink-0">{count}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Device breakdown */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-4">Mobile vs Desktop</h3>
+                      {trackerDevices.length === 0 ? (
+                        <p className="text-sm text-gray-400">No device data in this range yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {trackerDevices.map(({ device, count }) => {
+                            const max = trackerDevices[0]?.count || 1;
+                            return (
+                              <div key={device} className="flex items-center gap-3">
+                                <p className="text-xs text-gray-600 w-24 truncate flex-shrink-0 capitalize">{device}</p>
+                                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-full bg-[#b58a4a] rounded-full" style={{ width: `${(count / max) * 100}%` }} />
                                 </div>
                                 <p className="text-xs font-semibold text-gray-700 w-8 text-right flex-shrink-0">{count}</p>
                               </div>
@@ -7767,6 +7831,42 @@ export default function AdminPage() {
                         </div>
                       )}
                     </div>
+                  </div>
+
+                  {/* Recent activity — who did what */}
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Recent Activity — who added/bought what</h3>
+                    {trackerActivity.length === 0 ? (
+                      <p className="text-sm text-gray-400">No cart/checkout/purchase activity in this range yet.</p>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-100">
+                              {["Action", "Product", "Value", "Device", "Location", "When"].map((h) => (
+                                <th key={h} className="text-left px-3 py-2 text-xs uppercase tracking-wide text-gray-400 font-semibold">{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {trackerActivity.map((a) => {
+                              const label = a.event_type === "add_to_cart" ? "🛒 Added to cart" : a.event_type === "begin_checkout" ? "🔒 Started checkout" : "✅ Purchased";
+                              const location = [a.city, a.country].filter(Boolean).join(", ") || "—";
+                              return (
+                                <tr key={a.id} className="border-b border-gray-50 last:border-0">
+                                  <td className="px-3 py-2.5 whitespace-nowrap">{label}</td>
+                                  <td className="px-3 py-2.5 text-gray-600">{a.product_title || "—"}</td>
+                                  <td className="px-3 py-2.5 text-gray-600">{a.value ? `₹${a.value.toLocaleString("en-IN")}` : "—"}</td>
+                                  <td className="px-3 py-2.5 text-gray-500 capitalize">{a.device || "—"}</td>
+                                  <td className="px-3 py-2.5 text-gray-500">{location}</td>
+                                  <td className="px-3 py-2.5 text-gray-400 text-xs whitespace-nowrap">{new Date(a.created_at).toLocaleString("en-IN")}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 </>
               )}

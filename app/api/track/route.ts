@@ -10,6 +10,11 @@ function getSupabase() {
   return createClient(url, key);
 }
 
+function getDevice(userAgent: string | null): string {
+  if (!userAgent) return "unknown";
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(userAgent) ? "mobile" : "desktop";
+}
+
 // Called by lib/analytics.ts (sendBeacon/fetch) on page views, cart/checkout/purchase
 // events, and client-side errors. Best-effort: failures here must never surface to users.
 export async function POST(request: NextRequest) {
@@ -22,6 +27,13 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabase();
     if (!supabase) return NextResponse.json({ ok: true }); // table not configured yet — no-op
 
+    // Vercel injects these at the edge on every request — real geo/device info,
+    // not something the client can fake by sending a fake value in the body.
+    const device = getDevice(request.headers.get("user-agent"));
+    const country = request.headers.get("x-vercel-ip-country");
+    const cityHeader = request.headers.get("x-vercel-ip-city");
+    const city = cityHeader ? decodeURIComponent(cityHeader) : null;
+
     await supabase.from("analytics_events").insert([{
       event_type: body.event_type,
       path: typeof body.path === "string" ? body.path.slice(0, 500) : null,
@@ -32,6 +44,9 @@ export async function POST(request: NextRequest) {
       session_id: typeof body.session_id === "string" ? body.session_id.slice(0, 100) : null,
       message: typeof body.message === "string" ? body.message.slice(0, 1000) : null,
       meta: body.meta ?? null,
+      device,
+      country,
+      city,
     }]);
 
     return NextResponse.json({ ok: true });
