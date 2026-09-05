@@ -9,12 +9,17 @@ import { track } from "@/lib/analytics";
 // there too, instead of only ever being visible in a visitor's own browser console.
 export default function AnalyticsTracker() {
   const pathname = usePathname();
+  // The admin panel isn't a customer visiting the store — never let admin's own
+  // usage inflate the Live Tracker numbers it displays.
+  const isAdmin = pathname?.startsWith("/admin");
 
   useEffect(() => {
+    if (isAdmin) return;
     track({ type: "page_view", path: pathname });
-  }, [pathname]);
+  }, [pathname, isAdmin]);
 
   useEffect(() => {
+    if (isAdmin) return;
     const onError = (e: ErrorEvent) => {
       track({ type: "error", message: e.message?.slice(0, 500) || "Unknown error", path: window.location.pathname });
     };
@@ -28,7 +33,7 @@ export default function AnalyticsTracker() {
       window.removeEventListener("error", onError);
       window.removeEventListener("unhandledrejection", onRejection);
     };
-  }, []);
+  }, [isAdmin]);
 
   return null;
 }
