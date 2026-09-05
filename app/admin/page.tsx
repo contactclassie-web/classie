@@ -581,8 +581,15 @@ function ReviewEditForm({ rev, reviewsModal, setReviewsModal, saveAdminReviewEdi
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AdminPage() {
-  // Auth
+  // Auth — persisted in sessionStorage so a page refresh doesn't log the admin out
+  // (cleared when the browser tab closes, unlike localStorage). Starts false to match
+  // the server-rendered HTML, then syncs from sessionStorage post-mount — reading it
+  // in the initial state would make the client's first render diverge from the
+  // server's and trigger a hydration error.
   const [authed, setAuthed] = useState(false);
+  useEffect(() => {
+    try { if (sessionStorage.getItem("classie_admin_authed") === "1") setAuthed(true); } catch { /* ignore */ }
+  }, []);
   const [pw, setPw] = useState("");
   const [pwError, setPwError] = useState("");
 
@@ -1226,7 +1233,10 @@ export default function AdminPage() {
   const [trackerCustomFrom, setTrackerCustomFrom] = useState("");
   const [trackerCustomTo, setTrackerCustomTo] = useState("");
   const [trackerCounts, setTrackerCounts] = useState<Record<string, number>>({});
+  const [trackerUnique, setTrackerUnique] = useState(0);
+  const [trackerAvgDuration, setTrackerAvgDuration] = useState(0); // seconds
   const [trackerSources, setTrackerSources] = useState<{ source: string; count: number }[]>([]);
+  const [trackerPages, setTrackerPages] = useState<{ path: string; count: number }[]>([]);
   const [trackerDevices, setTrackerDevices] = useState<{ device: string; count: number }[]>([]);
   const [trackerErrors, setTrackerErrors] = useState<{ id: string; message: string; path: string; created_at: string }[]>([]);
   type TrackerActivity = { id: string; event_type: string; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
@@ -2105,7 +2115,7 @@ export default function AdminPage() {
 
       let query = supabase
         .from("analytics_events")
-        .select("event_type, source, message, path, product_title, value, device, country, city, created_at")
+        .select("event_type, source, message, path, product_title, value, device, country, city, session_id, created_at")
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(5000);
@@ -2118,15 +2128,25 @@ export default function AdminPage() {
       const counts: Record<string, number> = { page_view: 0, add_to_cart: 0, begin_checkout: 0, purchase: 0, error: 0 };
       const sourceMap: Record<string, number> = {};
       const deviceMap: Record<string, number> = {};
+      const pageMap: Record<string, number> = {};
+      const sessionTimes: Record<string, { min: number; max: number }> = {};
+      const uniqueSessions = new Set<string>();
       const errors: { id: string; message: string; path: string; created_at: string }[] = [];
       const activity: TrackerActivity[] = [];
 
-      (data ?? []).forEach((row: { event_type: string; source?: string; message?: string; path?: string; product_title?: string; value?: number; device?: string; country?: string; city?: string; created_at: string }, i: number) => {
+      (data ?? []).forEach((row: { event_type: string; source?: string; message?: string; path?: string; product_title?: string; value?: number; device?: string; country?: string; city?: string; session_id?: string; created_at: string }, i: number) => {
         counts[row.event_type] = (counts[row.event_type] ?? 0) + 1;
-        if (row.event_type === "page_view" && row.source) {
-          sourceMap[row.source] = (sourceMap[row.source] ?? 0) + 1;
+        if (row.event_type === "page_view") {
+          if (row.source) sourceMap[row.source] = (sourceMap[row.source] ?? 0) + 1;
+          if (row.path) pageMap[row.path] = (pageMap[row.path] ?? 0) + 1;
         }
         if (row.device) deviceMap[row.device] = (deviceMap[row.device] ?? 0) + 1;
+        if (row.session_id) {
+          uniqueSessions.add(row.session_id);
+          const t = new Date(row.created_at).getTime();
+          const s = sessionTimes[row.session_id];
+          sessionTimes[row.session_id] = s ? { min: Math.min(s.min, t), max: Math.max(s.max, t) } : { min: t, max: t };
+        }
         if (row.event_type === "error" && errors.length < 25) {
           errors.push({ id: String(i), message: row.message || "Unknown error", path: row.path || "—", created_at: row.created_at });
         }
@@ -2140,8 +2160,14 @@ export default function AdminPage() {
         }
       });
 
+      const durations = Object.values(sessionTimes).map((s) => (s.max - s.min) / 1000);
+      const avgDuration = durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
+
       setTrackerCounts(counts);
+      setTrackerUnique(uniqueSessions.size);
+      setTrackerAvgDuration(Math.round(avgDuration));
       setTrackerSources(Object.entries(sourceMap).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count).slice(0, 8));
+      setTrackerPages(Object.entries(pageMap).map(([path, count]) => ({ path, count })).sort((a, b) => b.count - a.count).slice(0, 10));
       setTrackerDevices(Object.entries(deviceMap).map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count));
       setTrackerErrors(errors);
       setTrackerActivity(activity);
@@ -2841,8 +2867,16 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw === "classie@admin123") { setAuthed(true); setPwError(""); }
-    else setPwError("Incorrect password. Please try again.");
+    if (pw === "classie@admin123") {
+      setAuthed(true);
+      setPwError("");
+      try { sessionStorage.setItem("classie_admin_authed", "1"); } catch { /* ignore */ }
+    } else setPwError("Incorrect password. Please try again.");
+  };
+
+  const handleLogout = () => {
+    setAuthed(false);
+    try { sessionStorage.removeItem("classie_admin_authed"); } catch { /* ignore */ }
   };
 
   // ── Order actions ─────────────────────────────────────────────────────────
@@ -3853,7 +3887,7 @@ export default function AdminPage() {
         {/* Sign Out */}
         <div className="px-3 py-4 border-t border-white/10">
           <button
-            onClick={() => setAuthed(false)}
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-all"
           >
             <LogOut className="w-4 h-4" />
@@ -7724,20 +7758,24 @@ export default function AdminPage() {
               ) : (
                 <>
                   {/* Stat cards */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                     {[
-                      { label: "Page Views",     value: trackerCounts.page_view ?? 0,     icon: Eye,          color: "#3B5373" },
-                      { label: "Add to Cart",    value: trackerCounts.add_to_cart ?? 0,   icon: ShoppingCart, color: "#b58a4a" },
-                      { label: "Began Checkout", value: trackerCounts.begin_checkout ?? 0, icon: Lock,         color: "#6b5ca5" },
-                      { label: "Purchases",      value: trackerCounts.purchase ?? 0,       icon: IndianRupee,  color: "#1f9d55" },
-                      { label: "Errors",         value: trackerCounts.error ?? 0,          icon: AlertCircle,  color: "#c0392b" },
-                    ].map(({ label, value, icon: Icon, color }) => (
+                      { label: "Page Views",     value: trackerCounts.page_view ?? 0,     icon: Eye,          color: "#3B5373", suffix: "" },
+                      { label: "Unique Visitors",value: trackerUnique,                     icon: Users,        color: "#3B5373", suffix: "" },
+                      { label: "Avg Time on Site", value: trackerAvgDuration,              icon: Clock,        color: "#8a6d3b", suffix: "s", formatDuration: true },
+                      { label: "Add to Cart",    value: trackerCounts.add_to_cart ?? 0,   icon: ShoppingCart, color: "#b58a4a", suffix: "" },
+                      { label: "Began Checkout", value: trackerCounts.begin_checkout ?? 0, icon: Lock,         color: "#6b5ca5", suffix: "" },
+                      { label: "Purchases",      value: trackerCounts.purchase ?? 0,       icon: IndianRupee,  color: "#1f9d55", suffix: "" },
+                      { label: "Errors",         value: trackerCounts.error ?? 0,          icon: AlertCircle,  color: "#c0392b", suffix: "" },
+                    ].map(({ label, value, icon: Icon, color, formatDuration }) => (
                       <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <Icon className="w-4 h-4" style={{ color }} />
                           <p className="text-xs text-gray-400 uppercase tracking-wide">{label}</p>
                         </div>
-                        <p className="text-2xl font-bold text-gray-800">{value.toLocaleString("en-IN")}</p>
+                        <p className="text-2xl font-bold text-gray-800">
+                          {formatDuration ? `${Math.floor(value / 60)}m ${value % 60}s` : value.toLocaleString("en-IN")}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -7768,7 +7806,30 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
+                    {/* Top pages */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-4">Top Pages</h3>
+                      {trackerPages.length === 0 ? (
+                        <p className="text-sm text-gray-400">No page views recorded in this range yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {trackerPages.map(({ path, count }) => {
+                            const max = trackerPages[0]?.count || 1;
+                            return (
+                              <div key={path} className="flex items-center gap-3">
+                                <p className="text-xs text-gray-600 flex-1 truncate" title={path}>{path}</p>
+                                <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden flex-shrink-0">
+                                  <div className="h-full bg-[#6b5ca5] rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+                                </div>
+                                <p className="text-xs font-semibold text-gray-700 w-8 text-right flex-shrink-0">{count}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
                     {/* Top sources */}
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                       <h3 className="text-sm font-semibold text-gray-700 mb-4">Where Visitors Came From</h3>
