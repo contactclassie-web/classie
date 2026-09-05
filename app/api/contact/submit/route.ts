@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendContactNotification } from "@/lib/emails";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,6 +32,9 @@ export async function POST(req: NextRequest) {
       console.error("contact_submissions insert error:", error);
       return NextResponse.json({ error: "Failed to save submission." }, { status: 500 });
     }
+
+    // Notify admin by email (non-blocking — submission is already saved either way)
+    sendContactNotification({ firstName: first_name, lastName: last_name, email, phone, message });
 
     return NextResponse.json({ success: true });
   } catch (err) {

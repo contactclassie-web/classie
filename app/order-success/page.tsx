@@ -1,13 +1,31 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Package, Truck, Home } from "lucide-react";
+import { track } from "@/lib/analytics";
+import { gtagEvent } from "@/lib/gtag";
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("id") || "—";
+  const isCOD = searchParams.get("method") !== "online";
+  const amount = Number(searchParams.get("amount")) || 0;
+
+  useEffect(() => {
+    if (orderId === "—") return;
+    // Dedupe: a refresh of this page must not double-count the same purchase.
+    const dedupeKey = `classie_purchase_${orderId}`;
+    try {
+      if (sessionStorage.getItem(dedupeKey)) return;
+      sessionStorage.setItem(dedupeKey, "1");
+    } catch { /* if storage is unavailable, fall through and track anyway */ }
+
+    track({ type: "purchase", orderId, value: amount });
+    gtagEvent("purchase", { transaction_id: orderId, currency: "INR", value: amount });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId]);
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4">
@@ -52,12 +70,21 @@ function OrderSuccessContent() {
           ))}
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-5 py-4 text-sm text-amber-800 mb-8 text-left">
-          <p className="font-semibold mb-1">💰 Cash on Delivery</p>
-          <p className="text-xs leading-relaxed">
-            Please keep the exact amount ready at the time of delivery. Our delivery partner will collect payment when your order arrives.
-          </p>
-        </div>
+        {isCOD ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-5 py-4 text-sm text-amber-800 mb-8 text-left">
+            <p className="font-semibold mb-1">💰 Cash on Delivery</p>
+            <p className="text-xs leading-relaxed">
+              Please keep the exact amount ready at the time of delivery. Our delivery partner will collect payment when your order arrives.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-5 py-4 text-sm text-emerald-800 mb-8 text-left">
+            <p className="font-semibold mb-1">✅ Payment Received</p>
+            <p className="text-xs leading-relaxed">
+              Your payment was successful. No further payment is needed — we&apos;ll notify you once your order ships.
+            </p>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/shop/heels" className="btn-primary">

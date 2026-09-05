@@ -8,7 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen,
+  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -386,8 +386,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
+type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -452,6 +452,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "settings":       "settings",
   "footer":         "footer",
   "messages":       "messages",
+  "live-tracker":   "live-tracker",
   "blog":           "blog",
 };
 
@@ -531,6 +532,7 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   settings: [],
   footer:   [],
   messages: [],
+  "live-tracker": [],
   blog:     [{ id: "blog", label: "Blog Posts" }],
 };
 
@@ -1217,6 +1219,14 @@ export default function AdminPage() {
   const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
   const [subsLoading, setSubsLoading] = useState(false);
   const [msgSubTab, setMsgSubTab] = useState<"messages" | "newsletter">("messages");
+
+  // Live Tracker (analytics_events)
+  const [trackerLoading, setTrackerLoading] = useState(false);
+  const [trackerRange, setTrackerRange] = useState<1 | 7 | 30>(1);
+  const [trackerCounts, setTrackerCounts] = useState<Record<string, number>>({});
+  const [trackerSources, setTrackerSources] = useState<{ source: string; count: number }[]>([]);
+  const [trackerErrors, setTrackerErrors] = useState<{ id: string; message: string; path: string; created_at: string }[]>([]);
+  const [trackerAvailable, setTrackerAvailable] = useState(true);
 
   // Testimonials
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -2072,6 +2082,44 @@ export default function AdminPage() {
     finally { setSubsLoading(false); }
   }, []);
 
+  const fetchAnalytics = useCallback(async (days: 1 | 7 | 30) => {
+    setTrackerLoading(true);
+    try {
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      const { data, error } = await supabase
+        .from("analytics_events")
+        .select("event_type, source, message, path, created_at")
+        .gte("created_at", since)
+        .order("created_at", { ascending: false })
+        .limit(5000);
+
+      if (error) { setTrackerAvailable(false); return; }
+      setTrackerAvailable(true);
+
+      const counts: Record<string, number> = { page_view: 0, add_to_cart: 0, begin_checkout: 0, purchase: 0, error: 0 };
+      const sourceMap: Record<string, number> = {};
+      const errors: { id: string; message: string; path: string; created_at: string }[] = [];
+
+      (data ?? []).forEach((row: { event_type: string; source?: string; message?: string; path?: string; created_at: string }, i: number) => {
+        counts[row.event_type] = (counts[row.event_type] ?? 0) + 1;
+        if (row.event_type === "page_view" && row.source) {
+          sourceMap[row.source] = (sourceMap[row.source] ?? 0) + 1;
+        }
+        if (row.event_type === "error" && errors.length < 25) {
+          errors.push({ id: String(i), message: row.message || "Unknown error", path: row.path || "—", created_at: row.created_at });
+        }
+      });
+
+      setTrackerCounts(counts);
+      setTrackerSources(Object.entries(sourceMap).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count).slice(0, 8));
+      setTrackerErrors(errors);
+    } catch {
+      setTrackerAvailable(false);
+    } finally {
+      setTrackerLoading(false);
+    }
+  }, []);
+
   // Sync footer link editor state when settings are fetched
   useEffect(() => {
     if (tab !== "footer") return;
@@ -2723,6 +2771,7 @@ export default function AdminPage() {
     if (tab === "settings") { fetchSettings(); fetchFeaturesBar(); }
     if (tab === "footer") { fetchSettings(); }
     if (tab === "messages") { fetchMessages(); fetchSubscribers(); }
+    if (tab === "live-tracker") { fetchAnalytics(trackerRange); }
     if (tab === "collections") fetchCollections();
     if (tab === "heels-page") fetchHeelsPage();
     if (tab === "clips-page") fetchClipsPage();
@@ -2754,7 +2803,7 @@ export default function AdminPage() {
     if (tab === "instagram") fetchInstagramImages();
     if (tab === "style-inspo") fetchStyleInspos();
     if (tab === "blog") fetchBlogPosts();
-  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
+  }, [authed, tab, fetchSlides, fetchSettings, fetchFeaturesBar, fetchMessages, fetchSubscribers, fetchAnalytics, trackerRange, fetchCollections, fetchCategories, fetchFeaturedPicks, fetchTestimonials, fetchInstagramImages, fetchStyleInspos, fetchBlogPosts, fetchClipsPage, fetchBowPage, fetchCollectionsPage, fetchStyleIdeasPage, fetchAdvSettings, fetchHdPage, fetchCoupons, fetchCouponStats, fetchAboutUs, fetchContactUs, fetchCtInbox, fetchShippingPolicy, fetchSizeGuide, fetchReturns]);
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
@@ -3687,6 +3736,7 @@ export default function AdminPage() {
         { id: "footer",            label: "Footer",    icon: Layout },
         { id: "advanced-settings", label: "Advanced",  icon: Palette },
         { id: "messages",          label: "Messages",  icon: MessageSquare, badge: messages.length },
+        { id: "live-tracker",      label: "Live Tracker", icon: Activity },
       ],
     },
   ];
@@ -3717,6 +3767,7 @@ export default function AdminPage() {
               if (id === "settings") return "settings";
               if (id === "footer") return "footer";
               if (id === "messages") return "messages";
+              if (id === "live-tracker") return "live-tracker";
               if (id === "clips-page") return "clips-page";
               if (id === "bow-page") return "bow-page";
               if (id === "collections-page") return "collections-page";
@@ -3804,7 +3855,8 @@ export default function AdminPage() {
                mainSection === "returns" ? "Returns & Exchanges" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
-               mainSection === "footer" ? "Footer" : "Messages"}
+               mainSection === "footer" ? "Footer" :
+               mainSection === "live-tracker" ? "Live Tracker" : "Messages"}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">Classie Admin Panel</p>
           </div>
@@ -7597,6 +7649,130 @@ export default function AdminPage() {
           {/* ══════════════════════════════════════
               MESSAGES TAB
           ══════════════════════════════════════ */}
+          {tab === "live-tracker" && (
+            <div className="space-y-5">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Live Tracker</h2>
+                  <p className="text-sm text-gray-400 mt-0.5">Real visitors on classie.co.in — traffic, cart activity, purchases &amp; errors</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {([1, 7, 30] as const).map((d) => (
+                    <button key={d} onClick={() => setTrackerRange(d)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        trackerRange === d ? "bg-[#3B5373] text-white border-[#3B5373]" : "bg-white text-gray-500 border-gray-200 hover:border-[#3B5373]"
+                      }`}>
+                      {d === 1 ? "24h" : `${d}d`}
+                    </button>
+                  ))}
+                  <button onClick={() => fetchAnalytics(trackerRange)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-[#3B5373] border border-gray-200 rounded-lg transition-colors">
+                    <RefreshCw className={`w-3.5 h-3.5 ${trackerLoading ? "animate-spin" : ""}`} /> Refresh
+                  </button>
+                </div>
+              </div>
+
+              {!trackerAvailable ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-sm text-amber-800">
+                  <p className="font-semibold mb-1">Live Tracker isn&apos;t set up yet</p>
+                  <p className="text-xs leading-relaxed">
+                    Run <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200">supabase/analytics_migration.sql</code> once
+                    in your Supabase project&apos;s SQL Editor to create the <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200">analytics_events</code> table, then refresh this tab.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Stat cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {[
+                      { label: "Page Views",     value: trackerCounts.page_view ?? 0,     icon: Eye,          color: "#3B5373" },
+                      { label: "Add to Cart",    value: trackerCounts.add_to_cart ?? 0,   icon: ShoppingCart, color: "#b58a4a" },
+                      { label: "Began Checkout", value: trackerCounts.begin_checkout ?? 0, icon: Lock,         color: "#6b5ca5" },
+                      { label: "Purchases",      value: trackerCounts.purchase ?? 0,       icon: IndianRupee,  color: "#1f9d55" },
+                      { label: "Errors",         value: trackerCounts.error ?? 0,          icon: AlertCircle,  color: "#c0392b" },
+                    ].map(({ label, value, icon: Icon, color }) => (
+                      <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Icon className="w-4 h-4" style={{ color }} />
+                          <p className="text-xs text-gray-400 uppercase tracking-wide">{label}</p>
+                        </div>
+                        <p className="text-2xl font-bold text-gray-800">{value.toLocaleString("en-IN")}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Funnel */}
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Conversion Funnel</h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {[
+                        { label: "Visitors",  value: trackerCounts.page_view ?? 0 },
+                        { label: "Added to Cart", value: trackerCounts.add_to_cart ?? 0 },
+                        { label: "Checkout Started", value: trackerCounts.begin_checkout ?? 0 },
+                        { label: "Purchased", value: trackerCounts.purchase ?? 0 },
+                      ].map((step, i, arr) => {
+                        const base = trackerCounts.page_view || 1;
+                        const pct = Math.round((step.value / base) * 100);
+                        return (
+                          <div key={step.label} className="flex items-center gap-2">
+                            <div className="text-center px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 min-w-[110px]">
+                              <p className="text-lg font-bold text-gray-800">{step.value.toLocaleString("en-IN")}</p>
+                              <p className="text-[11px] text-gray-400 mt-0.5">{step.label}</p>
+                              <p className="text-[10px] text-[#3B5373] font-medium mt-0.5">{i === 0 ? "100%" : `${pct}%`}</p>
+                            </div>
+                            {i < arr.length - 1 && <span className="text-gray-300">→</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {/* Top sources */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-4">Where Visitors Came From</h3>
+                      {trackerSources.length === 0 ? (
+                        <p className="text-sm text-gray-400">No traffic recorded in this range yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {trackerSources.map(({ source, count }) => {
+                            const max = trackerSources[0]?.count || 1;
+                            return (
+                              <div key={source} className="flex items-center gap-3">
+                                <p className="text-xs text-gray-600 w-28 truncate flex-shrink-0">{source}</p>
+                                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-full bg-[#3B5373] rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+                                </div>
+                                <p className="text-xs font-semibold text-gray-700 w-8 text-right flex-shrink-0">{count}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Recent errors */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-4">Recent Errors</h3>
+                      {trackerErrors.length === 0 ? (
+                        <p className="text-sm text-emerald-600">✅ No errors reported in this range.</p>
+                      ) : (
+                        <div className="space-y-2 max-h-72 overflow-y-auto">
+                          {trackerErrors.map((e) => (
+                            <div key={e.id} className="border border-red-100 bg-red-50 rounded-lg px-3 py-2">
+                              <p className="text-xs text-red-700 font-medium break-words">{e.message}</p>
+                              <p className="text-[10px] text-red-400 mt-1">{e.path} · {new Date(e.created_at).toLocaleString("en-IN")}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {tab === "messages" && (
             <div className="space-y-4">
               <div className="flex gap-2 items-center">

@@ -4,6 +4,7 @@ import { CartProvider } from "@/components/CartContext";
 import { WishlistProvider } from "@/components/WishlistContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { createClient } from "@supabase/supabase-js";
 import Script from "next/script";
 import { Cormorant_Garamond, Poppins } from "next/font/google";
@@ -114,6 +115,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://hrjvxwqvxvibtwyfoyca.supabase.co" />
       </head>
       <body className={`${cormorant.variable} ${poppins.variable}`}>
+        <AnalyticsTracker />
         <CartProvider>
           <WishlistProvider>
             <Navbar initialSettings={cfg} initialCategories={siteCategories ?? []} />

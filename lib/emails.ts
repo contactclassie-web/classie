@@ -212,3 +212,45 @@ export async function sendOrderEmails(data: OrderEmailData) {
     // Non-fatal — order already placed
   }
 }
+
+// ── Contact form notification (to admin only) ──────────────────────────────────
+interface ContactSubmissionData {
+  firstName: string
+  lastName?: string
+  email: string
+  phone?: string
+  message: string
+}
+
+export async function sendContactNotification(data: ContactSubmissionData) {
+  const client = getResend()
+  if (!client) {
+    console.error('RESEND_API_KEY not set — skipping contact notification email')
+    return
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL || 'contact.classie@gmail.com'
+  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'
+
+  try {
+    await client.emails.send({
+      from: `CLASSIE Website <${fromEmail}>`,
+      to: [adminEmail],
+      replyTo: data.email,
+      subject: `📩 New Contact Message — ${data.firstName} ${data.lastName || ''}`.trim(),
+      html: `
+        <div style="font-family:Arial,sans-serif;padding:24px;">
+          <h2 style="margin:0 0 16px;">New Contact Form Submission</h2>
+          <p><strong>Name:</strong> ${data.firstName} ${data.lastName || ''}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          ${data.phone ? `<p><strong>Phone:</strong> ${data.phone}</p>` : ''}
+          <p><strong>Message:</strong></p>
+          <p style="white-space:pre-wrap;background:#f9f9f9;padding:12px;border-radius:4px;">${data.message}</p>
+        </div>
+      `,
+    })
+  } catch (err) {
+    console.error('Contact notification email error:', err)
+    // Non-fatal — submission already saved
+  }
+}
