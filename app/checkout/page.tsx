@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
+import { track } from "@/lib/analytics";
+import { gtagEvent } from "@/lib/gtag";
 import { Loader2, Lock, Tag, CheckCircle, XCircle, CreditCard, Truck } from "lucide-react";
 
 const INDIA_STATES = [
@@ -49,6 +51,18 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("online");
+
+  useEffect(() => {
+    if (items.length === 0) return;
+    track({ type: "begin_checkout", value: total });
+    gtagEvent("begin_checkout", {
+      currency: "INR",
+      value: total,
+      items: items.map((i) => ({ item_id: i.slug, item_name: i.title, price: i.price, quantity: i.quantity })),
+    });
+    // Fire once per checkout page load, not on every cart mutation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Coupon state ──────────────────────────────────────────────────────
   const [couponCode, setCouponCode] = useState("");
@@ -233,7 +247,7 @@ export default function CheckoutPage() {
             const data = await placeOrderInDB("online", verifyData.payment_id);
             await recordCouponUsage(data.id);
             clearCart();
-            router.push(`/order-success?id=${data.id}`);
+            router.push(`/order-success?id=${data.id}&method=online&amount=${grandTotal}`);
           } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Payment verified but order failed. Contact support.");
             setLoading(false);
@@ -261,7 +275,7 @@ export default function CheckoutPage() {
       const data = await placeOrderInDB("cod");
       await recordCouponUsage(data.id);
       clearCart();
-      router.push(`/order-success?id=${data.id}`);
+      router.push(`/order-success?id=${data.id}&method=cod&amount=${grandTotal}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setLoading(false);

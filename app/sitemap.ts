@@ -11,7 +11,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: base, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
     { url: `${base}/shop/heels`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/shop/clips`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/shop/accessories`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/shop/shoe-charms`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/collections`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
@@ -55,7 +54,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-    return [...staticPages, ...productPages, ...blogPages];
+    // Dynamic shop category pages (admin-added categories under "Shop by Category")
+    const { data: categories } = await sb
+      .from("site_categories")
+      .select("slug")
+      .eq("active", true);
+
+    const categoryPages: MetadataRoute.Sitemap = (categories || [])
+      .filter((c) => !["heels", "clips", "shoe-charms"].includes(c.slug))
+      .map((c) => ({
+        url: `${base}/shop/${c.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }));
+
+    return [...staticPages, ...productPages, ...blogPages, ...categoryPages];
   } catch {
     return staticPages;
   }

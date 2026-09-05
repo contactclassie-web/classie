@@ -11,6 +11,8 @@ import {
   getCartTotal,
   getCartCount,
 } from "@/lib/cart";
+import { track } from "@/lib/analytics";
+import { gtagEvent } from "@/lib/gtag";
 
 interface CartContextType {
   items: CartItem[];
@@ -34,6 +36,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = (item: CartItem) => {
     const updated = addItem(item);
     setItems([...updated]);
+
+    track({ type: "add_to_cart", productSlug: item.slug, productTitle: item.title, value: item.price * item.quantity });
+    gtagEvent("add_to_cart", {
+      currency: "INR",
+      value: item.price * item.quantity,
+      items: [{ item_id: item.slug, item_name: item.title, price: item.price, quantity: item.quantity }],
+    });
   };
 
   const removeFromCart = (slug: string, variant?: string) => {

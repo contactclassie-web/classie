@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Instagram, Music2, Facebook } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -81,6 +82,7 @@ const DEFAULT_DATA: FooterData = {
 interface FooterProps { initialSettings?: Record<string, string>; }
 
 export default function Footer({ initialSettings }: FooterProps) {
+  const pathname = usePathname();
   const buildData = (s?: Record<string, string>): FooterData => {
     if (!s) return DEFAULT_DATA;
     const merged = { ...DEFAULT_DATA };
@@ -118,6 +120,9 @@ export default function Footer({ initialSettings }: FooterProps) {
 
   const headingCls = "text-[10px] tracking-[0.3em] uppercase text-white/40 mb-6 font-light";
   const linkCls = "text-sm font-light text-white/60 hover:text-white transition-colors duration-200";
+
+  // The Admin panel has its own header/sidebar — the public storefront chrome must not wrap it.
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <footer style={{ backgroundColor: "#12192c" }} className="text-white">

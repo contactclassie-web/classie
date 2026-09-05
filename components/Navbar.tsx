@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ShoppingBag, Menu, X, Search, Heart } from "lucide-react";
 import { useWishlist } from "@/components/WishlistContext";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useCart } from "./CartContext";
 import AnnouncementBar from "./AnnouncementBar";
 import { supabase } from "@/lib/supabase";
@@ -34,6 +35,7 @@ const DEFAULT_CATS: Category[] = [
 ];
 
 export default function Navbar({ initialSettings, initialCategories }: NavbarProps) {
+  const pathname = usePathname();
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
   const [open, setOpen]         = useState(false);
@@ -65,6 +67,9 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
   // First 2 categories shown as direct links, rest in Collections dropdown
   const directLinks = categories.slice(0, 2);
   const dropdownLinks = categories;
+
+  // The Admin panel has its own header/sidebar — the public storefront chrome must not wrap it.
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <header className={`sticky top-0 z-50 bg-white transition-all duration-300 ${scrolled ? "border-b border-gray-100 shadow-sm" : "border-b border-gray-100"}`}>
