@@ -1236,7 +1236,7 @@ export default function AdminPage() {
   const [trackerUnique, setTrackerUnique] = useState(0);
   const [trackerAvgDuration, setTrackerAvgDuration] = useState(0); // seconds
   const [trackerSources, setTrackerSources] = useState<{ source: string; count: number }[]>([]);
-  const [trackerPages, setTrackerPages] = useState<{ path: string; count: number }[]>([]);
+  const [trackerPages, setTrackerPages] = useState<{ path: string; count: number; unique: number }[]>([]);
   const [trackerDevices, setTrackerDevices] = useState<{ device: string; count: number }[]>([]);
   type ActiveNowRow = { session_id: string; path: string; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActiveNow, setTrackerActiveNow] = useState<ActiveNowRow[]>([]);
@@ -2107,6 +2107,7 @@ export default function AdminPage() {
         .from("analytics_events")
         .select("session_id, path, device, city, country, created_at")
         .eq("event_type", "page_view")
+        .not("path", "like", "/admin%")
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(300);
@@ -2143,6 +2144,7 @@ export default function AdminPage() {
       let query = supabase
         .from("analytics_events")
         .select("event_type, source, message, path, product_title, value, device, country, city, session_id, created_at")
+        .not("path", "like", "/admin%")
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(5000);
@@ -2156,6 +2158,7 @@ export default function AdminPage() {
       const sourceMap: Record<string, number> = {};
       const deviceMap: Record<string, number> = {};
       const pageMap: Record<string, number> = {};
+      const pageSessionMap: Record<string, Set<string>> = {};
       const sessionTimes: Record<string, { min: number; max: number }> = {};
       const uniqueSessions = new Set<string>();
       const errors: { id: string; message: string; path: string; created_at: string }[] = [];
@@ -2165,7 +2168,13 @@ export default function AdminPage() {
         counts[row.event_type] = (counts[row.event_type] ?? 0) + 1;
         if (row.event_type === "page_view") {
           if (row.source) sourceMap[row.source] = (sourceMap[row.source] ?? 0) + 1;
-          if (row.path) pageMap[row.path] = (pageMap[row.path] ?? 0) + 1;
+          if (row.path) {
+            pageMap[row.path] = (pageMap[row.path] ?? 0) + 1;
+            if (row.session_id) {
+              if (!pageSessionMap[row.path]) pageSessionMap[row.path] = new Set();
+              pageSessionMap[row.path].add(row.session_id);
+            }
+          }
         }
         if (row.device) deviceMap[row.device] = (deviceMap[row.device] ?? 0) + 1;
         if (row.session_id) {
@@ -2194,7 +2203,7 @@ export default function AdminPage() {
       setTrackerUnique(uniqueSessions.size);
       setTrackerAvgDuration(Math.round(avgDuration));
       setTrackerSources(Object.entries(sourceMap).map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count).slice(0, 8));
-      setTrackerPages(Object.entries(pageMap).map(([path, count]) => ({ path, count })).sort((a, b) => b.count - a.count).slice(0, 10));
+      setTrackerPages(Object.entries(pageMap).map(([path, count]) => ({ path, count, unique: pageSessionMap[path]?.size ?? 0 })).sort((a, b) => b.count - a.count).slice(0, 10));
       setTrackerDevices(Object.entries(deviceMap).map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count));
       setTrackerErrors(errors);
       setTrackerActivity(activity);
@@ -7887,20 +7896,24 @@ export default function AdminPage() {
                       {trackerPages.length === 0 ? (
                         <p className="text-sm text-gray-400">No page views recorded in this range yet.</p>
                       ) : (
-                        <div className="space-y-2">
-                          {trackerPages.map(({ path, count }) => {
-                            const max = trackerPages[0]?.count || 1;
-                            return (
-                              <div key={path} className="flex items-center gap-3">
-                                <p className="text-xs text-gray-600 flex-1 truncate" title={path}>{path}</p>
-                                <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden flex-shrink-0">
-                                  <div className="h-full bg-[#6b5ca5] rounded-full" style={{ width: `${(count / max) * 100}%` }} />
-                                </div>
-                                <p className="text-xs font-semibold text-gray-700 w-8 text-right flex-shrink-0">{count}</p>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-gray-100">
+                              <th className="text-left pb-2 text-[10px] uppercase tracking-wide text-gray-400 font-semibold">Page</th>
+                              <th className="text-right pb-2 text-[10px] uppercase tracking-wide text-gray-400 font-semibold">Views</th>
+                              <th className="text-right pb-2 text-[10px] uppercase tracking-wide text-gray-400 font-semibold">Unique</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {trackerPages.map(({ path, count, unique }) => (
+                              <tr key={path} className="border-b border-gray-50 last:border-0">
+                                <td className="py-1.5 text-gray-600 truncate max-w-[140px]" title={path}>{path}</td>
+                                <td className="py-1.5 text-right font-semibold text-gray-700">{count}</td>
+                                <td className="py-1.5 text-right text-gray-500">{unique}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       )}
                     </div>
 
