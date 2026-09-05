@@ -1244,8 +1244,9 @@ export default function AdminPage() {
   type ActiveNowRow = { session_id: string; path: string; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActiveNow, setTrackerActiveNow] = useState<ActiveNowRow[]>([]);
   const [trackerErrors, setTrackerErrors] = useState<{ id: string; message: string; path: string; created_at: string }[]>([]);
-  type TrackerActivity = { id: string; event_type: string; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
+  type TrackerActivity = { id: string; event_type: string; path: string | null; product_title: string | null; value: number | null; device: string | null; city: string | null; country: string | null; created_at: string };
   const [trackerActivity, setTrackerActivity] = useState<TrackerActivity[]>([]);
+  const [trackerActivityPage, setTrackerActivityPage] = useState(1);
   const [trackerAvailable, setTrackerAvailable] = useState(true);
 
   // Shipping Rates (site_settings: shipping_tiers + shipping_default_fee)
@@ -2237,9 +2238,9 @@ export default function AdminPage() {
         if (row.event_type === "error" && errors.length < 25) {
           errors.push({ id: String(i), message: row.message || "Unknown error", path: row.path || "—", created_at: row.created_at });
         }
-        if (["add_to_cart", "begin_checkout", "purchase"].includes(row.event_type) && activity.length < 30) {
+        if (["add_to_cart", "begin_checkout", "purchase", "page_view"].includes(row.event_type) && activity.length < 500) {
           activity.push({
-            id: String(i), event_type: row.event_type,
+            id: String(i), event_type: row.event_type, path: row.path ?? null,
             product_title: row.product_title ?? null, value: row.value ?? null,
             device: row.device ?? null, city: row.city ?? null, country: row.country ?? null,
             created_at: row.created_at,
@@ -2259,6 +2260,7 @@ export default function AdminPage() {
       setTrackerLocations(Object.entries(locationSessionMap).map(([location, sessions]) => ({ location, unique: sessions.size })).sort((a, b) => b.unique - a.unique).slice(0, 10));
       setTrackerErrors(errors);
       setTrackerActivity(activity);
+      setTrackerActivityPage(1);
     } catch {
       setTrackerAvailable(false);
     } finally {
@@ -8129,38 +8131,64 @@ export default function AdminPage() {
 
                   {/* Recent activity — who did what */}
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Recent Activity — who added/bought what</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-4">Recent Activity — who viewed/added/bought what, and from where</h3>
                     {trackerActivity.length === 0 ? (
-                      <p className="text-sm text-gray-400">No cart/checkout/purchase activity in this range yet.</p>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-gray-100">
-                              {["Action", "Product", "Value", "Device", "Location", "When"].map((h) => (
-                                <th key={h} className="text-left px-3 py-2 text-xs uppercase tracking-wide text-gray-400 font-semibold">{h}</th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {trackerActivity.map((a) => {
-                              const label = a.event_type === "add_to_cart" ? "🛒 Added to cart" : a.event_type === "begin_checkout" ? "🔒 Started checkout" : "✅ Purchased";
-                              const location = [a.city, a.country].filter(Boolean).join(", ") || "—";
-                              return (
-                                <tr key={a.id} className="border-b border-gray-50 last:border-0">
-                                  <td className="px-3 py-2.5 whitespace-nowrap">{label}</td>
-                                  <td className="px-3 py-2.5 text-gray-600">{a.product_title || "—"}</td>
-                                  <td className="px-3 py-2.5 text-gray-600">{a.value ? `₹${a.value.toLocaleString("en-IN")}` : "—"}</td>
-                                  <td className="px-3 py-2.5 text-gray-500 capitalize">{a.device || "—"}</td>
-                                  <td className="px-3 py-2.5 text-gray-500">{location}</td>
-                                  <td className="px-3 py-2.5 text-gray-400 text-xs whitespace-nowrap">{new Date(a.created_at).toLocaleString("en-IN")}</td>
+                      <p className="text-sm text-gray-400">No activity in this range yet.</p>
+                    ) : (() => {
+                      const PAGE_SIZE = 15;
+                      const totalPages = Math.max(1, Math.ceil(trackerActivity.length / PAGE_SIZE));
+                      const page = Math.min(trackerActivityPage, totalPages);
+                      const pageRows = trackerActivity.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+                      const ACTION_LABELS: Record<string, string> = {
+                        page_view: "👁️ Viewed page",
+                        add_to_cart: "🛒 Added to cart",
+                        begin_checkout: "🔒 Started checkout",
+                        purchase: "✅ Purchased",
+                      };
+                      return (
+                        <>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="border-b border-gray-100">
+                                  {["Action", "Product / Page", "Value", "Device", "Location", "When"].map((h) => (
+                                    <th key={h} className="text-left px-3 py-2 text-xs uppercase tracking-wide text-gray-400 font-semibold">{h}</th>
+                                  ))}
                                 </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+                              </thead>
+                              <tbody>
+                                {pageRows.map((a) => {
+                                  const location = [a.city, a.country].filter(Boolean).join(", ") || "—";
+                                  return (
+                                    <tr key={a.id} className="border-b border-gray-50 last:border-0">
+                                      <td className="px-3 py-2.5 whitespace-nowrap">{ACTION_LABELS[a.event_type] ?? a.event_type}</td>
+                                      <td className="px-3 py-2.5 text-gray-600 truncate max-w-[220px]" title={a.product_title || a.path || ""}>{a.product_title || a.path || "—"}</td>
+                                      <td className="px-3 py-2.5 text-gray-600">{a.value ? `₹${a.value.toLocaleString("en-IN")}` : "—"}</td>
+                                      <td className="px-3 py-2.5 text-gray-500 capitalize">{a.device || "—"}</td>
+                                      <td className="px-3 py-2.5 text-gray-500">{location}</td>
+                                      <td className="px-3 py-2.5 text-gray-400 text-xs whitespace-nowrap">{new Date(a.created_at).toLocaleString("en-IN")}</td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                          <div className="flex items-center justify-between mt-4 text-xs text-gray-500">
+                            <span>Page {page} of {totalPages} · {trackerActivity.length} events</span>
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => setTrackerActivityPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
+                                className="px-3 py-1.5 border border-gray-200 rounded-lg disabled:opacity-40 hover:border-[#3B5373] transition-colors">
+                                Prev
+                              </button>
+                              <button onClick={() => setTrackerActivityPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
+                                className="px-3 py-1.5 border border-gray-200 rounded-lg disabled:opacity-40 hover:border-[#3B5373] transition-colors">
+                                Next
+                              </button>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 </>
               )}
