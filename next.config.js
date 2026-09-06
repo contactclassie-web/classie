@@ -39,6 +39,24 @@ const nextConfig = {
         destination: '/collections/the-festive-edit',
         permanent: true,
       },
+      // Bots/crawlers occasionally probe "<page>.json" hoping for a raw data
+      // endpoint (e.g. /products/crovia.json) — send them to the real page
+      // instead of a 404, on every route that has a dynamic slug.
+      {
+        source: '/products/:slug.json',
+        destination: '/products/:slug',
+        permanent: true,
+      },
+      {
+        source: '/shop/:slug.json',
+        destination: '/shop/:slug',
+        permanent: true,
+      },
+      {
+        source: '/blog/:slug.json',
+        destination: '/blog/:slug',
+        permanent: true,
+      },
     ];
   },
 }
