@@ -33,10 +33,51 @@ const nextConfig = {
         destination: '/collections',
         permanent: true,
       },
-      // /collections/the-festive-edit/Heel+heel → /collections/the-festive-edit
+      // /collections/the-festive-edit(/Heel+heel) → /shop/the-festive-edit
+      // (old Shopify collection URL — /collections/the-festive-edit itself was
+      // never a real page here, so the previous version of this redirect sent
+      // visitors from one 404 straight into another)
       {
         source: '/collections/the-festive-edit/:tag',
-        destination: '/collections/the-festive-edit',
+        destination: '/shop/the-festive-edit',
+        permanent: true,
+      },
+      {
+        source: '/collections/the-festive-edit',
+        destination: '/shop/the-festive-edit',
+        permanent: true,
+      },
+      // /the-festive-edit (missing /shop prefix) → /shop/the-festive-edit
+      {
+        source: '/the-festive-edit',
+        destination: '/shop/the-festive-edit',
+        permanent: true,
+      },
+      // /product/:slug (singular — old Shopify pattern still linked/indexed
+      // from before this migration) → /products/:slug, the real route
+      {
+        source: '/product/:slug',
+        destination: '/products/:slug',
+        permanent: true,
+      },
+      // /track (old/incorrect link) → /track-order
+      {
+        source: '/track',
+        destination: '/track-order',
+        permanent: true,
+      },
+      // Footer used to link to a "Press" page that was never built — send
+      // any lingering links/bookmarks to About instead of a 404.
+      {
+        source: '/press',
+        destination: '/about',
+        permanent: true,
+      },
+      // A specific blog post URL Google has indexed that no longer resolves
+      // to any post — send it to the blog listing instead of a dead end.
+      {
+        source: '/blog/how-to-pick-shoe-charm-for-wedding',
+        destination: '/blog',
         permanent: true,
       },
       // Bots/crawlers occasionally probe "<page>.json" hoping for a raw data

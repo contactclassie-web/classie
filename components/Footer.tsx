@@ -48,7 +48,6 @@ const DEFAULT_HELP_LINKS: FooterLink[] = [
 const DEFAULT_COMPANY_LINKS: FooterLink[] = [
   { text: "About Classie", url: "/about" },
   { text: "Style Ideas", url: "/style-ideas" },
-  { text: "Press", url: "/press" },
   { text: "Privacy Policy", url: "/privacy-policy" },
   { text: "Terms of Use", url: "/terms" },
 ];
