@@ -11,6 +11,7 @@ import {
   Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import HomepageBuilder from "@/components/admin/HomepageBuilder";
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -386,11 +387,12 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type TabId = "dashboard" | "home-layout" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
 type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
+  "home-layout":    "homepage",
   "slides":         "homepage",
   "featured-picks": "homepage",
   "testimonials":   "homepage",
@@ -460,6 +462,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
 const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   dashboard: [],
   homepage: [
+    { id: "home-layout",    label: "Layout (New)" },
     { id: "slides",         label: "Hero" },
     { id: "announcement",   label: "Announcement" },
     { id: "featured-picks", label: "Featured Picks" },
@@ -7283,6 +7286,8 @@ export default function AdminPage() {
           {/* ══════════════════════════════════════
               ANNOUNCEMENT TAB
           ══════════════════════════════════════ */}
+          {tab === "home-layout" && <HomepageBuilder revalidate={revalidateSite} />}
+
           {tab === "announcement" && (
             <div className="max-w-2xl space-y-6">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">

@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     template: "%s | CLASSIE",
   },
   description:
-    "Shop CLASSIE — premium women's heels and shoe clips online in India. Block heels, slingback heels, rhinestone shoe clips, bow clips and shoe charms. Free shipping above ₹499. COD available.",
+    "Shop CLASSIE — premium women's heels and shoe clips online in India. Crystal shoe clips, bow & pearl shoe charms, handmade jute flower clips and comfort heels. Free delivery on eligible orders. COD available.",
   keywords: ["shoe clips", "bow clips", "women's heels india", "block heels", "shoe charms india", "shoe accessories for women", "shoe clips india", "classie"],
   icons: {
     icon: [

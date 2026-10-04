@@ -1,15 +1,34 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
-import { Instagram } from "lucide-react";
+import NewsletterSection from "@/components/NewsletterSection";
+import OccasionSection from "@/components/OccasionSection";
+import FeaturedPicks from "@/components/FeaturedPicks";
+import TrustBand from "@/components/TrustBand";
+import CategoryLinks from "@/components/CategoryLinks";
+import PhilosophySection from "@/components/PhilosophySection";
+import StyleInspoSection from "@/components/StyleInspoSection";
+import TestimonialCarousel from "@/components/TestimonialCarousel";
+import HeroSection from "@/components/HeroSection";
+import HomeHero from "@/components/home/HomeHero";
+import HomeProductGrid from "@/components/home/HomeProductGrid";
+import {
+  SectionHeading, MarketplaceStrip, ShopByType, FreeDeliveryBanner, HowItWorks, CustomDesigns,
+  SeasonEdit, Journal, WhyBuyHere, WhatsAppJoin, SeoBlock, type JournalPost,
+} from "@/components/home/HomeSections";
+import {
+  Product,
+  getProductsFromDB,
+  getFeaturedProductsFromDB,
+  getTabProductsFromDB,
+} from "@/lib/products";
+import { HOME_CONFIG_KEY, mergeHomeConfig, freeDeliveryThreshold, type SectionId } from "@/lib/homeConfig";
 
 export const metadata: Metadata = {
-  title: "CLASSIE — Women's Heels, Shoe Clips & Accessories Online India",
-  description: "Shop CLASSIE — premium women's heels, shoe clips, bow clips, rhinestone clips & accessories online in India. Block heels, slingback heels, crystal shoe charms & more. Free shipping above ₹499. COD available.",
-  keywords: ["women's heels india", "shoe clips india", "buy heels online india", "bow clips for shoes", "rhinestone shoe clips", "shoe charms india", "block heels women india", "shoe accessories for women"],
+  title: "CLASSIE — Shoe Clips, Shoe Charms & Heels Online India",
+  description: "Shop CLASSIE — crystal shoe clips, bow & pearl shoe charms, handmade jute flower clips and comfort heels for women in India. Custom rhinestone designs. Free delivery on eligible orders, COD available.",
+  keywords: ["shoe clips india", "shoe charms india", "rhinestone shoe clips", "bow clips for shoes", "crystal shoe clips", "custom rhinestone accessories", "women's heels india", "shoe accessories for women"],
   openGraph: {
-    title: "CLASSIE — Shoe Clips & Accessories",
-    description: "Handcrafted shoe clips, bow clips & rhinestone accessories. Transform any shoe instantly.",
+    title: "CLASSIE — Shoe Clips & Shoe Charms",
+    description: "Crystal, bow, pearl & jute shoe charms. One clip, a whole new shoe.",
     url: "https://classie.co.in",
     siteName: "CLASSIE",
     images: [{ url: "https://res.cloudinary.com/dbzt3soyi/image/upload/v1782380055/f5d0052f-6be6-4ac9-bee2-ffa893f3d4a3_je39kw.png", width: 1200, height: 630 }],
@@ -18,313 +37,226 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CLASSIE — Shoe Clips & Accessories for Women",
-    description: "Shop handcrafted shoe clips, bow clips & rhinestone accessories for women in India.",
+    title: "CLASSIE — Shoe Clips & Shoe Charms for Women",
+    description: "Crystal, bow, pearl & jute shoe charms for women in India.",
   },
   alternates: { canonical: "https://www.classie.co.in" },
 };
-import NewsletterSection from "@/components/NewsletterSection";
-import OccasionSection from "@/components/OccasionSection";
-import FeaturedPicks from "@/components/FeaturedPicks";
-import HeroImageSlider from "@/components/HeroImageSlider";
-import HeroSection from "@/components/HeroSection";
-import TrustBand from "@/components/TrustBand";
-import CategoryLinks from "@/components/CategoryLinks";
-import PhilosophySection from "@/components/PhilosophySection";
-import StyleInspoSection from "@/components/StyleInspoSection";
-import TestimonialCarousel from "@/components/TestimonialCarousel";
-import {
-  Product,
-  CURATED_COLLECTIONS,
-  getProductsFromDB,
-  getFeaturedProductsFromDB,
-  getTabProductsFromDB,
-} from "@/lib/products";
 
 export const dynamic = "force-dynamic";
 
+const WRAP = "max-w-[1280px] mx-auto px-4 md:px-10";
+
+const FALLBACK_OCCASIONS = [
+  { title: "The Date Edit", href: "/shop/the-date-edit", image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/70.png?v=1767129647", tag_label: "FESTIVE" },
+  { title: "The Everyday Edit", href: "/shop/the-everyday-edit", image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/40_c9833246-51b7-4ff5-8200-acf9809593c5.png?v=1767109414", tag_label: "EVERYDAY" },
+  { title: "The Festive Edit", href: "/shop/the-festive-edit", image: "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583", tag_label: "NEW IN" },
+];
+
+// Settings read by the homepage and the old (switchable) sections.
+const LEGACY_KEYS = [
+  "hero_eyebrow","hero_heading_line1","hero_heading_italic","hero_heading_line3",
+  "hero_subtitle","hero_cta1_text","hero_cta1_url","hero_cta2_text","hero_cta2_url",
+  "hero_image_url","hero_stat1_number","hero_stat1_label","hero_stat2_number","hero_stat2_label",
+  "hero_stat3_number","hero_stat3_label","hero_chip_code","hero_chip_text","band_text",
+  "hero_badge_text","hero_badge_sub","hero_badge_active","hero_pill_text","hero_pill_sub","hero_pill_active",
+  "philosophy_eyebrow","philosophy_headline","philosophy_headline_italic","philosophy_headline2",
+  "philosophy_body","philosophy_cta_text","philosophy_cta_url","philosophy_image_url",
+  "phil_stat1_number","phil_stat1_label","phil_stat2_number","phil_stat2_label",
+  "phil_stat3_number","phil_stat3_label","phil_f1_title","phil_f1_desc","phil_f2_title","phil_f2_desc",
+  "ig_handle","ig_heading","ig_subtext","ig_follow_text","ig_follow_url","adv_inspo_desktop","adv_inspo_gap",
+  "cat_links_bold","cat_links_hover","cat_links_hover_bg","cat_links_hover_text","cat_num_color","cat_text_size",
+  "coll_testimonial_text","coll_testimonial_author",
+];
+const FP_KEYS = [
+  "fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active",
+  "fp_eyebrow","fp_heading","fp_heading_italic",
+  "adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_picks_aspect","adv_picks_radius","adv_picks_card_h",
+];
+const NL_KEYS = ["nl_eyebrow","nl_heading","nl_heading_italic","nl_subtext","nl_placeholder","nl_btn_text","nl_success_text"];
+const HOME_KEYS = [HOME_CONFIG_KEY, "shipping_tiers", "shipping_default_fee", "footer_whatsapp_url"];
+
 export default async function HomePage() {
-  // ── Fetch live data from Supabase ──────────────────────────────────────
-  const [allProducts, featuredProducts, latestTabProducts, bestsellerTabProducts, saleTabProducts] = await Promise.all([
+  const { createClient } = await import("@supabase/supabase-js");
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+  const [allProducts, settingsRes, heroRes, colorRes, igRes] = await Promise.all([
     getProductsFromDB({ active: true }),
-    getFeaturedProductsFromDB(),
-    getTabProductsFromDB("latest"),
-    getTabProductsFromDB("bestseller"),
-    getTabProductsFromDB("sale"),
+    sb.from("site_settings").select("key,value").in("key", [...HOME_KEYS, ...LEGACY_KEYS, ...FP_KEYS, ...NL_KEYS]),
+    sb.from("hero_slides").select("image_url").eq("active", true).eq("page", "home").order("display_order", { ascending: true }),
+    sb.from("product_color_variants").select("product_slug,color_name,color_hex"),
+    sb.from("instagram_images").select("image_url, link_url").eq("active", true).order("display_order", { ascending: true }).limit(9),
   ]);
 
-  const latestProducts =
-    latestTabProducts.length > 0 ? latestTabProducts : allProducts.slice(0, 4);
-  const bestSellers =
-    bestsellerTabProducts.length > 0
-      ? bestsellerTabProducts
-      : featuredProducts.length > 0
-      ? featuredProducts.slice(0, 4)
-      : allProducts.slice(0, 4);
-  const saleProducts = saleTabProducts.length > 0
-    ? saleTabProducts
-    : allProducts.filter((p) => p.comparePrice && p.comparePrice > p.price).slice(0, 4);
-
-  // ── Supabase client ────────────────────────────────────────────────────
-  const { createClient } = await import("@supabase/supabase-js");
-  // cache: 'no-store' prevents Next.js from caching Supabase fetch calls
-  const sb = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-
-  // ── Hero Slides ───────────────────────────────────────────────────────
-  const { data: heroSlides } = await sb
-    .from("hero_slides")
-    .select("image_url")
-    .eq("active", true)
-    .eq("page", "home")
-    .order("display_order", { ascending: true });
-
-  // ── Occasions & Categories ─────────────────────────────────────────────
-  const { data: dbCollections } = await sb
-    .from("collections")
-    .select("*")
-    .eq("active", true)
-    .order("display_order", { ascending: true });
-
-  // ── Trust Band (features_bar) ──────────────────────────────────────────
-  const { data: dbFeaturesBar } = await sb
-    .from("features_bar")
-    .select("icon,title,active,display_order")
-    .eq("active", true)
-    .order("display_order", { ascending: true });
-  const { data: dbSiteCategories } = await sb
-    .from("site_categories")
-    .select("*")
-    .eq("active", true)
-    .order("display_order", { ascending: true });
-  const siteCategories: Array<{
-    name: string;
-    slug: string;
-    description: string;
-    image_url: string;
-  }> = dbSiteCategories ?? [];
-
-  const FALLBACK_OCCASIONS = [
-    {
-      title: "The Date Edit",
-      href: "/shop/the-date-edit",
-      image:
-        "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/70.png?v=1767129647",
-      tag_label: "FESTIVE",
-    },
-    {
-      title: "The Everyday Edit",
-      href: "/shop/the-everyday-edit",
-      image:
-        "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/40_c9833246-51b7-4ff5-8200-acf9809593c5.png?v=1767109414",
-      tag_label: "EVERYDAY",
-    },
-    {
-      title: "The Festive Edit",
-      href: "/shop/the-festive-edit",
-      image:
-        "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583",
-      tag_label: "NEW IN",
-    },
-  ];
-  const occasions =
-    dbCollections && dbCollections.length > 0
-      ? dbCollections.map(
-          (c: { title: string; slug: string; image_url?: string; tag_label?: string; image_position?: string }) => ({
-            title: c.title,
-            href: `/shop/${c.slug}`,
-            image: c.image_url ?? "",
-            tag_label: c.tag_label ?? "",
-            image_position: c.image_position ?? "top",
-          })
-        )
-      : FALLBACK_OCCASIONS;
-
-  // ── Site Settings ──────────────────────────────────────────────────────
-  const HERO_KEYS = [
-    "hero_eyebrow","hero_heading_line1","hero_heading_italic","hero_heading_line3",
-    "hero_subtitle","hero_cta1_text","hero_cta1_url","hero_cta2_text","hero_cta2_url",
-    "hero_image_url","hero_stat1_number","hero_stat1_label","hero_stat2_number","hero_stat2_label",
-    "hero_stat3_number","hero_stat3_label","hero_chip_code","hero_chip_text","band_text",
-    "hero_badge_text","hero_badge_sub","hero_badge_active","hero_pill_text","hero_pill_sub","hero_pill_active",
-  ];
-  const PHIL_KEYS = [
-    "philosophy_eyebrow","philosophy_headline","philosophy_headline_italic","philosophy_headline2",
-    "philosophy_body","philosophy_cta_text","philosophy_cta_url","philosophy_image_url",
-    "phil_stat1_number","phil_stat1_label","phil_stat2_number","phil_stat2_label",
-    "phil_stat3_number","phil_stat3_label","phil_f1_title","phil_f1_desc","phil_f2_title","phil_f2_desc",
-  ];
-  const IG_KEYS = [
-    "ig_handle","ig_heading","ig_subtext","ig_follow_text","ig_follow_url",
-    "adv_inspo_desktop","adv_inspo_gap",
-  ];
-  const CAT_KEYS = [
-    "cat_links_bold","cat_links_hover","cat_links_hover_bg","cat_links_hover_text","cat_num_color","cat_text_size",
-  ];
-  const FP_KEYS = [
-    "fp_tab1_label","fp_tab1_active","fp_tab2_label","fp_tab2_active","fp_tab3_label","fp_tab3_active",
-    "fp_eyebrow","fp_heading","fp_heading_italic",
-    "adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_picks_aspect","adv_picks_radius","adv_picks_card_h",
-  ];
-  const NL_KEYS = [
-    "nl_eyebrow","nl_heading","nl_heading_italic","nl_subtext","nl_placeholder","nl_btn_text","nl_success_text",
-  ];
-  const TEST_KEYS = ["coll_testimonial_text", "coll_testimonial_author"];
-
-  const { data: settingsRows } = await sb
-    .from("site_settings")
-    .select("key,value")
-    .in("key", [...HERO_KEYS, ...PHIL_KEYS, ...IG_KEYS, ...CAT_KEYS, ...FP_KEYS, ...NL_KEYS, ...TEST_KEYS]);
-
   const cfg: Record<string, string> = {};
-  (settingsRows ?? []).forEach((r: { key: string; value: string }) => {
-    cfg[r.key] = r.value;
+  (settingsRes.data ?? []).forEach((r: { key: string; value: string }) => { cfg[r.key] = r.value; });
+
+  let saved: unknown = null;
+  try { saved = cfg[HOME_CONFIG_KEY] ? JSON.parse(cfg[HOME_CONFIG_KEY]) : null; } catch { saved = null; }
+  const home = mergeHomeConfig(saved);
+  const on = new Set<SectionId>(home.sections.filter((s) => s.on).map((s) => s.id));
+  const amount = freeDeliveryThreshold(cfg.shipping_tiers, cfg.shipping_default_fee);
+
+  // Only fetch what the switched-on sections need.
+  const [journalRes, collectionsRes, featuresRes, siteCatsRes, legacyPicks] = await Promise.all([
+    on.has("journal")
+      ? sb.from("blog_posts").select("slug,title,cover_image,category").eq("active", true).order("published_at", { ascending: false }).limit(home.journal.count)
+      : Promise.resolve({ data: [] as JournalPost[] }),
+    on.has("legacyOccasions")
+      ? sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true })
+      : Promise.resolve({ data: null }),
+    on.has("legacyTrustBand")
+      ? sb.from("features_bar").select("icon,title,active,display_order").eq("active", true).order("display_order", { ascending: true })
+      : Promise.resolve({ data: null }),
+    on.has("legacyOccasions")
+      ? sb.from("site_categories").select("*").eq("active", true).order("display_order", { ascending: true })
+      : Promise.resolve({ data: null }),
+    on.has("legacyFeaturedPicks")
+      ? Promise.all([getFeaturedProductsFromDB(), getTabProductsFromDB("latest"), getTabProductsFromDB("bestseller"), getTabProductsFromDB("sale")])
+      : Promise.resolve(null),
+  ]);
+
+  // Product colours for the dots and the quick-add chooser.
+  const colors: Record<string, Record<string, string>> = {};
+  (colorRes.data ?? []).forEach((r: { product_slug: string; color_name: string; color_hex: string | null }) => {
+    if (!r.product_slug || !r.color_name || !r.color_hex) return;
+    (colors[r.product_slug] ||= {})[r.color_name.toLowerCase()] = r.color_hex;
   });
 
-  // FeaturedPicks settings
-  const fpSettings: Record<string, string> = {};
-  [...FP_KEYS].forEach((k) => { if (cfg[k] !== undefined) fpSettings[k] = cfg[k]; });
+  // Bestselling shoe charms: non-heel products tagged "Bestseller" in Featured Picks
+  // first, then the other non-heel products. Heels have their own section.
+  const pickBestsellers = (): Product[] => {
+    const charms = allProducts.filter((p) => p.category !== "heels");
+    const tagged = charms.filter((p) => p.featured_tab === "bestseller");
+    const rest = charms.filter((p) => p.featured_tab !== "bestseller");
+    return [...tagged, ...rest].slice(0, home.bestsellers.count);
+  };
+  const heelsList = allProducts.filter((p) => p.category === "heels").slice(0, home.heels.count);
 
-  // Newsletter settings
-  const nlSettings: Record<string, string> = {};
-  [...NL_KEYS].forEach((k) => { if (cfg[k] !== undefined) nlSettings[k] = cfg[k]; });
+  const heroFallback = (heroRes.data ?? []).map((r: { image_url: string }) => r.image_url).filter(Boolean);
 
-  // Hero
-  const heroEyebrow = cfg["hero_eyebrow"] || "";
-  const heroLine1 = cfg["hero_heading_line1"] || "";
-  const heroItalic = cfg["hero_heading_italic"] || "";
-  const heroLine3 = cfg["hero_heading_line3"] || "";
-  const heroSubtitle = cfg["hero_subtitle"] || "";
-  const heroCta1Text = cfg["hero_cta1_text"] || "";
-  const heroCta1Url = cfg["hero_cta1_url"] || "/shop";
-  const heroCta2Text = cfg["hero_cta2_text"] || "Explore Edits";
-  const heroCta2Url = cfg["hero_cta2_url"] || "/collections";
-  const heroImageUrl =
-    cfg["hero_image_url"] ||
-    "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583";
-  const heroStat1Num = cfg["hero_stat1_number"] || "";
-  const heroStat1Label = cfg["hero_stat1_label"] || "";
-  const heroStat2Num = cfg["hero_stat2_number"] || "";
-  const heroStat2Label = cfg["hero_stat2_label"] || "";
-  const heroStat3Num = cfg["hero_stat3_number"] || "";
-  const heroStat3Label = cfg["hero_stat3_label"] || "";
-  const showStats = !!(heroStat1Num || heroStat2Num || heroStat3Num);
-  const heroChipCode = cfg["hero_chip_code"] || "";
-  const heroChipText = cfg["hero_chip_text"] || "";
+  const igImages = igRes.data && igRes.data.length > 0
+    ? igRes.data.map((img: { image_url: string; link_url: string }) => ({ image: img.image_url, link: img.link_url || "https://www.instagram.com/_classie_in/" }))
+    : allProducts.slice(0, 6).map((p) => ({ image: p.image, link: "https://www.instagram.com/_classie_in/" }));
 
-  // Trust Band
-  const bandRaw =
-    cfg["band_text"] ||
-    "Free Shipping on Orders Above ₹999 · Easy Returns · Premium Quality · Comfort-First Design · Handcrafted Luxury";
-  const bandItems = bandRaw.split(" · ").map((s) => s.trim()).filter(Boolean);
+  const testimonials = (() => {
+    const rawText = cfg["coll_testimonial_text"] || "";
+    const rawAuthor = cfg["coll_testimonial_author"] || "";
+    let items: { quote: string; author: string }[] = [];
+    try { const p = JSON.parse(rawText); if (Array.isArray(p)) items = p; } catch { items = []; }
+    if (!items.length && rawText) items = [{ quote: rawText, author: rawAuthor }];
+    return items;
+  })();
 
-  // Philosophy
-  const philEyebrow = cfg["philosophy_eyebrow"] || "Our Philosophy";
-  const philHeadline =
-    cfg["philosophy_headline"] || "One Clip. Endless Possibilities.";
-  const philBody =
-    cfg["philosophy_body"] ||
-    "Classie was born from a simple idea — every woman deserves to feel powerful in her heels. Comfort-first design, premium quality, styled your way. From morning coffee to midnight celebrations, there's a Classie for every chapter of your day.";
-  const philCtaText = cfg["philosophy_cta_text"] || "Our Story";
-  const philCtaUrl = cfg["philosophy_cta_url"] || "/about";
-  const philImageUrl = cfg["philosophy_image_url"] || "";
+  const pick = (keys: string[]) => {
+    const o: Record<string, string> = {};
+    keys.forEach((k) => { if (cfg[k] !== undefined) o[k] = cfg[k]; });
+    return o;
+  };
 
-  // Style Inspo / Instagram feed — from instagram_images table (managed via Admin → Instagram tab)
-  const { data: dbInstagramImages } = await sb
-    .from("instagram_images")
-    .select("image_url, link_url")
-    .eq("active", true)
-    .order("display_order", { ascending: true })
-    .limit(9);
+  const renderSection = (id: SectionId) => {
+    switch (id) {
+      case "hero":
+        return <HomeHero hero={home.hero} fallbackImages={heroFallback} />;
+      case "marketplace":
+        return <MarketplaceStrip c={home.marketplace} />;
+      case "types":
+        return <ShopByType c={home.types} />;
+      case "bestsellers": {
+        const list = pickBestsellers();
+        if (!list.length) return null;
+        const b = home.bestsellers;
+        return (
+          <section className={`${WRAP} py-10 md:py-16`}>
+            <SectionHeading eyebrow={b.eyebrow} heading={b.heading} italic={b.headingItalic} linkText={b.linkText} linkUrl={b.linkUrl} />
+            <HomeProductGrid products={list} colors={colors} />
+          </section>
+        );
+      }
+      case "freeDelivery":
+        return <FreeDeliveryBanner c={home.freeDelivery} amount={amount} />;
+      case "howItWorks":
+        return <HowItWorks c={home.howItWorks} />;
+      case "custom":
+        return <CustomDesigns c={home.custom} />;
+      case "edit":
+        return <SeasonEdit c={home.edit} />;
+      case "heels": {
+        if (!heelsList.length) return null;
+        const h = home.heels;
+        return (
+          <section className={`${WRAP} py-10 md:py-16`}>
+            <SectionHeading eyebrow={h.eyebrow} heading={h.heading} italic={h.headingItalic} linkText={h.linkText} linkUrl={h.linkUrl} />
+            <HomeProductGrid products={heelsList} colors={colors} />
+          </section>
+        );
+      }
+      case "instagram":
+        return <StyleInspoSection initialImages={igImages} initialSettings={cfg} />;
+      case "journal":
+        return <Journal c={home.journal} posts={(journalRes.data ?? []) as JournalPost[]} />;
+      case "reviews":
+        return testimonials.length > 0 ? <TestimonialCarousel items={testimonials} intervalMs={5000} /> : null;
+      case "why":
+        return <WhyBuyHere c={home.why} amount={amount} />;
+      case "whatsapp":
+        return <WhatsAppJoin c={home.whatsapp} url={home.whatsapp.url || cfg.footer_whatsapp_url || ""} />;
+      case "seo":
+        return <SeoBlock c={home.seo} amount={amount} />;
 
-  const igImages = dbInstagramImages && dbInstagramImages.length > 0
-    ? dbInstagramImages.map((img: { image_url: string; link_url: string }) => ({
-        image: img.image_url,
-        link: img.link_url || "https://www.instagram.com/_classie_in/",
-      }))
-    : allProducts.slice(0, 6).map((p) => ({
-        image: p.image,
-        link: "https://www.instagram.com/_classie_in/",
-      }));
-
-  const stats = [
-    { number: heroStat1Num, label: heroStat1Label },
-    { number: heroStat2Num, label: heroStat2Label },
-    { number: heroStat3Num, label: heroStat3Label },
-  ];
+      // ── Old sections: kept intact, switched off by default ──
+      case "legacyHero":
+        return (
+          <HeroSection
+            heroSlides={heroRes.data ?? []}
+            heroImageUrl={cfg["hero_image_url"] || "https://cdn.shopify.com/s/files/1/0961/1286/9690/files/75.png?v=1767179583"}
+            initialSettings={cfg}
+          />
+        );
+      case "legacyTrustBand":
+        return <TrustBand initialItems={featuresRes.data ?? []} />;
+      case "legacyOccasions": {
+        const dbCollections = collectionsRes.data as { title: string; slug: string; image_url?: string; tag_label?: string; image_position?: string }[] | null;
+        const occasions = dbCollections && dbCollections.length > 0
+          ? dbCollections.map((c) => ({ title: c.title, href: `/shop/${c.slug}`, image: c.image_url ?? "", tag_label: c.tag_label ?? "", image_position: c.image_position ?? "top" }))
+          : FALLBACK_OCCASIONS;
+        return (
+          <section className="py-12 bg-white">
+            <div className="max-w-[1280px] mx-auto px-4 md:px-10">
+              <div className="text-center mb-10">
+                <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">Curated Edits</span>
+                <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.6rem)] font-light leading-[1.08] text-[#1a1a1a] mt-3">
+                  Shop by <em className="italic text-[#3B5373]">Occasion</em>
+                </h2>
+              </div>
+              <OccasionSection initialOccasions={occasions} />
+              <CategoryLinks initialCategories={siteCatsRes.data ?? []} initialSettings={cfg} />
+            </div>
+          </section>
+        );
+      }
+      case "legacyFeaturedPicks": {
+        if (!legacyPicks) return null;
+        const [featured, latestTab, bestTab, saleTab] = legacyPicks;
+        const latest = latestTab.length > 0 ? latestTab : allProducts.slice(0, 4);
+        const best = bestTab.length > 0 ? bestTab : featured.length > 0 ? featured.slice(0, 4) : allProducts.slice(0, 4);
+        const sale = saleTab.length > 0 ? saleTab : allProducts.filter((p) => p.comparePrice && p.comparePrice > p.price).slice(0, 4);
+        return <FeaturedPicks latestProducts={latest} bestSellers={best} saleProducts={sale} initialSettings={pick(FP_KEYS)} />;
+      }
+      case "legacyPhilosophy":
+        return <PhilosophySection initialSettings={cfg} />;
+      case "legacyNewsletter":
+        return <NewsletterSection initialSettings={pick(NL_KEYS)} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
-      {/* ══ 1. HERO ═══════════════════════════════════════════════════════ */}
-      <HeroSection heroSlides={heroSlides ?? []} heroImageUrl={heroImageUrl} initialSettings={cfg} />
-
-      {/* ══ 2. TRUST BAND ══════════════════════════════════════════════════ */}
-      <TrustBand initialItems={dbFeaturesBar ?? []} />
-
-      {/* ══ 3. SHOP BY OCCASION ════════════════════════════════════════════ */}
-      <section className="py-12 bg-white">
-        <div className="max-w-[1280px] mx-auto px-4 md:px-10">
-          {/* Header — centered like HTML design */}
-          <div className="text-center mb-10">
-              <span className="font-sans text-[10px] font-light tracking-[0.38em] uppercase text-[#3B5373]">
-                Curated Edits
-              </span>
-              <h2 className="font-serif text-[clamp(2.2rem,3.8vw,3.6rem)] font-light leading-[1.08] text-[#1a1a1a] mt-3">
-                Shop by <em className="italic text-[#3B5373]">Occasion</em>
-              </h2>
-          </div>
-          <OccasionSection initialOccasions={occasions} />
-          {/* Numbered Quick Links Row */}
-          <CategoryLinks initialCategories={siteCategories} initialSettings={cfg} />
-        </div>
-      </section>
-
-      {/* ══ 5. FEATURED PICKS ═════════════════════════════════════════════ */}
-      <FeaturedPicks latestProducts={latestProducts} bestSellers={bestSellers} saleProducts={saleProducts} initialSettings={fpSettings} />
-
-      {/* ══ 6. PHILOSOPHY ═════════════════════════════════════════════════ */}
-      <PhilosophySection initialSettings={cfg} />
-
-      {/* ══ 7. STYLE INSPO ════════════════════════════════════════════════ */}
-      <StyleInspoSection initialImages={igImages} initialSettings={cfg} />
-
-      {/* ══ 8. TESTIMONIALS CAROUSEL ══════════════════════════════════════ */}
-      {(() => {
-        const rawText   = cfg["coll_testimonial_text"] || "";
-        const rawAuthor = cfg["coll_testimonial_author"] || "";
-        let items: { quote: string; author: string }[] = [];
-        try { const p = JSON.parse(rawText); if (Array.isArray(p)) items = p; } catch { items = []; }
-        if (!items.length && rawText) items = [{ quote: rawText, author: rawAuthor }];
-        return items.length > 0 ? <TestimonialCarousel items={items} intervalMs={5000} /> : null;
-      })()}
-
-      {/* ══ 9. NEWSLETTER ═════════════════════════════════════════════════ */}
-      <NewsletterSection initialSettings={nlSettings} />
-
-      {/* ══ SEO CONTENT BLOCK ══════════════════════════════════════════════ */}
-      <section className="max-w-4xl mx-auto px-6 py-12 text-center border-t border-gray-100">
-        <h2 className="text-2xl font-serif font-light text-[#1a1a1a] mb-6">Women&apos;s Heels, Shoe Clips &amp; Accessories Online India</h2>
-        <p className="text-sm text-gray-500 leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          CLASSIE is India&apos;s premium destination for <strong>women&apos;s heels online</strong> and <strong>shoe clips</strong>. Shop a curated collection of <strong>block heels</strong>, <strong>slingback heels</strong>, <strong>sculpted heels</strong>, <strong>rhinestone shoe clips</strong>, <strong>bow clips</strong>, <strong>crystal shoe charms</strong> and more — all designed for Indian women who love style without compromise.
-        </p>
-        <p className="text-sm text-gray-500 leading-relaxed mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          Whether you&apos;re looking for <strong>heels for an Indian wedding</strong>, <strong>office heels</strong>, <strong>shoe clips for saree</strong>, or <strong>shoe charms for bridal wear</strong> — CLASSIE has the perfect pick. Free shipping above ₹499. COD available pan-India.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          {[
-            { label: "Block Heels", href: "/shop/heels" },
-            { label: "Slingback Heels", href: "/shop/heels" },
-            { label: "Shoe Clips", href: "/shop/clips" },
-            { label: "Shoe Charms", href: "/shop/shoe-charms" },
-            { label: "Wedding Heels", href: "/shop/heels" },
-            { label: "Bow Clips", href: "/shop/clips" },
-          ].map((item) => (
-            <a key={item.label} href={item.href} className="text-xs tracking-widest uppercase text-[#3B5373] border border-[#3B5373]/20 px-4 py-2 hover:bg-[#3B5373]/5 transition-colors" style={{ fontFamily: "'Poppins', sans-serif" }}>
-              {item.label}
-            </a>
-          ))}
-        </div>
-      </section>
+      {home.sections.filter((s) => s.on).map((s) => (
+        <div key={s.id} data-section={s.id}>{renderSection(s.id)}</div>
+      ))}
     </>
   );
 }
