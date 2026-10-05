@@ -82,16 +82,34 @@ export function MarketplaceStrip({ c }: { c: HomeConfig["marketplace"] }) {
 export function ShopByType({ c }: { c: HomeConfig["types"] }) {
   const items = c.items.filter((i) => i.label && i.image);
   if (!items.length) return null;
+  // Desktop: one row that fills the full width, however many items there are.
+  const cols = Math.min(items.length, 6);
   return (
-    <section className={`${WRAP} py-10 md:py-16`}>
-      <SectionHeading heading={c.heading} italic={c.headingItalic} />
-      <div className="flex gap-3.5 md:gap-8 overflow-x-auto md:overflow-visible md:justify-center pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section className="max-w-[1560px] mx-auto px-4 md:px-10 xl:px-14 pt-9 pb-8 md:pt-14 md:pb-12">
+      <div className="text-center mb-6 md:mb-10">
+        <h2 className="font-serif font-light text-[30px] md:text-[44px] leading-[1.1] text-[#1a1a1a]">
+          {c.heading} {c.headingItalic && <em className="italic text-[#3B5373]">{c.headingItalic}</em>}
+        </h2>
+        <span className="block mx-auto mt-3 w-10 h-px bg-[#B08D57]" aria-hidden />
+      </div>
+      <div
+        className="flex md:grid gap-4 md:gap-8 xl:gap-12 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 md:scroll-px-0 -mx-4 px-4 md:mx-0 md:px-0 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))]"
+        style={{ ["--cols" as string]: cols }}
+      >
         {items.map((it, i) => (
-          <Link key={i} href={it.link || "/shop/clips"} className="flex-none w-[84px] md:w-[150px] grid gap-2 justify-items-center text-center">
-            <Img src={it.image} alt={it.label} w={320} className="w-[84px] h-[84px] md:w-[150px] md:h-[150px] rounded-full object-cover border border-[#ECEAE6]" />
-            <span className="font-sans text-[11px] md:text-[12.5px] font-medium leading-tight text-[#1a1a1a]">
-              {it.label}
-              {it.note && <small className="block font-normal text-[10px] md:text-[11px] text-[#6b6b6b] mt-0.5">{it.note}</small>}
+          <Link
+            key={i}
+            href={it.link || "/shop/clips"}
+            className="group flex-none w-[40%] min-w-[130px] md:w-auto md:min-w-0 snap-start grid gap-3 md:gap-4 justify-items-center text-center"
+          >
+            <span className="block w-full max-w-[280px] aspect-square rounded-full p-1 md:p-1.5 border border-[#E6DFD4] transition-colors duration-300 group-hover:border-[#B08D57]">
+              <span className="block w-full h-full rounded-full overflow-hidden bg-[#F7F4EF]">
+                <Img src={it.image} alt={it.label} w={480} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              </span>
+            </span>
+            <span className="grid gap-0.5">
+              <span className="font-serif text-[18px] md:text-[22px] xl:text-[24px] leading-tight text-[#1a1a1a] group-hover:text-[#3B5373] transition-colors">{it.label}</span>
+              {it.note && <span className="font-sans text-[10px] md:text-[11px] tracking-[0.14em] uppercase text-[#8a8a8a]">{it.note}</span>}
             </span>
           </Link>
         ))}
