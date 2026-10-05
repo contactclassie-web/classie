@@ -11,12 +11,16 @@ import AnnouncementBar from "./AnnouncementBar";
 import { supabase } from "@/lib/supabase";
 
 // Static nav links (non-category)
-const leftLinks = [
-  { label: "Style Ideas", href: "/style-ideas" },
+// `wide`: shown on large desktops only (always in the mobile menu), so the
+// desktop bar never crowds the centred logo.
+const leftLinks: { label: string; href: string; wide?: boolean }[] = [
+  { label: "Gift Sets",   href: "/gift-sets" },
+  { label: "Style Ideas", href: "/style-ideas", wide: true },
 ];
-const rightLinks = [
+const rightLinks: { label: string; href: string; wide?: boolean }[] = [
+  { label: "Custom Designs", href: "/custom-designs" },
   { label: "Journal",  href: "/blog" },
-  { label: "About Us", href: "/about" },
+  { label: "About Us", href: "/about", wide: true },
 ];
 
 const NAV_LINK_CLS = "text-[11px] font-normal text-[#1a1a1a] hover:text-[#3B5373] transition-colors tracking-[0.14em] uppercase relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[1px] after:bg-[#3B5373] hover:after:w-full after:transition-all after:duration-300";
@@ -81,7 +85,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
         <div className="flex items-center justify-between" style={{ height: "68px" }}>
 
           {/* Left links: direct category links + Collections dropdown + Style Ideas */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6 xl:gap-8">
             {/* Direct category links (first 2 from DB) */}
             {directLinks.map((cat) => (
               <Link key={cat.slug} href={`/shop/${cat.slug}`} className={NAV_LINK_CLS}>
@@ -150,7 +154,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
 
             {/* Static left links */}
             {leftLinks.map((l) => (
-              <Link key={l.href} href={l.href} className={NAV_LINK_CLS}>{l.label}</Link>
+              <Link key={l.href} href={l.href} className={`${NAV_LINK_CLS} ${l.wide ? "hidden xl:inline" : ""}`}>{l.label}</Link>
             ))}
           </div>
 
@@ -168,9 +172,9 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
           </Link>
 
           {/* Right links + icons */}
-          <div className="flex items-center gap-7">
+          <div className="flex items-center gap-5 xl:gap-7">
             {rightLinks.map((l) => (
-              <Link key={l.href} href={l.href} className={NAV_LINK_CLS}>{l.label}</Link>
+              <Link key={l.href} href={l.href} className={`${NAV_LINK_CLS} ${l.wide ? "hidden xl:inline" : ""}`}>{l.label}</Link>
             ))}
             <button aria-label="Search" className="text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
               <Search className="w-[18px] h-[18px]" strokeWidth={1.6} />
