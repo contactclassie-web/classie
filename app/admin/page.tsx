@@ -8,10 +8,12 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity,
+  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity, Gift, PenTool,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import HomepageBuilder from "@/components/admin/HomepageBuilder";
+import GiftSetsAdmin from "@/components/admin/GiftSetsAdmin";
+import CustomDesignsAdmin from "@/components/admin/CustomDesignsAdmin";
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -387,8 +389,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "home-layout" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
-type MainSection = "dashboard" | "homepage" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
+type TabId = "dashboard" | "home-layout" | "gift-sets" | "gift-sets-page" | "custom-requests" | "custom-page" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type MainSection = "dashboard" | "homepage" | "gift-sets" | "custom-designs" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -457,6 +459,10 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "live-tracker":   "live-tracker",
   "shipping-rates": "shipping-rates",
   "blog":           "blog",
+  "gift-sets":       "gift-sets",
+  "gift-sets-page":  "gift-sets",
+  "custom-requests": "custom-designs",
+  "custom-page":     "custom-designs",
 };
 
 const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
@@ -539,6 +545,8 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   "live-tracker": [],
   "shipping-rates": [],
   blog:     [{ id: "blog", label: "Blog Posts" }],
+  "gift-sets":      [{ id: "gift-sets", label: "Sets" }, { id: "gift-sets-page", label: "Page" }],
+  "custom-designs": [{ id: "custom-requests", label: "Requests" }, { id: "custom-page", label: "Page" }],
 };
 
 // ── ReviewEditForm (inline helper) ───────────────────────────────────────
@@ -3904,6 +3912,8 @@ export default function AdminPage() {
         { id: "bow-page",          label: "Bow Collection",  icon: Star },
         { id: "collections-page",  label: "Collections",     icon: Grid3x3 },
         { id: "style-ideas-page",  label: "Style Ideas",     icon: Camera },
+        { id: "gift-sets",         label: "Gift Sets",       icon: Gift },
+        { id: "custom-designs",    label: "Custom Designs",  icon: PenTool },
       ],
     },
     {
@@ -4051,7 +4061,9 @@ export default function AdminPage() {
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" :
                mainSection === "live-tracker" ? "Live Tracker" :
-               mainSection === "shipping-rates" ? "Shipping Rates" : "Messages"}
+               mainSection === "shipping-rates" ? "Shipping Rates" :
+               mainSection === "gift-sets" ? "Gift Sets" :
+               mainSection === "custom-designs" ? "Custom Designs" : "Messages"}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">Classie Admin Panel</p>
           </div>
@@ -7287,6 +7299,10 @@ export default function AdminPage() {
               ANNOUNCEMENT TAB
           ══════════════════════════════════════ */}
           {tab === "home-layout" && <HomepageBuilder revalidate={revalidateSite} />}
+          {tab === "gift-sets" && <GiftSetsAdmin key="gs-sets" view="sets" revalidate={revalidateSite} />}
+          {tab === "gift-sets-page" && <GiftSetsAdmin key="gs-page" view="page" revalidate={revalidateSite} />}
+          {tab === "custom-requests" && <CustomDesignsAdmin key="cd-req" view="requests" revalidate={revalidateSite} />}
+          {tab === "custom-page" && <CustomDesignsAdmin key="cd-page" view="page" revalidate={revalidateSite} />}
 
           {tab === "announcement" && (
             <div className="max-w-2xl space-y-6">

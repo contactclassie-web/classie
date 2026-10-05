@@ -22,6 +22,8 @@ export async function POST(request: NextRequest) {
       "/about",
       "/contact",
       "/faq",
+      "/gift-sets",
+      "/custom-designs",
     ];
 
     for (const path of paths) {
@@ -33,6 +35,7 @@ export async function POST(request: NextRequest) {
     revalidatePath("/shop/[slug]", "page");
     revalidatePath("/blog", "page");
     revalidatePath("/blog/[slug]", "page");
+    revalidatePath("/gift-sets/[slug]", "page");
 
     return NextResponse.json({ revalidated: true, paths });
   } catch (err) {

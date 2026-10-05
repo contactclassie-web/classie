@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { GIFT_SETS_KEY, mergeGiftSets } from "@/lib/giftSets";
 
 export const revalidate = 3600;
 
@@ -13,6 +14,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/shop/clips`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/shop/shoe-charms`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/collections`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/gift-sets`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${base}/custom-designs`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
@@ -69,7 +72,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
 
-    return [...staticPages, ...productPages, ...blogPages, ...categoryPages];
+    // Gift set pages (switched-on sets only)
+    const { data: setsRow } = await sb.from("site_settings").select("value").eq("key", GIFT_SETS_KEY).maybeSingle();
+    let setPages: MetadataRoute.Sitemap = [];
+    try {
+      const sets = mergeGiftSets(setsRow?.value ? JSON.parse(setsRow.value) : null).sets.filter((x) => x.active);
+      setPages = sets.map((x) => ({ url: `${base}/gift-sets/${x.slug}`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 }));
+    } catch { setPages = []; }
+
+    return [...staticPages, ...productPages, ...blogPages, ...categoryPages, ...setPages];
   } catch {
     return staticPages;
   }

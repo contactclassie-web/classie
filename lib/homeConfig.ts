@@ -177,7 +177,7 @@ export const DEFAULT_HOME: HomeConfig = {
     text: "We now have our own rhinestone studio. Send us a sketch, a photo or a Pinterest pin, and we'll make it for you.",
     perk: "If our team adds your design to the Classie collection, your pair is free.",
     buttonText: "Design yours",
-    buttonUrl: "/contact",
+    buttonUrl: "/custom-designs",
     sketchImage: "",
     productImage: C + "v1784204557/c02279d6-b56e-436e-9599-795387501f3f_yrwurd.png",
   },
