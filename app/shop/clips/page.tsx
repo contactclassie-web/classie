@@ -1,14 +1,18 @@
 import { Metadata } from "next";
+import { loadFreeShippingAmount } from "@/lib/shippingServer";
 import { getShopCategorySettings } from "@/lib/products";
 import ShopCategoryPageClient from "@/components/ShopCategoryPageClient";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const free = await loadFreeShippingAmount();
+  return {
   title: "Buy Shoe Clips Online India — Rhinestone, Crystal & Bow Clips for Women | CLASSIE",
-  description: "Shop CLASSIE shoe clips online in India — rhinestone shoe clips, crystal clips, bow clips, floral clips & more. Instantly transform any pair of heels or flats. Free shipping above ₹499. COD available.",
-};
+  description: `Shop CLASSIE shoe clips online in India — rhinestone shoe clips, crystal clips, bow clips, floral clips & more. Instantly transform any pair of heels or flats. Free shipping above ₹${free}. COD available.`,
+  };
+}
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -30,6 +34,7 @@ function mapRow(row: Record<string, unknown>) {
 }
 
 export default async function ClipsPage() {
+  const free = await loadFreeShippingAmount();
   const [shoeCharmsRes, clipsRes, bowRes, settings, collectionsData] = await Promise.all([
     sb.from("products").select("*").eq("category", "shoe-charms").eq("active", true),
     sb.from("products").select("*").eq("category", "clips").eq("active", true),
@@ -71,7 +76,7 @@ export default async function ClipsPage() {
           Looking for <strong>shoe clips for wedding</strong>? Our bridal shoe clips add the perfect sparkle to your wedding day shoes. The <strong>Ivory Pearl Bow</strong>, <strong>Starburst Crystal</strong>, and <strong>Butterfly Bling</strong> are top picks for brides across India. Want to style your saree? Our <strong>saree accessories</strong> collection includes clips that work beautifully on dupattas, belts, and blouse pins too.
         </p>
         <p className="text-sm text-gray-600 leading-relaxed mb-8" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          All CLASSIE shoe clips are sold as a pair, made with premium materials, and available with free shipping above ₹499 and COD across India. Discover <strong>bow clips</strong>, <strong>crystal clips</strong>, <strong>satin clips</strong>, and <strong>fabric flower clips</strong> — all under one roof.
+          All CLASSIE shoe clips are sold as a pair, made with premium materials, and available with free shipping above ₹{free} and COD across India. Discover <strong>bow clips</strong>, <strong>crystal clips</strong>, <strong>satin clips</strong>, and <strong>fabric flower clips</strong> — all under one roof.
         </p>
       </section>
 
@@ -81,7 +86,7 @@ export default async function ClipsPage() {
         "@type": "FAQPage",
         "mainEntity": [
           { "@type": "Question", "name": "How do shoe clips work?", "acceptedAnswer": { "@type": "Answer", "text": "Shoe clips clip onto the fabric or straps of any shoe using a hinged clip mechanism — no glue or tools needed. They can be attached and removed in seconds without damaging your shoes." } },
-          { "@type": "Question", "name": "Where to buy shoe clips online in India?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE (classie.co.in) offers India's finest collection of shoe clips — rhinestone, crystal, bow, and floral styles. Free shipping above ₹499 with COD available pan-India." } },
+          { "@type": "Question", "name": "Where to buy shoe clips online in India?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE (classie.co.in) offers India's finest collection of shoe clips — rhinestone, crystal, bow, and floral styles. Free shipping above ₹" + free + " with COD available pan-India." } },
           { "@type": "Question", "name": "Can I use shoe clips on any type of shoe?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! CLASSIE shoe clips work on heels, flats, sandals, ballerinas, and most fabric or strap-based shoes. They also double as bag charms, hair clips and dupatta pins." } },
           { "@type": "Question", "name": "What shoe clips are best for a saree?", "acceptedAnswer": { "@type": "Answer", "text": "For sarees, rhinestone and crystal shoe clips add the perfect touch of elegance. Bow clips in gold, silver or pearl tones complement both traditional and contemporary saree looks." } },
         ]

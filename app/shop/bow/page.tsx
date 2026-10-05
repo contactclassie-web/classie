@@ -1,14 +1,18 @@
 import { Metadata } from "next";
+import { loadFreeShippingAmount } from "@/lib/shippingServer";
 import { getShopCategoryProducts, getShopCategorySettings } from "@/lib/products";
 import ShopCategoryPageClient from "@/components/ShopCategoryPageClient";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const free = await loadFreeShippingAmount();
+  return {
   title: "Bow Clips for Shoes — Satin, Jute & Pearl Bow Shoe Clips",
-  description: "Shop CLASSIE bow clips for shoes — handcrafted satin, jute and pearl bow shoe clips for women. Perfect for heels, flats and sandals. Free shipping above ₹499.",
-};
+  description: `Shop CLASSIE bow clips for shoes — handcrafted satin, jute and pearl bow shoe clips for women. Perfect for heels, flats and sandals. Free shipping above ₹${free}.`,
+  };
+}
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 

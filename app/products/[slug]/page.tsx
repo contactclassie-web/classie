@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { products, getProductBySlugFromDB, getProductsFromDB, getTabProductsFromDB, Product } from "@/lib/products";
 import ProductDetailClient from "./ProductDetailClient";
+import { loadShippingRules } from "@/lib/shippingServer";
+import { shippingFee } from "@/lib/shipping";
 export const revalidate = 300; // ISR: rebuild every 5 min, admin revalidation busts instantly
 export const dynamicParams = true; // allow new DB products not in generateStaticParams
 
@@ -134,6 +136,7 @@ export default async function ProductPage({ params }: Props) {
     latestProductsRaw,
     bestsellerProductsRaw,
     reviewsRes,
+    shippingRules,
   ] = await Promise.all([
     getProductsFromDB({ active: true }),
     supabase.from("product_bundle_offers").select("*").eq("main_product_slug", slug).eq("active", true).order("sort_order"),
@@ -145,6 +148,7 @@ export default async function ProductPage({ params }: Props) {
       `${SUPABASE_URL}/rest/v1/product_reviews?product_slug=eq.${encodeURIComponent(slug)}&active=eq.true&order=review_date.desc,created_at.desc`,
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, next: { revalidate: 300 } }
     ).catch(() => null),
+    loadShippingRules(),
   ]);
 
   const related = allProducts
@@ -256,9 +260,23 @@ export default async function ProductPage({ params }: Props) {
           "price": product.price,
           "availability": "https://schema.org/InStock",
           "seller": { "@type": "Organization", "name": "CLASSIE" },
-          "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": 0, "currency": "INR" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" } }
+          "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": shippingFee(product.price, shippingRules), "currency": "INR" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" } }
         },
         "category": isHeel ? "Women's Heels" : "Shoe Clips & Accessories",
+        ...(initialReviews.length > 0 ? {
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": Number((initialReviews.reduce((n, r) => n + Number(r.rating), 0) / initialReviews.length).toFixed(1)),
+            "reviewCount": initialReviews.length,
+          },
+          "review": initialReviews.slice(0, 5).map((r) => ({
+            "@type": "Review",
+            "author": { "@type": "Person", "name": r.customer_name },
+            "reviewRating": { "@type": "Rating", "ratingValue": Number(r.rating), "bestRating": 5 },
+            ...(r.review_text ? { "reviewBody": r.review_text } : {}),
+            ...(r.review_date ? { "datePublished": r.review_date } : {}),
+          })),
+        } : {}),
       }) }} />
       {/* Breadcrumb Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({

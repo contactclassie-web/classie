@@ -91,7 +91,7 @@ function customerEmailHtml(data: OrderEmailData): string {
                 <!-- Payment -->
                 <div style="background:#f9f9f9;border:1px solid #ebebeb;padding:16px 20px;margin-bottom:24px;border-radius:4px;">
                   <p style="margin:0;font-size:12px;color:#888;letter-spacing:1px;text-transform:uppercase;">Payment</p>
-                  <p style="margin:4px 0 0;font-size:14px;color:#1a1a1a;text-transform:capitalize;">${data.paymentMethod === 'online' ? '✅ Paid Online' : '💵 Cash on Delivery'}</p>
+                  <p style="margin:4px 0 0;font-size:14px;color:#1a1a1a;text-transform:capitalize;">${data.paymentMethod.startsWith('online') ? '✅ Paid Online' : '💵 Cash on Delivery'}</p>
                 </div>
 
                 <!-- Delivery Address -->
@@ -120,7 +120,7 @@ function customerEmailHtml(data: OrderEmailData): string {
 
 function customerEmailText(data: OrderEmailData): string {
   const items = data.items.map(i => `${i.quantity}x ${i.title}${i.variant ? ` (${i.variant})` : ''} - Rs.${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n')
-  return `Hi ${data.customerName},\n\nThank you for your order! We're getting it ready for you.\n\nOrder ID: ${data.orderId}\n\nItems ordered:\n${items}\n\nTotal: Rs.${data.totalAmount.toLocaleString('en-IN')}\nPayment: ${data.paymentMethod === 'online' ? 'Paid Online' : 'Cash on Delivery'}\n\nDelivery address:\n${data.address}, ${data.city}, ${data.state} - ${data.pincode}\n\nQuestions? Reply to this email or contact us at hello@classie.co.in\n\nCLASSIE - classie.co.in`
+  return `Hi ${data.customerName},\n\nThank you for your order! We're getting it ready for you.\n\nOrder ID: ${data.orderId}\n\nItems ordered:\n${items}\n\nTotal: Rs.${data.totalAmount.toLocaleString('en-IN')}\nPayment: ${data.paymentMethod.startsWith('online') ? 'Paid Online' : 'Cash on Delivery'}\n\nDelivery address:\n${data.address}, ${data.city}, ${data.state} - ${data.pincode}\n\nQuestions? Reply to this email or contact us at hello@classie.co.in\n\nCLASSIE - classie.co.in`
 }
 
 // ── Admin notification email ──────────────────────────────────────────────────
@@ -166,7 +166,7 @@ function adminEmailHtml(data: OrderEmailData): string {
           </td></tr>
           <tr><td style="padding:8px 0;">
             <span style="font-size:12px;color:#888;display:block;">Payment</span>
-            <strong>${data.paymentMethod === 'online' ? `✅ Paid Online — ${data.paymentId || ''}` : '💵 COD'}</strong>
+            <strong>${data.paymentMethod === 'online' ? `✅ Paid Online — ${data.paymentId || ''}` : data.paymentMethod.startsWith('online') ? `⚠️ ${data.paymentMethod} — ${data.paymentId || ''}` : '💵 COD'}</strong>
           </td></tr>
         </table>
       </div>
@@ -177,7 +177,7 @@ function adminEmailHtml(data: OrderEmailData): string {
 
 function adminEmailText(data: OrderEmailData): string {
   const items = data.items.map(i => `${i.quantity}x ${i.title}${i.variant ? ` (${i.variant})` : ''} - Rs.${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n')
-  return `New order received on classie.co.in\n\nOrder ID: ${data.orderId}\nCustomer: ${data.customerName}\nPhone: ${data.customerPhone}\n${data.customerEmail ? `Email: ${data.customerEmail}\n` : ''}Address: ${data.address}, ${data.city}, ${data.state} - ${data.pincode}\n\nItems:\n${items}\n\nTotal: Rs.${data.totalAmount.toLocaleString('en-IN')}\nPayment: ${data.paymentMethod === 'online' ? `Paid Online - ${data.paymentId || ''}` : 'COD'}`
+  return `New order received on classie.co.in\n\nOrder ID: ${data.orderId}\nCustomer: ${data.customerName}\nPhone: ${data.customerPhone}\n${data.customerEmail ? `Email: ${data.customerEmail}\n` : ''}Address: ${data.address}, ${data.city}, ${data.state} - ${data.pincode}\n\nItems:\n${items}\n\nTotal: Rs.${data.totalAmount.toLocaleString('en-IN')}\nPayment: ${data.paymentMethod === 'online' ? `Paid Online - ${data.paymentId || ''}` : data.paymentMethod.startsWith('online') ? `${data.paymentMethod} - ${data.paymentId || ''}` : 'COD'}`
 }
 
 // ── Send both emails ──────────────────────────────────────────────────────────
@@ -265,5 +265,39 @@ export async function sendContactNotification(data: ContactSubmissionData) {
   } catch (err) {
     console.error('Contact notification email error:', err)
     // Non-fatal — submission already saved
+  }
+}
+
+// ── Review request (sent when Admin marks an order "delivered") ───────────────
+const esc = (s: string) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string))
+
+export async function sendReviewRequest(data: { customerEmail: string; customerName: string; items: { slug: string; title: string }[] }) {
+  const client = getResend()
+  if (!client || !data.customerEmail) return
+  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'
+  const products = data.items.filter((i) => i.slug && !i.slug.startsWith('set-'))
+  if (!products.length) return
+  const first = esc((data.customerName || '').split(' ')[0] || 'there')
+  const rows = products.map((p) => `
+    <tr><td style="padding:10px 0;border-bottom:1px solid #eee;font-size:14px;color:#1a1a1a;">${esc(p.title)}</td>
+    <td style="padding:10px 0;border-bottom:1px solid #eee;text-align:right;">
+      <a href="https://www.classie.co.in/products/${encodeURIComponent(p.slug)}#write-review" style="background:#3B5373;color:#fff;text-decoration:none;font-size:12px;padding:8px 14px;border-radius:20px;display:inline-block;">Rate it ★</a>
+    </td></tr>`).join('')
+  try {
+    await client.emails.send({
+      from: `CLASSIE™ <${fromEmail}>`,
+      to: [data.customerEmail],
+      subject: 'How do you like your CLASSIE order? ★',
+      html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#333;">
+        <h2 style="font-family:Georgia,serif;font-weight:normal;color:#1a1a1a;">Hi ${first}, your order has arrived!</h2>
+        <p style="font-size:14px;line-height:1.6;">We hope you love it. Could you take 30 seconds to rate it? Your review helps other girls choose — and helps a small brand like ours a lot.</p>
+        <table style="width:100%;border-collapse:collapse;margin:16px 0;">${rows}</table>
+        <p style="font-size:13px;color:#777;">A photo of you wearing it would make our day — just reply to this email or send it on WhatsApp.</p>
+        <p style="font-size:13px;color:#777;">— Team CLASSIE</p>
+      </div>`,
+      text: `Hi ${data.customerName}, your CLASSIE order has arrived! Please rate it:\n\n${products.map((p) => `${p.title}: https://www.classie.co.in/products/${p.slug}#write-review`).join('\n')}\n\nThank you!\nTeam CLASSIE`,
+    })
+  } catch (err) {
+    console.error('Review request email error:', err)
   }
 }

@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SUPABASE_URL = "https://hrjvxwqvxvibtwyfoyca.supabase.co";
-const SUPABASE_KEY = "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z";
+import { SUPABASE_URL, serverRestHeaders } from "@/lib/supabaseServer";
 
-const headers = {
-  apikey: SUPABASE_KEY,
-  Authorization: `Bearer ${SUPABASE_KEY}`,
-  "Content-Type": "application/json",
-};
+const headers = () => serverRestHeaders();
 
 // GET /api/reviews?slug=velora → returns active reviews for that slug
 export async function GET(req: NextRequest) {
@@ -17,7 +12,7 @@ export async function GET(req: NextRequest) {
   }
 
   const url = `${SUPABASE_URL}/rest/v1/product_reviews?product_slug=eq.${encodeURIComponent(slug)}&active=eq.true&order=review_date.desc,created_at.desc`;
-  const res = await fetch(url, { headers, cache: "no-store" });
+  const res = await fetch(url, { headers: headers(), cache: "no-store" });
   if (!res.ok) {
     return NextResponse.json([], { status: 200 });
   }
@@ -39,11 +34,11 @@ export async function POST(req: NextRequest) {
     }
 
     const payload: Record<string, unknown> = {
-      product_slug,
-      customer_name,
-      rating,
-      review_text: review_text || "",
-      review_date: review_date || new Date().toISOString().split("T")[0],
+      product_slug: String(product_slug).slice(0, 120),
+      customer_name: String(customer_name).trim().slice(0, 60),
+      rating: Math.round(rating),
+      review_text: String(review_text || "").slice(0, 2000),
+      review_date: /^\d{4}-\d{2}-\d{2}$/.test(String(review_date || "")) ? review_date : new Date().toISOString().split("T")[0],
       active: false,
     };
     if (product_id) payload.product_id = product_id;
@@ -51,7 +46,7 @@ export async function POST(req: NextRequest) {
     const url = `${SUPABASE_URL}/rest/v1/product_reviews`;
     const res = await fetch(url, {
       method: "POST",
-      headers: { ...headers, Prefer: "return=representation" },
+      headers: { ...headers(), Prefer: "return=minimal" },
       body: JSON.stringify(payload),
     });
 

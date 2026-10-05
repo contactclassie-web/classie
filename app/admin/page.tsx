@@ -10,7 +10,7 @@ import {
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
   Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity, Gift, PenTool,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import HomepageBuilder from "@/components/admin/HomepageBuilder";
 import GiftSetsAdmin from "@/components/admin/GiftSetsAdmin";
 import CustomDesignsAdmin from "@/components/admin/CustomDesignsAdmin";
@@ -26,7 +26,7 @@ interface Order {
   city: string;
   state: string;
   pincode: string;
-  items: Array<{ title: string; quantity: number; price: number; variant?: string }>;
+  items: Array<{ slug?: string; title: string; quantity: number; price: number; variant?: string }>;
   total_amount: number;
   status: string;
   payment_method: string;
@@ -594,15 +594,21 @@ function ReviewEditForm({ rev, reviewsModal, setReviewsModal, saveAdminReviewEdi
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AdminPage() {
-  // Auth — persisted in sessionStorage so a page refresh doesn't log the admin out
-  // (cleared when the browser tab closes, unlike localStorage). Starts false to match
-  // the server-rendered HTML, then syncs from sessionStorage post-mount — reading it
-  // in the initial state would make the client's first render diverge from the
-  // server's and trigger a hydration error.
+  // Auth — checked on the server (httpOnly cookie set by /api/admin/login).
+  // Starts false to match the server-rendered HTML, then asks the server.
   const [authed, setAuthed] = useState(false);
-  useEffect(() => {
-    try { if (sessionStorage.getItem("classie_admin_authed") === "1") setAuthed(true); } catch { /* ignore */ }
+  const [authChecked, setAuthChecked] = useState(false);
+  const [security, setSecurity] = useState<{ secretKey: boolean; ownPassword: boolean } | null>(null);
+  const checkSession = useCallback(async () => {
+    try {
+      const r = await fetch("/api/admin/session", { cache: "no-store" });
+      const d = await r.json();
+      setAuthed(!!d.authed);
+      if (d.authed) setSecurity({ secretKey: !!d.secretKey, ownPassword: !!d.ownPassword });
+    } catch { /* offline: stay logged out */ }
+    setAuthChecked(true);
   }, []);
+  useEffect(() => { checkSession(); }, [checkSession]);
   const [pw, setPw] = useState("");
   const [pwError, setPwError] = useState("");
 
@@ -1675,7 +1681,7 @@ export default function AdminPage() {
       await fetch("/api/revalidate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ secret: "classie-revalidate-2024" }),
+        body: "{}",
       });
     } catch { /* silent fail — page will still update on next visit */ }
   };
@@ -2994,18 +3000,30 @@ export default function AdminPage() {
 
   // ── Auth ─────────────────────────────────────────────────────────────────
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [pwLoading, setPwLoading] = useState(false);
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw === "classie@admin123") {
-      setAuthed(true);
-      setPwError("");
-      try { sessionStorage.setItem("classie_admin_authed", "1"); } catch { /* ignore */ }
-    } else setPwError("Incorrect password. Please try again.");
+    setPwLoading(true);
+    setPwError("");
+    try {
+      const r = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pw }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok) { setPw(""); await checkSession(); }
+      else setPwError(d.error || "Incorrect password. Please try again.");
+    } catch {
+      setPwError("Couldn't reach the server. Please try again.");
+    } finally {
+      setPwLoading(false);
+    }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setAuthed(false);
-    try { sessionStorage.removeItem("classie_admin_authed"); } catch { /* ignore */ }
+    try { await fetch("/api/admin/logout", { method: "POST" }); } catch { /* ignore */ }
   };
 
   // ── Order actions ─────────────────────────────────────────────────────────
@@ -3841,6 +3859,10 @@ export default function AdminPage() {
 
   // ── Login screen ──────────────────────────────────────────────────────────
 
+  if (!authed && !authChecked) {
+    return <div className="min-h-screen bg-gradient-to-br from-[#3B5373] to-[#2a3a47]" />;
+  }
+
   if (!authed) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#3B5373] to-[#2a3a47] flex items-center justify-center px-4">
@@ -3867,8 +3889,8 @@ export default function AdminPage() {
                 <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" /> {pwError}
               </p>
             )}
-            <button type="submit" className="w-full py-3 bg-[#3B5373] text-white rounded-xl text-sm font-semibold hover:bg-[#2d3f4f] transition-colors">
-              Sign In
+            <button type="submit" disabled={pwLoading} className="w-full py-3 bg-[#3B5373] text-white rounded-xl text-sm font-semibold hover:bg-[#2d3f4f] disabled:opacity-60 transition-colors">
+              {pwLoading ? "Signing in…" : "Sign In"}
             </button>
           </form>
         </div>
@@ -4079,6 +4101,18 @@ export default function AdminPage() {
             )}
           </div>
         </div>
+
+        {security && (!security.secretKey || !security.ownPassword) && (
+          <div className="bg-amber-50 border-b border-amber-200 px-8 py-3 text-xs text-amber-800 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <div>
+              <b>Security setup is not finished.</b>{" "}
+              {!security.ownPassword && <>Add <code className="bg-amber-100 px-1 rounded">ADMIN_PASSWORD</code> (your new admin password) in Vercel → Settings → Environment Variables. </>}
+              {!security.secretKey && <>Add <code className="bg-amber-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> (Supabase → Project Settings → API Keys → secret key) in Vercel. </>}
+              Then redeploy. Lock the database (SQL in <code className="bg-amber-100 px-1 rounded">supabase/lock-down.sql</code>) only after this banner is gone.
+            </div>
+          </div>
+        )}
 
         {/* Sub-tab navigation */}
         {SECTION_SUBTABS[mainSection].length > 0 && (
@@ -4355,6 +4389,17 @@ export default function AdminPage() {
                               >
                                 {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
                               </select>
+                              {order.status === "delivered" && (() => {
+                                const links = order.items.filter((it) => !!it.slug && !it.slug.startsWith("set-"))
+                                  .map((it) => `${it.title}: https://www.classie.co.in/products/${it.slug}#write-review`).join("\n");
+                                const msg = `Hi ${order.customer_name.split(" ")[0]}, thank you for shopping with CLASSIE! 💙 We hope you love your order. Could you rate it here? It really helps us:\n${links}\n\nA photo of you wearing it would make our day!`;
+                                return links ? (
+                                  <a href={`https://wa.me/91${order.customer_phone}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"
+                                    className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 hover:underline">
+                                    ★ Ask for review on WhatsApp
+                                  </a>
+                                ) : null;
+                              })()}
                             </td>
                             <td className="px-5 py-4">
                               <p className="text-xs text-gray-400">

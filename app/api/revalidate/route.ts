@@ -1,12 +1,11 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminRequest } from "@/lib/adminAuth";
 
 // Called by admin after any save — instantly clears Vercel page cache
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => ({}));
-    const secret = body.secret || request.headers.get("x-revalidate-secret");
-    if (secret !== "classie-revalidate-2024") {
+    if (!isAdminRequest(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

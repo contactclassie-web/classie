@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { serverSupabase } from "@/lib/supabaseServer";
 import { sendContactNotification } from "@/lib/emails";
 import { REQUEST_TAG } from "@/lib/customDesigns";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
 
 const clip = (v: unknown, n: number) => (typeof v === "string" ? v.trim().slice(0, n) : "");
 
@@ -11,6 +11,8 @@ const clip = (v: unknown, n: number) => (typeof v === "string" ? v.trim().slice(
 // tagged so Admin → Custom Designs → Requests can list them separately.
 export async function POST(req: NextRequest) {
   try {
+    const supabase = serverSupabase();
+    if (!supabase) return NextResponse.json({ error: "Database not configured" }, { status: 503 });
     const body = await req.json().catch(() => ({}));
 
     // Honeypot: real visitors never fill this hidden field.

@@ -1,10 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import { serverSupabase } from "@/lib/supabaseServer";
 import { NextResponse } from "next/server";
 
-const sb = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const sb = serverSupabase()!;
 
 export const revalidate = 3600;
 
