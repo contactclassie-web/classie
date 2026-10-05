@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import { Plus, ArrowLeft, ToggleLeft, ToggleRight, X } from "lucide-react";
 
 interface HeelProduct {
@@ -32,11 +32,10 @@ export default function HeelsAdminPage() {
 
   // Auth check — reuse main admin session, redirect if not logged in
   useEffect(() => {
-    if (sessionStorage.getItem("classie_admin") === "ok") {
-      setAuthed(true);
-    } else {
-      router.replace("/admin");
-    }
+    fetch("/api/admin/session", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => { if (d.authed) setAuthed(true); else router.replace("/admin"); })
+      .catch(() => router.replace("/admin"));
   }, [router]);
 
   const fetchData = async () => {

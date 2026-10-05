@@ -1,20 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { isAdminRequest } from "@/lib/adminAuth";
+import { SUPABASE_URL, serverRestHeaders } from "@/lib/supabaseServer";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAdminRequest(req)) return NextResponse.json({ error: "Admin login required" }, { status: 401 });
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/product_reviews?active=eq.false&select=id,product_slug,customer_name,rating,created_at&order=created_at.desc`,
-    {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    }
+    { headers: serverRestHeaders(), cache: "no-store" }
   );
-  const data: { id: string; product_slug: string; customer_name: string; rating: number; created_at: string }[] = await res.json();
+  const data: { id: string; product_slug: string; customer_name: string; rating: number; created_at: string }[] = res.ok ? await res.json() : [];
   return NextResponse.json({ count: data.length, pending: data });
 }

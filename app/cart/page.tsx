@@ -8,6 +8,8 @@ import ProductCard from "@/components/ProductCard";
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { Product } from "@/lib/products";
+import { useShippingRules } from "@/lib/useShipping";
+import { shippingFee, freeShippingFrom } from "@/lib/shipping";
 
 function useSuggestedProducts() {
   const [suggested, setSuggested] = useState<Product[]>([]);
@@ -17,12 +19,13 @@ function useSuggestedProducts() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     sb.from("products")
-      .select("slug,title,price,compare_price,image,collection,category,featured_tab")
+      .select("slug,title,price,compare_price,image,category,featured_tab")
       .eq("active", true)
-      .order("sort_order", { ascending: true })
-      .limit(8)
+      .order("created_at", { ascending: false })
+      .limit(24)
       .then(({ data }) => {
-        if (data) setSuggested(data.map((p: any) => ({
+        // Clips and charms first (they sell most and are easy add-ons), then heels.
+        if (data) setSuggested([...data].sort((a: any, b: any) => (a.category === "heels" ? 1 : 0) - (b.category === "heels" ? 1 : 0)).map((p: any) => ({
           ...p,
           comparePrice: p.compare_price ?? 0,
           description: "",
@@ -38,8 +41,11 @@ export default function CartPage() {
   const { items, count, total, updateQuantity, removeFromCart } = useCart();
   const suggested = useSuggestedProducts();
 
-  const shipping   = total >= 999 ? 0 : 99;
+  const rules      = useShippingRules();
+  const shipping   = shippingFee(total, rules);
   const grandTotal = total + shipping;
+  const freeFrom   = freeShippingFrom(rules);
+  const toFree     = freeFrom != null ? Math.max(0, freeFrom - total) : 0;
 
   if (count === 0) {
     return (
@@ -52,7 +58,7 @@ export default function CartPage() {
           <p className="text-classie-gray text-sm mb-8 max-w-xs">
             Looks like you haven't added anything yet. Let's fix that!
           </p>
-          <Link href="/shop/heels" className="btn-primary">Continue Shopping</Link>
+          <Link href="/shop/clips" className="btn-primary">Continue Shopping</Link>
         </div>
 
         {/* You may also like */}
@@ -61,7 +67,7 @@ export default function CartPage() {
             You May Also Like
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
-            {suggested.map((p) => <ProductCard key={p.slug} product={p} />)}
+            {suggested.slice(0, 4).map((p) => <ProductCard key={p.slug} product={p} />)}
           </div>
         </div>
       </>
@@ -125,10 +131,17 @@ export default function CartPage() {
                   {shipping === 0 ? "FREE" : `₹${shipping}`}
                 </span>
               </div>
-              {shipping > 0 && (
-                <p className="text-xs text-classie-gray bg-[#faf8f6] px-3 py-2 rounded-lg">
-                  Add ₹{(999 - total).toLocaleString("en-IN")} more for free shipping
-                </p>
+              {freeFrom != null && freeFrom > 0 && (
+                <div className="bg-[#faf8f6] px-3 py-2.5 rounded-lg">
+                  <p className="text-xs text-classie-gray">
+                    {toFree > 0
+                      ? <>Add <b className="text-classie-black">₹{toFree.toLocaleString("en-IN")}</b> more for FREE delivery</>
+                      : <span className="text-emerald-700 font-medium">You get FREE delivery</span>}
+                  </p>
+                  <div className="mt-2 h-1.5 rounded-full bg-[#e8e4de] overflow-hidden" aria-hidden>
+                    <div className="h-full bg-[#3B5373] rounded-full transition-all" style={{ width: `${Math.min(100, Math.round((total / freeFrom) * 100))}%` }} />
+                  </div>
+                </div>
               )}
               <div className="border-t border-classie-border pt-3 flex justify-between font-semibold text-base">
                 <span>Total</span>
@@ -144,7 +157,7 @@ export default function CartPage() {
               Checkout
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/shop/heels" className="block text-center text-sm text-classie-gray hover:text-[#3B5373] mt-4 transition-colors">
+            <Link href="/shop/clips" className="block text-center text-sm text-classie-gray hover:text-[#3B5373] mt-4 transition-colors">
               ← Continue Shopping
             </Link>
           </div>

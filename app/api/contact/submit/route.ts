@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { serverSupabase } from "@/lib/supabaseServer";
 import { sendContactNotification } from "@/lib/emails";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = serverSupabase();
+    if (!supabase) return NextResponse.json({ error: "Database not configured" }, { status: 503 });
     const body = await req.json();
     const { first_name, last_name, email, phone, message } = body;
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import {
   HOME_CONFIG_KEY, DEFAULT_HOME, SECTION_LABELS, SECTION_EDITED_IN, mergeHomeConfig,
   type HomeConfig, type HeroSlide, type SectionId, type WhyIcon,

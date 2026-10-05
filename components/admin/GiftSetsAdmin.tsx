@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import { loadSettingJson, saveSettingJson } from "@/lib/adminSettings";
 import {
   GIFT_SETS_KEY, DEFAULT_GIFT_SETS, mergeGiftSets, slugify, setKind, setCompareAt, pieceCount,

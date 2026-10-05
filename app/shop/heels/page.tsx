@@ -1,19 +1,24 @@
 import { Metadata } from "next";
+import { loadFreeShippingAmount } from "@/lib/shippingServer";
 import { getHeelsForPageFromDB, getHeelsSettings } from "@/lib/products";
 import HeelsPageClient from "@/components/HeelsPageClient";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const free = await loadFreeShippingAmount();
+  return {
   title: "Buy Women's Heels Online India — Block, Slingback & Sculpted Heels | CLASSIE",
   description:
-    "Shop CLASSIE women's heels online in India — block heels, slingback heels, sculpted heels, slim heels & more. Premium quality, free shipping above ₹999, COD available. Buy heels for wedding, office, party & everyday wear.",
-};
+    `Shop CLASSIE women's heels online in India — block heels, slingback heels, sculpted heels, slim heels & more. Premium quality, free shipping above ₹${free}, COD available. Buy heels for wedding, office, party & everyday wear.`,
+  };
+}
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 export default async function HeelsPage() {
+  const free = await loadFreeShippingAmount();
   const [products, settings, collectionsData, filterSettingData, collectionProductsData] = await Promise.all([
     getHeelsForPageFromDB(),
     getHeelsSettings(),
@@ -66,7 +71,7 @@ export default async function HeelsPage() {
             Our <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>block heels for women</strong> are designed for all-day comfort without compromising on style. The <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>slingback heels</strong> and pointed toe styles are perfect for ethnic wear and sarees, while our <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>comfortable heels for long hours</strong> are crafted with premium cushioning and stable bases.
           </p>
           <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.82rem", color: "#555", lineHeight: 1.9, marginBottom: "40px", fontWeight: 300 }}>
-            Shop <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>black heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>white heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>gold &amp; silver heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>maroon heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>cream heels</strong> and more — all with free shipping above ₹999 and COD across India.
+            Shop <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>black heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>white heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>gold &amp; silver heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>maroon heels</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>cream heels</strong> and more — all with free shipping above ₹{free} and COD across India.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center" }}>
             {["Block Heels", "Slingback Heels", "Wedding Heels", "Office Heels"].map((label) => (
@@ -83,10 +88,10 @@ export default async function HeelsPage() {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
-          { "@type": "Question", "name": "Where can I buy women's heels online in India?", "acceptedAnswer": { "@type": "Answer", "text": "You can buy premium women's heels online at CLASSIE (classie.co.in). We offer block heels, slingback heels, sculpted heels and more with free shipping above ₹999 and COD across India." } },
+          { "@type": "Question", "name": "Where can I buy women's heels online in India?", "acceptedAnswer": { "@type": "Answer", "text": "You can buy premium women's heels online at CLASSIE (classie.co.in). We offer block heels, slingback heels, sculpted heels and more with free shipping above ₹" + free + " and COD across India." } },
           { "@type": "Question", "name": "Which heels are best for Indian weddings?", "acceptedAnswer": { "@type": "Answer", "text": "For Indian weddings, block heels and slingback heels work best with sarees and lehengas. Gold, cream, and maroon heels are the most popular choices for bridal and wedding guest outfits." } },
           { "@type": "Question", "name": "Are block heels comfortable for long hours?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Block heels distribute weight evenly and are much more comfortable than stilettos. CLASSIE block heels are designed with premium cushioning for all-day wear at office or events." } },
-          { "@type": "Question", "name": "What is the price range of CLASSIE heels?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE women's heels are priced between ₹1,499 to ₹3,999. Free shipping is available on orders above ₹999 with cash on delivery across India." } },
+          { "@type": "Question", "name": "What is the price range of CLASSIE heels?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE women's heels are priced between ₹1,499 to ₹3,999. Free shipping is available on orders above ₹" + free + " with cash on delivery across India." } },
         ]
       }) }} />
     </>

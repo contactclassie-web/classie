@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import { loadSettingJson, saveSettingJson } from "@/lib/adminSettings";
 import { CUSTOM_PAGE_KEY, DEFAULT_CUSTOM_PAGE, REQUEST_TAG, mergeCustomPage, type CustomPageConfig } from "@/lib/customDesigns";
 import { Field, MediaField, Panel, move, btnSm } from "@/components/admin/fields";

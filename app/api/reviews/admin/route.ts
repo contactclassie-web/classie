@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SUPABASE_URL = "https://hrjvxwqvxvibtwyfoyca.supabase.co";
-const SUPABASE_KEY = "sb_publishable_fO8FW4iIh9pTTYdYGZ3m9Q_VXMtKI6z";
+import { isAdminRequest } from "@/lib/adminAuth";
+import { SUPABASE_URL, serverRestHeaders } from "@/lib/supabaseServer";
 
-const headers = {
-  apikey: SUPABASE_KEY,
-  Authorization: `Bearer ${SUPABASE_KEY}`,
-  "Content-Type": "application/json",
-};
+const headers = () => serverRestHeaders();
+const denied = () => NextResponse.json({ error: "Admin login required" }, { status: 401 });
 
 // GET /api/reviews/admin?slug=velora → ALL reviews (active + inactive) for that slug
 export async function GET(req: NextRequest) {
+  if (!isAdminRequest(req)) return denied();
   const slug = req.nextUrl.searchParams.get("slug");
   if (!slug) {
     return NextResponse.json({ error: "slug is required" }, { status: 400 });
   }
 
   const url = `${SUPABASE_URL}/rest/v1/product_reviews?product_slug=eq.${encodeURIComponent(slug)}&order=review_date.desc,created_at.desc`;
-  const res = await fetch(url, { headers, cache: "no-store" });
+  const res = await fetch(url, { headers: headers(), cache: "no-store" });
   if (!res.ok) {
     return NextResponse.json([], { status: 200 });
   }
@@ -27,6 +25,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/reviews/admin → add review manually (active=true by default)
 export async function POST(req: NextRequest) {
+  if (!isAdminRequest(req)) return denied();
   try {
     const body = await req.json();
     const { product_slug, product_id, customer_name, rating, review_text, review_date, active } = body;
@@ -48,7 +47,7 @@ export async function POST(req: NextRequest) {
     const url = `${SUPABASE_URL}/rest/v1/product_reviews`;
     const res = await fetch(url, {
       method: "POST",
-      headers: { ...headers, Prefer: "return=representation" },
+      headers: { ...headers(), Prefer: "return=representation" },
       body: JSON.stringify(payload),
     });
 
@@ -66,6 +65,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/reviews/admin → update review (toggle active, edit fields)
 export async function PATCH(req: NextRequest) {
+  if (!isAdminRequest(req)) return denied();
   try {
     const body = await req.json();
     const { id, ...updates } = body;
@@ -77,7 +77,7 @@ export async function PATCH(req: NextRequest) {
     const url = `${SUPABASE_URL}/rest/v1/product_reviews?id=eq.${encodeURIComponent(id)}`;
     const res = await fetch(url, {
       method: "PATCH",
-      headers: { ...headers, Prefer: "return=representation" },
+      headers: { ...headers(), Prefer: "return=representation" },
       body: JSON.stringify(updates),
     });
 
@@ -95,13 +95,14 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/reviews/admin?id=xxx → delete a review
 export async function DELETE(req: NextRequest) {
+  if (!isAdminRequest(req)) return denied();
   const id = req.nextUrl.searchParams.get("id");
   if (!id) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
 
   const url = `${SUPABASE_URL}/rest/v1/product_reviews?id=eq.${encodeURIComponent(id)}`;
-  const res = await fetch(url, { method: "DELETE", headers });
+  const res = await fetch(url, { method: "DELETE", headers: headers() });
 
   if (!res.ok) {
     const err = await res.text();

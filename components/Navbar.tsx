@@ -4,10 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingBag, Menu, X, Search, Heart } from "lucide-react";
 import { useWishlist } from "@/components/WishlistContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "./CartContext";
 import AnnouncementBar from "./AnnouncementBar";
+import SearchOverlay from "./SearchOverlay";
 import { supabase } from "@/lib/supabase";
 
 // Static nav links (non-category)
@@ -44,6 +45,8 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
   const { count: wishCount } = useWishlist();
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
   const [logoUrl, setLogoUrl]   = useState(initialSettings?.logo_image_url || LOGO_FALLBACK);
   const [categories, setCategories] = useState<Category[]>(
     initialCategories && initialCategories.length > 0 ? initialCategories : DEFAULT_CATS
@@ -176,7 +179,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
             {rightLinks.map((l) => (
               <Link key={l.href} href={l.href} className={`${NAV_LINK_CLS} ${l.wide ? "hidden xl:inline" : ""}`}>{l.label}</Link>
             ))}
-            <button aria-label="Search" className="text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
+            <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)} className="text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
               <Search className="w-[18px] h-[18px]" strokeWidth={1.6} />
             </button>
             <Link href="/wishlist" aria-label="Wishlist" className="relative text-[#1a1a1a] hover:text-[#3B5373] transition-colors">
@@ -211,7 +214,10 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
               <span className="font-serif text-lg tracking-[0.1em] text-[#000]">✦ CLASSIE</span>
             )}
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <button type="button" aria-label="Search" onClick={() => { setOpen(false); setSearchOpen(true); }} className="text-[#1a1a1a]">
+              <Search className="w-5 h-5" strokeWidth={1.6} />
+            </button>
             <Link href="/cart" aria-label="Cart" className="relative text-[#1a1a1a]">
               <ShoppingBag className="w-5 h-5" strokeWidth={1.6} />
               {count > 0 && (
@@ -265,6 +271,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
         </nav>
       </div>
       {open && <div className="lg:hidden fixed inset-0 bg-black/20 z-40 backdrop-blur-sm" onClick={() => setOpen(false)} />}
+      <SearchOverlay open={searchOpen} onClose={closeSearch} />
     </header>
   );
 }

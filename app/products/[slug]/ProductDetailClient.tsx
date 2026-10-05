@@ -120,6 +120,25 @@ export default function ProductDetailClient({
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const reviewsRef = useRef<HTMLDivElement>(null);
+  // Links in review-request emails/WhatsApp end with #write-review: open the form.
+  useEffect(() => {
+    if (window.location.hash === "#write-review") {
+      reviewsRef.current?.scrollIntoView();
+      setShowWriteReview(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  // Mobile: show a bar with "Add to cart" at the bottom once the main button
+  // has scrolled up out of view.
+  const atcRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+  useEffect(() => {
+    const el = atcRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setShowSticky(!e.isIntersecting && e.boundingClientRect.top < 0));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Gallery images: main + additional (up to 10), plus optional video
   const allImages = [product.image, ...(product.images ?? [])].filter(Boolean);
@@ -527,7 +546,7 @@ export default function ProductDetailClient({
             )}
 
             {/* Qty + Add to Cart */}
-            <div className="flex items-center gap-2.5" style={{ marginBottom: "10px" }}>
+            <div ref={atcRef} className="flex items-center gap-2.5" style={{ marginBottom: "10px" }}>
               <div className="flex items-center overflow-hidden" style={{ border: "1.5px solid #E8E3DD", borderRadius: "100px", height: "52px" }}>
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
@@ -986,6 +1005,32 @@ export default function ProductDetailClient({
       )}
 
       {/* ── Related Products (You May Also Like) — hidden ── */}
+      {/* Mobile sticky add-to-cart (+ room for it at the end of the page) */}
+      <div className="md:hidden h-16" aria-hidden />
+      <div
+        className={`md:hidden fixed inset-x-0 bottom-0 z-40 bg-white border-t border-[#ECEAE6] shadow-[0_-4px_16px_rgba(0,0,0,0.06)] transition-transform duration-300 ${showSticky ? "translate-y-0" : "translate-y-full"}`}
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        aria-hidden={!showSticky}
+      >
+        <div className="flex items-center gap-3 px-4 py-2.5">
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] text-[#6b6b6b] truncate">{product.title}{selectedVariant ? ` · ${selectedVariant}` : ""}</p>
+            <p className="text-[15px] font-semibold text-[#1a1a1a]">
+              ₹{product.price.toLocaleString("en-IN")}
+              {discount > 0 && <s className="ml-1.5 text-[11px] font-normal text-[#9a9a9a]">₹{product.comparePrice.toLocaleString("en-IN")}</s>}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={doAdd}
+            tabIndex={showSticky ? 0 : -1}
+            className="flex items-center justify-center gap-2 px-5 h-11 rounded-full text-white text-[11.5px] font-semibold tracking-[0.12em] uppercase transition-colors"
+            style={{ background: added ? "#16a34a" : "#3B5373" }}
+          >
+            {added ? <><Check className="w-4 h-4" /> Added</> : <><ShoppingBag className="w-4 h-4" /> Add to cart</>}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

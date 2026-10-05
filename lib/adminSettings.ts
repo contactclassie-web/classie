@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { adminSupabase as supabase } from "@/lib/adminSupabase";
 
 // Read/write one JSON value in site_settings (used by the admin page builders).
 export async function loadSettingJson(key: string): Promise<{ value: unknown; exists: boolean }> {

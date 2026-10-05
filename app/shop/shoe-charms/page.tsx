@@ -1,14 +1,18 @@
 import { Metadata } from "next";
+import { loadFreeShippingAmount } from "@/lib/shippingServer";
 import { getShopCategorySettings } from "@/lib/products";
 import ShopCategoryPageClient from "@/components/ShopCategoryPageClient";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
+export async function generateMetadata(): Promise<Metadata> {
+  const free = await loadFreeShippingAmount();
+  return {
   title: "Buy Shoe Charms Online India — Crystal, Rhinestone, Flower & Bow Charms | CLASSIE",
-  description: "Shop CLASSIE shoe charms online in India — rhinestone shoe charms, crystal flower charms, bow charms, pearl anklet clips & more. Perfect for weddings, parties & everyday styling. Free shipping above ₹499.",
-};
+  description: `Shop CLASSIE shoe charms online in India — rhinestone shoe charms, crystal flower charms, bow charms, pearl anklet clips & more. Perfect for weddings, parties & everyday styling. Free shipping above ₹${free}.`,
+  };
+}
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -30,6 +34,7 @@ function mapRow(row: Record<string, unknown>) {
 }
 
 export default async function ShoeCharmsPage() {
+  const free = await loadFreeShippingAmount();
   const [shoeCharmsRes, clipsRes, bowRes, settings, collectionsData] = await Promise.all([
     sb.from("products").select("*").eq("category", "shoe-charms").eq("active", true),
     sb.from("products").select("*").eq("category", "clips").eq("active", true),
@@ -74,7 +79,7 @@ export default async function ShoeCharmsPage() {
             Looking for <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>shoe charms for wedding</strong>? Our bridal collection — Ivory Pearl Bow, Starburst Crystal, Celestial Wings — is perfect for brides and wedding guests. For everyday styling, our <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>bow shoe clips</strong> and <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>satin charms</strong> in black, beige and rose are the finishing touch every outfit needs.
           </p>
           <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.82rem", color: "#555", lineHeight: 1.9, marginBottom: "40px", fontWeight: 300 }}>
-            All CLASSIE shoe charms also work as <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>bag charms</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>dupatta clips</strong>, and <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>hair accessories</strong> — one clip, endless possibilities. Free shipping above ₹499, COD across India.
+            All CLASSIE shoe charms also work as <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>bag charms</strong>, <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>dupatta clips</strong>, and <strong style={{ color: "#1a1a1a", fontWeight: 500 }}>hair accessories</strong> — one clip, endless possibilities. Free shipping above ₹{free}, COD across India.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center" }}>
             {["Crystal Charms", "Bow Clips", "Bridal Charms", "Flower Clips"].map((label) => (
@@ -94,7 +99,7 @@ export default async function ShoeCharmsPage() {
           { "@type": "Question", "name": "What are shoe charms and how do they work?", "acceptedAnswer": { "@type": "Answer", "text": "Shoe charms are decorative clips that attach instantly to any shoe without glue or tools. They clip onto straps, toe bands, or anywhere on your shoe to add sparkle and personality." } },
           { "@type": "Question", "name": "Can shoe charms be used as bag charms or hair clips?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! CLASSIE shoe charms are multi-use accessories. They work beautifully as bag charms, dupatta pins, hair clips and even saree pins — making them incredibly versatile." } },
           { "@type": "Question", "name": "Which shoe charms are best for Indian weddings?", "acceptedAnswer": { "@type": "Answer", "text": "For Indian weddings, crystal and rhinestone shoe charms are most popular. The Ivory Pearl Bow, Starburst Crystal, and Marquise Bloom are bestsellers for brides and wedding guests." } },
-          { "@type": "Question", "name": "Where to buy shoe charms online in India?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE (classie.co.in) is India's leading online store for premium shoe charms. We offer free shipping above ₹499 and COD across all pin codes in India." } },
+          { "@type": "Question", "name": "Where to buy shoe charms online in India?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE (classie.co.in) is India's leading online store for premium shoe charms. We offer free shipping above ₹" + free + " and COD across all pin codes in India." } },
         ]
       }) }} />
     </>

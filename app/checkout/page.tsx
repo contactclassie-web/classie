@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
-import { supabase } from "@/lib/supabase";
+import { useShippingRules } from "@/lib/useShipping";
+import { shippingFee } from "@/lib/shipping";
 import { track } from "@/lib/analytics";
 import { gtagEvent } from "@/lib/gtag";
 import { Loader2, Lock, Tag, CheckCircle, XCircle, CreditCard, Truck } from "lucide-react";
@@ -53,29 +54,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("online");
 
-  // Shipping tiers — admin-configurable (Admin > Shipping Rates). Defaults match the
-  // old hardcoded behavior (free above ₹999, ₹99 below) until settings load or if
-  // the admin hasn't set any up yet.
-  const [shippingTiers, setShippingTiers] = useState<{ threshold: number; fee: number }[]>([{ threshold: 999, fee: 99 }]);
-  const [shippingDefaultFee, setShippingDefaultFee] = useState(0);
-
-  useEffect(() => {
-    supabase.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee"])
-      .then(({ data }) => {
-        if (!data) return;
-        const m: Record<string, string> = {};
-        data.forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
-        if (m.shipping_tiers) {
-          try {
-            const parsed = JSON.parse(m.shipping_tiers);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setShippingTiers([...parsed].sort((a, b) => a.threshold - b.threshold));
-            }
-          } catch { /* keep defaults */ }
-        }
-        if (m.shipping_default_fee !== undefined) setShippingDefaultFee(Number(m.shipping_default_fee) || 0);
-      });
-  }, []);
+  // Delivery charge — from Admin > Shipping Rates (same rules the server uses).
+  const shippingRules = useShippingRules();
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -104,6 +84,7 @@ export default function CheckoutPage() {
   }>(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [appliedCouponId, setAppliedCouponId] = useState<string | null>(null);
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
 
   const applyCoupon = async () => {
@@ -125,9 +106,11 @@ export default function CheckoutPage() {
       setCouponResult(data);
       if (data.valid) {
         setAppliedCouponId(data.coupon_id);
+        setAppliedCode(couponCode.trim().toUpperCase());
         setCouponDiscount(data.discount_amount || 0);
       } else {
         setAppliedCouponId(null);
+        setAppliedCode(null);
         setCouponDiscount(0);
       }
     } catch {
@@ -141,11 +124,11 @@ export default function CheckoutPage() {
     setCouponCode("");
     setCouponResult(null);
     setAppliedCouponId(null);
+    setAppliedCode(null);
     setCouponDiscount(0);
   };
 
-  const matchedTier = shippingTiers.find((t) => total < t.threshold);
-  const shipping = matchedTier ? matchedTier.fee : shippingDefaultFee;
+  const shipping = shippingFee(total, shippingRules);
   const grandTotal = Math.max(0, total + shipping - couponDiscount);
 
   const [form, setForm] = useState({
@@ -163,51 +146,23 @@ export default function CheckoutPage() {
   };
 
   // ── Place order in DB ─────────────────────────────────────────────────
-  const placeOrderInDB = async (paymentMethodStr: string, paymentId?: string) => {
+  // The server works out the prices, delivery and coupon itself; it returns the
+  // saved order with the final total.
+  const placeOrderInDB = async (paymentMethodStr: string, payment?: RazorpayResponse) => {
     const res = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
         items,
-        total_amount: grandTotal,
+        coupon_code: appliedCouponId ? appliedCode : null,
         payment_method: paymentMethodStr,
-        payment_id: paymentId || null,
+        ...(payment || {}),
       }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to place order");
-    return data;
-  };
-
-  // ── Record coupon usage ───────────────────────────────────────────────
-  const recordCouponUsage = async (orderId: string) => {
-    if (!appliedCouponId || couponDiscount <= 0) return;
-    try {
-      await fetch("/api/coupons/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          coupon_id: appliedCouponId,
-          user_phone: form.customer_phone || null,
-          user_email: form.customer_email || null,
-          user_name: form.customer_name || null,
-          order_id: orderId || null,
-          order_total: total + shipping,
-          discount_applied: couponDiscount,
-          final_amount: grandTotal,
-          products_json: items.map((item) => ({
-            name: item.title,
-            qty: item.quantity,
-            price: item.price,
-            variant: item.variant || null,
-          })),
-          items_count: items.reduce((sum, i) => sum + i.quantity, 0),
-        }),
-      });
-    } catch {
-      console.warn("Coupon usage record failed");
-    }
+    return data as { id: string; status: string; total_amount?: number };
   };
 
   // ── Load Razorpay script ──────────────────────────────────────────────
@@ -240,7 +195,12 @@ export default function CheckoutPage() {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: grandTotal }),
+        body: JSON.stringify({
+          items,
+          coupon_code: appliedCouponId ? appliedCode : null,
+          phone: form.customer_phone || undefined,
+          email: form.customer_email || undefined,
+        }),
       });
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.error || "Could not initiate payment");
@@ -270,11 +230,10 @@ export default function CheckoutPage() {
             const verifyData = await verifyRes.json();
             if (!verifyData.verified) throw new Error("Payment verification failed");
 
-            // Place order in DB
-            const data = await placeOrderInDB("online", verifyData.payment_id);
-            await recordCouponUsage(data.id);
+            // Place order in DB (the server checks the payment again)
+            const data = await placeOrderInDB("online", response);
             clearCart();
-            router.push(`/order-success?id=${data.id}&method=online&amount=${grandTotal}`);
+            router.push(`/order-success?id=${data.id}&method=online&amount=${data.total_amount ?? grandTotal}`);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : "Payment verified but order failed. Contact support.";
             setError(msg);
@@ -304,9 +263,8 @@ export default function CheckoutPage() {
     setError("");
     try {
       const data = await placeOrderInDB("cod");
-      await recordCouponUsage(data.id);
       clearCart();
-      router.push(`/order-success?id=${data.id}&method=cod&amount=${grandTotal}`);
+      router.push(`/order-success?id=${data.id}&method=cod&amount=${data.total_amount ?? grandTotal}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
       setError(msg);
