@@ -5,7 +5,7 @@ import { WishlistProvider } from "@/components/WishlistContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
-import { createClient } from "@supabase/supabase-js";
+import { publicSupabase } from "@/lib/supabasePublic";
 import Script from "next/script";
 import { Cormorant_Garamond, Poppins } from "next/font/google";
 
@@ -71,8 +71,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Fetch all layout-level settings server-side — eliminates Navbar/Footer/AnnouncementBar blink
-  const sb = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const sb = publicSupabase();
 
   const LAYOUT_KEYS = [
     // Logo

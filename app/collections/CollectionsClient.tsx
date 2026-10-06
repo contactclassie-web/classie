@@ -419,7 +419,7 @@ function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="p-4 pb-5">
-        <p className="text-[8.5px] tracking-[0.2em] uppercase text-gray-400 mb-1.5 capitalize">{product.category}</p>
+        <p className="text-[8.5px] tracking-[0.2em] uppercase text-gray-400 mb-1.5">{product.category === "heels" ? "Heels" : "Shoe Charms"}</p>
         <h3 className="font-serif text-[17px] font-light text-[#1a1a1a] leading-snug group-hover:text-[#3B5373] transition-colors line-clamp-2 mb-2.5">
           {product.title}
         </h3>

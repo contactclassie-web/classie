@@ -11,6 +11,7 @@ import { useWishlist } from "@/components/WishlistContext";
 import { useCart } from "@/components/CartContext";
 import { useRouter } from "next/navigation";
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import CloudVideo from "@/components/CloudVideo";
 
 interface Props {
   initialProducts: HeelProduct[];
@@ -69,11 +70,11 @@ function WhyChooseSection({ m, prefix, categoryLabel }: { m: HeelsSettings; pref
 
   if (!visible) return null;
   return (
-    <section className="py-16 px-6 text-center" style={{ background: "#ffffff" }}>
+    <section className="pt-12 pb-4 md:py-16 px-6 text-center" style={{ background: "#ffffff" }}>
       <h2 className="font-serif text-[2.4rem] font-light text-[#1a1a1a] mb-10">
         {cfg.heading} <em className="italic text-[#3B5373]">{cfg.headingItalic}</em>
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[860px] mx-auto mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[860px] mx-auto md:mb-10">
         {cards.map((item, i) => (
           <div key={i} className="bg-[#f5f5f5] px-8 py-10 text-center">
             <div className="text-4xl mb-4">{item.icon}</div>
@@ -162,7 +163,7 @@ function CategoryHero({
         </>
       )}
       {bgType === "video" && bgUrl && !isYouTube && (
-        <video src={bgUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover object-center opacity-90" />
+        <CloudVideo src={bgUrl} width={1280} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover object-center opacity-90" />
       )}
       {bgType === "video" && isYouTube && ytId && (
         <iframe src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&showinfo=0`}
@@ -274,7 +275,7 @@ function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; car
       </div>
 
       <div className="mt-3">
-        <p className="text-sm font-medium text-gray-800 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
+        <p className="text-[13px] md:text-sm font-medium text-gray-800 leading-snug line-clamp-2 min-h-[2.6em]" style={{ fontFamily: "'Poppins', sans-serif" }}>
           {product.title}
         </p>
         {product.heel_type && (

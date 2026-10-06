@@ -29,6 +29,10 @@ export async function POST(request: NextRequest) {
       revalidatePath(path);
     }
 
+    // Clear every cached page and database read under the root layout
+    // (logo, announcement bar, footer, homepage, gift sets…).
+    revalidatePath("/", "layout");
+
     // Also revalidate dynamic product + blog pages
     revalidatePath("/products/[slug]", "page");
     revalidatePath("/shop/[slug]", "page");

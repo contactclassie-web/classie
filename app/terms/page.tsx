@@ -12,7 +12,7 @@ export default function TermsPage() {
         {[
           ["Acceptance of Terms", "By accessing or purchasing from classie.co.in, you agree to be bound by these Terms of Service. If you do not agree, please do not use our website."],
           ["Products & Pricing", "All prices are in Indian Rupees (₹) and inclusive of applicable taxes. We reserve the right to change prices without prior notice. Product images may vary slightly from actual products."],
-          ["Orders & Payment", "Orders are confirmed only after successful placement. We currently offer Cash on Delivery (COD). Online payment options will be available in future."],
+          ["Orders & Payment", "Orders are confirmed only after successful placement. You can pay online (UPI, cards, net banking and wallets, processed securely by Razorpay) or choose Cash on Delivery (COD). Prices are charged as shown at checkout."],
           ["Cancellations", "Orders may be cancelled before they are shipped. Once shipped, the order cannot be cancelled. Contact us immediately at contact.classie@gmail.com if you need to cancel."],
           ["Intellectual Property", "All content on this website — including logos, product images, text, and design — is the property of Classie and protected by copyright law. Unauthorized use is prohibited."],
           ["Limitation of Liability", "Classie is not liable for any indirect, incidental, or consequential damages arising from the use of our products or website beyond the purchase price of the product in question."],

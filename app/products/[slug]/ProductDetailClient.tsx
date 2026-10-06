@@ -11,6 +11,7 @@ import { useCart } from "@/components/CartContext";
 import ProductCard from "@/components/ProductCard";
 import { supabase } from "@/lib/supabase";
 import { BundleOfferWithProduct, FeatureTile, ColorVariant, ProductReview } from "./page";
+import CloudVideo from "@/components/CloudVideo";
 
 // Cloudinary already serves the gallery as small WebP/AVIF at this width.
 const GALLERY_W = 1000;
@@ -44,12 +45,17 @@ const SPECS: Record<string, string[][]> = {
   ],
 };
 
-const FEATURE_CHECKS = [
-  "Genuine Leather Finish",
-  "COD Available",
-  "Comfortable for long wear",
-  "High Quality Product",
+// Shown on shoe clips / charms when Admin hasn't set tiles for them.
+const CLIP_FEATURE_TILES: FeatureTile[] = [
+  { icon: "✨", title: "One Clip, New Look", desc: "Change the look of any pair in seconds" },
+  { icon: "🔒", title: "Secure Hold", desc: "Firm clip that stays put — no glue, no damage" },
+  { icon: "👜", title: "Wear It Anywhere", desc: "Shoes, bags, hair, dupattas and belts" },
+  { icon: "🎁", title: "Sold as a Pair", desc: "Two matching clips, ready to gift" },
 ];
+
+// Default tick list when Admin hasn't set one for the product.
+const FEATURE_CHECKS_HEELS = ["Cushioned comfort insole", "COD Available", "Easy 7-day returns", "Size exchange available"];
+const FEATURE_CHECKS_CLIPS = ["Sold as a pair", "No glue, no damage", "COD Available", "Easy 7-day returns"];
 
 // ── Component ─────────────────────────────────────────────────────────────
 
@@ -62,6 +68,8 @@ export default function ProductDetailClient({
   bestsellerProducts = [],
   colorVariants = [],
   initialReviews = [],
+  clipFeatureTiles = [],
+  freeShippingFrom = 999,
 }: {
   product: Product;
   related: Product[];
@@ -71,7 +79,11 @@ export default function ProductDetailClient({
   bestsellerProducts?: Product[];
   colorVariants?: ColorVariant[];
   initialReviews?: ProductReview[];
+  clipFeatureTiles?: FeatureTile[];
+  freeShippingFrom?: number | null;
 }) {
+  const isHeel = product.category === "heels";
+  const needsSize = product.variants.type === "size" && product.variants.options.length > 0;
   const { addToCart } = useCart();
   const router = useRouter();
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
@@ -110,7 +122,11 @@ export default function ProductDetailClient({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [colorVariants]);
-  const [selectedVariant, setSelectedVariant] = useState(product.variants.options[0] ?? "");
+  // Sizes must be picked by the customer (no default) so nobody orders the
+  // wrong size by accident; colours start on the first option.
+  const [selectedVariant, setSelectedVariant] = useState(needsSize ? "" : (product.variants.options[0] ?? ""));
+  const [sizeError, setSizeError] = useState(false);
+  const sizeRef = useRef<HTMLDivElement>(null);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [addedBundle, setAddedBundle] = useState<Record<string, boolean>>({});
@@ -195,16 +211,28 @@ export default function ProductDetailClient({
     : (SPECS[product.category] ?? []);
   const featureChecks = (product.feature_checks && product.feature_checks.trim())
     ? product.feature_checks.split("|").map((s: string) => s.trim()).filter(Boolean)
-    : FEATURE_CHECKS;
-  const tiles = featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES;
+    : (isHeel ? FEATURE_CHECKS_HEELS : FEATURE_CHECKS_CLIPS);
+  const tiles = isHeel
+    ? (featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES)
+    : (clipFeatureTiles.length > 0 ? clipFeatureTiles : CLIP_FEATURE_TILES);
+
+  // Returns false (and points at the size buttons) when a size is still needed.
+  const sizeChosen = () => {
+    if (!needsSize || selectedVariant) return true;
+    setSizeError(true);
+    sizeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  };
 
   const doAdd = () => {
+    if (!sizeChosen()) return;
     addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   };
 
   const doBuyNow = () => {
+    if (!sizeChosen()) return;
     addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined });
     router.push("/checkout");
   };
@@ -245,8 +273,8 @@ export default function ProductDetailClient({
             {/* Main image carousel with left/right arrows */}
             <div className="relative rounded-[4px] overflow-hidden mb-3" style={{ aspectRatio: "1/1", background: "#F9F9F9" }}>
               {showVideo && product.video_url ? (
-                <video
-                  src={product.video_url}
+                <CloudVideo
+                  src={product.video_url} width={1000}
                   controls autoPlay
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{ background: "#000" }}
@@ -344,7 +372,7 @@ export default function ProductDetailClient({
           <div style={{ paddingTop: "8px" }}>
             {/* Category label */}
             <p style={{ fontSize: "10.5px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#888", marginBottom: "10px" }}>
-              {product.category === "heels" ? "Women's Heels" : "Accessories"}
+              {isHeel ? "Women's Heels" : "Shoe Clips & Charms"}
             </p>
 
             {/* Product name */}
@@ -354,7 +382,7 @@ export default function ProductDetailClient({
 
             {/* Subtitle / description short */}
             <p style={{ fontSize: "13px", color: "#888", marginBottom: "14px", fontStyle: "italic" }}>
-              {product.category === "heels" ? "Premium Heel Collection" : "Accessory Collection"}
+              {isHeel ? "Premium Heel Collection" : "Sold as a pair · Clip on in seconds"}
             </p>
 
             {/* Stars — dynamic from reviews */}
@@ -492,7 +520,7 @@ export default function ProductDetailClient({
 
             {/* Size selector */}
             {product.variants.type === "size" && (
-              <div style={{ marginBottom: "20px" }}>
+              <div ref={sizeRef} style={{ marginBottom: "20px" }}>
                 <div className="flex items-center justify-between" style={{ marginBottom: "10px" }}>
                   <p style={{ fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#1a1a1a" }}>
                     {product.variant_label || "Shoe Size (EU)"}
@@ -503,7 +531,9 @@ export default function ProductDetailClient({
                   {product.variants.options.map((sz) => (
                     <button
                       key={sz}
-                      onClick={() => setSelectedVariant(sz)}
+                      type="button"
+                      aria-pressed={selectedVariant === sz}
+                      onClick={() => { setSelectedVariant(sz); setSizeError(false); }}
                       style={{
                         width: "48px", height: "48px", borderRadius: "50%",
                         border: `1.5px solid ${selectedVariant === sz ? "#3B5373" : "#E8E3DD"}`,
@@ -517,6 +547,9 @@ export default function ProductDetailClient({
                     </button>
                   ))}
                 </div>
+                {sizeError && (
+                  <p role="alert" style={{ fontSize: "12px", color: "#c0392b", marginTop: "8px" }}>Please choose your size first.</p>
+                )}
               </div>
             )}
 
@@ -627,6 +660,7 @@ export default function ProductDetailClient({
                   {/* CTA bar — medium navy, not too dark */}
                   <button
                     onClick={() => {
+                      if (!sizeChosen()) return;
                       addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
                     }}
                     style={{ width: "100%", padding: "14px", background: "#4A6580", color: "#fff", border: "none", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer" }}
@@ -641,7 +675,7 @@ export default function ProductDetailClient({
             {bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
               <div style={{ border: "1px solid #E8E3DD", borderRadius: "12px", overflow: "hidden", marginTop: "8px" }}>
                 <div style={{ padding: "12px 18px", borderBottom: "1px solid #E8E3DD", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff" }}>
-                  <p style={{ fontFamily: "Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>Style it with Clip-ons</p>
+                  <p style={{ fontFamily: "Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>{isHeel ? "Style it with Clip-ons" : "Complete the look"}</p>
                   <span style={{ fontSize: "10px", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase" }}>Exclusive bundle savings</span>
                 </div>
                 <div style={{ background: "#fff", padding: "0 18px" }}>
@@ -714,7 +748,11 @@ export default function ProductDetailClient({
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14 mb-0">
         <div className="overflow-hidden" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: "1px solid #E8E3DD", borderRadius: "12px" }}>
           {[
-            { icon: "🚚", text: "Free Shipping", sub: "on orders ₹999+" },
+            freeShippingFrom === 0
+              ? { icon: "🚚", text: "Free Shipping", sub: "on all orders" }
+              : freeShippingFrom
+              ? { icon: "🚚", text: "Free Shipping", sub: `on orders ₹${freeShippingFrom.toLocaleString("en-IN")}+` }
+              : { icon: "🚚", text: "Fast Delivery", sub: "across India" },
             { icon: "↩", text: "Easy Returns",   sub: "7-day policy" },
             { icon: "💳", text: "COD Available", sub: "all orders" },
           ].map((item, i) => (
@@ -732,8 +770,12 @@ export default function ProductDetailClient({
         <div style={{ borderTop: "1px solid #E8E3DD" }}>
           {[
             { id: "description",  label: "Description",  content: product.description },
-            { id: "key-features", label: "Key Features",  content: product.key_features || `Signature handcrafted detailing. Classie Comfort cushioned insole. Premium material finish. Anti-slip durable sole. Refined quality construction.` },
-            { id: "other-info",   label: "Other Info",    content: product.other_info || `Clean with a soft, dry cloth only. Avoid contact with water, perfumes, or harsh chemicals. Store in a dust bag or box to preserve the finish.` },
+            { id: "key-features", label: "Key Features",  content: product.key_features || (isHeel
+              ? `Signature handcrafted detailing. Classie Comfort cushioned insole. Premium material finish. Anti-slip durable sole. Refined quality construction.`
+              : `Handcrafted detailing. Secure clip-on back — no glue, no damage. Sold as a matching pair. Works on shoes, bags, hair and dupattas.`) },
+            { id: "other-info",   label: "Other Info",    content: product.other_info || (isHeel
+              ? `Clean with a soft, dry cloth only. Avoid contact with water, perfumes, or harsh chemicals. Store in a dust bag or box to preserve the finish.`
+              : `Wipe gently with a soft, dry cloth. Keep away from water and perfume. Store in the pouch or box so the stones and fabric stay neat.`) },
           ].map((acc) => (
             <div key={acc.id} style={{ borderBottom: "1px solid #E8E3DD" }}>
               <button
@@ -1020,7 +1062,7 @@ export default function ProductDetailClient({
       >
         <div className="flex items-center gap-3 px-4 py-2.5">
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] text-[#6b6b6b] truncate">{product.title}{selectedVariant ? ` · ${selectedVariant}` : ""}</p>
+            <p className="text-[12px] text-[#6b6b6b] truncate">{product.title}{selectedVariant ? ` · ${selectedVariant}` : needsSize ? " · choose your size" : ""}</p>
             <p className="text-[15px] font-semibold text-[#1a1a1a]">
               ₹{product.price.toLocaleString("en-IN")}
               {discount > 0 && <s className="ml-1.5 text-[11px] font-normal text-[#9a9a9a]">₹{product.comparePrice.toLocaleString("en-IN")}</s>}

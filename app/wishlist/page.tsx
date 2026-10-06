@@ -2,6 +2,7 @@
 import { useWishlist } from "@/components/WishlistContext";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Heart, Trash2, ShoppingBag } from "lucide-react";
 import { getProductBySlugFromDB, Product } from "@/lib/products";
@@ -11,6 +12,7 @@ import { useCart } from "@/components/CartContext";
 export default function WishlistPage() {
   const { wishlist, toggle } = useWishlist();
   const { addToCart } = useCart();
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,7 +83,11 @@ export default function WishlistPage() {
                   {/* Actions */}
                   <div className="flex gap-2 mt-3">
                     <button
-                      onClick={() => { addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: 1 }); }}
+                      onClick={() => {
+                        // Heels (sizes) and multi-colour items: choose on the product page.
+                        if ((product.variants?.options?.length ?? 0) > 1) { router.push(`/products/${product.slug}`); return; }
+                        addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: 1, variant: product.variants?.options?.[0] || undefined });
+                      }}
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#3B5373] text-white text-[11px] tracking-widest uppercase hover:bg-[#2d3f4f] transition-colors"
                     >
                       <ShoppingBag className="w-3 h-3" /> Add to Cart

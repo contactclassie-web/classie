@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { publicSupabase } from "@/lib/supabasePublic";
 import { GIFT_SETS_KEY, mergeGiftSets, type GiftSetsConfig, type SetProduct } from "@/lib/giftSets";
 import { freeDeliveryThreshold } from "@/lib/homeConfig";
 
@@ -11,7 +11,7 @@ export interface GiftSetsData {
 
 // Server-side loader shared by /gift-sets and /gift-sets/[slug].
 export async function loadGiftSets(): Promise<GiftSetsData> {
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const sb = publicSupabase(30);
   const [settingsRes, productsRes] = await Promise.all([
     sb.from("site_settings").select("key,value").in("key", [GIFT_SETS_KEY, "shipping_tiers", "shipping_default_fee", "footer_whatsapp_url"]),
     sb.from("products").select("slug,title,price,image,category,variant_type,variants,active"),

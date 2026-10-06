@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
+import { publicSupabase } from "@/lib/supabasePublic";
 import CustomDesignForm from "@/components/custom/CustomDesignForm";
 import { SketchSvg } from "@/components/home/HomeSections";
 import { CUSTOM_PAGE_KEY, mergeCustomPage, splitList } from "@/lib/customDesigns";
@@ -9,7 +9,7 @@ import { optimizeCloudinary } from "@/lib/cloudinary";
 export const dynamic = "force-dynamic";
 
 async function load() {
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const sb = publicSupabase(30);
   const { data } = await sb.from("site_settings").select("key,value").in("key", [CUSTOM_PAGE_KEY, "footer_whatsapp_url"]);
   const cfg: Record<string, string> = {};
   (data ?? []).forEach((r: { key: string; value: string }) => { cfg[r.key] = r.value; });

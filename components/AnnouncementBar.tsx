@@ -72,10 +72,10 @@ export default function AnnouncementBar({ initialSettings }: AnnProps) {
     const items = [...msgs, ...msgs]; // duplicate for seamless loop
     return (
       <div style={{ ...BAR_STYLE, position: "relative" }}>
-        <style>{`
+        <style dangerouslySetInnerHTML={{ __html: `
           @keyframes marquee2 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
           .ann-ticker2 { display: inline-flex; white-space: nowrap; animation: marquee2 ${dur} linear infinite; }
-        `}</style>
+        ` }} />
         <span className="ann-ticker2">
           {items.map((msg, i) => (
             <span key={i} style={{ display: "inline-block" }}>
@@ -91,10 +91,10 @@ export default function AnnouncementBar({ initialSettings }: AnnProps) {
   // ROTATE mode — blink/fade single message
   return (
     <div style={BAR_STYLE}>
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fadeMsg { 0%,10%{opacity:0;transform:translateY(4px)} 20%,80%{opacity:1;transform:translateY(0)} 90%,100%{opacity:0;transform:translateY(-4px)} }
         .ann-msg { display:inline-block; animation: fadeMsg ${Math.max(3, parseInt(speed) / Math.max(1, msgs.length))}s ease-in-out; }
-      `}</style>
+      ` }} />
       <p key={idx} className="ann-msg">{highlightText(msgs[idx] ?? DEFAULT_TEXT)}</p>
     </div>
   );
