@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import StyleIdeasHero from "./StyleIdeasHero";
 import StyleIdeasLooksClient from "./StyleIdeasLooksClient";
 import ReelCard from "./ReelCard";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 type FeaturedLookData = {
   label: string; heading: string; desc: string;
@@ -60,7 +61,7 @@ function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
                     <div className="w-12 h-12 rounded-full bg-[#f7f7f7] overflow-hidden flex-shrink-0 border border-[#ece9e3]">
                       {p.image
                         // eslint-disable-next-line @next/next/no-img-element
-                        ? <img src={p.image} alt={p.title} className="w-full h-full object-cover object-top"/>
+                        ? <img src={optimizeCloudinary(p.image, 500)} alt={p.title} className="w-full h-full object-cover object-top"/>
                         : null}
                     </div>
                     <div className="flex-1">
@@ -91,10 +92,10 @@ function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
           {/* Right — Image/Video */}
           <div className="relative aspect-[4/5] overflow-hidden" style={{ background: "#3B5373" }}>
             {f.image && f.mediaType === "video"
-              ? <video src={f.image} autoPlay muted loop playsInline className="w-full h-full object-cover object-center"/>
+              ? <video src={optimizeCloudinary(f.image, 800)} autoPlay muted loop playsInline className="w-full h-full object-cover object-center"/>
               : f.image
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={f.image} alt={f.heading} className="w-full h-full object-cover object-center"/>
+              ? <img src={optimizeCloudinary(f.image, 800)} alt={f.heading} className="w-full h-full object-cover object-center"/>
               : <div className="w-full h-full flex items-center justify-center text-white text-xs tracking-widest uppercase opacity-30">Featured Look</div>
             }
             {f.label && (
@@ -112,7 +113,8 @@ function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Style Ideas | Classie",
+  title: "Style Ideas — How to Style Shoe Clips & Heels",
+  alternates: { canonical: "/style-ideas" },
   description: "Outfit inspiration and styling tips from Classie — heels, clip-ons and more.",
 };
 

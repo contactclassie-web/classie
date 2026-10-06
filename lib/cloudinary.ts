@@ -4,7 +4,7 @@
  * q_auto → auto-quality compression without visible loss
  */
 export function optimizeCloudinary(url: string, width?: number): string {
-  if (!url || !url.includes("res.cloudinary.com")) return url;
+  if (!url || !url.includes("res.cloudinary.com") || url.includes("/video/upload/")) return url;
   // Already has transformations — skip
   if (url.includes("f_auto")) return url;
   const transforms = width ? `f_auto,q_auto,w_${width}` : "f_auto,q_auto";

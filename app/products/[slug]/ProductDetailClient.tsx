@@ -12,6 +12,9 @@ import ProductCard from "@/components/ProductCard";
 import { supabase } from "@/lib/supabase";
 import { BundleOfferWithProduct, FeatureTile, ColorVariant, ProductReview } from "./page";
 
+// Cloudinary already serves the gallery as small WebP/AVIF at this width.
+const GALLERY_W = 1000;
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
 const GOLD = "#C9A84C";
@@ -80,12 +83,14 @@ export default function ProductDetailClient({
     });
   }, [colorVariants, product.slug, router]);
 
-  // Preload all gallery images for instant switching
+  // Preload the gallery (same small WebP size the main photo uses) for instant
+  // switching — after the page has loaded, so it doesn't slow the first view.
   useEffect(() => {
-    const imgs = [product.image, ...(product.images ?? [])].filter(Boolean).slice(0, 10);
-    imgs.forEach(src => {
-      if (src) { const img = new window.Image(); img.src = src; }
-    });
+    const imgs = [product.image, ...(product.images ?? [])].filter(Boolean).slice(0, 8);
+    const run = () => imgs.forEach(src => { const img = new window.Image(); img.src = optimizeCloudinary(src, GALLERY_W); });
+    if (document.readyState === "complete") { const t = setTimeout(run, 800); return () => clearTimeout(t); }
+    window.addEventListener("load", run, { once: true });
+    return () => window.removeEventListener("load", run);
   }, [product.image, product.images]);
 
   // Initialize activeImages from first same-product color variant (shoe-charms)
@@ -249,12 +254,13 @@ export default function ProductDetailClient({
               ) : (
                 <Image
                   key={currentIndex}
-                  src={optimizeCloudinary(mainImage, 900)}
+                  src={optimizeCloudinary(mainImage, GALLERY_W)}
                   alt={product.title}
                   fill
                   className="object-contain object-center"
                   sizes="(max-width: 768px) 100vw, 52vw"
                   priority
+                  unoptimized
                 />
               )}
               {discount > 0 && !showVideo && (
@@ -400,7 +406,7 @@ export default function ProductDetailClient({
                         transition: "box-shadow 0.15s",
                       }}>
                         {v.image ? (
-                          <img src={v.image} alt={v.color_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          <img src={optimizeCloudinary(v.image, 120)} alt={v.color_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         ) : (
                           <div style={{ width: "100%", height: "100%", background: v.color_hex }} />
                         )}
@@ -650,7 +656,7 @@ export default function ProductDetailClient({
                     <div key={offer.id} className="flex items-center gap-3" style={{ padding: "14px 0", borderBottom: "1px solid #F0EDEA" }}>
                       {/* Thumbnail */}
                       <div className="rounded-[8px] overflow-hidden flex-shrink-0" style={{ width: "64px", height: "64px", background: "#EDE8E1" }}>
-                        <img src={offer.product.image} alt={offer.product.title} style={{ width: "64px", height: "64px", objectFit: "cover", display: "block" }} />
+                        <img src={optimizeCloudinary(offer.product.image, 160)} alt={offer.product.title} style={{ width: "64px", height: "64px", objectFit: "cover", display: "block" }} />
                       </div>
                       {/* Info */}
                       <div className="flex-1 min-w-0">

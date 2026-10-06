@@ -12,10 +12,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: base, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
     { url: `${base}/shop/heels`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/shop/clips`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/shop/shoe-charms`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/collections`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/gift-sets`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/custom-designs`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
+    { url: `${base}/style-ideas`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 },
+    { url: `${base}/hot-deals`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.5 },
     { url: `${base}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${base}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
@@ -64,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq("active", true);
 
     const categoryPages: MetadataRoute.Sitemap = (categories || [])
-      .filter((c) => !["heels", "clips", "shoe-charms"].includes(c.slug))
+      .filter((c) => !["heels", "clips", "shoe-charms", "bow"].includes(c.slug))
       .map((c) => ({
         url: `${base}/shop/${c.slug}`,
         lastModified: new Date(),

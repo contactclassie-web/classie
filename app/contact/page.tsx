@@ -3,11 +3,13 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import ContactForm from "./ContactForm";
 import FaqAccordion from "./FaqAccordion";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Contact Us — CLASSIE",
+  title: "Contact Us",
+  alternates: { canonical: "/contact" },
   description: "Get in touch with Classie. We're here to help with orders, sizing, returns and more.",
 };
 
@@ -59,7 +61,7 @@ export default async function ContactPage() {
         {/* Left — image or navy */}
         <div className="w-full md:w-[40%] relative flex items-center justify-center" style={{ minHeight: "200px" }}>
           {heroImg ? (
-            <div className="absolute inset-0" style={{ backgroundImage: `url(${heroImg})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+            <div className="absolute inset-0" style={{ backgroundImage: `url(${optimizeCloudinary(heroImg, 1600)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center" style={{ background: "#3B5373" }}>
               <p className="font-serif text-4xl md:text-5xl text-white italic text-center px-8 leading-tight">

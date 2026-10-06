@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import CategoryLinks from "./CategoryLinks";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 interface Occasion {
   title: string;
@@ -44,7 +45,7 @@ function OccasionFilterCard({
       {occ.image ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={occ.image}
+          src={optimizeCloudinary(occ.image, 700)}
           alt={occ.title}
           className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-75"
           style={{ objectPosition: occ.image_position ?? "50% 50%" }}

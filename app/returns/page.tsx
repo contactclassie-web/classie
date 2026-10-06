@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 3600;
-export const metadata: Metadata = { title: "Returns & Exchanges – Classie" };
+export const metadata: Metadata = { title: "Returns & Exchanges", alternates: { canonical: "/returns" } };
 
 export default async function ReturnsPage() {
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);

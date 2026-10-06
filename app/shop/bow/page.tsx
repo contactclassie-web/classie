@@ -9,6 +9,7 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const free = await loadFreeShippingAmount();
   return {
+    alternates: { canonical: "/shop/clips" },
   title: "Bow Clips for Shoes — Satin, Jute & Pearl Bow Shoe Clips",
   description: `Shop CLASSIE bow clips for shoes — handcrafted satin, jute and pearl bow shoe clips for women. Perfect for heels, flats and sandals. Free shipping above ₹${free}.`,
   };

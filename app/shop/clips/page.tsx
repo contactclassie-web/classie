@@ -9,7 +9,8 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const free = await loadFreeShippingAmount();
   return {
-  title: "Buy Shoe Clips Online India — Rhinestone, Crystal & Bow Clips for Women | CLASSIE",
+    alternates: { canonical: "/shop/clips" },
+  title: "Buy Shoe Clips Online India — Rhinestone, Crystal & Bow Clips for Women",
   description: `Shop CLASSIE shoe clips online in India — rhinestone shoe clips, crystal clips, bow clips, floral clips & more. Instantly transform any pair of heels or flats. Free shipping above ₹${free}. COD available.`,
   };
 }

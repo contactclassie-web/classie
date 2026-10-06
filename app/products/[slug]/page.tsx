@@ -78,11 +78,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isCharm = !isHeel; // accessories / shoe-charms
 
   // SEO-optimized title by category (layout adds "| CLASSIE" via template)
+  const cleanTitle = product.title.trim().replace(/\s+/g, " ").replace(/\b([a-z])/g, (c) => c.toUpperCase());
   const seoTitle = isHeel
-    ? `Buy ${product.title} for Women India`
+    ? `${cleanTitle}${/heel|pump|sandal/i.test(cleanTitle) ? "" : " Heels"} for Women — Buy Online India`
     : isCharm
-    ? `${product.title} — Shoe Clip Accessories`
-    : product.title;
+    ? `${cleanTitle}${/clip|charm|anklet/i.test(cleanTitle) ? "" : " Shoe Clip"} — Buy Online India`
+    : cleanTitle;
 
   // Clean 155-char description
   const rawDesc = (product.description || "").replace(/\n/g, " ").trim();

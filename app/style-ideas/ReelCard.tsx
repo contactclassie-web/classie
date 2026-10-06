@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 type CardData = { title: string; tag: string; media_url: string; media_type: "image" | "video" };
 
@@ -51,7 +52,7 @@ export default function ReelCard({ card, cardH, cardW, aspect, radius }: {
         </>
       ) : card.media_url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={card.media_url} alt={card.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+        <img src={optimizeCloudinary(card.media_url, 700)} alt={card.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
           <span className="text-white/20 text-4xl">▶</span>

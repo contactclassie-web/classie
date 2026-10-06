@@ -9,7 +9,8 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const free = await loadFreeShippingAmount();
   return {
-  title: "Buy Women's Heels Online India — Block, Slingback & Sculpted Heels | CLASSIE",
+    alternates: { canonical: "/shop/heels" },
+  title: "Buy Women's Heels Online India — Block, Slingback & Sculpted Heels",
   description:
     `Shop CLASSIE women's heels online in India — block heels, slingback heels, sculpted heels, slim heels & more. Premium quality, free shipping above ₹${free}, COD available. Buy heels for wedding, office, party & everyday wear.`,
   };
@@ -26,6 +27,12 @@ export default async function HeelsPage() {
     sb.from("site_settings").select("value").eq("key", "heels_filter_heel_types").maybeSingle(),
     sb.from("collection_products").select("collection_id, product_slug"),
   ]);
+
+  const heelPrices = products.map((p) => Number(p.price)).filter((n) => n > 0);
+  const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+  const priceRange = heelPrices.length
+    ? `between ${inr(Math.min(...heelPrices))} and ${inr(Math.max(...heelPrices))}`
+    : "from ₹1,499";
 
   const initialOccasions = (collectionsData.data ?? []).map((c) => ({
     title: c.title,
@@ -91,7 +98,7 @@ export default async function HeelsPage() {
           { "@type": "Question", "name": "Where can I buy women's heels online in India?", "acceptedAnswer": { "@type": "Answer", "text": "You can buy premium women's heels online at CLASSIE (classie.co.in). We offer block heels, slingback heels, sculpted heels and more with free shipping above ₹" + free + " and COD across India." } },
           { "@type": "Question", "name": "Which heels are best for Indian weddings?", "acceptedAnswer": { "@type": "Answer", "text": "For Indian weddings, block heels and slingback heels work best with sarees and lehengas. Gold, cream, and maroon heels are the most popular choices for bridal and wedding guest outfits." } },
           { "@type": "Question", "name": "Are block heels comfortable for long hours?", "acceptedAnswer": { "@type": "Answer", "text": "Yes! Block heels distribute weight evenly and are much more comfortable than stilettos. CLASSIE block heels are designed with premium cushioning for all-day wear at office or events." } },
-          { "@type": "Question", "name": "What is the price range of CLASSIE heels?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE women's heels are priced between ₹1,499 to ₹3,999. Free shipping is available on orders above ₹" + free + " with cash on delivery across India." } },
+          { "@type": "Question", "name": "What is the price range of CLASSIE heels?", "acceptedAnswer": { "@type": "Answer", "text": "CLASSIE women's heels are priced " + priceRange + ". Free shipping is available on orders above ₹" + free + " with cash on delivery across India." } },
         ]
       }) }} />
     </>

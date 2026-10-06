@@ -10,6 +10,7 @@ import OccasionFilterSection from "./OccasionFilterSection";
 import { useWishlist } from "@/components/WishlistContext";
 import { useCart } from "@/components/CartContext";
 import { useRouter } from "next/navigation";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 // ── Why Choose Section (reads settings from DB) ───────────────────────
 const WHY_DEFAULTS = {
@@ -105,12 +106,12 @@ function HeelsHero({ productCount, heelTypeCount, m }: { productCount: number; h
     <section className="relative overflow-hidden" style={{ background: "#F5F5F5" }}>
       {/* Background */}
       {bgType === "image" && bgUrl && (
-        <img src={bgUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-100" />
+        <img src={optimizeCloudinary(bgUrl, 1600)} alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-100" />
       )}
       {bgType === "slider" && slides.length > 0 && (
         <>
           {slides.map((s, i) => (
-            <img key={s} src={s} alt="" className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700"
+            <img key={s} src={optimizeCloudinary(s, 1600)} alt="" className="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700"
               style={{ opacity: i === slideIdx ? 0.9 : 0 }} />
           ))}
           {slides.length > 1 && (
