@@ -68,7 +68,7 @@ export default async function ClipsPage() {
       />
 
       {/* SEO Content Block */}
-      <section className="max-w-4xl mx-auto px-6 py-16 text-center">
+      <section className="max-w-4xl mx-auto px-6 pt-8 pb-14 md:py-16 text-center">
         <h2 className="text-2xl font-serif font-light text-[#1a1a1a] mb-6">Buy Shoe Clips Online in India</h2>
         <p className="text-sm text-gray-600 leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
           CLASSIE is India&apos;s favourite destination to <strong>buy shoe clips online</strong>. Our handcrafted <strong>rhinestone shoe clips</strong>, <strong>bow clips for shoes</strong>, <strong>crystal clips</strong>, and <strong>floral shoe clips</strong> are designed to transform any pair of heels, flats, or sandals instantly — no glue, no damage, no effort.

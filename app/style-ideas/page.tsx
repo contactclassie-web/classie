@@ -5,6 +5,7 @@ import StyleIdeasHero from "./StyleIdeasHero";
 import StyleIdeasLooksClient from "./StyleIdeasLooksClient";
 import ReelCard from "./ReelCard";
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import CloudVideo from "@/components/CloudVideo";
 
 type FeaturedLookData = {
   label: string; heading: string; desc: string;
@@ -92,7 +93,7 @@ function FeaturedLook({ featured: f }: { featured: FeaturedLookData }) {
           {/* Right — Image/Video */}
           <div className="relative aspect-[4/5] overflow-hidden" style={{ background: "#3B5373" }}>
             {f.image && f.mediaType === "video"
-              ? <video src={optimizeCloudinary(f.image, 800)} autoPlay muted loop playsInline className="w-full h-full object-cover object-center"/>
+              ? <CloudVideo src={f.image} width={720} autoPlay muted loop playsInline className="w-full h-full object-cover object-center"/>
               : f.image
               // eslint-disable-next-line @next/next/no-img-element
               ? <img src={optimizeCloudinary(f.image, 800)} alt={f.heading} className="w-full h-full object-cover object-center"/>

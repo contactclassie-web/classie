@@ -67,7 +67,7 @@ export default function FeaturesBar() {
           </div>
         ))}
       </div>
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes featuresScroll {
           0%   { transform: translateX(0); }
           100% { transform: translateX(-33.33%); }
@@ -75,7 +75,7 @@ export default function FeaturesBar() {
         .features-marquee:hover {
           animation-play-state: paused;
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

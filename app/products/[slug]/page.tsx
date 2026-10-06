@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { products, getProductBySlugFromDB, getProductsFromDB, getTabProductsFromDB, Product } from "@/lib/products";
 import ProductDetailClient from "./ProductDetailClient";
 import { loadShippingRules } from "@/lib/shippingServer";
-import { shippingFee } from "@/lib/shipping";
+import { shippingFee, freeShippingFrom } from "@/lib/shipping";
 export const revalidate = 300; // ISR: rebuild every 5 min, admin revalidation busts instantly
 export const dynamicParams = true; // allow new DB products not in generateStaticParams
 
@@ -141,7 +141,7 @@ export default async function ProductPage({ params }: Props) {
   ] = await Promise.all([
     getProductsFromDB({ active: true }),
     supabase.from("product_bundle_offers").select("*").eq("main_product_slug", slug).eq("active", true).order("sort_order"),
-    supabase.from("site_settings").select("value").eq("key", "feature_tiles").maybeSingle(),
+    supabase.from("site_settings").select("value").eq("key", product.category === "heels" ? "feature_tiles" : "feature_tiles_clips").maybeSingle(),
     supabase.from("product_color_variants").select("*").eq("product_slug", slug).limit(1),
     getTabProductsFromDB("latest").catch(() => [] as Product[]),
     getTabProductsFromDB("bestseller").catch(() => [] as Product[]),
@@ -293,7 +293,9 @@ export default async function ProductPage({ params }: Props) {
         product={product}
         related={related}
         bundleOffers={bundleOffers}
-        featureTiles={featureTiles}
+        featureTiles={product.category === "heels" ? featureTiles : []}
+        clipFeatureTiles={product.category === "heels" ? [] : featureTiles}
+        freeShippingFrom={freeShippingFrom(shippingRules)}
         latestProducts={latestProducts}
         bestsellerProducts={bestsellerProducts}
         colorVariants={colorVariants}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import CloudVideo from "@/components/CloudVideo";
 
 function optimizeHeroImage(url: string): string {
   if (!url || !url.includes("res.cloudinary.com")) return url;
@@ -63,9 +64,9 @@ export default function HeroImageSlider({
     <>
       {items.map((src, i) =>
         isVideo(src) ? (
-          <video
+          <CloudVideo
             key={i}
-            src={src}
+            src={src} width={1280}
             autoPlay
             muted
             loop

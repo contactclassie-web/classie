@@ -165,9 +165,9 @@ export default function HotDealsPage() {
       {/* ── Hero ── */}
       <section style={{ background: "#f7f7f7" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2" style={{ minHeight: "480px" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 md:min-h-[480px]">
             {/* Left */}
-            <div className="flex flex-col justify-center py-16 md:py-20 pr-0 md:pr-16">
+            <div className="flex flex-col justify-center py-10 md:py-20 pr-0 md:pr-16">
               {heroEyebrow && (
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-8 h-px" style={{ background: "#3B5373" }} />
@@ -202,7 +202,7 @@ export default function HotDealsPage() {
 
           {!ready ? (
             /* Skeleton cards while loading */
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols || 1}, 1fr)`, gap: "28px" }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
               {[1, 2].map(i => (
                 <div key={i} className="overflow-hidden animate-pulse" style={{ border: "1px solid #ece9e3", background: "#fff" }}>
                   <div style={{ height: "280px", background: "#f0f0f0" }} />
@@ -219,8 +219,10 @@ export default function HotDealsPage() {
               <p className="text-sm" style={{ color: "#888" }}>No deals right now. Check back soon!</p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: `${gap}px` }}
-              className={`[&]:grid-cols-${mobileCols} md:[&]:grid-cols-${cols}`}>
+            // Columns from Admin (phone / desktop); a phone shows at most 2.
+            <div
+              style={{ "--hd-cols": cols, "--hd-mcols": Math.min(mobileCols, 2), gap: `${gap}px` } as React.CSSProperties}
+              className="grid grid-cols-[repeat(var(--hd-mcols),minmax(0,1fr))] md:grid-cols-[repeat(var(--hd-cols),minmax(0,1fr))]">
               {coupons.map(c => <DealCard key={c.id} coupon={c} cardH={cardH} />)}
             </div>
           )}

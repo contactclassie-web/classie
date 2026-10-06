@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import CloudVideo from "@/components/CloudVideo";
 
 type CardData = { title: string; tag: string; media_url: string; media_type: "image" | "video" };
 
@@ -30,9 +31,10 @@ export default function ReelCard({ card, cardH, cardW, aspect, radius }: {
     >
       {card.media_type === "video" && card.media_url ? (
         <>
-          <video
+          <CloudVideo
             ref={videoRef}
-            src={card.media_url}
+            src={card.media_url} width={720}
+            preload="metadata"
             muted
             loop
             playsInline

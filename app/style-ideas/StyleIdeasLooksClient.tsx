@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import CloudVideo from "@/components/CloudVideo";
 
 interface LookCard {
   id: string;
@@ -104,8 +105,8 @@ function LookCard({ look, showTag = true, aspect = "3/4", radius = "rounded-none
       <div className={`relative overflow-hidden bg-[#f5f5f5] ${radius}`}
         style={{ aspectRatio: cardH > 0 ? undefined : aspect, height: cardH > 0 ? `${cardH}px` : undefined }}>
         {(look.media_type === "video" || look.image_url?.match(/\.(mp4|webm|mov)(\?|$)/i) || look.image_url?.includes("/video/")) ? (
-          <video
-            src={optimizeCloudinary(look.image_url, 800)}
+          <CloudVideo
+            src={look.image_url} width={720}
             autoPlay muted loop playsInline
             className="w-full h-full object-cover object-center"
           />

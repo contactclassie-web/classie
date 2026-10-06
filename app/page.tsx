@@ -21,6 +21,7 @@ import {
   getTabProductsFromDB,
 } from "@/lib/products";
 import { HOME_CONFIG_KEY, mergeHomeConfig, freeDeliveryThreshold, type SectionId } from "@/lib/homeConfig";
+import { publicSupabase } from "@/lib/supabasePublic";
 
 export const metadata: Metadata = {
   title: "CLASSIE — Shoe Clips, Shoe Charms & Heels Online India",
@@ -77,8 +78,7 @@ const NL_KEYS = ["nl_eyebrow","nl_heading","nl_heading_italic","nl_subtext","nl_
 const HOME_KEYS = [HOME_CONFIG_KEY, "shipping_tiers", "shipping_default_fee", "footer_whatsapp_url"];
 
 export default async function HomePage() {
-  const { createClient } = await import("@supabase/supabase-js");
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const sb = publicSupabase();
 
   const [allProducts, settingsRes, heroRes, colorRes, igRes] = await Promise.all([
     getProductsFromDB({ active: true }),

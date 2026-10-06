@@ -1,5 +1,6 @@
 // ── Pure Server Component — no "use client", no hydration flash ──────────────
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import CloudVideo from "@/components/CloudVideo";
 
 interface HeroConfig {
   bgType: "none" | "image" | "video" | "slider";
@@ -75,8 +76,8 @@ export default function StyleIdeasHero({ hero }: { hero: HeroConfig }) {
   if (hero.bgType === "video" && hero.bgUrl) {
     return (
       <div className="relative w-full overflow-hidden" style={{ minHeight: "60vh", height: "70vh" }}>
-        <video
-          src={optimizeCloudinary(hero.bgUrl, 1600)}
+        <CloudVideo
+          src={hero.bgUrl} width={1280}
           autoPlay muted loop playsInline
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
@@ -114,12 +115,12 @@ export default function StyleIdeasHero({ hero }: { hero: HeroConfig }) {
     return (
       <div className="relative w-full overflow-hidden" style={{ minHeight: "60vh", height: "70vh" }}>
         {/* CSS keyframe per slide */}
-        <style>{`
+        <style dangerouslySetInnerHTML={{ __html: `
           @keyframes si-fade {
             0%, ${(100 / count).toFixed(1)}% { opacity: 1; }
             ${((100 / count) + 5).toFixed(1)}%, 100% { opacity: 0; }
           }
-        `}</style>
+        ` }} />
 
         {hero.slides.map((src, i) => (
           // eslint-disable-next-line @next/next/no-img-element

@@ -397,7 +397,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
       </div>
 
       {/* Hover styles */}
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .blog-card:hover .blog-card-title { color: #3B5373; }
         .blog-card:hover .blog-card-img { transform: scale(1.04); }
         .blog-card-img { transition: transform 0.45s ease; }
@@ -409,7 +409,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
         @media (max-width: 560px) {
           .blog-cards-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

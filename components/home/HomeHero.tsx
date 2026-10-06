@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { optimizeCloudinary } from "@/lib/cloudinary";
 import type { HomeConfig, HeroSlide } from "@/lib/homeConfig";
+import CloudVideo from "@/components/CloudVideo";
 
 interface Props {
   hero: HomeConfig["hero"];
@@ -112,9 +113,9 @@ export default function HomeHero({ hero, fallbackImages }: Props) {
                 return s.link ? <Link href={s.link} tabIndex={i === idx ? 0 : -1}>{img}</Link> : img;
               })()}
               {s.type === "video" && (
-                <video
+                <CloudVideo
                   ref={(el) => { videoRefs.current[i] = el; }}
-                  src={s.url}
+                  src={s.url} width={1280}
                   poster={s.poster ? optimizeCloudinary(s.poster, 1400) : undefined}
                   className="w-full h-full object-cover"
                   muted

@@ -440,7 +440,7 @@ export default async function BlogPostPage({
         </div>
       )}
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .blog-prose h2 {
           font-family: 'Cormorant Garamond', serif;
           font-size: 1.8rem;
@@ -469,7 +469,7 @@ export default async function BlogPostPage({
         @media (max-width: 560px) {
           .more-cards-grid { grid-template-columns: 1fr !important; }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }
