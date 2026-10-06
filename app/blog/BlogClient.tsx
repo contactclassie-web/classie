@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 interface BlogPost {
   id: string;
@@ -39,6 +40,16 @@ export default function BlogClient({ posts, categories: propCategories }: { post
     <div style={{ fontFamily: "'Poppins', sans-serif", background: "#fff", color: "#1a1a1a" }}>
       {/* ── Main Content ── */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 40px" }}>
+
+        {/* ── Page heading ── */}
+        <header style={{ paddingTop: "44px", textAlign: "center" }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2.2rem, 5vw, 3.4rem)", fontWeight: 400, lineHeight: 1.1, color: "#1a1a1a" }}>
+            The CLASSIE <em style={{ color: "#3B5373" }}>Journal</em>
+          </h1>
+          <p style={{ fontSize: "0.85rem", color: "#777", marginTop: "10px" }}>
+            Styling ideas for shoe clips, shoe charms and heels
+          </p>
+        </header>
 
         {/* ── Featured Post ── */}
         {featured && (
@@ -155,7 +166,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                 {featured.cover_image ? (
                   <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", aspectRatio: "16/10" }}>
                     <Image
-                      src={featured.cover_image}
+                      src={optimizeCloudinary(featured.cover_image, 1200)}
                       alt={featured.title}
                       fill
                       className="object-cover"
@@ -310,7 +321,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                   >
                     {post.cover_image ? (
                       <Image
-                        src={post.cover_image}
+                        src={optimizeCloudinary(post.cover_image, 700)}
                         alt={post.title}
                         fill
                         className="object-cover blog-card-img"

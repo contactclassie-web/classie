@@ -37,6 +37,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.classie.co.in"),
   title: {
     default: "CLASSIE — Women's Heels, Shoe Clips & Accessories India",
     template: "%s | CLASSIE",

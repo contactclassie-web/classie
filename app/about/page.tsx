@@ -1,11 +1,12 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "About CLASSIE — Women's Heels & Shoe Clips Brand India",
+  title: { absolute: "About CLASSIE — Women's Heels & Shoe Clips Brand India" },
   description: "CLASSIE is India's premium women's heels and shoe clips brand — handcrafted block heels, slingback heels, rhinestone shoe clips and charms. Made for the modern Indian woman. Free shipping. COD available.",
   alternates: { canonical: "https://www.classie.co.in/about" },
   keywords: ["classie brand", "women's heels india brand", "shoe clips india brand", "classie founder", "classie story", "handcrafted heels india"],
@@ -169,7 +170,7 @@ export default async function AboutPage() {
         {bannerImg ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={bannerImg}
+            src={optimizeCloudinary(bannerImg, 1600)}
             alt="Classie banner"
             className="w-full h-auto block"
           />
@@ -197,7 +198,7 @@ export default async function AboutPage() {
           <div className="rounded-2xl overflow-hidden bg-[#f9f9f9]">
             {s1Img ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={s1Img} alt={s1Heading} className="w-full h-auto block" />
+              <img src={optimizeCloudinary(s1Img, 900)} alt={s1Heading} className="w-full h-auto block" />
             ) : (
               <StoryImgPlaceholder />
             )}
@@ -214,7 +215,7 @@ export default async function AboutPage() {
           <div className="rounded-2xl overflow-hidden order-2 md:order-1 bg-[#f9f9f9]">
             {s2Img ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={s2Img} alt={s2Heading} className="w-full h-auto block" />
+              <img src={optimizeCloudinary(s2Img, 900)} alt={s2Heading} className="w-full h-auto block" />
             ) : (
               <StoryImgPlaceholder />
             )}
@@ -251,7 +252,7 @@ export default async function AboutPage() {
           <div className="rounded-2xl overflow-hidden bg-[#f9f9f9]">
             {s3Img ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={s3Img} alt={s3Heading} className="w-full h-auto block" />
+              <img src={optimizeCloudinary(s3Img, 900)} alt={s3Heading} className="w-full h-auto block" />
             ) : (
               <StoryImgPlaceholder />
             )}

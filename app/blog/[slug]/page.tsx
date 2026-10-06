@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 export const revalidate = 3600;
 
@@ -53,6 +54,24 @@ async function getPost(slug: string): Promise<BlogPost | null> {
   }
 }
 
+// Post HTML from Admin: serve Cloudinary photos small (WebP), and turn links to
+// posts that are switched off / deleted into plain text so they don't 404.
+async function prepareContent(html: string): Promise<string> {
+  let out = html.replace(
+    /(https:\/\/res\.cloudinary\.com\/[^"'\s)]+?\/image\/upload\/)(?!f_auto)/g,
+    "$1f_auto,q_auto,w_1200/",
+  );
+  try {
+    const { data } = await getSupabase().from("blog_posts").select("slug").eq("active", true);
+    const live = new Set((data ?? []).map((p: { slug: string }) => p.slug));
+    out = out.replace(
+      /<a\b[^>]*href=["'](?:https?:\/\/(?:www\.)?classie\.co\.in)?\/blog\/([^"'#?\/]+)[^"']*["'][^>]*>([\s\S]*?)<\/a>/gi,
+      (m, slug: string, text: string) => (live.has(slug) ? m : text),
+    );
+  } catch { /* keep links as they are */ }
+  return out;
+}
+
 async function getMorePosts(category: string, excludeId: string): Promise<BlogPost[]> {
   try {
     const sb = getSupabase();
@@ -97,7 +116,7 @@ export async function generateMetadata({
   if (!post) return { title: "Post Not Found" };
   const canonicalUrl = `https://www.classie.co.in/blog/${post.slug}`;
   return {
-    title: `${post.title} | CLASSIE`,
+    title: post.title,
     description: post.excerpt || undefined,
     alternates: { canonical: canonicalUrl },
     openGraph: {
@@ -126,7 +145,10 @@ export default async function BlogPostPage({
   const post = await getPost(params.slug);
   if (!post) notFound();
 
-  const morePosts = await getMorePosts(post.category, post.id);
+  const [morePosts, content] = await Promise.all([
+    getMorePosts(post.category, post.id),
+    prepareContent(post.content || ""),
+  ]);
 
   const canonicalUrl = `https://www.classie.co.in/blog/${post.slug}`;
 
@@ -168,7 +190,7 @@ export default async function BlogPostPage({
           }}
         >
           <Image
-            src={post.cover_image}
+            src={optimizeCloudinary(post.cover_image, 1400)}
             alt={post.title}
             fill
             priority
@@ -278,7 +300,7 @@ export default async function BlogPostPage({
 
         {/* Content */}
         <div
-          dangerouslySetInnerHTML={{ __html: post.content || "<p>Content coming soon.</p>" }}
+          dangerouslySetInnerHTML={{ __html: content || "<p>Content coming soon.</p>" }}
           style={{
             fontFamily: "'Poppins', sans-serif",
             fontSize: "1rem",

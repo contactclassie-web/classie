@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 type Coupon = {
@@ -61,7 +62,7 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
       {/* Top — Image strip */}
       <div className="relative overflow-hidden" style={{ height: "280px" }}>
         {coupon.image_url ? (
-          <img src={coupon.image_url} alt={coupon.title}
+          <img src={optimizeCloudinary(coupon.image_url, 600)} alt={coupon.title}
             className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center relative" style={{ background: "#3B5373" }}>
@@ -182,7 +183,7 @@ export default function HotDealsPage() {
             {/* Right */}
             <div className="relative hidden md:block overflow-hidden" style={{ background: "#3B5373" }}>
               {heroImg ? (
-                <img src={heroImg} alt="Hot Deals" className="w-full h-full object-cover object-center" />
+                <img src={optimizeCloudinary(heroImg, 1600)} alt="Hot Deals" className="w-full h-full object-cover object-center" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <span className="select-none pointer-events-none font-serif font-bold"

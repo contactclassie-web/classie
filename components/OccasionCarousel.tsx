@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 interface Occasion {
   title: string;
@@ -19,7 +20,7 @@ function OccasionCard({ occ }: { occ: Occasion }) {
       style={{ aspectRatio: "3 / 4", maxHeight: "520px" }}>
       {occ.image ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={occ.image} alt={occ.title}
+        <img src={optimizeCloudinary(occ.image, 700)} alt={occ.title}
           className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-75"
           style={{ objectPosition: occ.image_position ?? "50% 50%" }} />
       ) : (

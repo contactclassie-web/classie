@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import CollectionsClient from "./CollectionsClient";
 
 export const metadata: Metadata = {
-  title: "Shop All Collections — Women's Heels, Shoe Clips & Accessories India | CLASSIE",
+  title: "Shop All Collections — Women's Heels, Shoe Clips & Accessories India",
   description: "Browse all CLASSIE collections — women's heels, shoe clips, bow clips, rhinestone clips, crystal clips and festive accessories for women in India. Shop the full range with free shipping.",
   alternates: { canonical: "https://www.classie.co.in/collections" },
 };
@@ -21,14 +21,24 @@ async function getCategories() {
   return data ?? [];
 }
 
+async function getSettings(): Promise<Record<string, string>> {
+  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+  const { data } = await sb.from("site_settings").select("key,value").like("key", "coll_%");
+  const m: Record<string, string> = {};
+  (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+  return m;
+}
+
 export default async function CollectionsPage() {
-  const [allProducts, categories] = await Promise.all([
+  const [allProducts, categories, settings] = await Promise.all([
     getProductsFromDB({ active: true }),
     getCategories(),
+    getSettings(),
   ]);
 
   return (
     <CollectionsClient
+      initialSettings={settings}
       initialProducts={allProducts}
       categories={categories}
     />

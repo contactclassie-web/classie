@@ -17,6 +17,7 @@ interface Category {
 }
 
 interface Props {
+  initialSettings?: Record<string, string>;
   initialProducts: Product[];
   categories: Category[];
 }
@@ -79,12 +80,14 @@ function g(settings: Settings, key: string): string {
   return key in settings ? settings[key] : DEFAULTS[key] ?? "";
 }
 
-export default function CollectionsClient({ initialProducts, categories }: Props) {
+export default function CollectionsClient({ initialProducts, categories, initialSettings }: Props) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sort, setSort]                     = useState("newest");
   const [sortOpen, setSortOpen]             = useState(false);
-  const [settings, setSettings]             = useState<Settings>(DEFAULTS);
-  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  // Settings come from the server (so the page is in the HTML Google reads),
+  // then refresh on the client.
+  const [settings, setSettings]             = useState<Settings>(initialSettings ? { ...DEFAULTS, ...initialSettings } : DEFAULTS);
+  const [settingsLoaded, setSettingsLoaded] = useState(!!initialSettings);
 
   // ── Client-side settings fetch — instant update on every page visit ──────
   useEffect(() => {

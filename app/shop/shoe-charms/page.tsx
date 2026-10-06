@@ -9,7 +9,8 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const free = await loadFreeShippingAmount();
   return {
-  title: "Buy Shoe Charms Online India — Crystal, Rhinestone, Flower & Bow Charms | CLASSIE",
+    alternates: { canonical: "/shop/clips" },
+  title: "Buy Shoe Charms Online India — Crystal, Rhinestone, Flower & Bow Charms",
   description: `Shop CLASSIE shoe charms online in India — rhinestone shoe charms, crystal flower charms, bow charms, pearl anklet clips & more. Perfect for weddings, parties & everyday styling. Free shipping above ₹${free}.`,
   };
 }

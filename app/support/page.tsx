@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { MessageCircle, Mail, Instagram, HelpCircle, Package, RefreshCw } from "lucide-react";
 
-export const metadata: Metadata = { title: "Support" };
+export const metadata: Metadata = { title: "Support", alternates: { canonical: "/support" } };
 
 export default function SupportPage() {
   return (

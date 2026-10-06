@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { optimizeCloudinary } from "@/lib/cloudinary";
 
 interface LookCard {
   id: string;
@@ -104,14 +105,14 @@ function LookCard({ look, showTag = true, aspect = "3/4", radius = "rounded-none
         style={{ aspectRatio: cardH > 0 ? undefined : aspect, height: cardH > 0 ? `${cardH}px` : undefined }}>
         {(look.media_type === "video" || look.image_url?.match(/\.(mp4|webm|mov)(\?|$)/i) || look.image_url?.includes("/video/")) ? (
           <video
-            src={look.image_url}
+            src={optimizeCloudinary(look.image_url, 800)}
             autoPlay muted loop playsInline
             className="w-full h-full object-cover object-center"
           />
         ) : look.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={look.image_url}
+            src={optimizeCloudinary(look.image_url, 800)}
             alt={look.title}
             className={`w-full h-full object-cover object-center transition-transform duration-500 ${hovered ? "scale-105" : "scale-100"}`}
           />

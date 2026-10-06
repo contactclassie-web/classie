@@ -5,7 +5,8 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Size Guide — CLASSIE",
+  title: "Heel Size Guide (India / UK / EU)",
+  alternates: { canonical: "/size-guide" },
   description: "Find your perfect fit with the Classie heel size guide — measurements, how-to steps, and expert fit tips.",
 };
 

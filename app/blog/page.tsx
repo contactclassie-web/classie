@@ -5,7 +5,7 @@ import BlogClient from "./BlogClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Heels & Shoe Clips Style Guide — The CLASSIE Journal | India",
+  title: { absolute: "The CLASSIE Journal — Shoe Clips & Heels Style Guide India" },
   description: "Explore CLASSIE's style guides for women's heels and shoe clips in India — how to wear black heels, heels with saree, shoe clips for weddings, block heels, office heels and more.",
   alternates: { canonical: "https://www.classie.co.in/blog" },
   keywords: ["heels style guide india", "shoe clips guide", "how to wear heels india", "block heels tips", "shoe clips for saree", "heels for indian wedding"],

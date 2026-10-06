@@ -5,6 +5,7 @@ import { getCollectionProductsFromDB } from "@/lib/products";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/shop/the-date-edit" },
   title: "The Date Edit",
   description: "Dressed to impress, effortlessly. Shop Classie's Date Edit collection.",
 };
