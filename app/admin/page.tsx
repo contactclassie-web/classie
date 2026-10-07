@@ -14,6 +14,7 @@ import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import HomepageBuilder from "@/components/admin/HomepageBuilder";
 import GiftSetsAdmin from "@/components/admin/GiftSetsAdmin";
 import CustomDesignsAdmin from "@/components/admin/CustomDesignsAdmin";
+import { ABOUT_GROUPS, type AboutGroup } from "@/lib/aboutContent";
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -389,7 +390,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "home-layout" | "gift-sets" | "gift-sets-page" | "custom-requests" | "custom-page" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type TabId = "dashboard" | "home-layout" | "gift-sets" | "gift-sets-page" | "custom-requests" | "custom-page" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-page" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
 type MainSection = "dashboard" | "homepage" | "gift-sets" | "custom-designs" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -425,6 +426,7 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "hd-coupons": "hot-deals",
   "hd-stats":   "hot-deals",
 
+  "au-page":     "about-us",
   "au-hero":     "about-us",
   "au-banner":   "about-us",
   "au-story":    "about-us",
@@ -506,11 +508,12 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "hd-stats",   label: "Usage Stats" },
   ],
   "about-us": [
-    { id: "au-hero",     label: "Hero" },
-    { id: "au-banner",   label: "Banner" },
-    { id: "au-story",    label: "Our Story" },
-    { id: "au-features", label: "Features" },
+    { id: "au-page",     label: "New Page" },
     { id: "au-founder",  label: "Founder" },
+    { id: "au-hero",     label: "Old: Hero" },
+    { id: "au-banner",   label: "Old: Banner" },
+    { id: "au-story",    label: "Old: Story" },
+    { id: "au-features", label: "Old: Features" },
   ],
   "contact-us": [
     { id: "ct-hero",  label: "Hero" },
@@ -893,6 +896,10 @@ export default function AdminPage() {
   const [auStorySaving,   setAuStorySaving]   = useState(false);
   const [auFeatsSaving,   setAuFeatsSaving]   = useState(false);
   const [auFounderSaving, setAuFounderSaving] = useState(false);
+  // New About page (lib/aboutContent.ts) — empty value = default text
+  const [auNew, setAuNew] = useState<Record<string, string>>({});
+  const [auNewSaving, setAuNewSaving] = useState<string | null>(null);
+  const [auNewSaved, setAuNewSaved] = useState<string | null>(null);
 
   // ── Contact Us state ──────────────────────────────────────────────────────
   const [ctHeroImg,      setCtHeroImg]      = useState("");
@@ -2480,9 +2487,10 @@ export default function AdminPage() {
 
   // ── About Us fetcher & savers ─────────────────────────────────────────────
   const fetchAboutUs = useCallback(async () => {
-    const { data } = await supabase.from("site_settings").select("key,value").like("key", "au_%");
+    const { data } = await supabase.from("site_settings").select("key,value").like("key", "au%");
     const m: Record<string, string> = {};
     (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+    setAuNew(Object.fromEntries(Object.entries(m).filter(([k]) => k.startsWith("au2_"))));
     if (m.au_hero_heading  !== undefined) setAuHeroHeading(m.au_hero_heading || "About CLASSIE");
     if (m.au_hero_eyebrow  !== undefined) setAuHeroEyebrow(m.au_hero_eyebrow || "Our Story");
     if (m.au_hero_text     !== undefined) setAuHeroText(m.au_hero_text);
@@ -2563,6 +2571,15 @@ export default function AdminPage() {
     { key: "au_founder_title", value: auFounderTitle },
     { key: "au_founder_img",   value: auFounderImg },
   ], setAuFounderSaving);
+
+  const saveAuNewGroup = async (group: AboutGroup) => {
+    await saveAuBatch(
+      group.fields.map((f) => ({ key: f.key, value: (auNew[f.key] ?? "").trim() })),
+      (v) => setAuNewSaving(v ? group.id : null),
+    );
+    setAuNewSaved(group.id);
+    setTimeout(() => setAuNewSaved((g) => (g === group.id ? null : g)), 2500);
+  };
 
   // ── Contact Us fetcher & savers ───────────────────────────────────────────
   const fetchContactUs = useCallback(async () => {
@@ -2978,7 +2995,7 @@ export default function AdminPage() {
     if (tab === "hd-coupons") fetchCoupons();
     if (tab === "hd-stats")   fetchCouponStats();
 
-    if (["au-hero","au-banner","au-story","au-features","au-founder"].includes(tab)) fetchAboutUs();
+    if (["au-page","au-hero","au-banner","au-story","au-features","au-founder"].includes(tab)) fetchAboutUs();
 
     if (["ct-hero","ct-help","ct-faq","ct-info"].includes(tab)) fetchContactUs();
     if (tab === "ct-inbox") fetchCtInbox();
@@ -4005,7 +4022,7 @@ export default function AdminPage() {
               if (id === "collections-page") return "collections-page";
               if (id === "style-ideas-page") return "style-ideas-page";
               if (id === "hot-deals") return "hd-page";
-              if (id === "about-us") return "au-hero";
+              if (id === "about-us") return "au-page";
               if (id === "contact-us") return "ct-hero";
               if (id === "shipping-policy") return "sp-hero";
               if (id === "size-guide") return "sg-hero";
@@ -8729,13 +8746,65 @@ export default function AdminPage() {
           )}
 
           {/* ══════════════════════════════════════
+              ABOUT US — au-page TAB (new layout)
+          ══════════════════════════════════════ */}
+          {tab === "au-page" && (
+            <div className="space-y-6 max-w-3xl">
+              <div>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">About Us — New Page</h2>
+                <p className="text-xs text-gray-400">Every text and photo on the About Us page, top to bottom. Leave a box empty to use the default text shown in grey. Photos: paste a Cloudinary link.</p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {ABOUT_GROUPS.map((g) => (
+                    <a key={g.id} href={`#au-${g.id}`} className="text-[11px] px-2.5 py-1 rounded-full border border-gray-200 text-gray-600 hover:border-[#3B5373] hover:text-[#3B5373]">{g.label}</a>
+                  ))}
+                  <a href="/about" target="_blank" rel="noopener noreferrer" className="text-[11px] px-2.5 py-1 rounded-full bg-[#3B5373] text-white">View page ↗</a>
+                </div>
+              </div>
+              {ABOUT_GROUPS.map((g) => (
+                <div key={g.id} id={`au-${g.id}`} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4 scroll-mt-24">
+                  <div>
+                    <p className="text-sm font-semibold text-[#3B5373]">{g.label}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{g.note}</p>
+                  </div>
+                  {g.fields.map((f) => {
+                    const val = auNew[f.key] ?? "";
+                    const set = (v: string) => setAuNew((prev) => ({ ...prev, [f.key]: v }));
+                    return (
+                      <div key={f.key}>
+                        <label className={labelCls}>{f.label}</label>
+                        {f.type === "textarea" ? (
+                          <textarea rows={4} value={val} onChange={(e) => set(e.target.value)} placeholder={f.def} className={inputCls + " resize-y"} />
+                        ) : (
+                          <input type="text" value={val} onChange={(e) => set(e.target.value)} placeholder={f.type === "image" ? (f.def || "https://res.cloudinary.com/...") : f.def} className={inputCls} />
+                        )}
+                        {f.hint && <p className="text-[10px] text-gray-400 mt-1">{f.hint}</p>}
+                        {f.type === "image" && (val || f.def) && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={val || f.def} alt="" className="mt-2 h-20 w-20 object-cover rounded-lg border border-gray-100" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => saveAuNewGroup(g)} disabled={auNewSaving === g.id}
+                      className="flex items-center gap-2 px-5 py-2 bg-[#3B5373] text-white text-sm font-medium rounded-lg hover:bg-[#2d3f4f] transition-colors disabled:opacity-60">
+                      <Save className="w-4 h-4" />{auNewSaving === g.id ? "Saving…" : "Save"}
+                    </button>
+                    {auNewSaved === g.id && <span className="text-xs text-green-600">Saved — live on the site in about a minute.</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
               ABOUT US — au-hero TAB
           ══════════════════════════════════════ */}
           {tab === "au-hero" && (
             <div className="space-y-8">
               <div>
-                <h2 className="text-base font-semibold text-gray-800 mb-1">Hero Section</h2>
-                <p className="text-xs text-gray-400 mb-4">Split layout — large heading on the left, story text on the right.</p>
+                <h2 className="text-base font-semibold text-gray-800 mb-1">Hero Section (old page)</h2>
+                <p className="text-xs text-gray-400 mb-4">The About page now uses the new layout — edit it in New Page. These old texts are kept here and are not shown on the site.</p>
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
                   <div>
                     <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Eyebrow Text</p>
@@ -8949,7 +9018,7 @@ export default function AdminPage() {
             <div className="space-y-8">
               <div>
                 <h2 className="text-base font-semibold text-gray-800 mb-1">Founder Section</h2>
-                <p className="text-xs text-gray-400 mb-4">Centered quote with founder photo and name.</p>
+                <p className="text-xs text-gray-400 mb-4">Name, role and photo are used on the new About page (next to the short quote in New Page → 2 · Our Story). The long quote below was for the old page.</p>
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
                   <div>
                     <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Founder Quote</p>

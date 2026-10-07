@@ -331,6 +331,12 @@ export default function ShopCategoryPageClient({
 }: Props) {
   const [activeOccasion, setActiveOccasion] = useState<string | null>(null);
   const [selectedFilterTypes, setSelectedFilterTypes] = useState<string[]>([]);
+  // Links like /shop/clips?type=Bow%20Shoe%20Charms open with that type selected
+  useEffect(() => {
+    if (settingsPrefix !== "clips") return;
+    const type = new URLSearchParams(window.location.search).get("type");
+    if (type) setSelectedFilterTypes([type]);
+  }, [settingsPrefix]);
   const [maxPrice, setMaxPrice] = useState<number>(9999);
   const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "newest">("default");
 
