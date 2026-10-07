@@ -698,6 +698,7 @@ export default function AdminPage() {
   const [clipsFilterSaving, setClipsFilterSaving] = useState(false);
   const [clipsHeroBgType, setClipsHeroBgType] = useState<"none"|"image"|"video"|"slider">("none");
   const [clipsHeroBgUrl, setClipsHeroBgUrl] = useState("");
+  const [clipsHeroMobileUrl, setClipsHeroMobileUrl] = useState("");
   const [clipsHeroSlides, setClipsHeroSlides] = useState<string[]>([]);
   const [clipsHeroTextPos, setClipsHeroTextPos] = useState<"left"|"center"|"right">("center");
   const [clipsHeroEyebrow, setClipsHeroEyebrow] = useState("New Collection · SS25");
@@ -734,6 +735,7 @@ export default function AdminPage() {
   const [bowFilterSaving, setBowFilterSaving] = useState(false);
   const [bowHeroBgType, setBowHeroBgType] = useState<"none"|"image"|"video"|"slider">("none");
   const [bowHeroBgUrl, setBowHeroBgUrl] = useState("");
+  const [bowHeroMobileUrl, setBowHeroMobileUrl] = useState("");
   const [bowHeroSlides, setBowHeroSlides] = useState<string[]>([]);
   const [bowHeroTextPos, setBowHeroTextPos] = useState<"left"|"center"|"right">("center");
   const [bowHeroEyebrow, setBowHeroEyebrow] = useState("New Collection · SS25");
@@ -1481,7 +1483,7 @@ export default function AdminPage() {
   const fetchClipsPage = useCallback(async () => {
     setClipsPageLoading(true);
     try {
-      const settingsKeys = ["clips_filter_types","clips_hero_bg_type","clips_hero_bg_url","clips_hero_slides","clips_hero_text_pos","clips_hero_eyebrow","clips_hero_title","clips_hero_subtitle","clips_hero_show_stats","clips_hero_stat1_val","clips_hero_stat1_label","clips_hero_stat2_val","clips_hero_stat2_label","clips_hero_stat3_val","clips_hero_stat3_label","clips_why_heading","clips_why_heading_italic","clips_why_card1_icon","clips_why_card1_title","clips_why_card1_desc","clips_why_card2_icon","clips_why_card2_title","clips_why_card2_desc","clips_why_card3_icon","clips_why_card3_title","clips_why_card3_desc","clips_why_footer_text","clips_why_visible"];
+      const settingsKeys = ["clips_filter_types","clips_hero_bg_type","clips_hero_bg_url","clips_hero_mobile_url","clips_hero_slides","clips_hero_text_pos","clips_hero_eyebrow","clips_hero_title","clips_hero_subtitle","clips_hero_show_stats","clips_hero_stat1_val","clips_hero_stat1_label","clips_hero_stat2_val","clips_hero_stat2_label","clips_hero_stat3_val","clips_hero_stat3_label","clips_why_heading","clips_why_heading_italic","clips_why_card1_icon","clips_why_card1_title","clips_why_card1_desc","clips_why_card2_icon","clips_why_card2_title","clips_why_card2_desc","clips_why_card3_icon","clips_why_card3_title","clips_why_card3_desc","clips_why_footer_text","clips_why_visible"];
       const [{ data: shoeCharmsData }, { data: clipsData }, { data: settings }] = await Promise.all([
         supabase.from("products").select("*").eq("category", "shoe-charms").order("created_at", { ascending: false }),
         supabase.from("products").select("*").eq("category", "clips").order("created_at", { ascending: false }),
@@ -1494,6 +1496,7 @@ export default function AdminPage() {
       if (m.clips_filter_types) { try { setClipsFilterTypes(JSON.parse(m.clips_filter_types)); } catch { setClipsFilterTypes([]); } }
       if (m.clips_hero_bg_type) setClipsHeroBgType(m.clips_hero_bg_type as "none"|"image"|"video"|"slider");
       if (m.clips_hero_bg_url) setClipsHeroBgUrl(m.clips_hero_bg_url);
+      setClipsHeroMobileUrl(m.clips_hero_mobile_url || "");
       if (m.clips_hero_slides) { try { setClipsHeroSlides(JSON.parse(m.clips_hero_slides)); } catch { setClipsHeroSlides([]); } }
       if (m.clips_hero_text_pos) setClipsHeroTextPos(m.clips_hero_text_pos as "left"|"center"|"right");
       if (m.clips_hero_eyebrow) setClipsHeroEyebrow(m.clips_hero_eyebrow);
@@ -1529,6 +1532,7 @@ export default function AdminPage() {
       const pairs = [
         { key: "clips_hero_bg_type",  value: clipsHeroBgType },
         { key: "clips_hero_bg_url",   value: clipsHeroBgUrl },
+        { key: "clips_hero_mobile_url", value: clipsHeroMobileUrl },
         { key: "clips_hero_slides",   value: JSON.stringify(clipsHeroSlides) },
         { key: "clips_hero_text_pos", value: clipsHeroTextPos },
         { key: "clips_hero_eyebrow",     value: clipsHeroEyebrow },
@@ -1592,7 +1596,7 @@ export default function AdminPage() {
   const fetchBowPage = useCallback(async () => {
     setBowPageLoading(true);
     try {
-      const settingsKeys = ["bow_filter_types","bow_hero_bg_type","bow_hero_bg_url","bow_hero_slides","bow_hero_text_pos","bow_hero_eyebrow","bow_hero_title","bow_hero_subtitle","bow_hero_show_stats","bow_hero_stat1_val","bow_hero_stat1_label","bow_hero_stat2_val","bow_hero_stat2_label","bow_hero_stat3_val","bow_hero_stat3_label","bow_why_heading","bow_why_heading_italic","bow_why_card1_icon","bow_why_card1_title","bow_why_card1_desc","bow_why_card2_icon","bow_why_card2_title","bow_why_card2_desc","bow_why_card3_icon","bow_why_card3_title","bow_why_card3_desc","bow_why_footer_text","bow_why_visible"];
+      const settingsKeys = ["bow_filter_types","bow_hero_bg_type","bow_hero_bg_url","bow_hero_mobile_url","bow_hero_slides","bow_hero_text_pos","bow_hero_eyebrow","bow_hero_title","bow_hero_subtitle","bow_hero_show_stats","bow_hero_stat1_val","bow_hero_stat1_label","bow_hero_stat2_val","bow_hero_stat2_label","bow_hero_stat3_val","bow_hero_stat3_label","bow_why_heading","bow_why_heading_italic","bow_why_card1_icon","bow_why_card1_title","bow_why_card1_desc","bow_why_card2_icon","bow_why_card2_title","bow_why_card2_desc","bow_why_card3_icon","bow_why_card3_title","bow_why_card3_desc","bow_why_footer_text","bow_why_visible"];
       const [{ data }, { data: settings }] = await Promise.all([
         supabase.from("products").select("*").eq("category", "bow").order("created_at", { ascending: false }),
         supabase.from("site_settings").select("key,value").in("key", settingsKeys),
@@ -1603,6 +1607,7 @@ export default function AdminPage() {
       if (m.bow_filter_types) { try { setBowFilterTypes(JSON.parse(m.bow_filter_types)); } catch { setBowFilterTypes([]); } }
       if (m.bow_hero_bg_type) setBowHeroBgType(m.bow_hero_bg_type as "none"|"image"|"video"|"slider");
       if (m.bow_hero_bg_url) setBowHeroBgUrl(m.bow_hero_bg_url);
+      setBowHeroMobileUrl(m.bow_hero_mobile_url || "");
       if (m.bow_hero_slides) { try { setBowHeroSlides(JSON.parse(m.bow_hero_slides)); } catch { setBowHeroSlides([]); } }
       if (m.bow_hero_text_pos) setBowHeroTextPos(m.bow_hero_text_pos as "left"|"center"|"right");
       if (m.bow_hero_eyebrow) setBowHeroEyebrow(m.bow_hero_eyebrow);
@@ -1925,6 +1930,7 @@ export default function AdminPage() {
       const pairs = [
         { key: "bow_hero_bg_type",  value: bowHeroBgType },
         { key: "bow_hero_bg_url",   value: bowHeroBgUrl },
+        { key: "bow_hero_mobile_url", value: bowHeroMobileUrl },
         { key: "bow_hero_slides",   value: JSON.stringify(bowHeroSlides) },
         { key: "bow_hero_text_pos", value: bowHeroTextPos },
         { key: "bow_hero_eyebrow",     value: bowHeroEyebrow },
@@ -5170,6 +5176,18 @@ export default function AdminPage() {
                           )}
                         </div>
                       )}
+                      {clipsHeroBgType === "image" && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Mobile banner photo (optional)</label>
+                          <input type="text" value={clipsHeroMobileUrl} onChange={e=>setClipsHeroMobileUrl(e.target.value)}
+                            placeholder="https://res.cloudinary.com/... (a taller photo for phones)"
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          <p className="text-[11px] text-gray-400 mt-1.5">Phones show the whole photo with the text below it. Leave empty to use the banner image above. Best: a square or 4:5 photo.</p>
+                          {clipsHeroMobileUrl && (
+                            <img src={clipsHeroMobileUrl} alt="preview" className="mt-2 h-32 w-24 object-cover rounded-lg" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                          )}
+                        </div>
+                      )}
                       {clipsHeroBgType === "slider" && (
                         <div>
                           <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Slider Images (one per line)</label>
@@ -5435,6 +5453,18 @@ export default function AdminPage() {
                             className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
                           {bowHeroBgUrl && bowHeroBgType==="image" && (
                             <img src={bowHeroBgUrl} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg object-top" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
+                          )}
+                        </div>
+                      )}
+                      {bowHeroBgType === "image" && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Mobile banner photo (optional)</label>
+                          <input type="text" value={bowHeroMobileUrl} onChange={e=>setBowHeroMobileUrl(e.target.value)}
+                            placeholder="https://res.cloudinary.com/... (a taller photo for phones)"
+                            className="w-full border border-gray-200 text-sm px-3 py-2.5 focus:outline-none focus:border-[#3B5373] rounded-lg"/>
+                          <p className="text-[11px] text-gray-400 mt-1.5">Phones show the whole photo with the text below it. Leave empty to use the banner image above. Best: a square or 4:5 photo.</p>
+                          {bowHeroMobileUrl && (
+                            <img src={bowHeroMobileUrl} alt="preview" className="mt-2 h-32 w-24 object-cover rounded-lg" onError={e=>{(e.target as HTMLImageElement).style.display="none"}}/>
                           )}
                         </div>
                       )}

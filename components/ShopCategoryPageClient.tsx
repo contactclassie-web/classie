@@ -107,6 +107,9 @@ function CategoryHero({
 
   const bgType   = (m[`${prefix}_hero_bg_type`]  || "none") as "none"|"image"|"video"|"slider";
   const bgUrl    = m[`${prefix}_hero_bg_url`]    || "";
+  // Optional phone-only banner photo (Admin → page → "Mobile banner photo").
+  const mobileUrl = m[`${prefix}_hero_mobile_url`] || "";
+  const phonePhoto = bgType === "image" ? (mobileUrl || bgUrl) : "";
   const textPos  = (m[`${prefix}_hero_text_pos`] || "center") as "left"|"center"|"right";
   const eyebrow  = m[`${prefix}_hero_eyebrow`]   || "New Collection · SS25";
   const title    = m[`${prefix}_hero_title`]     || categoryLabel;
@@ -136,15 +139,29 @@ function CategoryHero({
   const isYouTube = bgUrl.includes("youtube.com") || bgUrl.includes("youtu.be");
   const ytId = isYouTube ? bgUrl.match(/(?:v=|youtu\.be\/)([^&?]+)/)?.[1] : null;
 
-  const textAlign = textPos === "left" ? "items-start text-left" : textPos === "right" ? "items-end text-right" : "items-center text-center";
-  const textPad   = textPos === "left"  ? "pl-10 md:pl-20 pr-4" :
-                    textPos === "right" ? "pr-10 md:pr-20 pl-4" :
-                    "px-6";
+  // With a photo on top (phones), the text is always centred below it.
+  const textAlign = phonePhoto
+    ? (textPos === "left" ? "items-center text-center md:items-start md:text-left"
+      : textPos === "right" ? "items-center text-center md:items-end md:text-right"
+      : "items-center text-center")
+    : (textPos === "left" ? "items-start text-left" : textPos === "right" ? "items-end text-right" : "items-center text-center");
+  const textPad   = phonePhoto
+    ? (textPos === "left" ? "px-6 md:pl-20 md:pr-4" : textPos === "right" ? "px-6 md:pr-20 md:pl-4" : "px-6")
+    : (textPos === "left"  ? "pl-10 md:pl-20 pr-4" : textPos === "right" ? "pr-10 md:pr-20 pl-4" : "px-6");
+  const sideJustify = textPos === "left" ? "justify-start" : textPos === "right" ? "justify-end" : "justify-center";
+  const rowJustify = phonePhoto
+    ? (textPos === "left" ? "justify-center md:justify-start" : textPos === "right" ? "justify-center md:justify-end" : "justify-center")
+    : sideJustify;
 
   return (
-    <section className="relative overflow-hidden" style={{ background: "#F5F5F5", aspectRatio: "16/5" }}>
+    // Desktop: wide banner with the text on top of it.
+    // Phone: the whole photo first (nothing cropped), the text underneath.
+    <section className="relative overflow-hidden bg-[#F5F5F5] md:aspect-[16/5]">
+      {phonePhoto && (
+        <img src={optimizeCloudinary(phonePhoto, 900)} alt="" className="md:hidden block w-full h-auto" />
+      )}
       {bgType === "image" && bgUrl && (
-        <img src={optimizeCloudinary(bgUrl, 1600)} alt="" className="absolute inset-0 w-full h-full object-contain opacity-100" />
+        <img src={optimizeCloudinary(bgUrl, 1600)} alt="" className="hidden md:block absolute inset-0 w-full h-full object-contain opacity-100" />
       )}
       {bgType === "slider" && slides.length > 0 && (
         <>
@@ -170,24 +187,24 @@ function CategoryHero({
           className="absolute inset-0 w-full h-full opacity-30 pointer-events-none scale-[1.4]" allow="autoplay" />
       )}
 
-      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} py-20`} style={{ minHeight: "320px" }}>
-        <div className="flex items-center gap-4 mb-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
+      <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} ${phonePhoto ? "pt-7 pb-9" : "py-14"} md:py-20 md:min-h-[320px]`}>
+        <div className={`flex items-center gap-4 mb-4 md:mb-6 ${rowJustify}`}>
           <div className="w-8 h-px bg-white/40" />
           <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "'Poppins', sans-serif" }}>
             {eyebrow}
           </span>
           <div className="w-8 h-px bg-white/40" />
         </div>
-        <h1 className="font-serif font-light text-[#1a1a1a] leading-none mb-5" style={{ fontSize: "clamp(64px, 10vw, 96px)" }}>
+        <h1 className="font-serif font-light text-[#1a1a1a] leading-none mb-3 md:mb-5 text-[48px] md:text-[clamp(64px,10vw,96px)]">
           {title}
         </h1>
         {subtitle && (
-          <p className="font-serif italic text-[#1a1a1a] text-xl mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          <p className="font-serif italic text-[#1a1a1a] text-lg md:text-xl mb-5 md:mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
             {subtitle}
           </p>
         )}
         {showStats && (
-          <div className="flex items-center gap-6" style={{ justifyContent: textPos === "center" ? "center" : textPos === "right" ? "flex-end" : "flex-start" }}>
+          <div className={`flex items-center gap-6 ${rowJustify}`}>
             {[
               { val: stat1Val || String(productCount), label: stat1Label },
               { val: stat2Val || String(filterCount),  label: stat2Label },

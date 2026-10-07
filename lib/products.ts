@@ -443,7 +443,7 @@ export async function getShopCategoryProducts(category: string): Promise<HeelPro
 export async function getShopCategorySettings(prefix: string): Promise<HeelsSettings> {
   try {
     const keys = [
-      `${prefix}_hero_bg_type`, `${prefix}_hero_bg_url`, `${prefix}_hero_slides`, `${prefix}_hero_text_pos`,
+      `${prefix}_hero_bg_type`, `${prefix}_hero_bg_url`, `${prefix}_hero_mobile_url`, `${prefix}_hero_slides`, `${prefix}_hero_text_pos`,
       `${prefix}_hero_eyebrow`, `${prefix}_hero_title`, `${prefix}_hero_subtitle`,
       `${prefix}_hero_show_stats`, `${prefix}_hero_stat1_val`, `${prefix}_hero_stat1_label`,
       `${prefix}_hero_stat2_val`, `${prefix}_hero_stat2_label`, `${prefix}_hero_stat3_val`, `${prefix}_hero_stat3_label`,
