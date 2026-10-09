@@ -124,3 +124,9 @@ h4, h5, h6 { font-family: var(--font-cormorant); font-weight: 400; }
 }
 
 
+
+/* Admin: plain font for headings (the decorative serif is for the shop) */
+.admin-ui h1, .admin-ui h2, .admin-ui h3 { font-family: var(--font-poppins), sans-serif; font-weight: 600; }
+@media (max-width: 767px) {
+  .admin-ui .overflow-x-auto > table { min-width: 860px; }
+}
