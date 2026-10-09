@@ -37,13 +37,13 @@ export default function BlogClient({ posts, categories: propCategories }: { post
       : latestPosts.filter((p) => p.category === activeFilter);
 
   return (
-    <div style={{ fontFamily: "'Poppins', sans-serif", background: "#fff", color: "#1a1a1a" }}>
+    <div style={{ fontFamily: "var(--font-poppins), sans-serif", background: "#fff", color: "#1a1a1a" }}>
       {/* ── Main Content ── */}
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 40px" }}>
+      <div className="blog-wrap" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 40px" }}>
 
         {/* ── Page heading ── */}
         <header style={{ paddingTop: "44px", textAlign: "center" }}>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2.2rem, 5vw, 3.4rem)", fontWeight: 400, lineHeight: 1.1, color: "#1a1a1a" }}>
+          <h1 style={{ fontFamily: "var(--font-cormorant), Georgia, serif", fontSize: "clamp(2.2rem, 5vw, 3.4rem)", fontWeight: 400, lineHeight: 1.1, color: "#1a1a1a" }}>
             The CLASSIE <em style={{ color: "#3B5373" }}>Journal</em>
           </h1>
           <p style={{ fontSize: "0.85rem", color: "#777", marginTop: "10px" }}>
@@ -55,6 +55,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
         {featured && (
           <section style={{ padding: "64px 0 56px" }}>
             <div
+              className="blog-featured-grid"
               style={{
                 display: "grid",
                 gridTemplateColumns: "45fr 55fr",
@@ -70,7 +71,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "12px",
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "var(--font-poppins), sans-serif",
                     fontSize: "0.65rem",
                     fontWeight: 600,
                     letterSpacing: "0.25em",
@@ -94,7 +95,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                 {/* Title */}
                 <h2
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "var(--font-cormorant), Georgia, serif",
                     fontSize: "2.8rem",
                     fontWeight: 500,
                     color: "#1a1a1a",
@@ -110,7 +111,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                 {featured.excerpt && (
                   <p
                     style={{
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "var(--font-poppins), sans-serif",
                       fontSize: "0.82rem",
                       color: "#555",
                       lineHeight: 1.8,
@@ -130,7 +131,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "14px",
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "var(--font-poppins), sans-serif",
                     fontSize: "0.72rem",
                     fontWeight: 600,
                     letterSpacing: "0.16em",
@@ -214,7 +215,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
             >
               <span
                 style={{
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "var(--font-poppins), sans-serif",
                   fontSize: "0.62rem",
                   fontWeight: 600,
                   letterSpacing: "0.22em",
@@ -231,7 +232,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                   key={cat}
                   onClick={() => setActiveFilter(cat)}
                   style={{
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "var(--font-poppins), sans-serif",
                     fontSize: "0.68rem",
                     fontWeight: 500,
                     letterSpacing: "0.06em",
@@ -265,7 +266,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
           >
             <span
               style={{
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "var(--font-poppins), sans-serif",
                 fontSize: "0.62rem",
                 fontWeight: 600,
                 letterSpacing: "0.28em",
@@ -284,7 +285,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
               style={{
                 textAlign: "center",
                 color: "#888",
-                fontFamily: "'Poppins', sans-serif",
+                fontFamily: "var(--font-poppins), sans-serif",
                 fontSize: "0.85rem",
                 padding: "48px 0",
               }}
@@ -348,7 +349,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                   {/* Category */}
                   <span
                     style={{
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "var(--font-poppins), sans-serif",
                       fontSize: "0.6rem",
                       fontWeight: 600,
                       letterSpacing: "0.2em",
@@ -364,7 +365,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                   {/* Title */}
                   <h3
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "var(--font-cormorant), Georgia, serif",
                       fontSize: "1.28rem",
                       fontWeight: 500,
                       color: "#1a1a1a",
@@ -381,7 +382,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                   {/* Date */}
                   <span
                     style={{
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "var(--font-poppins), sans-serif",
                       fontSize: "0.65rem",
                       color: "#888",
                       fontWeight: 300,
@@ -405,6 +406,10 @@ export default function BlogClient({ posts, categories: propCategories }: { post
         .read-story-btn:hover span { border-color: #3B5373 !important; color: #3B5373 !important; }
         @media (max-width: 900px) {
           .blog-cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .blog-featured-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .blog-featured-grid > div:last-child { order: -1; }
+          .blog-featured-grid h2 { font-size: 2rem !important; }
+          .blog-wrap { padding: 0 20px !important; }
         }
         @media (max-width: 560px) {
           .blog-cards-grid { grid-template-columns: 1fr !important; }

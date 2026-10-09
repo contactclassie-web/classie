@@ -9,7 +9,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: { absolute: "About CLASSIE — Shoe Clips, Shoe Charms & Heels Brand India" },
-  description: "CLASSIE makes clip-on shoe charms and easy heels for Indian women. Clip a crystal, bow, flower or jute charm onto your shoes and get a new look in seconds. COD available, 7-day returns.",
+  description: "CLASSIE makes clip-on shoe charms and easy heels for Indian women. Clip a crystal, bow, flower or jute charm onto your shoes and get a new look in seconds. COD available, 7-day returns on heels.",
   alternates: { canonical: "https://www.classie.co.in/about" },
   keywords: ["classie brand", "shoe clips india", "shoe charms india", "how to use shoe clips", "classie founder", "classie story", "women's heels india brand"],
   openGraph: {
@@ -274,7 +274,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── 4. HOW IT WORKS ─────────────────────────────────── */}
-      <section className="max-w-[1200px] mx-auto py-14 md:py-28 flex flex-col gap-6 md:gap-12">
+      <section id="how-it-works" className="scroll-mt-24 max-w-[1200px] mx-auto py-14 md:py-28 flex flex-col gap-6 md:gap-12">
         <div className="px-5 md:px-10 flex flex-col gap-3 md:items-center md:text-center">
           <Eyebrow>{c("au2_steps_eyebrow")}</Eyebrow>
           <Heading title={c("au2_steps_title")} em={c("au2_steps_title_em")} className="text-[32px] md:text-[46px]" />

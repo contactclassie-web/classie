@@ -55,7 +55,7 @@ const CLIP_FEATURE_TILES: FeatureTile[] = [
 
 // Default tick list when Admin hasn't set one for the product.
 const FEATURE_CHECKS_HEELS = ["Cushioned comfort insole", "COD Available", "Easy 7-day returns", "Size exchange available"];
-const FEATURE_CHECKS_CLIPS = ["Sold as a pair", "No glue, no damage", "COD Available", "Easy 7-day returns"];
+const FEATURE_CHECKS_CLIPS = ["Sold as a pair", "No glue, no damage", "COD Available", "Works on heels, flats & sandals"];
 
 // ── Component ─────────────────────────────────────────────────────────────
 
@@ -753,7 +753,7 @@ export default function ProductDetailClient({
               : freeShippingFrom
               ? { icon: "🚚", text: "Free Shipping", sub: `on orders ₹${freeShippingFrom.toLocaleString("en-IN")}+` }
               : { icon: "🚚", text: "Fast Delivery", sub: "across India" },
-            { icon: "↩", text: "Easy Returns",   sub: "7-day policy" },
+            isHeel ? { icon: "↩", text: "Easy Returns", sub: "7-day policy" } : { icon: "✦", text: "Sold as a Pair", sub: "one for each shoe" },
             { icon: "💳", text: "COD Available", sub: "all orders" },
           ].map((item, i) => (
             <div key={item.text} className="text-center" style={{ padding: "16px 10px", borderRight: i < 2 ? "1px solid #E8E3DD" : "none" }}>

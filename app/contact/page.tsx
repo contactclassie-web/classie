@@ -26,7 +26,7 @@ const DEFAULT_FAQS = [
 
 export default async function ContactPage() {
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const { data } = await sb.from("site_settings").select("key,value").like("key", "ct_%");
+  const { data } = await sb.from("site_settings").select("key,value").or("key.like.ct_%,key.eq.footer_whatsapp_url,key.eq.footer_ig_url");
   const cfg: Record<string, string> = {};
   (data ?? []).forEach((r: { key: string; value: string }) => { cfg[r.key] = r.value; });
 
@@ -54,78 +54,91 @@ export default async function ContactPage() {
   }
   const faqs = dbFaqs.length > 0 ? dbFaqs : DEFAULT_FAQS;
 
+  // Quick contact links
+  const digits = phone.replace(/\D/g, "");
+  const intl = digits.length === 10 ? `91${digits}` : digits;
+  const pretty = intl.length === 12 ? `+${intl.slice(0, 2)} ${intl.slice(2, 7)} ${intl.slice(7)}` : phone;
+  const waUrl = cfg.footer_whatsapp_url || `https://wa.me/${intl}`;
+  const handle = social.trim().replace(/^@/, "");
+  const igUrl = cfg.footer_ig_url || `https://www.instagram.com/${handle}/`;
+  const navy = "#3B5373";
+  const line = (d: React.ReactNode) => (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={navy} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>
+  );
+  const quick = [
+    { label: "WhatsApp", value: "Chat with us", href: waUrl, icon: line(<path d="M20 12a8 8 0 0 1-11.7 7.1L4 20l1-4A8 8 0 1 1 20 12z" />), external: true },
+    { label: "Call", value: pretty, href: `tel:+${intl}`, icon: line(<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />), external: false },
+    { label: "Email", value: email, href: `mailto:${email}`, icon: line(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>), external: false },
+  ];
+
   return (
     <>
-      {/* ── Section 1: Hero + Form ── */}
-      <section className="flex flex-col md:flex-row" style={{ minHeight: "520px" }}>
-        {/* Left — image or navy */}
-        <div className="w-full md:w-[40%] relative flex items-center justify-center" style={{ minHeight: "200px" }}>
-          {heroImg ? (
-            <div className="absolute inset-0" style={{ backgroundImage: `url(${optimizeCloudinary(heroImg, 1600)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center" style={{ background: "#3B5373" }}>
-              <p className="font-serif text-4xl md:text-5xl text-white italic text-center px-8 leading-tight">
-                Let&apos;s Connect
-              </p>
-            </div>
+      {/* ── 1: How can we help — quick ways first ── */}
+      <section style={{ background: "#F7F4EF" }}>
+        <div className="max-w-[1100px] mx-auto px-4 md:px-10 pt-9 pb-8 md:pt-16 md:pb-14 flex flex-col gap-6 md:gap-8">
+          <div className="flex flex-col gap-2 md:gap-3 max-w-[620px]">
+            <h1 className="text-[40px] md:text-[56px] leading-none font-normal text-[#1a1a1a]">{heading}</h1>
+            {subtext.split(/\n\s*\n/).map((para, i) => (
+              <p key={i} className="text-[13.5px] md:text-[15px] leading-relaxed text-[#555]">{para.replace(/\s*\n\s*/g, " ")}</p>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-4">
+            {quick.map((q) => (
+              <a key={q.label} href={q.href} {...(q.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="bg-white border border-[#E6E0D6] hover:border-[#3B5373] transition-colors px-5 py-4 md:py-6 flex sm:flex-col items-center sm:items-start gap-4 sm:gap-3 min-h-[64px]">
+                {q.icon}
+                <span className="flex flex-col min-w-0">
+                  <span className="text-[14px] md:text-[15px] font-medium text-[#1a1a1a]">{q.label}</span>
+                  <span className="text-[12.5px] text-[#555] truncate">{q.value}</span>
+                </span>
+              </a>
+            ))}
+          </div>
+          <p className="text-[12.5px] text-[#555]">
+            {infoSub}{handle && <> · Instagram <a href={igUrl} target="_blank" rel="noopener noreferrer" className="underline" style={{ color: navy }}>@{handle}</a></>}
+          </p>
+        </div>
+      </section>
+
+      {/* ── 2: Track + returns ── */}
+      <section className="bg-white">
+        <div className="max-w-[1100px] mx-auto px-4 md:px-10 py-8 md:py-12 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+          {[
+            { title: "Order Tracking", text: trackText, href: trackUrl, cta: "Track your order", icon: line(<><path d="M3 7h11v9H3z" /><path d="M14 10h4l3 3v3h-7" /><circle cx="7" cy="17.5" r="1.6" /><circle cx="17" cy="17.5" r="1.6" /></>) },
+            { title: "Returns & Exchange", text: retText, href: retUrl, cta: "See returns policy", icon: line(<><path d="M4 12a8 8 0 1 0 2.4-5.7" /><path d="M4 4v4.3h4.3" /></>) },
+          ].map((b) => (
+            <Link key={b.title} href={b.href} className="border border-[#ECEAE6] hover:border-[#3B5373] transition-colors p-5 md:p-7 flex gap-4 items-start group">
+              {b.icon}
+              <span className="flex flex-col gap-1">
+                <span className="text-[22px] md:text-[24px] leading-tight text-[#1a1a1a] font-serif">{b.title}</span>
+                <span className="text-[13px] text-[#555] leading-relaxed">{b.text}</span>
+                <span className="text-[12px] tracking-[0.1em] uppercase mt-1 group-hover:underline" style={{ color: navy }}>{b.cta} →</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 3: Message form (photo beside it on desktop) ── */}
+      <section className="bg-white border-t border-[#ECEAE6]">
+        <div className="max-w-[1100px] mx-auto px-4 md:px-10 py-10 md:py-16 grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_380px] gap-8 md:gap-14 items-start">
+          <div>
+            <h2 className="text-[30px] md:text-[38px] font-normal text-[#1a1a1a] mb-2">Send us a message</h2>
+            <p className="text-[13px] text-[#555] mb-6">We reply within 24–48 hours.</p>
+            <ContactForm />
+          </div>
+          {heroImg && (
+            <div className="hidden md:block relative h-[460px] overflow-hidden" style={{ backgroundImage: `url(${optimizeCloudinary(heroImg, 900)})`, backgroundSize: "cover", backgroundPosition: "center" }} />
           )}
         </div>
-        {/* Right — form */}
-        <div className="w-full md:w-[60%] bg-white px-6 md:px-14 py-12 flex flex-col justify-center">
-          <h1 className="font-serif text-4xl mb-3" style={{ color: "#1a1a1a" }}>{heading}</h1>
-          <p className="text-sm leading-relaxed mb-8 whitespace-pre-line" style={{ color: "#666" }}>{subtext}</p>
-          <ContactForm />
-        </div>
       </section>
 
-      {/* ── Section 2: Quick Help ── */}
-      <section className="bg-white py-14 px-4">
-        <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="border border-[#e5e5e5] rounded-xl p-8 text-center flex flex-col items-center gap-3">
-            <span className="text-3xl">📍</span>
-            <h3 className="font-serif text-xl" style={{ color: "#1a1a1a" }}>Order Tracking</h3>
-            <p className="text-sm leading-relaxed" style={{ color: "#666" }}>{trackText}</p>
-            <Link href={trackUrl} className="mt-2 inline-block px-5 py-2.5 text-white text-sm font-medium hover:opacity-90 transition-opacity"
-              style={{ background: "#3B5373" }}>Track your order →</Link>
-          </div>
-          <div className="border border-[#e5e5e5] rounded-xl p-8 text-center flex flex-col items-center gap-3">
-            <span className="text-3xl">✅</span>
-            <h3 className="font-serif text-xl" style={{ color: "#1a1a1a" }}>Return &amp; Exchange</h3>
-            <p className="text-sm leading-relaxed" style={{ color: "#666" }}>{retText}</p>
-            <Link href={retUrl} className="mt-2 inline-block px-5 py-2.5 text-white text-sm font-medium hover:opacity-90 transition-opacity"
-              style={{ background: "#3B5373" }}>Start a return →</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Section 3: FAQ ── */}
-      <section className="py-14 px-4" style={{ background: "#f7f7f7" }}>
+      {/* ── 4: Questions ── */}
+      <section className="py-12 md:py-16 px-4" style={{ background: "#f7f7f7" }}>
         <div className="max-w-2xl mx-auto">
-          <h2 className="font-serif text-3xl text-center mb-10" style={{ color: "#1a1a1a" }}>{faqHeading}</h2>
+          <h2 className="text-[30px] md:text-[34px] text-center mb-8 md:mb-10 font-normal" style={{ color: "#1a1a1a" }}>{faqHeading}</h2>
           <FaqAccordion faqs={faqs} />
-        </div>
-      </section>
-
-      {/* ── Section 4: Contact Info ── */}
-      <section className="bg-white py-14 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-serif text-3xl mb-3" style={{ color: "#1a1a1a" }}>{infoHeading}</h2>
-          <p className="text-sm mb-10" style={{ color: "#666" }}>{infoSub}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className="border border-[#e5e5e5] rounded-xl p-6 flex flex-col items-center gap-2">
-              <span className="text-2xl">📞</span>
-              <p className="text-sm font-medium" style={{ color: "#1a1a1a" }}>{phone}</p>
-            </div>
-            <div className="border border-[#e5e5e5] rounded-xl p-6 flex flex-col items-center gap-2">
-              <span className="text-2xl">✉️</span>
-              <p className="text-sm font-medium" style={{ color: "#1a1a1a" }}>{email}</p>
-            </div>
-            <div className="border border-[#e5e5e5] rounded-xl p-6 flex flex-col items-center gap-2">
-              <span className="text-2xl">💬</span>
-              <p className="text-xs mb-0.5" style={{ color: "#888" }}>WhatsApp / Instagram</p>
-              <p className="text-sm font-medium" style={{ color: "#1a1a1a" }}>{social}</p>
-            </div>
-          </div>
+          <p className="text-center mt-6"><Link href="/faq" className="text-[13px] underline" style={{ color: navy }}>See all questions →</Link></p>
         </div>
       </section>
     </>

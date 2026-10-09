@@ -128,7 +128,7 @@ export const DEFAULT_HOME: HomeConfig = {
   marketplace: {
     prefix: "Classie is also on",
     names: "Amazon, Flipkart, Myntra",
-    note: "Buy here for COD, 7-day returns & WhatsApp help",
+    note: "Buy here for COD, easy heel returns & WhatsApp help",
   },
   types: {
     heading: "Shop by",
@@ -210,7 +210,7 @@ export const DEFAULT_HOME: HomeConfig = {
     items: [
       { icon: "truck", title: "Free delivery", sub: "on {amount}+" },
       { icon: "cash", title: "Cash on delivery", sub: "pay at your door" },
-      { icon: "returns", title: "7-day returns", sub: "easy & quick" },
+      { icon: "returns", title: "7-day heel returns", sub: "easy size exchange" },
       { icon: "whatsapp", title: "WhatsApp help", sub: "real people reply" },
     ],
   },

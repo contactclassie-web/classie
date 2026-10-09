@@ -26,8 +26,8 @@ body {
   font-weight: 300;
 }
 
-/* Headings — DM Serif Display */
-h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; }
+/* Headings — Cormorant Garamond (the brand serif loaded by next/font) */
+h1, h2, h3 { font-family: var(--font-cormorant), Georgia, serif; font-weight: 400; }
 
 /* Sub-headings — Cormorant Garamond */
 h4, h5, h6 { font-family: var(--font-cormorant); font-weight: 400; }
@@ -99,7 +99,7 @@ h4, h5, h6 { font-family: var(--font-cormorant); font-weight: 400; }
     letter-spacing: 0.5em;
     text-transform: uppercase;
     color: #3B5373;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-poppins), sans-serif;
     font-weight: 400;
   }
 

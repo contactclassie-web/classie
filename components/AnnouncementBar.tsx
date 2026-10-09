@@ -19,7 +19,7 @@ const BAR_STYLE: React.CSSProperties = {
   background: "#3B5373",
   padding: "5px 16px",
   textAlign: "center",
-  fontFamily: "'Poppins', sans-serif",
+  fontFamily: "var(--font-poppins), sans-serif",
   fontSize: "11px",
   letterSpacing: "0.16em",
   textTransform: "uppercase",

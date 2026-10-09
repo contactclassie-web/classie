@@ -78,8 +78,8 @@ function WhyChooseSection({ m, prefix, categoryLabel }: { m: HeelsSettings; pref
         {cards.map((item, i) => (
           <div key={i} className="bg-[#f5f5f5] px-8 py-10 text-center">
             <div className="text-4xl mb-4">{item.icon}</div>
-            <p className="text-sm font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.title}</p>
-            <p className="text-xs text-[#1a1a1a] leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>{item.desc}</p>
+            <p className="text-sm font-semibold text-[#1a1a1a] mb-2" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{item.title}</p>
+            <p className="text-xs text-[#1a1a1a] leading-relaxed" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{item.desc}</p>
           </div>
         ))}
       </div>
@@ -190,7 +190,7 @@ function CategoryHero({
       <div className={`relative z-10 flex flex-col justify-center ${textAlign} ${textPad} ${phonePhoto ? "pt-7 pb-9" : "py-14"} md:py-20 md:min-h-[320px]`}>
         <div className={`flex items-center gap-4 mb-4 md:mb-6 ${rowJustify}`}>
           <div className="w-8 h-px bg-white/40" />
-          <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <span className="text-[10px] tracking-[0.5em] uppercase text-[#3B5373]" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
             {eyebrow}
           </span>
           <div className="w-8 h-px bg-white/40" />
@@ -199,7 +199,7 @@ function CategoryHero({
           {title}
         </h1>
         {subtitle && (
-          <p className="font-serif italic text-[#1a1a1a] text-lg md:text-xl mb-5 md:mb-8" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+          <p className="font-serif italic text-[#1a1a1a] text-lg md:text-xl mb-5 md:mb-8" style={{ fontFamily: "var(--font-cormorant), Georgia, serif" }}>
             {subtitle}
           </p>
         )}
@@ -214,7 +214,7 @@ function CategoryHero({
                 {i > 0 && <div key={`div-${i}`} className="w-px h-8 bg-white/20" />}
                 <div key={s.label} className="text-center">
                   <p className="text-2xl font-serif font-light text-[#1a1a1a]">{s.val}</p>
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-[#3B5373] mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.label}</p>
+                  <p className="text-[10px] tracking-[0.2em] uppercase text-[#3B5373] mt-1" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>{s.label}</p>
                 </div>
               </>
             ))}
@@ -284,7 +284,7 @@ function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; car
           <button
             onClick={handleQuickAdd}
             className="w-full bg-[#3B5373] text-white text-[11px] tracking-[0.2em] uppercase py-3 font-medium hover:bg-[#2d3f4f] transition-colors"
-            style={{ fontFamily: "'Poppins', sans-serif" }}
+            style={{ fontFamily: "var(--font-poppins), sans-serif" }}
           >
             {hasVariants ? "Select Size →" : "Quick Add"}
           </button>
@@ -292,16 +292,16 @@ function CategoryProductCard({ product, cardStyle }: { product: HeelProduct; car
       </div>
 
       <div className="mt-3">
-        <p className="text-[13px] md:text-sm font-medium text-gray-800 leading-snug line-clamp-2 min-h-[2.6em]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+        <p className="text-[13px] md:text-sm font-medium text-gray-800 leading-snug line-clamp-2 min-h-[2.6em]" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
           {product.title}
         </p>
         {product.heel_type && (
-          <p className="text-[11px] text-[#1a1a1a] mt-0.5" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <p className="text-[11px] text-[#1a1a1a] mt-0.5" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
             {product.heel_type}
           </p>
         )}
         <div className="flex items-center gap-2 mt-1 flex-wrap">
-          <span className="text-sm text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <span className="text-sm text-gray-800" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
             ₹{product.price.toLocaleString("en-IN")}
           </span>
           {discount > 0 && (
@@ -465,11 +465,11 @@ export default function ShopCategoryPageClient({
       {settingsPrefix === "clips" && (
         <section className="py-14 bg-white border-b border-gray-100">
           <div className="max-w-[1280px] mx-auto px-4 md:px-10 text-center">
-            <h2 style={{ fontFamily: "'Cormorant Garamond', 'Cormorant', Georgia, serif", fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 400, color: "#1a1a1a", letterSpacing: "0.01em", marginBottom: "8px", lineHeight: 1.3, fontStyle: "normal" }}>
+            <h2 style={{ fontFamily: "var(--font-cormorant), Georgia, serif", fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 400, color: "#1a1a1a", letterSpacing: "0.01em", marginBottom: "8px", lineHeight: 1.3, fontStyle: "normal" }}>
               {initialSettings["clips_charm_heading"] || "Shoe Charms"}
             </h2>
             {initialSettings["clips_charm_subheading"] && (
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "12px", color: "#888", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
+              <p style={{ fontFamily: "var(--font-poppins), sans-serif", fontSize: "12px", color: "#888", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
                 {initialSettings["clips_charm_subheading"]}
               </p>
             )}
@@ -496,7 +496,7 @@ export default function ShopCategoryPageClient({
                       background: isActive ? "#3B5373" : "transparent",
                       color: isActive ? "#ffffff" : "#3B5373",
                       fontSize: "12px",
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "var(--font-poppins), sans-serif",
                       fontWeight: 500,
                       letterSpacing: "0.04em",
                       cursor: "pointer",
@@ -563,10 +563,10 @@ export default function ShopCategoryPageClient({
               <div className="sticky top-24 space-y-6">
 
                 <div>
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                     Availability
                   </p>
-                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                     <input type="checkbox" defaultChecked className="accent-[#3B5373]" />
                     In Stock ({initialProducts.length})
                   </label>
@@ -576,12 +576,12 @@ export default function ShopCategoryPageClient({
                   <>
                     <div className="border-t border-gray-200" />
                     <div>
-                      <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                         Type
                       </p>
                       <div className="space-y-2">
                         {filterTypes.map((ft) => (
-                          <label key={ft} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                          <label key={ft} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                             <input
                               type="checkbox"
                               checked={selectedFilterTypes.includes(ft)}
@@ -599,7 +599,7 @@ export default function ShopCategoryPageClient({
                 <div className="border-t border-gray-200" />
 
                 <div>
-                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#1a1a1a] mb-3" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                     Max Price
                   </p>
                   <input
@@ -611,7 +611,7 @@ export default function ShopCategoryPageClient({
                     onChange={(e) => setMaxPrice(Number(e.target.value))}
                     className="w-full accent-[#3B5373]"
                   />
-                  <p className="text-xs text-[#1a1a1a] mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  <p className="text-xs text-[#1a1a1a] mt-1" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                     Up to ₹{maxPrice >= 9999 ? "Any" : maxPrice.toLocaleString("en-IN")}
                   </p>
                 </div>
@@ -626,7 +626,7 @@ export default function ShopCategoryPageClient({
                         setMaxPrice(9999);
                       }}
                       className="text-[11px] tracking-[0.15em] uppercase text-[#3B5373] underline"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                      style={{ fontFamily: "var(--font-poppins), sans-serif" }}
                     >
                       Clear All Filters
                     </button>
@@ -638,7 +638,7 @@ export default function ShopCategoryPageClient({
             {/* Grid */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-6">
-                <p className="text-sm text-[#1a1a1a]" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                <p className="text-sm text-[#1a1a1a]" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                   {filtered.length} {filtered.length === 1 ? "item" : "items"}
                   {hasFilters && " (filtered)"}
                 </p>
@@ -646,7 +646,7 @@ export default function ShopCategoryPageClient({
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                   className="text-xs border border-gray-200 px-3 py-2 bg-white text-[#1a1a1a] focus:outline-none focus:border-[#3B5373]"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  style={{ fontFamily: "var(--font-poppins), sans-serif" }}
                 >
                   <option value="default">Sort: Featured</option>
                   <option value="newest">Newest First</option>
@@ -658,11 +658,11 @@ export default function ShopCategoryPageClient({
               {filtered.length === 0 ? (
                 <div className="text-center py-20">
                   <p className="font-serif text-2xl text-[#1a1a1a] mb-3">No items found</p>
-                  <p className="text-sm text-[#1a1a1a]" style={{ fontFamily: "'Poppins', sans-serif" }}>Try removing some filters</p>
+                  <p className="text-sm text-[#1a1a1a]" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>Try removing some filters</p>
                   <button
                     onClick={() => { setActiveOccasion(null); setSelectedFilterTypes([]); setMaxPrice(9999); }}
                     className="mt-4 text-[11px] tracking-[0.2em] uppercase text-[#3B5373] border border-[#3B5373] px-6 py-2"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                    style={{ fontFamily: "var(--font-poppins), sans-serif" }}
                   >
                     Clear Filters
                   </button>

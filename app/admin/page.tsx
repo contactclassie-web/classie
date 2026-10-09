@@ -15,6 +15,8 @@ import HomepageBuilder from "@/components/admin/HomepageBuilder";
 import GiftSetsAdmin from "@/components/admin/GiftSetsAdmin";
 import CustomDesignsAdmin from "@/components/admin/CustomDesignsAdmin";
 import { ABOUT_GROUPS, type AboutGroup } from "@/lib/aboutContent";
+import PageContentEditor from "@/components/admin/PageContentEditor";
+import { CHARMS_GROUPS, COLLECTIONS_GROUPS, HEELS_GROUPS } from "@/lib/shopPageContent";
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
 
@@ -390,7 +392,7 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "home-layout" | "gift-sets" | "gift-sets-page" | "custom-requests" | "custom-page" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-page" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type TabId = "dashboard" | "home-layout" | "gift-sets" | "gift-sets-page" | "custom-requests" | "custom-page" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-new" | "clips-new" | "coll-new" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-page" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
 type MainSection = "dashboard" | "homepage" | "gift-sets" | "custom-designs" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
@@ -409,6 +411,9 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "categories":     "catalog",
   "product-page":   "catalog",
   "heels-page":     "heels",
+  "heels-new":      "heels",
+  "clips-new":      "clips-page",
+  "coll-new":       "collections-page",
   "clips-page":     "clips-page",
   "bow-page":           "bow-page",
   "collections-page":   "collections-page",
@@ -486,10 +491,10 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
     { id: "categories",   label: "Categories" },
     { id: "product-page", label: "Product Page" },
   ],
-  heels:       [{ id: "heels-page", label: "Heels Page" }],
-  "clips-page": [{ id: "clips-page", label: "Clips Page" }],
+  heels:       [{ id: "heels-new", label: "New Page" }, { id: "heels-page", label: "Banner & More" }],
+  "clips-page": [{ id: "clips-new", label: "New Page" }, { id: "clips-page", label: "Banner, Filters & More" }],
   "bow-page":          [{ id: "bow-page",         label: "Bow Page" }],
-  "collections-page":  [{ id: "collections-page", label: "Collections Page" }],
+  "collections-page":  [{ id: "coll-new", label: "New Page" }, { id: "collections-page", label: "Old Page Texts" }],
   "style-ideas-page": [
     { id: "style-ideas-page",     label: "Style Ideas" },
     { id: "style-ideas-featured", label: "Featured Look" },
@@ -4017,9 +4022,10 @@ export default function AdminPage() {
               if (id === "messages") return "messages";
               if (id === "live-tracker") return "live-tracker";
               if (id === "shipping-rates") return "shipping-rates";
-              if (id === "clips-page") return "clips-page";
+              if (id === "heels") return "heels-new";
+              if (id === "clips-page") return "clips-new";
               if (id === "bow-page") return "bow-page";
-              if (id === "collections-page") return "collections-page";
+              if (id === "collections-page") return "coll-new";
               if (id === "style-ideas-page") return "style-ideas-page";
               if (id === "hot-deals") return "hd-page";
               if (id === "about-us") return "au-page";
@@ -4872,6 +4878,7 @@ export default function AdminPage() {
           {/* ── HEELS PAGE TAB ───────────────────────────────── */}
           {tab === "heels-page" && (
             <div className="space-y-8">
+              <p className="text-xs bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3">The Heels page now uses the new layout (edit it in New Page). From this tab it still uses the banner photo (if New Page has no photo). The other texts here (stats, Why Choose cards) are kept but no longer shown.</p>
               {heelsPageLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading…</div> : (
                 <>
                   {/* ── Hero Settings ─────────────────────────────────── */}
@@ -5158,8 +5165,19 @@ export default function AdminPage() {
           {/* ══════════════════════════════════════
               CLIPS PAGE TAB
           ══════════════════════════════════════ */}
+          {tab === "heels-new" && (
+            <PageContentEditor title="Heels page" intro="Texts and photos of the Heels page (www.classie.co.in/shop/heels). Heels themselves come from Products; the occasion tiles from Catalog → Collections." groups={HEELS_GROUPS} viewUrl="/shop/heels" revalidate={revalidateSite} />
+          )}
+          {tab === "clips-new" && (
+            <PageContentEditor title="Shoe Charms page" intro="Texts and photos of the Shoe Charms page (www.classie.co.in/shop/clips). Which type buttons show comes from 'Banner, Filters & More' → filter types." groups={CHARMS_GROUPS} viewUrl="/shop/clips" revalidate={revalidateSite} />
+          )}
+          {tab === "coll-new" && (
+            <PageContentEditor title="Collections page" intro="Texts, photos and 'Shop the look' pairs of the Collections page (www.classie.co.in/collections)." groups={COLLECTIONS_GROUPS} viewUrl="/collections" revalidate={revalidateSite} />
+          )}
+
           {tab === "clips-page" && (
             <div className="space-y-8">
+              <p className="text-xs bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3">The Shoe Charms page now uses the new layout (edit it in New Page). From this tab it still uses the filter types (which type buttons show). The other texts here are kept but no longer shown.</p>
               {clipsPageLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading…</div> : (
                 <>
                   {/* ── Hero Settings ─────────────────────────────────── */}
@@ -5787,6 +5805,7 @@ export default function AdminPage() {
           ══════════════════════════════════════ */}
           {tab === "collections-page" && (
             <div className="space-y-8">
+              <p className="text-xs bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3">The Collections page now uses the new layout (edit it in New Page). These old texts are kept here but no longer shown.</p>
 
               {/* ── Hero Section ─────────────────────────────────── */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">

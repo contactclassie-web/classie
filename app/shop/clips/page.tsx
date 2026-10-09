@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { loadFreeShippingAmount } from "@/lib/shippingServer";
-import { getShopCategorySettings } from "@/lib/products";
-import ShopCategoryPageClient from "@/components/ShopCategoryPageClient";
-import { createClient } from "@supabase/supabase-js";
+import ShopListing from "@/components/shop/ShopListing";
+import { contentReader } from "@/lib/shopPageContent";
+import { DEFAULT_CHARM_TYPES, loadAllListingProducts, loadGiftSummary, loadSettings, parseList } from "@/lib/shopListingServer";
 
 export const revalidate = 3600;
 
@@ -15,71 +15,36 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-
-function mapRow(row: Record<string, unknown>) {
-  return {
-    slug: row.slug as string,
-    title: row.title as string,
-    price: Number(row.price),
-    comparePrice: Number(row.compare_price ?? 0),
-    category: (row.category === "clips" || row.category === "bow" || row.category === "shoe-charms" ? "accessories" : row.category) as "heels" | "accessories",
-    collection: "clips" as "heels" | "clips" | "bow",
-    variants: { type: "none" as const, options: [] },
-    image: row.image as string ?? "",
-    description: (row.description as string) ?? "",
-    featured_tab: (row.featured_tab as string) ?? null,
-    heel_type: (row.heel_type as string) ?? null,
-    tags: (row.tags as string[]) ?? [],
-  };
-}
-
 export default async function ClipsPage() {
-  const free = await loadFreeShippingAmount();
-  const [shoeCharmsRes, clipsRes, bowRes, settings, collectionsData] = await Promise.all([
-    sb.from("products").select("*").eq("category", "shoe-charms").eq("active", true),
-    sb.from("products").select("*").eq("category", "clips").eq("active", true),
-    sb.from("products").select("*").eq("category", "bow").eq("active", true),
-    getShopCategorySettings("clips"),
-    sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true }),
+  const [free, { charms }, settings, gift] = await Promise.all([
+    loadFreeShippingAmount(),
+    loadAllListingProducts(),
+    loadSettings(["cp2_"], ["clips_filter_types"]),
+    loadGiftSummary(),
   ]);
-
-  const allProducts = [
-    ...(shoeCharmsRes.data ?? []).map(mapRow),
-    ...(clipsRes.data ?? []).map(mapRow),
-    ...(bowRes.data ?? []).map(mapRow),
-  ];
-
-  const initialOccasions = (collectionsData.data ?? []).map((c) => ({
-    title: c.title, slug: c.slug, image: c.image_url ?? "",
-    tag_label: c.tag_label ?? "", image_position: c.image_position ?? "50% 50%",
-  }));
 
   return (
     <>
-      <ShopCategoryPageClient
-        initialProducts={allProducts}
-        initialSettings={settings}
-        category="clips"
-        settingsPrefix="clips"
-        categoryLabel="Shoe Charms"
-        activeCategorySlug="clips"
-        initialOccasions={initialOccasions}
-      />
-
-      {/* SEO Content Block */}
-      <section className="max-w-4xl mx-auto px-6 pt-8 pb-14 md:py-16 text-center">
-        <h2 className="text-2xl font-serif font-light text-[#1a1a1a] mb-6">Buy Shoe Clips Online in India</h2>
-        <p className="text-sm text-gray-600 leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          CLASSIE is India&apos;s favourite destination to <strong>buy shoe clips online</strong>. Our handcrafted <strong>rhinestone shoe clips</strong>, <strong>bow clips for shoes</strong>, <strong>crystal clips</strong>, and <strong>floral shoe clips</strong> are designed to transform any pair of heels, flats, or sandals instantly — no glue, no damage, no effort.
+      <ShopListing
+        mode="charms"
+        settings={settings}
+        products={charms}
+        heroImage={contentReader(settings)("cp2_hero_img")}
+        typeTags={parseList(settings.clips_filter_types, DEFAULT_CHARM_TYPES)}
+        giftFrom={gift.from}
+        giftImage={gift.image}
+        freeFrom={free}
+      >
+        <p>
+          CLASSIE is the place to <strong>buy shoe clips online</strong> in India. Our <strong>rhinestone shoe clips</strong>, <strong>bow clips for shoes</strong>, <strong>crystal clips</strong> and <strong>floral shoe clips</strong> change any pair of heels, flats or sandals in seconds — no glue, no damage.
         </p>
-        <p className="text-sm text-gray-600 leading-relaxed mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          Looking for <strong>shoe clips for wedding</strong>? Our bridal shoe clips add the perfect sparkle to your wedding day shoes. The <strong>Ivory Pearl Bow</strong>, <strong>Starburst Crystal</strong>, and <strong>Butterfly Bling</strong> are top picks for brides across India. Want to style your saree? Our <strong>saree accessories</strong> collection includes clips that work beautifully on dupattas, belts, and blouse pins too.
+        <p>
+          Looking for <strong>shoe clips for a wedding</strong>? Crystal and pearl styles add sparkle to bridal and party shoes. The clips also work on dupattas, belts and bags.
         </p>
-        <p className="text-sm text-gray-600 leading-relaxed mb-8" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          All CLASSIE shoe clips are sold as a pair, made with premium materials, and available with free shipping above ₹{free} and COD across India. Discover <strong>bow clips</strong>, <strong>crystal clips</strong>, <strong>satin clips</strong>, and <strong>fabric flower clips</strong> — all under one roof.
+        <p>
+          All CLASSIE shoe clips are sold as a pair, with free shipping above ₹{free} and COD across India.
         </p>
-      </section>
+      </ShopListing>
 
       {/* FAQ Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({

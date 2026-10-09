@@ -4,6 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import { loadAllListingProducts } from "@/lib/shopListingServer";
+import { postCover, storyProducts } from "@/lib/blogProducts";
+import { ProductCard } from "@/components/shop/ShopListing";
 
 export const revalidate = 3600;
 
@@ -115,6 +118,8 @@ export async function generateMetadata({
   const post = await getPost(params.slug);
   if (!post) return { title: "Post Not Found" };
   const canonicalUrl = `https://www.classie.co.in/blog/${post.slug}`;
+  const { heels, charms } = await loadAllListingProducts();
+  const cover = postCover(post, heels, charms);
   return {
     title: post.title,
     description: post.excerpt || undefined,
@@ -125,14 +130,14 @@ export async function generateMetadata({
       url: canonicalUrl,
       type: "article",
       publishedTime: post.published_at,
-      images: post.cover_image ? [{ url: post.cover_image, width: 1200, height: 630 }] : undefined,
+      images: cover ? [{ url: cover, width: 1200, height: 630 }] : undefined,
       siteName: "CLASSIE",
     },
     twitter: {
       card: "summary_large_image",
       title: `${post.title} | CLASSIE`,
       description: post.excerpt || undefined,
-      images: post.cover_image ? [post.cover_image] : undefined,
+      images: cover ? [cover] : undefined,
     },
   };
 }
@@ -145,22 +150,26 @@ export default async function BlogPostPage({
   const post = await getPost(params.slug);
   if (!post) notFound();
 
-  const [morePosts, content] = await Promise.all([
+  const [morePosts, content, { heels, charms }] = await Promise.all([
     getMorePosts(post.category, post.id),
     prepareContent(post.content || ""),
+    loadAllListingProducts(),
   ]);
+  const cover = postCover(post, heels, charms);
+  const more = morePosts.map((mp) => ({ ...mp, cover_image: postCover(mp, heels, charms) || null }));
+  const shopProducts = storyProducts(post, heels, charms, 4);
 
   const canonicalUrl = `https://www.classie.co.in/blog/${post.slug}`;
 
   return (
-    <div style={{ fontFamily: "'Poppins', sans-serif", background: "#fff", color: "#1a1a1a" }}>
+    <div style={{ fontFamily: "var(--font-poppins), sans-serif", background: "#fff", color: "#1a1a1a" }}>
       {/* Article Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "Article",
         "headline": post.title,
         "description": post.excerpt || "",
-        "image": post.cover_image || "",
+        "image": cover || "",
         "datePublished": post.published_at,
         "dateModified": post.published_at,
         "author": { "@type": "Person", "name": post.author || "CLASSIE" },
@@ -178,30 +187,6 @@ export default async function BlogPostPage({
           { "@type": "ListItem", "position": 3, "name": post.title, "item": canonicalUrl },
         ]
       }) }} />
-      {/* Cover image — full width */}
-      {post.cover_image && (
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            aspectRatio: "16/5",
-            overflow: "hidden",
-            backgroundColor: "#F5F5F5",
-          }}
-        >
-          <Image
-            src={optimizeCloudinary(post.cover_image, 1400)}
-            alt={post.title}
-            fill
-            priority
-            quality={95}
-            unoptimized
-            className="object-contain"
-            sizes="100vw"
-          />
-        </div>
-      )}
-
       {/* Article content */}
       <div
         style={{
@@ -217,7 +202,7 @@ export default async function BlogPostPage({
             display: "inline-flex",
             alignItems: "center",
             gap: "6px",
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "var(--font-poppins), sans-serif",
             fontSize: "0.72rem",
             fontWeight: 500,
             letterSpacing: "0.1em",
@@ -242,7 +227,7 @@ export default async function BlogPostPage({
         >
           <span
             style={{
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "var(--font-poppins), sans-serif",
               fontSize: "0.62rem",
               fontWeight: 600,
               letterSpacing: "0.18em",
@@ -257,7 +242,7 @@ export default async function BlogPostPage({
           </span>
           <span
             style={{
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "var(--font-poppins), sans-serif",
               fontSize: "0.72rem",
               color: "#666",
               fontWeight: 300,
@@ -270,8 +255,8 @@ export default async function BlogPostPage({
         {/* Title */}
         <h1
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "3rem",
+            fontFamily: "var(--font-cormorant), Georgia, serif",
+            fontSize: "clamp(2rem, 6vw, 3rem)",
             fontWeight: 500,
             color: "#1a1a1a",
             lineHeight: 1.2,
@@ -285,7 +270,7 @@ export default async function BlogPostPage({
         {/* Author */}
         <p
           style={{
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "var(--font-poppins), sans-serif",
             fontSize: "0.78rem",
             color: "#666",
             fontWeight: 300,
@@ -298,11 +283,17 @@ export default async function BlogPostPage({
         {/* Divider */}
         <hr style={{ border: "none", borderTop: "1px solid #e5e5e5", marginBottom: "36px" }} />
 
+        {cover && (
+          <div style={{ position: "relative", width: "100%", aspectRatio: "16/10", overflow: "hidden", borderRadius: "12px", background: "#F5F2ED", marginBottom: "36px" }}>
+            <Image src={optimizeCloudinary(cover, 1200)} alt={post.title} fill priority unoptimized className="object-cover" sizes="(max-width: 800px) 100vw, 768px" />
+          </div>
+        )}
+
         {/* Content */}
         <div
           dangerouslySetInnerHTML={{ __html: content || "<p>Content coming soon.</p>" }}
           style={{
-            fontFamily: "'Poppins', sans-serif",
+            fontFamily: "var(--font-poppins), sans-serif",
             fontSize: "1rem",
             lineHeight: 1.8,
             color: "#333",
@@ -311,8 +302,23 @@ export default async function BlogPostPage({
         />
       </div>
 
+      {/* Shop this story */}
+      {shopProducts.length > 0 && (
+        <section className="max-w-[1200px] mx-auto px-5 md:px-10 pb-14 md:pb-20">
+          <div className="flex items-center gap-5 mb-6 md:mb-9">
+            <h2 className="text-[26px] md:text-[34px] font-normal whitespace-nowrap">Shop this <em style={{ color: "#3B5373" }}>story</em></h2>
+            <div className="flex-1 h-px bg-[#e5e5e5]" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-2.5 md:gap-x-5 gap-y-7">
+            {shopProducts.map((p) => (
+              <ProductCard key={p.slug} p={p} mode={heels.includes(p) ? "heels" : "charms"} wornFirst={false} hidePair />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* More Stories */}
-      {morePosts.length > 0 && (
+      {more.length > 0 && (
         <div
           style={{
             borderTop: "1px solid #e5e5e5",
@@ -331,7 +337,7 @@ export default async function BlogPostPage({
             >
               <span
                 style={{
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "var(--font-poppins), sans-serif",
                   fontSize: "0.62rem",
                   fontWeight: 600,
                   letterSpacing: "0.28em",
@@ -352,7 +358,7 @@ export default async function BlogPostPage({
               }}
               className="more-cards-grid"
             >
-              {morePosts.map((mp) => (
+              {more.map((mp) => (
                 <Link
                   key={mp.id}
                   href={`/blog/${mp.slug}`}
@@ -398,7 +404,7 @@ export default async function BlogPostPage({
                   </div>
                   <span
                     style={{
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "var(--font-poppins), sans-serif",
                       fontSize: "0.6rem",
                       fontWeight: 600,
                       letterSpacing: "0.2em",
@@ -412,7 +418,7 @@ export default async function BlogPostPage({
                   </span>
                   <h3
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "var(--font-cormorant), Georgia, serif",
                       fontSize: "1.28rem",
                       fontWeight: 500,
                       color: "#1a1a1a",
@@ -425,7 +431,7 @@ export default async function BlogPostPage({
                   </h3>
                   <span
                     style={{
-                      fontFamily: "'Poppins', sans-serif",
+                      fontFamily: "var(--font-poppins), sans-serif",
                       fontSize: "0.65rem",
                       color: "#666",
                       fontWeight: 300,
@@ -442,7 +448,7 @@ export default async function BlogPostPage({
 
       <style dangerouslySetInnerHTML={{ __html: `
         .blog-prose h2 {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--font-cormorant), Georgia, serif;
           font-size: 1.8rem;
           font-weight: 500;
           color: #1a1a1a;
@@ -450,7 +456,7 @@ export default async function BlogPostPage({
           line-height: 1.3;
         }
         .blog-prose h3 {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: var(--font-cormorant), Georgia, serif;
           font-size: 1.4rem;
           font-weight: 500;
           color: #1a1a1a;

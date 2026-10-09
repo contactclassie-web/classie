@@ -103,7 +103,7 @@ export default function CategoryLinks({ excludeSlug, activeSlug, initialCategori
                 {cat.name}
               </p>
               {isActive && (
-                <span style={{ fontSize: "10px", color: style.hoverText, opacity: 0.7, letterSpacing: "0.15em", fontFamily: "'Poppins', sans-serif" }}>
+                <span style={{ fontSize: "10px", color: style.hoverText, opacity: 0.7, letterSpacing: "0.15em", fontFamily: "var(--font-poppins), sans-serif" }}>
                   ✓
                 </span>
               )}
