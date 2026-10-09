@@ -46,7 +46,7 @@ export const HEELS_GROUPS: PageGroup[] = [
   },
   {
     id: "band", label: "2 · Shoe charms band",
-    note: "Navy band shown after the first row of heels. Photos empty = the 'on a heel' photo of three shoe charms.",
+    note: "Navy band shown after the first row of heels. Three photos of shoe charms on a heel (empty = the default photos shown).",
     fields: [
       onOff("hp2_cs_show", "Show this band"),
       t("hp2_cs_eyebrow", "Small text", "One heel, many looks"),
@@ -54,7 +54,9 @@ export const HEELS_GROUPS: PageGroup[] = [
       t("hp2_cs_title_em", "Heading (italic part)", "wear a clip."),
       ta("hp2_cs_text", "Text", "Add a pair of shoe charms and wear the same heel to the office and to a wedding."),
       t("hp2_cs_button", "Button", "Shop shoe charms", "The lowest charm price is added automatically."),
-      img("hp2_cs_img1", "Photo 1"), img("hp2_cs_img2", "Photo 2"), img("hp2_cs_img3", "Photo 3"),
+      img("hp2_cs_img1", "Photo 1", undefined, C + "v1783885597/d6e603de-2a3a-4311-a1b8-7c2b37cbad1e_renzr6.png"),
+      img("hp2_cs_img2", "Photo 2", undefined, C + "v1784293137/4cae7e67-5bb7-4edc-83df-8af37690d4bf_mjvvnq.png"),
+      img("hp2_cs_img3", "Photo 3", undefined, C + "v1783885081/a4d19c1b-77e0-4de4-8b5b-aafcfbf12afd_p2uyto.png"),
     ],
   },
   {

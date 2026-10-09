@@ -201,13 +201,13 @@ export default function ShopListing(props: Props) {
   // Band after the first 4 products
   const band = mode === "heels" ? (show("cs_show") && (
     <div key="band" className="col-span-full grid grid-cols-1 md:grid-cols-[400px_minmax(0,1fr)] text-white my-2 md:my-4" style={{ background: NAVY }}>
-      <div className="grid grid-cols-3 md:order-2">
+      <div className="grid grid-cols-3 md:order-2 md:h-full">
         {[1, 2, 3].map((n, i) => {
           const src = k(`cs_img${n}`) || bandImages[i] || "";
           return src
             // eslint-disable-next-line @next/next/no-img-element
-            ? <img key={n} src={optimizeCloudinary(src, 500)} alt="A CLASSIE shoe charm on a heel" loading="lazy" className="w-full h-[130px] md:h-[320px] object-cover" />
-            : <div key={n} className="h-[130px] md:h-[320px] bg-white/10" />;
+            ? <img key={n} src={optimizeCloudinary(src, 500)} alt="A CLASSIE shoe charm on a heel" loading="lazy" className="w-full h-[130px] md:h-full md:min-h-[320px] object-cover" />
+            : <div key={n} className="h-[130px] md:h-full md:min-h-[320px] bg-white/10" />;
         })}
       </div>
       <div className="md:order-1 px-4 py-6 md:p-12 flex flex-col justify-center gap-3">
