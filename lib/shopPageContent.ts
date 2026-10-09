@@ -85,6 +85,7 @@ export const HEELS_GROUPS: PageGroup[] = [
     fields: [
       t("hp2_seo_title", "Heading", "Buy women's heels online in India"),
       ta("hp2_seo_text", "Short text", "CLASSIE heels — block heels, slingbacks, sculpted heels and kitten heels — for weddings, office and everyday wear. Free delivery and COD across India."),
+      ta("hp2_seo_more", "Longer text (inside Read more)", "CLASSIE offers a curated collection of premium women's heels online in India — from everyday block heels and slingback heels to elegant sculpted heels and slim heels. Whether you're shopping for heels for an Indian wedding, office wear, a party or everyday styling, there is a pair for every occasion.\n\nOur block heels for women are designed for all-day comfort. The slingback heels and pointed toe styles suit ethnic wear and sarees, and our comfortable heels for long hours come with cushioning and stable bases.\n\nShop black heels, white heels, maroon heels, cream heels and more — with free shipping above ₹{free} and COD across India.", "Leave an empty line between paragraphs. {free} = your free-delivery amount."),
     ],
   },
 ];
@@ -169,6 +170,7 @@ export const CHARMS_GROUPS: PageGroup[] = [
     fields: [
       t("cp2_seo_title", "Heading", "Buy shoe clips online in India"),
       ta("cp2_seo_text", "Short text", "Rhinestone, bow, pearl and jute shoe clips that change any heel, flat or sandal in seconds. Sold as a pair, with COD across India."),
+      ta("cp2_seo_more", "Longer text (inside Read more)", "CLASSIE is the place to buy shoe clips online in India. Our rhinestone shoe clips, bow clips for shoes, crystal clips and floral shoe clips change any pair of heels, flats or sandals in seconds — no glue, no damage.\n\nLooking for shoe clips for a wedding? Crystal and pearl styles add sparkle to bridal and party shoes. The clips also work on dupattas, belts and bags.\n\nAll CLASSIE shoe clips are sold as a pair, with free shipping above ₹{free} and COD across India.", "Leave an empty line between paragraphs. {free} = your free-delivery amount."),
     ],
   },
 ];

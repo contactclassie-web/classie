@@ -137,3 +137,23 @@ export function listingJsonLd(name: string, path: string, products: ListingProdu
     },
   ]).replace(/</g, "\\u003c");
 }
+
+/** An occasion edit (Catalog → Collections) with its products in admin order. */
+export async function loadEdit(slug: string): Promise<{ title: string; description: string; image: string; tag: string; products: ListingProduct[] } | null> {
+  const sb = publicSupabase(60);
+  const { data: col } = await sb.from("collections").select("id,title,description,image_url,tag_label").eq("slug", slug).maybeSingle();
+  if (!col) return null;
+  const { data: links } = await sb.from("collection_products").select("product_slug,display_order").eq("collection_id", col.id).order("display_order", { ascending: true });
+  const slugs = (links ?? []).map((l: { product_slug: string }) => l.product_slug);
+  const { data: rows } = slugs.length
+    ? await sb.from("products").select(COLS).in("slug", slugs).eq("active", true)
+    : { data: [] as Row[] };
+  const bySlug = new Map((rows ?? []).map((r: Row) => [r.slug, toListing(r)]));
+  return {
+    title: col.title ?? "",
+    description: col.description ?? "",
+    image: col.image_url ?? "",
+    tag: col.tag_label ?? "",
+    products: slugs.map((s: string) => bySlug.get(s)).filter((p): p is ListingProduct => !!p),
+  };
+}

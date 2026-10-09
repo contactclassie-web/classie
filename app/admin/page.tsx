@@ -8,7 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity, Gift, PenTool,
+  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity, Gift, PenTool, FileText,
 } from "lucide-react";
 import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import HomepageBuilder from "@/components/admin/HomepageBuilder";
@@ -16,6 +16,7 @@ import GiftSetsAdmin from "@/components/admin/GiftSetsAdmin";
 import CustomDesignsAdmin from "@/components/admin/CustomDesignsAdmin";
 import { ABOUT_GROUPS, type AboutGroup } from "@/lib/aboutContent";
 import PageContentEditor from "@/components/admin/PageContentEditor";
+import SiteTextAdmin from "@/components/admin/SiteTextAdmin";
 import { CHARMS_GROUPS, COLLECTIONS_GROUPS, HEELS_GROUPS } from "@/lib/shopPageContent";
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
@@ -392,8 +393,8 @@ const labelCls = "block text-xs font-medium text-gray-500 uppercase tracking-wid
 
 interface FooterLinkItem { text: string; url: string; }
 
-type TabId = "dashboard" | "home-layout" | "gift-sets" | "gift-sets-page" | "custom-requests" | "custom-page" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-new" | "clips-new" | "coll-new" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-page" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
-type MainSection = "dashboard" | "homepage" | "gift-sets" | "custom-designs" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
+type TabId = "dashboard" | "home-layout" | "gift-sets" | "gift-sets-page" | "custom-requests" | "custom-page" | "orders" | "products" | "slides" | "collections" | "categories" | "featured-picks" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "testimonials" | "instagram" | "style-inspo" | "announcement" | "trust-band" | "heels-new" | "clips-new" | "coll-new" | "st-menu" | "st-faq" | "st-privacy" | "st-terms" | "st-refund" | "heels-page" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "style-ideas-featured" | "style-ideas-reels" | "adv-shop" | "adv-coll" | "adv-picks" | "adv-inspo" | "adv-related" | "hd-page" | "hd-coupons" | "hd-stats" | "au-page" | "au-hero" | "au-banner" | "au-story" | "au-features" | "au-founder" | "ct-hero" | "ct-help" | "ct-faq" | "ct-info" | "ct-inbox" | "sp-hero" | "sp-tiles" | "sp-content" | "sp-cta" | "sg-hero" | "sg-measure" | "sg-chart" | "sg-tips" | "sg-cta" | "re-hero" | "re-tiles" | "re-policy" | "re-cta" | "philosophy" | "product-page" | "blog";
+type MainSection = "site-text" | "dashboard" | "homepage" | "gift-sets" | "custom-designs" | "catalog" | "heels" | "clips-page" | "bow-page" | "collections-page" | "style-ideas-page" | "advanced-settings" | "orders" | "settings" | "footer" | "messages" | "live-tracker" | "shipping-rates" | "hot-deals" | "about-us" | "contact-us" | "shipping-policy" | "size-guide" | "returns" | "blog";
 
 const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "dashboard":      "dashboard",
@@ -412,6 +413,11 @@ const TAB_TO_SECTION: Record<TabId, MainSection> = {
   "product-page":   "catalog",
   "heels-page":     "heels",
   "heels-new":      "heels",
+  "st-menu":        "site-text",
+  "st-faq":         "site-text",
+  "st-privacy":     "site-text",
+  "st-terms":       "site-text",
+  "st-refund":      "site-text",
   "clips-new":      "clips-page",
   "coll-new":       "collections-page",
   "clips-page":     "clips-page",
@@ -554,6 +560,13 @@ const SECTION_SUBTABS: Record<MainSection, { id: TabId; label: string }[]> = {
   "shipping-rates": [],
   blog:     [{ id: "blog", label: "Blog Posts" }],
   "gift-sets":      [{ id: "gift-sets", label: "Sets" }, { id: "gift-sets-page", label: "Page" }],
+  "site-text":      [
+    { id: "st-menu", label: "Top Menu" },
+    { id: "st-faq", label: "FAQ Page" },
+    { id: "st-privacy", label: "Privacy" },
+    { id: "st-terms", label: "Terms" },
+    { id: "st-refund", label: "Refund Policy" },
+  ],
   "custom-designs": [{ id: "custom-requests", label: "Requests" }, { id: "custom-page", label: "Page" }],
 };
 
@@ -3979,6 +3992,7 @@ export default function AdminPage() {
         { id: "shipping-policy", label: "Shipping",         icon: Truck },
         { id: "size-guide",      label: "Size Guide",       icon: Ruler },
         { id: "returns",         label: "Returns",          icon: RefreshCw },
+        { id: "site-text",       label: "Menu, FAQ & Legal", icon: FileText },
       ],
     },
     {
@@ -4108,6 +4122,7 @@ export default function AdminPage() {
                mainSection === "shipping-policy" ? "Shipping Policy" :
                mainSection === "size-guide" ? "Size Guide" :
                mainSection === "returns" ? "Returns & Exchanges" :
+               mainSection === "site-text" ? "Menu, FAQ & Legal" :
                mainSection === "orders" ? "Orders" :
                mainSection === "settings" ? "Settings" :
                mainSection === "footer" ? "Footer" :
@@ -5165,6 +5180,9 @@ export default function AdminPage() {
           {/* ══════════════════════════════════════
               CLIPS PAGE TAB
           ══════════════════════════════════════ */}
+          {(tab === "st-menu" || tab === "st-faq" || tab === "st-privacy" || tab === "st-terms" || tab === "st-refund") && (
+            <SiteTextAdmin view={tab === "st-menu" ? "menu" : tab === "st-faq" ? "faq" : tab === "st-privacy" ? "privacy" : tab === "st-terms" ? "terms" : "refund"} revalidate={revalidateSite} />
+          )}
           {tab === "heels-new" && (
             <PageContentEditor title="Heels page" intro="Texts and photos of the Heels page (www.classie.co.in/shop/heels). Heels themselves come from Products; the occasion tiles from Catalog → Collections." groups={HEELS_GROUPS} viewUrl="/shop/heels" revalidate={revalidateSite} />
           )}

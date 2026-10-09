@@ -1,6 +1,7 @@
 import { Metadata } from "next";
-import CollectionGrid from "@/components/CollectionGrid";
-import { getCollectionProductsFromDB } from "@/lib/products";
+import { notFound } from "next/navigation";
+import EditView from "@/components/shop/EditView";
+import { listingJsonLd, loadEdit } from "@/lib/shopListingServer";
 
 export const revalidate = 60;
 
@@ -11,12 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default async function EverydayEditPage() {
-  const collectionProducts = await getCollectionProductsFromDB("the-everyday-edit");
+  const edit = await loadEdit("the-everyday-edit");
+  if (!edit) notFound();
   return (
-    <CollectionGrid
-      title="The Everyday Edit"
-      subtitle="Comfort for the every-day woman"
-      products={collectionProducts}
-    />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: listingJsonLd(edit.title || "The Everyday Edit", "/shop/the-everyday-edit", edit.products) }} />
+      <EditView {...edit} title={edit.title || "The Everyday Edit"} fallbackSub="Comfort for the every-day woman" />
+    </>
   );
 }

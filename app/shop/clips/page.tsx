@@ -35,15 +35,7 @@ export default async function ClipsPage() {
         giftImage={gift.image}
         freeFrom={free}
       >
-        <p>
-          CLASSIE is the place to <strong>buy shoe clips online</strong> in India. Our <strong>rhinestone shoe clips</strong>, <strong>bow clips for shoes</strong>, <strong>crystal clips</strong> and <strong>floral shoe clips</strong> change any pair of heels, flats or sandals in seconds — no glue, no damage.
-        </p>
-        <p>
-          Looking for <strong>shoe clips for a wedding</strong>? Crystal and pearl styles add sparkle to bridal and party shoes. The clips also work on dupattas, belts and bags.
-        </p>
-        <p>
-          All CLASSIE shoe clips are sold as a pair, with free shipping above ₹{free} and COD across India.
-        </p>
+        {contentReader(settings)("cp2_seo_more").replaceAll("{free}", String(free)).split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
       </ShopListing>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: listingJsonLd("Shoe Charms", "/shop/clips", charms) }} />

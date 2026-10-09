@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { loadFreeShippingAmount } from "@/lib/shippingServer";
 import ShopListing from "@/components/shop/ShopListing";
+import { contentReader } from "@/lib/shopPageContent";
 import { DEFAULT_CHARM_TYPES, bandPhotos, listingJsonLd, loadAllListingProducts, loadOccasions, loadSettings, parseList } from "@/lib/shopListingServer";
 
 export const revalidate = 3600;
@@ -43,15 +44,7 @@ export default async function HeelsPage() {
         charmFrom={charmPrices.length ? Math.min(...charmPrices) : 0}
         freeFrom={free}
       >
-        <p>
-          CLASSIE offers a curated collection of premium <strong>women&apos;s heels online in India</strong> — from everyday <strong>block heels</strong> and <strong>slingback heels</strong> to elegant sculpted heels and slim heels. Whether you&apos;re shopping for <strong>heels for an Indian wedding</strong>, office wear, a party or everyday styling, there is a pair for every occasion.
-        </p>
-        <p>
-          Our <strong>block heels for women</strong> are designed for all-day comfort. The <strong>slingback heels</strong> and pointed toe styles suit ethnic wear and sarees, and our <strong>comfortable heels for long hours</strong> come with cushioning and stable bases.
-        </p>
-        <p>
-          Shop <strong>black heels</strong>, <strong>white heels</strong>, <strong>maroon heels</strong>, <strong>cream heels</strong> and more — with free shipping above ₹{free} and COD across India.
-        </p>
+        {contentReader(settings)("hp2_seo_more").replaceAll("{free}", String(free)).split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
       </ShopListing>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: listingJsonLd("Heels", "/shop/heels", heels) }} />
