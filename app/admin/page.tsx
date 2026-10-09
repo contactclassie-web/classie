@@ -8,7 +8,7 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, X, Save, Mail, Users,
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
-  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity, Gift, PenTool, FileText,
+  Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity, Gift, PenTool, FileText, Menu as MenuIcon,
 } from "lucide-react";
 import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import HomepageBuilder from "@/components/admin/HomepageBuilder";
@@ -635,6 +635,8 @@ export default function AdminPage() {
 
   // Active tab
   const [tab, setTab] = useState<TabId>("dashboard");
+  const [navOpen, setNavOpen] = useState(false);
+  const [secOpen, setSecOpen] = useState(false); // phone: admin menu drawer
 
   // Orders
   const [orders, setOrders] = useState<Order[]>([]);
@@ -4011,12 +4013,16 @@ export default function AdminPage() {
   // ── Main layout ───────────────────────────────────────────────────────────
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="admin-ui flex min-h-screen bg-gray-50">
+      {/* Phone: dark backdrop behind the open menu */}
+      {navOpen && (
+        <button type="button" aria-label="Close menu" onClick={() => setNavOpen(false)} className="fixed inset-0 z-40 bg-black/40 md:hidden" />
+      )}
       {/* ══════════════════════════════════════════════════
-          SIDEBAR
+          SIDEBAR (phone: slide-out drawer)
       ══════════════════════════════════════════════════ */}
       <aside
-        className="w-56 flex-shrink-0 flex flex-col"
+        className={`fixed inset-y-0 left-0 z-50 w-64 md:w-56 md:static md:z-auto flex-shrink-0 flex flex-col transition-transform duration-200 md:translate-x-0 ${navOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}`}
         style={{ background: "#3B5373" }}
       >
         {/* Logo */}
@@ -4063,7 +4069,7 @@ export default function AdminPage() {
                     return (
                       <button
                         key={id}
-                        onClick={() => setTab(getFirstTab(id))}
+                        onClick={() => { setTab(getFirstTab(id)); setNavOpen(false); window.scrollTo({ top: 0 }); }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
                           active
                             ? "bg-white/15 text-white"
@@ -4102,10 +4108,13 @@ export default function AdminPage() {
       {/* ══════════════════════════════════════════════════
           MAIN CONTENT
       ══════════════════════════════════════════════════ */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 min-w-0 overflow-auto">
         {/* Top header */}
-        <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
-          <div>
+        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-3 md:py-4 flex items-center justify-between gap-3 sticky top-0 z-30">
+          <button type="button" aria-label="Open admin menu" onClick={() => setNavOpen(true)} className="md:hidden -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100">
+            <MenuIcon className="w-5 h-5" />
+          </button>
+          <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-gray-800 capitalize">
               {mainSection === "dashboard" ? "Dashboard" :
                mainSection === "homepage" ? "Homepage" :
@@ -4129,7 +4138,8 @@ export default function AdminPage() {
                mainSection === "live-tracker" ? "Live Tracker" :
                mainSection === "shipping-rates" ? "Shipping Rates" :
                mainSection === "gift-sets" ? "Gift Sets" :
-               mainSection === "custom-designs" ? "Custom Designs" : "Messages"}
+               mainSection === "custom-designs" ? "Custom Designs" :
+               mainSection === "blog" ? "Blog" : "Messages"}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">Classie Admin Panel</p>
           </div>
@@ -4147,25 +4157,28 @@ export default function AdminPage() {
         </div>
 
         {security && (!security.secretKey || !security.ownPassword) && (
-          <div className="bg-amber-50 border-b border-amber-200 px-8 py-3 text-xs text-amber-800 flex items-start gap-2">
+          <div className="bg-amber-50 border-b border-amber-200 px-4 md:px-8 py-3 text-xs text-amber-800 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <div>
+            <div className="min-w-0">
               <b>Security setup is not finished.</b>{" "}
+              <button type="button" onClick={() => setSecOpen((v) => !v)} className="md:hidden underline font-medium">{secOpen ? "Hide" : "What to do"}</button>
+              <span className={secOpen ? "block mt-1 md:inline md:mt-0" : "hidden md:inline"}>
               {!security.ownPassword && <>Add <code className="bg-amber-100 px-1 rounded">ADMIN_PASSWORD</code> (your new admin password) in Vercel → Settings → Environment Variables. </>}
               {!security.secretKey && <>Add <code className="bg-amber-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> (Supabase → Project Settings → API Keys → secret key) in Vercel. </>}
               Then redeploy. Lock the database (SQL in <code className="bg-amber-100 px-1 rounded">supabase/lock-down.sql</code>) only after this banner is gone.
+              </span>
             </div>
           </div>
         )}
 
         {/* Sub-tab navigation */}
         {SECTION_SUBTABS[mainSection].length > 0 && (
-          <div className="bg-white border-b border-gray-100 px-8 flex gap-0">
+          <div className="bg-white border-b border-gray-100 px-2 md:px-8 flex gap-0 overflow-x-auto [scrollbar-width:none]">
             {SECTION_SUBTABS[mainSection].map(({ id, label }) => (
               <button
                 key={id}
                 onClick={() => setTab(id)}
-                className={`px-5 py-3 text-xs font-medium tracking-widest uppercase transition-colors border-b-2 -mb-px ${
+                className={`shrink-0 whitespace-nowrap px-3 md:px-5 py-3 text-[11px] md:text-xs font-medium tracking-widest uppercase transition-colors border-b-2 -mb-px ${
                   tab === id
                     ? "border-[#3B5373] text-[#3B5373]"
                     : "border-transparent text-gray-400 hover:text-gray-600"
@@ -4177,7 +4190,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        <div className="p-8">
+        <div className="p-4 md:p-8">
 
           {/* ══════════════════════════════════════
               DASHBOARD TAB
@@ -5099,7 +5112,7 @@ export default function AdminPage() {
                         View Live Page →
                       </a>
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-100 bg-gray-50">
@@ -5370,7 +5383,7 @@ export default function AdminPage() {
                         View Live Page →
                       </a>
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-100 bg-gray-50">
@@ -5650,7 +5663,7 @@ export default function AdminPage() {
                         View Live Page →
                       </a>
                     </div>
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-100 bg-gray-50">
@@ -8007,7 +8020,7 @@ export default function AdminPage() {
                 ) : (
                   <>
                     {shipTiers.map((t, i) => (
-                      <div key={i} className="flex items-center gap-3">
+                      <div key={i} className="flex flex-wrap items-center gap-2 md:gap-3">
                         <span className="text-sm text-gray-500 whitespace-nowrap">Order below ₹</span>
                         <input type="number" value={t.threshold}
                           onChange={(e) => setShipTiers((rows) => rows.map((r, idx) => idx === i ? { ...r, threshold: Number(e.target.value) || 0 } : r))}
@@ -8030,7 +8043,7 @@ export default function AdminPage() {
                       <Plus className="w-3.5 h-3.5" /> Add tier
                     </button>
 
-                    <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 pt-3 border-t border-gray-100">
                       <span className="text-sm text-gray-500 whitespace-nowrap">Above all tiers → shipping ₹</span>
                       <input type="number" value={shipDefaultFee}
                         onChange={(e) => setShipDefaultFee(Number(e.target.value) || 0)}
@@ -9728,7 +9741,7 @@ export default function AdminPage() {
                     className="inline-block mt-3 text-xs text-[#3B5373] hover:underline">Open Supabase Dashboard ↗</a>
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50">
