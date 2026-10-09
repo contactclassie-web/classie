@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/returns`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
     { url: `${base}/privacy-policy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
     { url: `${base}/refund-policy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
+    { url: `${base}/terms`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.2 },
   ];
 
   // Dynamic product pages
@@ -36,12 +37,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
     const { data: products } = await sb
       .from("products")
-      .select("slug, updated_at")
+      .select("slug, created_at")
       .eq("active", true);
 
     const productPages: MetadataRoute.Sitemap = (products || []).map((p) => ({
       url: `${base}/products/${p.slug}`,
-      lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
+      lastModified: p.created_at ? new Date(p.created_at) : new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
     }));
@@ -74,6 +75,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
 
+    // Occasion edits (Catalog → Collections), e.g. /shop/the-date-edit
+    const { data: edits } = await sb.from("collections").select("slug").eq("active", true);
+    const editPages: MetadataRoute.Sitemap = (edits || []).map((e: { slug: string }) => ({
+      url: `${base}/shop/${e.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+
     // Gift set pages (switched-on sets only)
     const { data: setsRow } = await sb.from("site_settings").select("value").eq("key", GIFT_SETS_KEY).maybeSingle();
     let setPages: MetadataRoute.Sitemap = [];
@@ -82,7 +92,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       setPages = sets.map((x) => ({ url: `${base}/gift-sets/${x.slug}`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 }));
     } catch { setPages = []; }
 
-    return [...staticPages, ...productPages, ...blogPages, ...categoryPages, ...setPages];
+    const seen = new Set<string>();
+    return [...staticPages, ...productPages, ...blogPages, ...categoryPages, ...editPages, ...setPages]
+      .filter((x) => (seen.has(x.url) ? false : (seen.add(x.url), true)));
   } catch {
     return staticPages;
   }

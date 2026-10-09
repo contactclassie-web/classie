@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import CollectionsView, { type Look, type SmallTile } from "./CollectionsView";
 import { contentReader } from "@/lib/shopPageContent";
-import { loadAllListingProducts, loadGiftSummary, loadOccasions, loadSettings } from "@/lib/shopListingServer";
+import { listingJsonLd, loadAllListingProducts, loadGiftSummary, loadOccasions, loadSettings } from "@/lib/shopListingServer";
 
 export const metadata: Metadata = {
   title: "Shop All Collections — Women's Heels, Shoe Clips & Accessories India",
@@ -51,5 +51,10 @@ export default async function CollectionsPage() {
     return heel && clip ? [{ name: c(`col2_l${n}_name`), heel, clip }] : [];
   });
 
-  return <CollectionsView settings={settings} edits={occasions} tiles={tiles} looks={looks} heels={heels} charms={charms} />;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: listingJsonLd("Collections", "/collections", [...heels, ...charms]) }} />
+      <CollectionsView settings={settings} edits={occasions} tiles={tiles} looks={looks} heels={heels} charms={charms} />
+    </>
+  );
 }

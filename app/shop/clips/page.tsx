@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { loadFreeShippingAmount } from "@/lib/shippingServer";
 import ShopListing from "@/components/shop/ShopListing";
 import { contentReader } from "@/lib/shopPageContent";
-import { DEFAULT_CHARM_TYPES, loadAllListingProducts, loadGiftSummary, loadSettings, parseList } from "@/lib/shopListingServer";
+import { DEFAULT_CHARM_TYPES, listingJsonLd, loadAllListingProducts, loadGiftSummary, loadSettings, parseList } from "@/lib/shopListingServer";
 
 export const revalidate = 3600;
 
@@ -45,6 +45,8 @@ export default async function ClipsPage() {
           All CLASSIE shoe clips are sold as a pair, with free shipping above ₹{free} and COD across India.
         </p>
       </ShopListing>
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: listingJsonLd("Shoe Charms", "/shop/clips", charms) }} />
 
       {/* FAQ Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({

@@ -82,7 +82,7 @@ export default async function HomePage() {
 
   const [allProducts, settingsRes, heroRes, colorRes, igRes] = await Promise.all([
     getProductsFromDB({ active: true }),
-    sb.from("site_settings").select("key,value").in("key", [...HOME_KEYS, ...LEGACY_KEYS, ...FP_KEYS, ...NL_KEYS]),
+    sb.from("site_settings").select("key,value").in("key", [...HOME_KEYS, ...LEGACY_KEYS, ...FP_KEYS, ...NL_KEYS, "footer_ig_url", "footer_fb_url"]),
     sb.from("hero_slides").select("image_url").eq("active", true).eq("page", "home").order("display_order", { ascending: true }),
     sb.from("product_color_variants").select("product_slug,color_name,color_hex"),
     sb.from("instagram_images").select("image_url, link_url").eq("active", true).order("display_order", { ascending: true }).limit(9),
@@ -252,8 +252,24 @@ export default async function HomePage() {
     }
   };
 
+  // Google: who CLASSIE is (logo, socials, contact) and the site name
+  const orgLd = JSON.stringify([
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "CLASSIE",
+      url: "https://www.classie.co.in",
+      logo: "https://www.classie.co.in/logo.jpg",
+      description: "CLASSIE makes clip-on shoe charms (crystal, bow, pearl and jute shoe clips) and comfortable heels for women in India.",
+      sameAs: [cfg.footer_ig_url, cfg.footer_fb_url].filter(Boolean),
+      contactPoint: { "@type": "ContactPoint", contactType: "customer service", telephone: "+91-9468147781", email: "contact.classie@gmail.com", areaServed: "IN", availableLanguage: ["English", "Hindi"] },
+    },
+    { "@context": "https://schema.org", "@type": "WebSite", name: "CLASSIE", url: "https://www.classie.co.in" },
+  ]).replace(/</g, "\\u003c");
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: orgLd }} />
       {home.sections.filter((s) => s.on).map((s) => (
         <div key={s.id} data-section={s.id}>{renderSection(s.id)}</div>
       ))}

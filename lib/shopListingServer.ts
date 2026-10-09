@@ -108,3 +108,32 @@ export function parseList(raw: string | undefined, fallback: string[]): string[]
     return fallback;
   }
 }
+
+/** Google data for a listing page: breadcrumb + list of products. */
+export function listingJsonLd(name: string, path: string, products: ListingProduct[]): string {
+  const base = "https://www.classie.co.in";
+  return JSON.stringify([
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: base },
+        { "@type": "ListItem", position: 2, name, item: base + path },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name,
+      url: base + path,
+      numberOfItems: products.length,
+      itemListElement: products.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${base}/products/${p.slug}`,
+        name: p.title.trim(),
+        image: p.image,
+      })),
+    },
+  ]).replace(/</g, "\\u003c");
+}

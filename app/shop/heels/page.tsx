@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { loadFreeShippingAmount } from "@/lib/shippingServer";
 import ShopListing from "@/components/shop/ShopListing";
-import { DEFAULT_CHARM_TYPES, bandPhotos, loadAllListingProducts, loadOccasions, loadSettings, parseList } from "@/lib/shopListingServer";
+import { DEFAULT_CHARM_TYPES, bandPhotos, listingJsonLd, loadAllListingProducts, loadOccasions, loadSettings, parseList } from "@/lib/shopListingServer";
 
 export const revalidate = 3600;
 
@@ -53,6 +53,8 @@ export default async function HeelsPage() {
           Shop <strong>black heels</strong>, <strong>white heels</strong>, <strong>maroon heels</strong>, <strong>cream heels</strong> and more — with free shipping above ₹{free} and COD across India.
         </p>
       </ShopListing>
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: listingJsonLd("Heels", "/shop/heels", heels) }} />
 
       {/* FAQ Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({

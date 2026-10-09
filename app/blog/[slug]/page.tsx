@@ -172,8 +172,8 @@ export default async function BlogPostPage({
         "image": cover || "",
         "datePublished": post.published_at,
         "dateModified": post.published_at,
-        "author": { "@type": "Person", "name": post.author || "CLASSIE" },
-        "publisher": { "@type": "Organization", "name": "CLASSIE", "logo": { "@type": "ImageObject", "url": "https://www.classie.co.in/logo.png" } },
+        "author": { "@type": "Organization", "name": post.author || "CLASSIE", "url": "https://www.classie.co.in/about" },
+        "publisher": { "@type": "Organization", "name": "CLASSIE", "logo": { "@type": "ImageObject", "url": "https://www.classie.co.in/logo.jpg" } },
         "mainEntityOfPage": { "@type": "WebPage", "@id": canonicalUrl },
         "url": canonicalUrl,
       }) }} />
