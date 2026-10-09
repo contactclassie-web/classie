@@ -305,7 +305,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-3 space-y-8">
             {/* Contact */}
             <section>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-classie-black mb-5 pb-3 border-b border-classie-border">
+              <h2 className="font-sans text-sm font-semibold uppercase tracking-widest text-classie-black mb-5 pb-3 border-b border-classie-border">
                 Contact Information
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
 
             {/* Shipping */}
             <section>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-classie-black mb-5 pb-3 border-b border-classie-border">
+              <h2 className="font-sans text-sm font-semibold uppercase tracking-widest text-classie-black mb-5 pb-3 border-b border-classie-border">
                 Delivery Address
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -361,7 +361,7 @@ export default function CheckoutPage() {
 
             {/* Payment Method */}
             <section>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-classie-black mb-5 pb-3 border-b border-classie-border">
+              <h2 className="font-sans text-sm font-semibold uppercase tracking-widest text-classie-black mb-5 pb-3 border-b border-classie-border">
                 Payment Method
               </h2>
               <div className="space-y-3">
@@ -388,7 +388,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                   {paymentMethod === "online" && (
-                    <span className="ml-auto text-xs bg-white text-classie-black font-bold px-2 py-0.5 rounded">
+                    <span className="hidden sm:inline ml-auto text-xs bg-white text-classie-black font-bold px-2 py-0.5 rounded">
                       RECOMMENDED
                     </span>
                   )}

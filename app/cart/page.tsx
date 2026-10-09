@@ -89,8 +89,8 @@ export default function CartPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between gap-2">
                   <div>
-                    <h3 className="text-sm font-semibold text-classie-black leading-snug">{item.title}</h3>
-                    {item.variant && <p className="text-xs text-classie-gray mt-0.5">{item.variant}</p>}
+                    <h3 className="font-sans text-sm font-medium text-classie-black leading-snug">{item.title}</h3>
+                    {item.variant && <p className="text-xs text-classie-gray mt-0.5">{/^\d+(\.\d+)?$/.test(item.variant) ? `Size ${item.variant}` : item.variant}</p>}
                   </div>
                   <button onClick={() => removeFromCart(item.slug, item.variant)} className="text-classie-gray hover:text-red-500 transition-colors flex-shrink-0" aria-label="Remove">
                     <Trash2 className="w-4 h-4" />
@@ -150,7 +150,7 @@ export default function CartPage() {
             </div>
 
             <div className="bg-[#faf8f6] rounded-xl px-4 py-3 text-xs text-classie-gray text-center mb-5">
-              💳 Cash on Delivery Available
+              Cash on Delivery available
             </div>
 
             <Link href="/checkout" className="btn-primary w-full py-4 gap-2">

@@ -1,3 +1,5 @@
+import { loadAllListingProducts } from "@/lib/shopListingServer";
+import { postCover } from "@/lib/blogProducts";
 import type { Metadata } from "next";
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionSection from "@/components/OccasionSection";
@@ -100,7 +102,7 @@ export default async function HomePage() {
   // Only fetch what the switched-on sections need.
   const [journalRes, collectionsRes, featuresRes, siteCatsRes, legacyPicks] = await Promise.all([
     on.has("journal")
-      ? sb.from("blog_posts").select("slug,title,cover_image,category").eq("active", true).order("published_at", { ascending: false }).limit(home.journal.count)
+      ? sb.from("blog_posts").select("slug,title,cover_image,category,content").eq("active", true).order("published_at", { ascending: false }).limit(home.journal.count)
       : Promise.resolve({ data: [] as JournalPost[] }),
     on.has("legacyOccasions")
       ? sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true })
@@ -194,7 +196,7 @@ export default async function HomePage() {
       case "instagram":
         return <StyleInspoSection initialImages={igImages} initialSettings={cfg} />;
       case "journal":
-        return <Journal c={home.journal} posts={(journalRes.data ?? []) as JournalPost[]} />;
+        return <Journal c={home.journal} posts={journalPosts} />;
       case "reviews":
         return testimonials.length > 0 ? <TestimonialCarousel items={testimonials} intervalMs={5000} /> : null;
       case "why":
@@ -251,6 +253,16 @@ export default async function HomePage() {
         return null;
     }
   };
+
+  // Journal teaser: real CLASSIE photos as covers (no stock photos), no post text to the browser
+  let journalPosts: JournalPost[] = [];
+  if (on.has("journal")) {
+    const { heels, charms } = await loadAllListingProducts();
+    journalPosts = ((journalRes.data ?? []) as (JournalPost & { content: string | null })[]).map(({ content, ...p }) => ({
+      ...p,
+      cover_image: postCover({ ...p, content }, heels, charms) || null,
+    }));
+  }
 
   // Google: who CLASSIE is (logo, socials, contact) and the site name
   const orgLd = JSON.stringify([
