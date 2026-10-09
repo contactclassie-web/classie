@@ -25,11 +25,11 @@ export default function WishlistPage() {
   }, [wishlist]);
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
+    <div className="min-h-screen bg-white" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         {/* Header */}
         <div className="mb-10 text-center">
-          <h1 className="font-serif text-3xl md:text-4xl text-[#1a1a1a] font-light mb-2" style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic" }}>
+          <h1 className="font-serif text-3xl md:text-4xl text-[#1a1a1a] font-light mb-2" style={{ fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: "italic" }}>
             My Wishlist
           </h1>
           <p className="text-sm text-gray-500">{wishlist.length} {wishlist.length === 1 ? "item" : "items"} saved</p>

@@ -51,7 +51,7 @@ export default function ProductCard({ product, cardStyle }: { product: Product; 
 
       {/* ── Product info */}
       <div className="pt-3 pb-1">
-        <p className="text-sm font-light text-gray-800 leading-snug line-clamp-2" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 300 }}>
+        <p className="text-sm font-light text-gray-800 leading-snug line-clamp-2" style={{ fontFamily: "var(--font-poppins), sans-serif", fontWeight: 300 }}>
           {product.title}
         </p>
         <div className="flex items-center gap-2 mt-1.5">

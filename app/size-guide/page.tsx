@@ -24,8 +24,6 @@ const DEFAULT_CHART = [
   { eu: "37", uk: "4", in: "5", cm: "23.5" },
   { eu: "38", uk: "5", in: "6", cm: "24.0–24.5" },
   { eu: "39", uk: "6", in: "7", cm: "25.0" },
-  { eu: "40", uk: "7", in: "8", cm: "25.5–26.0" },
-  { eu: "41", uk: "8", in: "9", cm: "26.5" },
 ];
 
 export default async function SizeGuidePage() {
@@ -104,19 +102,21 @@ export default async function SizeGuidePage() {
               </ol>
             </div>
 
-            {/* Right: Illustration placeholder */}
-            <div
-              className="rounded-2xl flex flex-col items-center justify-center gap-3"
-              style={{ background: "#3B5373", minHeight: "280px" }}
-            >
-              <span className="text-7xl select-none">👣</span>
-              <p
-                className="text-sm font-medium tracking-wide"
-                style={{ color: "rgba(255,255,255,0.6)" }}
-              >
-                Foot Measurement
-              </p>
-            </div>
+            {/* Right: how to measure, drawn */}
+            <figure className="rounded-2xl flex flex-col items-center justify-center gap-4 p-8" style={{ background: "#F7F4EF", minHeight: "280px" }}>
+              <svg viewBox="0 0 220 260" width="200" height="236" fill="none" stroke="#3B5373" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="30" y1="232" x2="190" y2="232" strokeWidth="4" />
+                <text x="110" y="252" textAnchor="middle" fontSize="11" fill="#3B5373" stroke="none" fontFamily="sans-serif">WALL</text>
+                <rect x="45" y="20" width="130" height="206" rx="4" strokeDasharray="5 5" stroke="#B08D57" />
+                <path d="M110 226 C 82 226 76 200 78 170 C 80 140 74 110 80 80 C 86 52 98 38 112 38 C 130 38 140 56 140 84 C 140 120 134 150 138 180 C 142 210 134 226 110 226 Z" />
+                <line x1="62" y1="38" x2="158" y2="38" stroke="#B08D57" />
+                <line x1="160" y1="44" x2="160" y2="220" />
+                <polyline points="155,52 160,44 165,52" />
+                <polyline points="155,212 160,220 165,212" />
+                <text x="168" y="134" fontSize="12" fill="#3B5373" stroke="none" fontFamily="sans-serif">cm</text>
+              </svg>
+              <figcaption className="text-[13px] text-center text-[#555] max-w-[240px]">Heel against the wall, mark your longest toe, measure the line in centimetres.</figcaption>
+            </figure>
           </div>
         </div>
       </section>

@@ -126,11 +126,11 @@ function ProductCard({ product, isNew, cardStyle }: { product: Product; isNew?: 
 
       {/* Info */}
       <div className="mt-3">
-        <p className="text-sm font-medium text-gray-800 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
+        <p className="text-sm font-medium text-gray-800 truncate" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
           {product.title}
         </p>
         <div className="flex items-center gap-2 mt-1 flex-wrap">
-          <span className="text-sm text-gray-800" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          <span className="text-sm text-gray-800" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
             ₹{product.price.toLocaleString("en-IN")}
           </span>
           {hasDiscount && (
@@ -273,7 +273,7 @@ export default function FeaturedPicks({ latestProducts: _l, bestSellers: _b, sal
               <button key={key} onClick={() => setActiveTab(key)}
                 className={`relative pb-3 text-[11px] tracking-[0.15em] uppercase font-medium transition-colors duration-200 ${
                   activeTab === key ? "text-[#1a1a1a] border-b-2 border-[#3B5373]" : "text-[#1a1a1a] hover:text-[#1a1a1a]"
-                }`} style={{ fontFamily: "'Poppins', sans-serif" }}>
+                }`} style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
                 {cfg.label}
               </button>
             ))}

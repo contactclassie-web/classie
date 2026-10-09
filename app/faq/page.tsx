@@ -29,10 +29,10 @@ const faqs = [
   {
     section: "Returns & Exchanges",
     items: [
-      { q: "What is your return policy?", a: "We accept returns within 7 days of delivery. Products must be unused, unworn, and in original packaging." },
+      { q: "What is your return policy?", a: "Heels can be returned within 7 days of delivery if they are unused, unworn and in original packaging. Shoe charms and accessories are not returnable — if a pair arrives damaged, WhatsApp us within 48 hours of delivery." },
       { q: "How do I initiate a return?", a: "WhatsApp us at +91 94681 47781 or email contact.classie@gmail.com with your order ID and reason. We'll arrange a pickup." },
       { q: "When will I get my refund?", a: "Refunds are processed within 5–7 business days after we receive and inspect the returned product." },
-      { q: "Can I exchange heels for a different size?", a: "Yes! Heel size exchanges are free within 7 days of delivery, subject to availability. Shoe clips are one size, so they can be returned but not exchanged for a size." },
+      { q: "Can I exchange heels for a different size?", a: "Yes! Heel size exchanges are free within 7 days of delivery, subject to availability. Shoe clips are one size, so there is nothing to exchange." },
     ],
   },
   {

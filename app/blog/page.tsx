@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import BlogClient from "./BlogClient";
+import { loadAllListingProducts } from "@/lib/shopListingServer";
+import { postCover } from "@/lib/blogProducts";
 
 export const revalidate = 3600;
 
@@ -46,13 +48,19 @@ async function getCategories(): Promise<string[]> {
 }
 
 export default async function BlogPage() {
-  const [posts, categories] = await Promise.all([getPosts(), getCategories()]);
+  const [rawPosts, categories, { heels, charms }] = await Promise.all([getPosts(), getCategories(), loadAllListingProducts()]);
+  // Real CLASSIE photo as every cover; the full text stays on the server
+  const posts = rawPosts.map((p) => ({
+    ...p,
+    cover_image: postCover(p, heels, charms) || null,
+    content: null,
+  }));
   return (
     <>
       <BlogClient posts={posts} categories={categories} />
       <section className="max-w-4xl mx-auto px-6 py-12 text-center border-t border-gray-100">
         <h2 className="text-xl font-serif font-light text-[#1a1a1a] mb-4">Style Guides for Heels &amp; Shoe Clips in India</h2>
-        <p className="text-sm text-gray-500 leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+        <p className="text-sm text-gray-500 leading-relaxed" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
           The CLASSIE Journal covers everything you need to know about <strong>women&apos;s heels in India</strong> — from <strong>how to wear block heels</strong> and <strong>slingback heels</strong> to complete guides on <strong>heels with saree</strong>, <strong>heels for Indian weddings</strong>, and <strong>office heels</strong>. We also cover <strong>shoe clips</strong>, <strong>bow clips</strong>, <strong>shoe charms</strong> and how to style them for every occasion.
         </p>
       </section>
