@@ -251,8 +251,9 @@ export default async function ProductPage({ params }: Props) {
         "@type": "Product",
         "name": product.title,
         "description": product.description || "",
-        "image": product.image || "",
+        "image": Array.from(new Set([product.image, ...(Array.isArray(product.images) ? product.images : [])].filter(Boolean))).slice(0, 8),
         "url": productCanonical,
+        "sku": slug,
         "brand": { "@type": "Brand", "name": "CLASSIE" },
         "offers": {
           "@type": "Offer",
@@ -260,7 +261,12 @@ export default async function ProductPage({ params }: Props) {
           "priceCurrency": "INR",
           "price": product.price,
           "availability": "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/NewCondition",
+          "priceValidUntil": `${new Date().getFullYear() + 1}-12-31`,
           "seller": { "@type": "Organization", "name": "CLASSIE" },
+          "hasMerchantReturnPolicy": isHeel
+            ? { "@type": "MerchantReturnPolicy", "applicableCountry": "IN", "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow", "merchantReturnDays": 7, "returnMethod": "https://schema.org/ReturnByMail", "returnFees": "https://schema.org/FreeReturn" }
+            : { "@type": "MerchantReturnPolicy", "applicableCountry": "IN", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted" },
           "shippingDetails": { "@type": "OfferShippingDetails", "shippingRate": { "@type": "MonetaryAmount", "value": shippingFee(product.price, shippingRules), "currency": "INR" }, "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "IN" } }
         },
         "category": isHeel ? "Women's Heels" : "Shoe Clips & Accessories",

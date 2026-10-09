@@ -172,7 +172,7 @@ export default async function AboutPage() {
         "@type": "Organization",
         "name": "CLASSIE",
         "url": "https://www.classie.co.in",
-        "logo": "https://www.classie.co.in/logo.png",
+        "logo": "https://www.classie.co.in/logo.jpg",
         "description": "CLASSIE makes clip-on shoe charms (crystal, bow, flower and jute shoe clips) and easy heels for Indian women.",
         "founder": { "@type": "Person", "name": founderName },
         "foundingDate": "2024",

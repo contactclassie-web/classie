@@ -6,8 +6,8 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/shop/the-everyday-edit" },
-  title: "The Everyday Edit",
-  description: "Comfort for the every-day woman. Shop Classie's Everyday Edit collection.",
+  title: "Everyday & Office Heels and Shoe Charms — The Everyday Edit",
+  description: "Comfortable block and kitten heels with easy shoe charms for office and everyday wear, by CLASSIE. COD and free delivery across India.",
 };
 
 export default async function EverydayEditPage() {
