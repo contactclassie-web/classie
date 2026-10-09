@@ -1,5 +1,7 @@
 "use client";
 
+import { DEFAULT_NAV, NAV_KEY, type NavLink, type NavLinks } from "@/lib/siteContent";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ShoppingBag, Menu, X, Search, Heart } from "lucide-react";
@@ -11,18 +13,17 @@ import AnnouncementBar from "./AnnouncementBar";
 import SearchOverlay from "./SearchOverlay";
 import { supabase } from "@/lib/supabase";
 
-// Static nav links (non-category)
+// Extra menu links (besides the categories) come from Admin → Menu, FAQ & Legal.
 // `wide`: shown on large desktops only (always in the mobile menu), so the
 // desktop bar never crowds the centred logo.
-const leftLinks: { label: string; href: string; wide?: boolean }[] = [
-  { label: "Gift Sets",   href: "/gift-sets" },
-  { label: "Style Ideas", href: "/style-ideas", wide: true },
-];
-const rightLinks: { label: string; href: string; wide?: boolean }[] = [
-  { label: "Custom Designs", href: "/custom-designs" },
-  { label: "Journal",  href: "/blog" },
-  { label: "About Us", href: "/about", wide: true },
-];
+function parseNav(raw?: string): NavLinks {
+  try {
+    const v = raw ? JSON.parse(raw) : null;
+    const ok = (l: unknown): l is NavLink => !!l && typeof (l as NavLink).label === "string" && typeof (l as NavLink).href === "string" && (l as NavLink).label.trim() !== "";
+    if (v && Array.isArray(v.left) && Array.isArray(v.right)) return { left: v.left.filter(ok), right: v.right.filter(ok) };
+  } catch { /* use default */ }
+  return DEFAULT_NAV;
+}
 
 const NAV_LINK_CLS = "text-[11px] font-normal text-[#1a1a1a] hover:text-[#3B5373] transition-colors tracking-[0.14em] uppercase relative after:absolute after:bottom-[-2px] after:left-0 after:w-0 after:h-[1px] after:bg-[#3B5373] hover:after:w-full after:transition-all after:duration-300";
 
@@ -48,6 +49,7 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
   const [searchOpen, setSearchOpen] = useState(false);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
   const [logoUrl, setLogoUrl]   = useState(initialSettings?.logo_image_url || LOGO_FALLBACK);
+  const { left: leftLinks, right: rightLinks } = parseNav(initialSettings?.[NAV_KEY]);
   const [categories, setCategories] = useState<Category[]>(
     initialCategories && initialCategories.length > 0 ? initialCategories : DEFAULT_CATS
   );

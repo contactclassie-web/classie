@@ -1,6 +1,7 @@
 import { Metadata } from "next";
-import CollectionGrid from "@/components/CollectionGrid";
-import { getCollectionProductsFromDB } from "@/lib/products";
+import { notFound } from "next/navigation";
+import EditView from "@/components/shop/EditView";
+import { listingJsonLd, loadEdit } from "@/lib/shopListingServer";
 
 export const revalidate = 60;
 
@@ -11,12 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default async function FestiveEditPage() {
-  const collectionProducts = await getCollectionProductsFromDB("the-festive-edit");
+  const edit = await loadEdit("the-festive-edit");
+  if (!edit) notFound();
   return (
-    <CollectionGrid
-      title="The Festive Edit"
-      subtitle="Celebrate in style"
-      products={collectionProducts}
-    />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: listingJsonLd(edit.title || "The Festive Edit", "/shop/the-festive-edit", edit.products) }} />
+      <EditView {...edit} title={edit.title || "The Festive Edit"} fallbackSub="Celebrate in style" />
+    </>
   );
 }
