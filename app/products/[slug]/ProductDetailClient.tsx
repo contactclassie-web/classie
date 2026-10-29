@@ -107,17 +107,16 @@ export default function ProductDetailClient({
 
   // Initialize activeImages from first same-product color variant (shoe-charms)
   useEffect(() => {
-    if (colorVariants.length > 0) {
-      const selfVariants = colorVariants.filter(v => v.product_slug === product.slug);
-      if (selfVariants.length > 0 && selfVariants[0].image && selfVariants[0].image.startsWith("[")) {
-        try {
-          const imgs = JSON.parse(selfVariants[0].image);
-          if (Array.isArray(imgs) && imgs.length > 0) {
-            setActiveImages(imgs);
-            setSelectedVariant(selfVariants[0].color_name);
-            setCurrentIndex(0);
-          }
-        } catch {}
+    // Start on the first colour that has its own photos, using the product's
+    // spelling of the colour so the right swatch is highlighted.
+    if (product.variants.type !== "color" || !colorVariants.some(v => v.product_slug === product.slug)) return;
+    for (const col of product.variants.options) {
+      const imgs = colorSetImages(col);
+      if (imgs.length > 0) {
+        setActiveImages(imgs);
+        setSelectedVariant(col);
+        setCurrentIndex(0);
+        return;
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -165,6 +164,22 @@ export default function ProductDetailClient({
   const allImages = [product.image, ...(product.images ?? [])].filter(Boolean);
   const [activeImages, setActiveImages] = useState<string[]>(allImages);
   const galleryImages = activeImages.slice(0, 10);
+
+  // A colour's own photo set (shoe-charms). If the same colour is saved twice
+  // (e.g. "lint" and "Lint"), the one that has photos wins.
+  const colorSetImages = (col: string): string[] => {
+    const key = col.trim().toLowerCase();
+    let best: string[] = [];
+    for (const v of colorVariants) {
+      if (v.product_slug !== product.slug || (v.color_name || "").trim().toLowerCase() !== key) continue;
+      if (!v.image || !v.image.startsWith("[")) continue;
+      try {
+        const imgs = (JSON.parse(v.image) as unknown[]).filter((u): u is string => typeof u === "string" && u.trim() !== "");
+        if (imgs.length > best.length) best = imgs;
+      } catch { /* ignore bad rows */ }
+    }
+    return best;
+  };
   const hasVideo = !!product.video_url;
   const [currentIndex, setCurrentIndex] = useState(0);
   const mainImage = galleryImages[currentIndex] ?? galleryImages[0];
@@ -465,34 +480,20 @@ export default function ProductDetailClient({
                 </p>
                 <div className="flex gap-2.5 flex-wrap">
                   {product.variants.options.map((col) => {
-                    // Find same-product color variant for image swap (shoe-charms)
-                    const colorVariant = colorVariants.find(v => v.product_slug === product.slug && v.color_name === col);
-                    // Determine swatch thumbnail — use first image from JSON array if available
-                    let swatchSrc = product.image;
-                    if (colorVariant?.image && colorVariant.image.startsWith("[")) {
-                      try {
-                        const imgs = JSON.parse(colorVariant.image);
-                        if (Array.isArray(imgs) && imgs[0]) swatchSrc = imgs[0];
-                      } catch {}
-                    }
+                    // Photos for this colour (shoe-charms). Colour names match
+                    // regardless of capitals; a colour without its own photos
+                    // shows the product's main photos.
+                    const colorImgs = colorSetImages(col);
+                    const swatchSrc = colorImgs[0] || product.image;
                     return (
                       <button
                         key={col}
                         onClick={() => {
-                          // Shoe-charm: swap gallery images instantly
-                          if (colorVariant?.image && colorVariant.image.startsWith("[")) {
-                            try {
-                              const imgs = JSON.parse(colorVariant.image);
-                              if (Array.isArray(imgs) && imgs.length > 0) {
-                                setActiveImages(imgs);
-                                setCurrentIndex(0);
-                                setShowVideo(false);
-                              }
-                            } catch {}
-                            setSelectedVariant(col);
-                            return;
+                          if (colorVariants.some(v => v.product_slug === product.slug)) {
+                            setActiveImages(colorImgs.length > 0 ? colorImgs : allImages);
+                            setCurrentIndex(0);
+                            setShowVideo(false);
                           }
-                          // Default: just update selected variant (no image swap)
                           setSelectedVariant(col);
                         }}
                         title={col}
