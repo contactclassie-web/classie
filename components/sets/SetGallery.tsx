@@ -4,10 +4,12 @@ import { useState } from "react";
 import { optimizeCloudinary } from "@/lib/cloudinary";
 import { SetCollage } from "@/components/sets/SetCard";
 
-// Set photos with thumbnails; with no set photos, a collage of the pieces.
-export default function SetGallery({ setImages, pieceImages, name }: { setImages: string[]; pieceImages: string[]; name: string }) {
+// Set photos followed by a photo of each piece, with thumbnails; with no set
+// photos, a collage of the pieces.
+export default function SetGallery({ setImages: own, pieceImages, name }: { setImages: string[]; pieceImages: string[]; name: string }) {
   const [i, setI] = useState(0);
-  if (!setImages.length) return <SetCollage images={pieceImages} />;
+  if (!own.length) return <SetCollage images={pieceImages} />;
+  const setImages = [...own, ...pieceImages].filter((u, k, a) => u && a.indexOf(u) === k);
   return (
     <div className="grid gap-2 md:grid-cols-[72px_1fr] md:gap-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}

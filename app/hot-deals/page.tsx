@@ -65,11 +65,9 @@ function DealCard({ coupon, cardH }: { coupon: Coupon; cardH: number }) {
           <img src={optimizeCloudinary(coupon.image_url, 600)} alt={coupon.title}
             className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center relative" style={{ background: "#3B5373" }}>
-            <span className="text-white font-serif absolute select-none pointer-events-none"
-              style={{ fontSize: "7rem", fontWeight: 900, opacity: 0.06, letterSpacing: "-4px" }}>OFF</span>
-            <span className="text-white font-bold relative z-10" style={{ fontSize: "2.8rem", letterSpacing: "-1px", fontFamily: "serif" }}>{discountLabel}</span>
-            <span className="text-white text-[9px] tracking-[0.3em] uppercase mt-1 relative z-10" style={{ opacity: 0.45 }}>exclusive offer</span>
+          <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: "#F7F4EF" }}>
+            <span className="font-serif font-light text-[#1a1a1a]" style={{ fontSize: "2.4rem" }}>{discountLabel.replace(" OFF", " off")}</span>
+            <span className="text-[10px] tracking-[0.25em] uppercase mt-1 text-[#6b6b6b]">with code {coupon.code}</span>
           </div>
         )}
         {/* Status badge */}
@@ -128,6 +126,9 @@ function SectionDivider({ heading, sub }: { heading: string; sub: string }) {
   );
 }
 
+// Lifestyle photo (The Festive Edit) when Admin hasn't set one.
+const DEFAULT_HERO = "https://res.cloudinary.com/dbzt3soyi/image/upload/v1782310953/c59e7afc-beaf-44e7-9a21-79e3c7c37812_qm36re.png";
+
 // ── Main Page ─────────────────────────────────────────────────────────────
 export default function HotDealsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -154,12 +155,12 @@ export default function HotDealsPage() {
   const mobileCols = parseInt(settings.hd_mobile_cols || "1") || 1;
   const cardH      = parseInt(settings.hd_card_h || "280") || 280;
   const gap        = parseInt(settings.hd_card_gap || "28") || 28;
-  const heroEyebrow   = settings.hd_hero_eyebrow || "Limited Time";
-  const heroHeading   = settings.hd_hero_heading || "HOT\nDEALS";
-  const heroSub       = settings.hd_hero_sub || "OFFERS YOU DON'T WANT TO MISS";
+  const heroEyebrow   = settings.hd_hero_eyebrow || "This month";
+  const heroHeading   = settings.hd_hero_heading || "Offers";
+  const heroSub       = settings.hd_hero_sub || "Use the code at checkout";
   const heroImg       = settings.hd_hero_img || "";
   const sectionHeading = settings.hd_section_heading || "Current Offers";
-  const sectionSub     = settings.hd_section_sub || "Use the code at checkout · Limited stock";
+  const sectionSub     = settings.hd_section_sub || "Use the code at checkout";
 
   return (
     <>
@@ -175,22 +176,16 @@ export default function HotDealsPage() {
                   <span className="text-[9px] tracking-[0.35em] uppercase font-semibold" style={{ color: "#3B5373" }}>{heroEyebrow}</span>
                 </div>
               )}
-              <h1 className="font-serif mb-5" style={{ fontSize: "clamp(3.5rem,10vw,7rem)", lineHeight: 0.88, color: "#3B5373", fontWeight: 700, letterSpacing: "-2px" }}>
+              <h1 className="font-serif font-light mb-5" style={{ fontSize: "clamp(2.6rem,6vw,4.2rem)", lineHeight: 1.05, color: "#1a1a1a" }}>
                 {heroHeading.split("\n").map((line, i) => <span key={i} className="block">{line}</span>)}
               </h1>
               <div className="h-px mb-5 max-w-[120px]" style={{ background: "#3B5373", opacity: 0.2 }} />
               <p className="text-[10px] tracking-[0.2em] uppercase" style={{ color: "#888" }}>{heroSub}</p>
             </div>
             {/* Right */}
-            <div className="relative hidden md:block overflow-hidden" style={{ background: "#3B5373" }}>
-              {heroImg ? (
-                <img src={optimizeCloudinary(heroImg, 1600)} alt="Hot Deals" className="w-full h-full object-cover object-center" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="select-none pointer-events-none font-serif font-bold"
-                    style={{ fontSize: "9rem", color: "rgba(255,255,255,0.06)", letterSpacing: "-6px" }}>HOT</span>
-                </div>
-              )}
+            <div className="relative overflow-hidden -mx-4 sm:mx-0 aspect-[4/3] md:aspect-auto" style={{ background: "#F7F4EF" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={optimizeCloudinary(heroImg || DEFAULT_HERO, 1600)} alt="CLASSIE heels with shoe clips" className="w-full h-full object-cover object-center" />
             </div>
           </div>
         </div>

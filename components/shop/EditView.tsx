@@ -22,7 +22,7 @@ export default function EditView({ title, description, image, tag, products, fal
           {tag && <p className="text-[10px] md:text-[11px] tracking-[0.3em] uppercase font-medium text-[#8a6a3a]">{tag}</p>}
           <h1 className="text-[40px] md:text-[64px] leading-none font-normal text-[#1a1a1a]" style={serif}>{title}</h1>
           <p className="text-[13.5px] md:text-[15px] text-[#4a4a4a] leading-relaxed max-w-[460px]">{description || fallbackSub}</p>
-          <p className="text-[12.5px] text-[#555]">{products.length} {products.length === 1 ? "piece" : "pieces"}{heels.length ? " · heels in sizes 35–39" : ""}</p>
+          <p className="text-[12.5px] text-[#555]">{products.length} {products.length === 1 ? "piece" : "pieces"}{heels.length && heels.length < products.length ? " · heels and shoe charms" : heels.length ? " · heels in EU sizes 35–39" : ""}</p>
         </div>
       </section>
       <section className="max-w-[1280px] mx-auto px-4 md:px-10 pt-8 md:pt-12 pb-14 md:pb-20">

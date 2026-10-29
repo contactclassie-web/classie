@@ -6,6 +6,8 @@ import SetGallery from "@/components/sets/SetGallery";
 import { SetCard } from "@/components/sets/SetCard";
 import { loadGiftSets } from "@/lib/giftSetsServer";
 import { setAvailable, setCompareAt, setImages, setKind } from "@/lib/giftSets";
+import { CARD_PHOTOS_KEY, parseCardPhotos } from "@/lib/cardPhotos";
+import { publicSupabase } from "@/lib/supabasePublic";
 import { optimizeCloudinary } from "@/lib/cloudinary";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +34,10 @@ export default async function GiftSetPage({ params }: { params: { slug: string }
   const { data, set } = await findSet(params.slug);
   if (!set) notFound();
   const { products, config, whatsapp, freeAmount } = data;
-  const pieceImages = set.items.map((it) => products[it.slug]?.image).filter((u): u is string => !!u);
+  // Each piece's shop-card photo (heel + clips on white) when chosen, else its main photo.
+  const { data: cardRow } = await publicSupabase(60).from("site_settings").select("value").eq("key", CARD_PHOTOS_KEY).maybeSingle();
+  const cards = parseCardPhotos(cardRow?.value);
+  const pieceImages = set.items.map((it) => cards[it.slug] || products[it.slug]?.image).filter((u): u is string => !!u);
   const more = config.sets.filter((s) => s.id !== set.id && s.active && (s.askOnly || setAvailable(s, products))).slice(0, 3);
 
   return (
