@@ -10,7 +10,12 @@ type Row = {
   slug: string; title: string; price: number | string; compare_price: number | string | null;
   image: string | null; images: string[] | null; tags: string[] | null; heel_type: string | null;
   variant_type: string | null; variants: string[] | null; featured_tab: string | null; category: string;
+  created_at?: string | null;
 };
+
+// "NEW" badge: only products added in the last 30 days.
+const NEW_DAYS = 30;
+const isRecent = (iso?: string | null) => !!iso && Date.now() - new Date(iso).getTime() < NEW_DAYS * 864e5;
 
 /** "Block heel" / "Block Heel" / "block heel " → "Block Heel" */
 export function normalizeHeelType(s: string | null | undefined): string {
@@ -32,11 +37,12 @@ export function toListing(r: Row): ListingProduct {
     heelType: normalizeHeelType(r.heel_type === "None" ? "" : r.heel_type),
     variantType: vt,
     options: vt === "none" ? [] : (Array.isArray(r.variants) ? r.variants.filter((v) => String(v).trim() !== "") : []),
-    isNew: r.featured_tab === "latest",
+    isNew: isRecent(r.created_at),
+    pinned: r.featured_tab === "latest",
   };
 }
 
-const COLS = "slug,title,price,compare_price,image,images,tags,heel_type,variant_type,variants,featured_tab,category";
+const COLS = "slug,title,price,compare_price,image,images,tags,heel_type,variant_type,variants,featured_tab,category,created_at";
 
 export async function loadAllListingProducts(): Promise<{ heels: ListingProduct[]; charms: ListingProduct[] }> {
   const sb = publicSupabase(60);

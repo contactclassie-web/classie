@@ -13,7 +13,7 @@ import HeroSection from "@/components/HeroSection";
 import HomeHero from "@/components/home/HomeHero";
 import HomeProductGrid from "@/components/home/HomeProductGrid";
 import {
-  SectionHeading, MarketplaceStrip, ShopByType, FreeDeliveryBanner, HowItWorks, CustomDesigns,
+  SectionHeading, TrustPoints, MarketplaceStrip, ShopByType, FreeDeliveryBanner, HowItWorks, CustomDesigns,
   SeasonEdit, Journal, WhyBuyHere, WhatsAppJoin, SeoBlock, type JournalPost,
 } from "@/components/home/HomeSections";
 import {
@@ -86,7 +86,7 @@ export default async function HomePage() {
     getProductsFromDB({ active: true }),
     sb.from("site_settings").select("key,value").in("key", [...HOME_KEYS, ...LEGACY_KEYS, ...FP_KEYS, ...NL_KEYS, "footer_ig_url", "footer_fb_url"]),
     sb.from("hero_slides").select("image_url").eq("active", true).eq("page", "home").order("display_order", { ascending: true }),
-    sb.from("product_color_variants").select("product_slug,color_name,color_hex"),
+    sb.from("product_color_variants").select("product_slug,color_name,color_hex,image"),
     sb.from("instagram_images").select("image_url, link_url").eq("active", true).order("display_order", { ascending: true }).limit(9),
   ]);
 
@@ -119,10 +119,17 @@ export default async function HomePage() {
   ]);
 
   // Product colours for the dots and the quick-add chooser.
+  // colourPhotos: first photo of each colour, so a Gold quick-add shows gold in the bag.
   const colors: Record<string, Record<string, string>> = {};
-  (colorRes.data ?? []).forEach((r: { product_slug: string; color_name: string; color_hex: string | null }) => {
-    if (!r.product_slug || !r.color_name || !r.color_hex) return;
-    (colors[r.product_slug] ||= {})[r.color_name.toLowerCase()] = r.color_hex;
+  const colourPhotos: Record<string, Record<string, string>> = {};
+  (colorRes.data ?? []).forEach((r: { product_slug: string; color_name: string; color_hex: string | null; image: string | null }) => {
+    if (!r.product_slug || !r.color_name) return;
+    const key = r.color_name.toLowerCase();
+    if (r.color_hex) (colors[r.product_slug] ||= {})[key] = r.color_hex;
+    try {
+      const first = r.image?.startsWith("[") ? (JSON.parse(r.image) as unknown[]).find((u) => typeof u === "string" && u) : null;
+      if (typeof first === "string" && !colourPhotos[r.product_slug]?.[key]) (colourPhotos[r.product_slug] ||= {})[key] = first;
+    } catch { /* ignore bad rows */ }
   });
 
   // Bestselling shoe charms: non-heel products tagged "Bestseller" in Featured Picks
@@ -160,6 +167,8 @@ export default async function HomePage() {
     switch (id) {
       case "hero":
         return <HomeHero hero={home.hero} fallbackImages={heroFallback} />;
+      case "trust":
+        return <TrustPoints c={home.trust} />;
       case "marketplace":
         return <MarketplaceStrip c={home.marketplace} />;
       case "types":
@@ -171,7 +180,7 @@ export default async function HomePage() {
         return (
           <section className={`${WRAP} py-10 md:py-16`}>
             <SectionHeading eyebrow={b.eyebrow} heading={b.heading} italic={b.headingItalic} linkText={b.linkText} linkUrl={b.linkUrl} />
-            <HomeProductGrid products={list} colors={colors} />
+            <HomeProductGrid products={list} colors={colors} photos={colourPhotos} />
           </section>
         );
       }
@@ -189,7 +198,7 @@ export default async function HomePage() {
         return (
           <section className={`${WRAP} py-10 md:py-16`}>
             <SectionHeading eyebrow={h.eyebrow} heading={h.heading} italic={h.headingItalic} linkText={h.linkText} linkUrl={h.linkUrl} />
-            <HomeProductGrid products={heelsList} colors={colors} />
+            <HomeProductGrid products={heelsList} colors={colors} photos={colourPhotos} />
           </section>
         );
       }

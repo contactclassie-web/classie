@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCart } from "@/components/CartContext";
 import { optimizeCloudinary } from "@/lib/cloudinary";
-import { needsChoice, type GiftSet, type SetProduct } from "@/lib/giftSets";
+import { needsChoice, setOfferLine, setTagLabel, type GiftSet, type SetProduct } from "@/lib/giftSets";
 
 interface Props {
   set: GiftSet;
@@ -52,7 +52,7 @@ export default function SetBuyBox({ set, products, compare, kind, image, whatsap
   return (
     <div className="grid gap-4 md:gap-5">
       <div className="grid gap-2">
-        <span className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#6b6b6b]">Gift set · {kind}{set.tag ? ` · ${set.tag}` : ""}</span>
+        <span className="font-sans text-[10px] tracking-[0.2em] uppercase text-[#6b6b6b]">Gift set · {kind}{setTagLabel(set.tag, kind) ? ` · ${setTagLabel(set.tag, kind)}` : ""}</span>
         <h1 className="font-serif font-normal text-[30px] md:text-[42px] leading-[1.08] text-[#1a1a1a]">{set.name}</h1>
         {set.askOnly ? (
           <span className="font-sans text-[16px] font-semibold text-[#1a1a1a]">Price on request</span>
@@ -60,12 +60,12 @@ export default function SetBuyBox({ set, products, compare, kind, image, whatsap
           <div className="flex flex-wrap items-baseline gap-2.5">
             <span className="font-sans text-[24px] font-semibold text-[#1a1a1a] tabular-nums">₹{set.price.toLocaleString("en-IN")}</span>
             {save > 0 && <span className="font-sans text-[14px] text-[#9a9a9a] line-through tabular-nums">₹{compare.toLocaleString("en-IN")}</span>}
-            {save > 0 && <span className="bg-[#E6F4EC] text-[#1E7A4C] font-sans text-[11.5px] font-semibold px-2 py-1">Save ₹{save.toLocaleString("en-IN")}</span>}
+            <span className="bg-[#E6F4EC] text-[#1E7A4C] font-sans text-[11.5px] font-semibold px-2 py-1">{setOfferLine(save)}</span>
           </div>
         )}
         {!set.askOnly && (
           <span className="font-sans text-[11.5px] text-[#6b6b6b]">
-            Inclusive of all taxes{freeAmount && set.price >= freeAmount ? " · FREE delivery" : ""}
+            Inclusive of all taxes · FREE delivery
           </span>
         )}
       </div>

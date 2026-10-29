@@ -260,3 +260,15 @@ export function setImages(set: GiftSet, products: Record<string, SetProduct>): s
   if (set.images.length) return set.images;
   return set.items.map((it) => products[it.slug]?.image).filter((u): u is string => !!u);
 }
+
+// Short offer line for a set. Every gift set ships free, so a small saving is
+// shown together with free delivery, and no saving shows just free delivery.
+export function setOfferLine(save: number): string {
+  if (save >= 100) return `Save ₹${save.toLocaleString("en-IN")}`;
+  if (save > 0) return `Save ₹${save.toLocaleString("en-IN")} + free delivery`;
+  return "Free delivery included";
+}
+
+// The set's tag, unless it only repeats the kind ("Duo" next to "Duo").
+export const setTagLabel = (tag: string | undefined, kind: string) =>
+  tag && tag.trim().toLowerCase() !== kind.trim().toLowerCase() ? tag : "";

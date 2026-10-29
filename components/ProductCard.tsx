@@ -63,9 +63,6 @@ export default function ProductCard({ product, cardStyle }: { product: Product; 
               <span className="line-through text-gray-400 text-xs">
                 ₹{product.comparePrice.toLocaleString("en-IN")}
               </span>
-              <span className="text-[#3B5373] text-xs">
-                -{discount}%
-              </span>
             </>
           )}
         </div>

@@ -64,11 +64,6 @@ export default function WishlistPage() {
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 640px) 50vw, 25vw"
                       />
-                      {discount > 0 && (
-                        <span className="absolute top-2 left-2 px-2 py-0.5 text-[9px] font-semibold tracking-wide bg-[#3B5373] text-white">
-                          -{discount}%
-                        </span>
-                      )}
                     </div>
                     <div className="pt-3">
                       <p className="text-sm text-gray-800 leading-snug line-clamp-2 font-light">{product.title}</p>

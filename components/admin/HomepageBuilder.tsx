@@ -186,6 +186,11 @@ export default function HomepageBuilder({ revalidate }: { revalidate: () => Prom
         </div>
       </Panel>
 
+      {/* ── Trust points ── */}
+      <Panel title="Trust points under the hero">
+        <Field label="Points (separate with ·)" value={cfg.trust.items} onChange={(v) => update("trust", { items: v })} />
+      </Panel>
+
       {/* ── Marketplace ── */}
       <Panel title="Amazon · Flipkart · Myntra line">
         <div className="grid sm:grid-cols-2 gap-3">

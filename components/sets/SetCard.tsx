@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { optimizeCloudinary } from "@/lib/cloudinary";
-import { pieceCount, setCompareAt, setImages, setKind, type GiftSet, type SetProduct } from "@/lib/giftSets";
+import { pieceCount, setCompareAt, setImages, setKind, setOfferLine, setTagLabel, type GiftSet, type SetProduct } from "@/lib/giftSets";
 
 // Up to three photos arranged as one tile: one tall on the left, two stacked.
 export function SetCollage({ images, className = "" }: { images: string[]; className?: string }) {
@@ -36,10 +36,10 @@ export function SetCard({ set, products }: { set: GiftSet; products: Record<stri
       <div className="relative overflow-hidden bg-[#f6f6f6]">
         <div className="transition-transform duration-500 group-hover:scale-[1.03]"><SetCollage images={imgs} /></div>
         <span className="absolute left-2 bottom-2 bg-white px-2 py-1.5 font-sans text-[9.5px] font-semibold tracking-[0.08em] uppercase text-[#3B5373]">
-          {set.askOnly ? `${pieceCount(set)}+ pairs` : `${kind}${save > 0 ? ` · Save ₹${save.toLocaleString("en-IN")}` : ""}`}
+          {set.askOnly ? `${pieceCount(set)}+ pairs` : `${kind} · ${setOfferLine(save)}`}
         </span>
       </div>
-      {set.tag && <span className="font-sans text-[9.5px] md:text-[10px] tracking-[0.16em] uppercase text-[#B08D57] mt-1">{set.tag}</span>}
+      {setTagLabel(set.tag, kind) && <span className="font-sans text-[9.5px] md:text-[10px] tracking-[0.16em] uppercase text-[#B08D57] mt-1">{setTagLabel(set.tag, kind)}</span>}
       <b className="font-serif font-normal text-[18px] md:text-[22px] leading-tight text-[#1a1a1a] group-hover:text-[#3B5373] transition-colors">{set.name}</b>
       <span className="font-sans text-[11px] md:text-[12.5px] text-[#6b6b6b] leading-snug line-clamp-2">{names.join(" + ")}</span>
       <div className="flex items-baseline gap-2 mt-0.5">

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-const DEFAULT_TEXT = "Use code FIRST10 for 10% off your first order · Free shipping above ₹999";
+const DEFAULT_TEXT = "Free delivery over ₹999 · Pay online, save ₹99";
 const ALL_KEYS = ["announcement_1","announcement_2","announcement_3","announcement_4","announcement_5","announcement_6"];
 
 function highlightText(text: string) {
@@ -66,7 +66,7 @@ export default function AnnouncementBar({ initialSettings }: AnnProps) {
   }, [msgs, speed, mode]);
 
   // SCROLL mode — single marquee ticker
-  if (mode === "scroll") {
+  if (mode === "scroll" && msgs.length > 1) {
     const dur = `${Math.max(10, parseInt(speed))}s`;
     const sep = "\u00A0\u00A0\u00A0\u00A0\u00A0✦\u00A0\u00A0\u00A0\u00A0\u00A0";
     const items = [...msgs, ...msgs]; // duplicate for seamless loop
@@ -86,6 +86,11 @@ export default function AnnouncementBar({ initialSettings }: AnnProps) {
         </span>
       </div>
     );
+  }
+
+  // One message: a still line, no animation.
+  if (msgs.length <= 1) {
+    return <div style={BAR_STYLE}><p>{highlightText(msgs[0] ?? DEFAULT_TEXT)}</p></div>;
   }
 
   // ROTATE mode — blink/fade single message

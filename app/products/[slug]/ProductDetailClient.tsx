@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { optimizeCloudinary } from "@/lib/cloudinary";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Check, ChevronRight, Plus, Minus } from "lucide-react";
+import { ShoppingBag, Check, ChevronRight, Plus, Minus, Truck, Banknote, RotateCcw, ShieldCheck, Sparkles, Heart, Lock, Gift, Leaf, Footprints, Sun, Moon, Shirt, type LucideIcon } from "lucide-react";
 import { Product } from "@/lib/products";
 import { useCart } from "@/components/CartContext";
 import ProductCard from "@/components/ProductCard";
@@ -56,6 +56,27 @@ const CLIP_FEATURE_TILES: FeatureTile[] = [
 // Default tick list when Admin hasn't set one for the product.
 const FEATURE_CHECKS_HEELS = ["Cushioned comfort insole", "COD Available", "Easy 7-day returns", "Size exchange available"];
 const FEATURE_CHECKS_CLIPS = ["Sold as a pair", "No glue, no damage", "COD Available", "Works on heels, flats & sandals"];
+// Trust lines (delivery, COD, returns, first-order offer) are shown once, in the
+// row under the buttons, so they're dropped from the tick list and promo line.
+const TRUST_RE = /shipping|delivery|\bcod\b|cash on delivery|return|replacement|exchange|first order|% off/i;
+const EMOJI_RE = new RegExp("[\\p{Extended_Pictographic}\\u2726\\uFE0F]", "gu");
+const stripEmoji = (t: string) => t.replace(EMOJI_RE, "").trim();
+// A tick that only repeats the product name ("Crystal Cascade Fan") says nothing.
+const repeatsTitle = (tick: string, title: string) => {
+  const words = tick.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  const t = new Set(title.toLowerCase().match(/[a-z0-9]+/g) ?? []);
+  return words.length > 0 && words.filter((w) => t.has(w)).length >= Math.max(2, words.length - 1);
+};
+// Thin navy line icons for the "Designed for every moment" tiles (no emoji).
+const TILE_ICONS: [RegExp, LucideIcon][] = [
+  [/comfort|cushion|insole|walk/i, Footprints], [/secure|hold|grip/i, Lock], [/vegan|cruelty|eco/i, Leaf],
+  [/pair|gift/i, Gift], [/care|craft|made|premium|quality/i, Heart], [/season|summer|sun/i, Sun],
+  [/night|evening/i, Moon], [/casual|formal|wear it|anywhere|styl|outfit/i, Shirt],
+];
+const tileIcon = (title: string): LucideIcon => TILE_ICONS.find(([re]) => re.test(title))?.[1] ?? Sparkles;
+
+// EU 35–42 → UK 2–9 (same chart as /size-guide).
+const euToUk = (eu: string) => { const n = Number(eu); return n >= 35 && n <= 42 ? String(n - 33) : ""; };
 const CHARM_RETURN_TICK = "Damaged? Free replacement within 48 h";
 
 // ── Component ─────────────────────────────────────────────────────────────
@@ -242,7 +263,16 @@ export default function ProductDetailClient({
     : (isHeel ? FEATURE_CHECKS_HEELS : FEATURE_CHECKS_CLIPS))
     // Shoe charms can't be returned (only replaced if damaged), so never
     // promise "7-day returns" on a charm page.
-    .map((t: string) => (!isHeel && /7[\s-]*day\s+return/i.test(t) ? CHARM_RETURN_TICK : t));
+    .map((t: string) => (!isHeel && /7[\s-]*day\s+return/i.test(t) ? CHARM_RETURN_TICK : t))
+    .map(stripEmoji)
+    .filter((t: string) => t && !TRUST_RE.test(t) && !repeatsTitle(t, product.title));
+  const promoLine = stripEmoji((product.promo_line || "").split("|").map((x: string) => x.trim()).filter((x: string) => x && !TRUST_RE.test(x)).join(" · "));
+  // One trust row under the buttons (delivery · COD · returns/replacement).
+  const trustRow: { Icon: LucideIcon; text: string }[] = [
+    { Icon: Truck, text: freeShippingFrom === 0 ? "Free delivery" : freeShippingFrom ? `Free delivery ₹${freeShippingFrom.toLocaleString("en-IN")}+` : "Delivery across India" },
+    { Icon: Banknote, text: "COD available" },
+    isHeel ? { Icon: RotateCcw, text: "7-day easy returns" } : { Icon: ShieldCheck, text: "Damaged? Free replacement" },
+  ];
   const tiles = isHeel
     ? (featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES)
     : (clipFeatureTiles.length > 0 ? clipFeatureTiles : CLIP_FEATURE_TILES);
@@ -260,16 +290,19 @@ export default function ProductDetailClient({
   const unavailable = soldOut || (!!selectedVariant && optionSoldOut(selectedVariant)) || (!product.variants.options.length && optionSoldOut("_"));
   const maxQty = selectionLeft !== undefined && selectionLeft > 0 ? selectionLeft : 50;
 
+  // Bag/checkout/email photo: the chosen colour's first photo (e.g. Gold), else the main photo.
+  const cartImage = (product.variants.type === "color" && selectedVariant && colorSetImages(selectedVariant)[0]) || product.image;
+
   const doAdd = () => {
     if (unavailable || !sizeChosen()) return;
-    addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: Math.min(qty, maxQty), variant: selectedVariant || undefined });
+    addToCart({ slug: product.slug, title: product.title, price: product.price, image: cartImage, quantity: Math.min(qty, maxQty), variant: selectedVariant || undefined });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   };
 
   const doBuyNow = () => {
     if (unavailable || !sizeChosen()) return;
-    addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined }, { openDrawer: false });
+    addToCart({ slug: product.slug, title: product.title, price: product.price, image: cartImage, quantity: qty, variant: selectedVariant || undefined }, { openDrawer: false });
     router.push("/checkout");
   };
 
@@ -326,11 +359,6 @@ export default function ProductDetailClient({
                   priority
                   unoptimized
                 />
-              )}
-              {discount > 0 && !showVideo && (
-                <span className="absolute top-4 left-4 text-white text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#3B5373", fontSize: "11px", letterSpacing: "0.04em" }}>
-                  -{discount}% OFF
-                </span>
               )}
               {/* Left arrow */}
               {(galleryImages.length > 1 || hasVideo) && !showVideo && (
@@ -545,9 +573,11 @@ export default function ProductDetailClient({
               <div ref={sizeRef} style={{ marginBottom: "20px" }}>
                 <div className="flex items-center justify-between" style={{ marginBottom: "10px" }}>
                   <p style={{ fontSize: "12px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#1a1a1a" }}>
-                    {product.variant_label || "Shoe Size (EU)"}
+                    {/* Sizes 35–39 are EU sizes; an old "(UK)" label would mislead. */}
+                    {product.variant_label && !/\buk\b/i.test(product.variant_label) ? product.variant_label : "Size (EU)"}
+                    {euToUk(selectedVariant) && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "#6b6b6b" }}> · EU {selectedVariant} = UK {euToUk(selectedVariant)}</span>}
                   </p>
-                  <Link href="/faq#size-guide" style={{ fontSize: "11px", color: "#3B5373", textDecoration: "underline" }}>Size Guide</Link>
+                  <Link href="/size-guide" style={{ fontSize: "11px", color: "#3B5373", textDecoration: "underline" }}>Size Guide (UK / EU)</Link>
                 </div>
                 <div className="flex gap-2 flex-wrap">
                   {product.variants.options.map((sz) => (
@@ -592,20 +622,20 @@ export default function ProductDetailClient({
               </table>
             )}
 
-            {/* Feature checkmarks (2-col grid) */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #E8E3DD" }}>
+            {/* Feature checkmarks (2-col grid) — product facts only */}
+            {featureChecks.length > 0 && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px", marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #E8E3DD" }}>
               {featureChecks.map((feat) => (
                 <div key={feat} className="flex items-center gap-1.5" style={{ fontSize: "12.5px", color: "#444" }}>
                   <span style={{ color: "#3B5373", fontWeight: 700, fontSize: "14px" }}>✓</span>
                   {feat}
                 </div>
               ))}
-            </div>
+            </div>}
 
             {/* Promo line — admin editable */}
-            {product.promo_line && (
+            {promoLine && (
               <p className="flex items-center gap-1.5" style={{ fontSize: "12.5px", color: "#3B5373", fontWeight: 500, marginBottom: "16px" }}>
-                {product.promo_line}
+                {promoLine}
               </p>
             )}
 
@@ -657,11 +687,21 @@ export default function ProductDetailClient({
                 border: "1.5px solid #3B5373", color: "#3B5373",
                 background: "#fff", fontSize: "12.5px", fontWeight: 600,
                 letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer",
-                marginBottom: "22px",
+                marginBottom: "16px",
               }}
             >
               Buy it Now
             </button>
+
+            {/* Trust row — the only place delivery / COD / returns are shown */}
+            <ul className="grid grid-cols-3" style={{ borderTop: "1px solid #E8E3DD", borderBottom: "1px solid #E8E3DD", padding: "14px 0", marginBottom: "22px" }}>
+              {trustRow.map(({ Icon, text }, i) => (
+                <li key={text} className="flex flex-col items-center text-center gap-1.5" style={{ fontSize: "11.5px", color: "#444", lineHeight: 1.35, padding: "0 6px", borderLeft: i ? "1px solid #E8E3DD" : "none" }}>
+                  <Icon className="w-[18px] h-[18px]" strokeWidth={1.4} color="#3B5373" aria-hidden />
+                  {text}
+                </li>
+              ))}
+            </ul>
 
             {/* ── Buy 2 Get X% Off ── */}
             {bundleOffers.filter(o => o.accessory_slug === product.slug).map((offer) => {
@@ -692,7 +732,7 @@ export default function ProductDetailClient({
                   <button
                     onClick={() => {
                       if (!sizeChosen()) return;
-                      addToCart({ slug: product.slug, title: product.title, price: discPrice, image: product.image, quantity: 2, variant: selectedVariant || undefined });
+                      addToCart({ slug: product.slug, title: product.title, price: discPrice, image: cartImage, quantity: 2, variant: selectedVariant || undefined });
                     }}
                     style={{ width: "100%", padding: "14px", background: "#4A6580", color: "#fff", border: "none", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", cursor: "pointer" }}
                   >
@@ -775,27 +815,6 @@ export default function ProductDetailClient({
           FULL-WIDTH BELOW FOLD
       ══════════════════════════════════════════ */}
 
-      {/* ── Trust Badges Strip ── */}
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14 mb-0">
-        <div className="overflow-hidden" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: "1px solid #E8E3DD", borderRadius: "12px" }}>
-          {[
-            freeShippingFrom === 0
-              ? { icon: "🚚", text: "Free Shipping", sub: "on all orders" }
-              : freeShippingFrom
-              ? { icon: "🚚", text: "Free Shipping", sub: `on orders ₹${freeShippingFrom.toLocaleString("en-IN")}+` }
-              : { icon: "🚚", text: "Fast Delivery", sub: "across India" },
-            isHeel ? { icon: "↩", text: "Easy Returns", sub: "7-day policy" } : { icon: "✦", text: "Sold as a Pair", sub: "one for each shoe" },
-            { icon: "💳", text: "COD Available", sub: "all orders" },
-          ].map((item, i) => (
-            <div key={item.text} className="text-center" style={{ padding: "16px 10px", borderRight: i < 2 ? "1px solid #E8E3DD" : "none" }}>
-              <div style={{ fontSize: "22px", marginBottom: "6px" }}>{item.icon}</div>
-              <div style={{ fontSize: "12px", fontWeight: 500, color: "#1a1a1a", marginBottom: "2px" }}>{item.text}</div>
-              <div style={{ fontSize: "11px", color: "#888" }}>{item.sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── Accordion ── */}
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14 mt-8">
         <div style={{ borderTop: "1px solid #E8E3DD" }}>
@@ -835,8 +854,8 @@ export default function ProductDetailClient({
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: `repeat(${isDesktop ? 4 : 2}, 1fr)`, gap: "12px" }}>
             {tiles.map((tile, i) => (
-              <div key={i} className="text-center" style={{ padding: "28px 20px", border: "1.5px solid #3B5373", borderRadius: "8px", background: "#fff" }}>
-                <div style={{ fontSize: "30px", marginBottom: "12px" }}>{tile.icon}</div>
+              <div key={i} className="text-center" style={{ padding: "28px 20px", border: "1px solid #E8E3DD", background: "#fff" }}>
+                {(() => { const Icon = tileIcon(tile.title); return <Icon className="mx-auto w-6 h-6" strokeWidth={1.3} color="#3B5373" style={{ marginBottom: "12px" }} aria-hidden />; })()}
                 <div style={{ fontSize: "12.5px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: "#3B5373", marginBottom: "8px" }}>{tile.title}</div>
                 <div style={{ fontSize: "12px", color: "#888", lineHeight: 1.6 }}>{tile.desc}</div>
               </div>

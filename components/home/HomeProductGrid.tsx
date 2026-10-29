@@ -10,9 +10,11 @@ interface Props {
   products: Product[];
   // product slug → { colour name (lowercase) → hex } from product_color_variants
   colors?: Record<string, Record<string, string>>;
+  // product slug → { colour name (lowercase) → first photo of that colour }
+  photos?: Record<string, Record<string, string>>;
 }
 
-function QuickCard({ p, colors }: { p: Product; colors?: Record<string, string> }) {
+function QuickCard({ p, colors, photos }: { p: Product; colors?: Record<string, string>; photos?: Record<string, string> }) {
   const { addToCart } = useCart();
   const [choosing, setChoosing] = useState(false);
   const [added, setAdded] = useState(false);
@@ -21,7 +23,7 @@ function QuickCard({ p, colors }: { p: Product; colors?: Record<string, string> 
   const off = p.comparePrice > p.price ? Math.round(((p.comparePrice - p.price) / p.comparePrice) * 100) : 0;
 
   const add = (variant?: string) => {
-    addToCart({ slug: p.slug, title: p.title, price: p.price, image: p.image, quantity: 1, variant });
+    addToCart({ slug: p.slug, title: p.title, price: p.price, image: (variant && photos?.[variant.toLowerCase()]) || p.image, quantity: 1, variant });
     setChoosing(false);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
@@ -93,10 +95,10 @@ function QuickCard({ p, colors }: { p: Product; colors?: Record<string, string> 
   );
 }
 
-export default function HomeProductGrid({ products, colors }: Props) {
+export default function HomeProductGrid({ products, colors, photos }: Props) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-2.5 gap-y-5 md:gap-x-6 md:gap-y-9">
-      {products.map((p) => <QuickCard key={p.slug} p={p} colors={colors?.[p.slug]} />)}
+      {products.map((p) => <QuickCard key={p.slug} p={p} colors={colors?.[p.slug]} photos={photos?.[p.slug]} />)}
     </div>
   );
 }

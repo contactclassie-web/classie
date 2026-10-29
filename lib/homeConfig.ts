@@ -11,12 +11,13 @@ export type HeroSlide =
   | { type: "video"; url: string; poster: string };
 
 export type SectionId =
-  | "hero" | "marketplace" | "types" | "bestsellers" | "freeDelivery" | "howItWorks"
+  | "hero" | "trust" | "marketplace" | "types" | "bestsellers" | "freeDelivery" | "howItWorks"
   | "custom" | "edit" | "heels" | "instagram" | "journal" | "reviews" | "why" | "whatsapp" | "seo"
   | "legacyHero" | "legacyTrustBand" | "legacyOccasions" | "legacyFeaturedPicks" | "legacyPhilosophy" | "legacyNewsletter";
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   hero: "Hero banner (slider)",
+  trust: "Trust points under the hero",
   marketplace: "Amazon · Flipkart · Myntra line",
   types: "Shop by type (round photos)",
   bestsellers: "Bestselling shoe charms",
@@ -61,6 +62,7 @@ export interface HomeConfig {
     intervalSec: number;
     slides: HeroSlide[];
   };
+  trust: { items: string };   // short points separated by "·"
   marketplace: { prefix: string; names: string; note: string };
   types: { heading: string; headingItalic: string; items: { label: string; image: string; link: string; note: string }[] };
   bestsellers: { eyebrow: string; heading: string; headingItalic: string; count: number; linkText: string; linkUrl: string };
@@ -80,7 +82,8 @@ const C = "https://res.cloudinary.com/dbzt3soyi/image/upload/";
 export const DEFAULT_HOME: HomeConfig = {
   sections: [
     { id: "hero", on: true },
-    { id: "marketplace", on: true },
+    { id: "trust", on: true },
+    { id: "marketplace", on: false },
     { id: "types", on: true },
     { id: "bestsellers", on: true },
     { id: "freeDelivery", on: true },
@@ -125,6 +128,7 @@ export const DEFAULT_HOME: HomeConfig = {
       { type: "image", url: "", link: "" },
     ],
   },
+  trust: { items: "Cash on delivery · Damaged? Free replacement · WhatsApp help" },
   marketplace: {
     prefix: "Classie is also on",
     names: "Amazon, Flipkart, Myntra",
@@ -135,10 +139,10 @@ export const DEFAULT_HOME: HomeConfig = {
     headingItalic: "type",
     items: [
       { label: "Crystal", image: C + "v1783885593/b7881316-ad7b-4b83-82ae-d4444edd280a_w4ueo6.png", link: "/shop/clips", note: "₹399+" },
-      { label: "Bow & Pearl", image: C + "v1784293137/4aa57f8c-8b90-4e21-a08e-85bc4f5694b6_hgbcxu.png", link: "/shop/clips", note: "₹299+" },
+      { label: "Bow & Pearl", image: C + "v1784293137/4aa57f8c-8b90-4e21-a08e-85bc4f5694b6_hgbcxu.png", link: "/shop/clips", note: "₹339+" },
       { label: "Flower & Jute", image: C + "v1786391658/1d465eba-5e95-4988-ac63-a22011f7eb61_okgiig.png", link: "/shop/clips", note: "₹249+" },
-      { label: "Anklets", image: C + "v1785502275/b03551d4-2e7d-448f-bdf6-b5c570aa5e4b_oqnh1w.png", link: "/shop/clips", note: "₹349" },
-      { label: "Heels", image: C + "v1783884222/060a9b45-5fab-4dd8-a8f5-f704de1a8b13_-_Copy_c2mjkz.png", link: "/shop/heels", note: "₹1,269+" },
+      { label: "Anklets", image: C + "v1785502275/b03551d4-2e7d-448f-bdf6-b5c570aa5e4b_oqnh1w.png", link: "/shop/clips", note: "₹379" },
+      { label: "Heels", image: C + "v1783884222/060a9b45-5fab-4dd8-a8f5-f704de1a8b13_-_Copy_c2mjkz.png", link: "/shop/heels", note: "₹1,499+" },
     ],
   },
   bestsellers: {
@@ -192,7 +196,7 @@ export const DEFAULT_HOME: HomeConfig = {
     badge: "",
   },
   heels: {
-    eyebrow: "Comfort heels · from ₹1,269",
+    eyebrow: "Comfort heels · from ₹1,499",
     heading: "Heels that",
     headingItalic: "take a clip",
     count: 4,
@@ -283,6 +287,7 @@ export function mergeHomeConfig(saved: unknown): HomeConfig {
   const out: HomeConfig = {
     sections,
     hero,
+    trust: mergeObj(DEFAULT_HOME.trust, s.trust),
     marketplace: mergeObj(DEFAULT_HOME.marketplace, s.marketplace),
     types: mergeObj(DEFAULT_HOME.types, s.types),
     bestsellers: mergeObj(DEFAULT_HOME.bestsellers, s.bestsellers),
