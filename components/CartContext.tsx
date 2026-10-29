@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import CartDrawer from "@/components/CartDrawer";
 import { CartItem } from "@/lib/supabase";
 import {
   getCart,
@@ -18,24 +19,30 @@ interface CartContextType {
   items: CartItem[];
   count: number;
   total: number;
-  addToCart: (item: CartItem) => void;
+  /** Adds the item and opens the slide-in bag (pass { openDrawer: false } when going straight to checkout). */
+  addToCart: (item: CartItem, opts?: { openDrawer?: boolean }) => void;
   removeFromCart: (slug: string, variant?: string) => void;
   updateQuantity: (slug: string, variant: string | undefined, qty: number) => void;
   clearCart: () => void;
+  drawerOpen: boolean;
+  closeDrawer: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
   useEffect(() => {
     setItems(getCart());
   }, []);
 
-  const addToCart = (item: CartItem) => {
+  const addToCart = (item: CartItem, opts?: { openDrawer?: boolean }) => {
     const updated = addItem(item);
     setItems([...updated]);
+    if (opts?.openDrawer !== false) setDrawerOpen(true);
 
     track({ type: "add_to_cart", productSlug: item.slug, productTitle: item.title, value: item.price * item.quantity });
     gtagEvent("add_to_cart", {
@@ -70,9 +77,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
+        drawerOpen,
+        closeDrawer,
       }}
     >
       {children}
+      <CartDrawer />
     </CartContext.Provider>
   );
 }

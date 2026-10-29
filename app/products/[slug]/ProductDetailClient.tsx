@@ -269,7 +269,7 @@ export default function ProductDetailClient({
 
   const doBuyNow = () => {
     if (unavailable || !sizeChosen()) return;
-    addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined });
+    addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined }, { openDrawer: false });
     router.push("/checkout");
   };
 

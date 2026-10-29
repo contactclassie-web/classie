@@ -40,7 +40,7 @@ export default function SetBuyBox({ set, products, compare, kind, image, whatsap
     const miss = set.items.map((it, i) => (needsChoice(it, products) && !choice[i] ? i : -1)).filter((i) => i >= 0);
     setMissing(miss);
     if (miss.length) return;
-    addToCart({ slug: `set-${set.slug}`, title: `${set.name} (Gift Set)`, price: set.price, image, quantity: qty, variant: describe() });
+    addToCart({ slug: `set-${set.slug}`, title: `${set.name} (Gift Set)`, price: set.price, image, quantity: qty, variant: describe() }, { openDrawer: !then });
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
     then?.();
