@@ -3344,9 +3344,26 @@ export default function AdminPage() {
           await supabase.from("product_color_variants").insert({ group_id: groupId, product_slug: slug, color_name: colorName, color_hex: hex, image: imageJson, sort_order: i });
         }
       }
+      // Shop pages show the main photo, so a product with only colour sets
+      // would appear without a picture. Use the first colour's photos then.
+      const notes: string[] = [];
+      if (!(productModal.data.image || "").trim()) {
+        const firstSet = colors
+          .map((c) => (shoeCharmColorData[c]?.images || []).filter((u: string) => u.trim() !== ""))
+          .find((urls) => urls.length > 0);
+        if (firstSet) {
+          const patch = { image: firstSet[0], images: firstSet.slice(1, 10) };
+          const { error } = await supabase.from("products").update(patch).eq("slug", slug);
+          if (!error) {
+            setProductModal((m) => ({ ...m, data: { ...m.data, ...patch } }));
+            notes.push("The main photo was empty, so the first colour's photos are now the main photos.");
+          }
+        }
+      }
+      if (productModal.data.active === false) notes.push("This product is still hidden. Click the eye icon in the product list to show it on the website.");
       await loadColorVariants(slug);
       await revalidateSite();
-      alert("✅ Color images saved!");
+      alert(["✅ Color images saved!", ...notes].join("\n\n"));
     } finally {
       setShoeCharmSaving(false);
     }
