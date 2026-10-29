@@ -639,7 +639,13 @@ export default function AdminPage() {
   const [tab, setTab] = useState<TabId>("dashboard");
   const [navOpen, setNavOpen] = useState(false);
   const [secOpen, setSecOpen] = useState(false);
-  const [productView, setProductView] = useState<"manage" | "list">("manage"); // phone: admin menu drawer
+  const [productView, setProductView] = useState<"manage" | "list">("manage");
+  // Photos ticked for removal in the product modal: key "main" or "color:<name>" → slot indexes
+  const [photoPick, setPhotoPick] = useState<Record<string, number[]>>({});
+  const togglePick = (key: string, i: number) => setPhotoPick((m) => {
+    const cur = m[key] || [];
+    return { ...m, [key]: cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i] };
+  }); // phone: admin menu drawer
 
   // Orders
   const [orders, setOrders] = useState<Order[]>([]);
@@ -3088,8 +3094,9 @@ export default function AdminPage() {
 
   // ── Product actions ───────────────────────────────────────────────────────
 
-  const openAddProduct = () => { setBundleOffers([]); setProductCollectionId(""); setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } }); };
+  const openAddProduct = () => { setPhotoPick({}); setBundleOffers([]); setProductCollectionId(""); setProductModal({ open: true, mode: "add", data: { ...EMPTY_PRODUCT } }); };
   const openEditProduct = (p: DbProduct) => {
+    setPhotoPick({});
     setProductModal({ open: true, mode: "edit", data: { ...p } });
     setProductCollectionId("");
     if (p.slug) {
@@ -3100,7 +3107,7 @@ export default function AdminPage() {
         .then(({ data }) => { setProductCollectionId(data?.collection_id ?? ""); });
     }
   };
-  const closeProductModal = () => setProductModal((m) => ({ ...m, open: false }));
+  const closeProductModal = () => { setPhotoPick({}); setProductModal((m) => ({ ...m, open: false })); };
 
   const handleProductSave = async () => {
     setProductSaving(true);
@@ -10316,17 +10323,59 @@ export default function AdminPage() {
                     return { ...m, data: { ...m.data, image: main, images: rest.slice(0, 9) } };
                   })} />
                 </div>
-                <div>
-                  <label className={labelCls}>Image 1 — Main</label>
-                  <input type="text" value={productModal.data.image} onChange={(e) => setProductField("image", e.target.value)} className={inputCls} placeholder="https://…" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {[1,2,3,4,5,6,7,8,9].map((i) => (
-                    <div key={i}>
-                      <label className={labelCls}>Image {i + 1}</label>
-                      <input type="text" value={productModal.data.images?.[i - 1] ?? ""} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[i - 1] = e.target.value; setProductField("images", arr); }} className={inputCls} placeholder="https://…" />
+                {(() => {
+                  // Slot 0 = main photo, 1-9 = gallery. Ticked slots can be removed together.
+                  const slots = [productModal.data.image || "", ...Array.from({ length: 9 }, (_, i) => productModal.data.images?.[i] ?? "")];
+                  const picked = photoPick["main"] || [];
+                  const filled = slots.map((u, i) => (u.trim() ? i : -1)).filter((i) => i >= 0);
+                  const removePicked = () => {
+                    const keep = slots.filter((u, i) => u.trim() && !picked.includes(i));
+                    setProductModal((m) => ({ ...m, data: { ...m.data, image: keep[0] || "", images: keep.slice(1) } }));
+                    setPhotoPick((m) => ({ ...m, main: [] }));
+                  };
+                  return filled.length > 0 && (
+                    <div className="flex items-center gap-3 flex-wrap text-xs">
+                      <button type="button" className="text-[#3B5373] underline" onClick={() => setPhotoPick((m) => ({ ...m, main: picked.length === filled.length ? [] : filled }))}>
+                        {picked.length === filled.length ? "Clear selection" : "Select all"}
+                      </button>
+                      {picked.length > 0 && (
+                        <button type="button" onClick={removePicked} className="px-3 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 font-medium">
+                          Remove {picked.length} selected
+                        </button>
+                      )}
+                      <span className="text-gray-400">Tick photos to remove them. They come off this product when you click Save Changes.</span>
                     </div>
-                  ))}
+                  );
+                })()}
+                <div className="flex items-start gap-2">
+                  <input type="checkbox" className="mt-7 w-4 h-4 accent-red-500 flex-shrink-0" disabled={!(productModal.data.image || "").trim()}
+                    checked={(photoPick["main"] || []).includes(0)} onChange={() => togglePick("main", 0)} aria-label="Select main photo" />
+                  <div className="flex-1 min-w-0">
+                    <label className={labelCls}>Image 1 — Main</label>
+                    <input type="text" value={productModal.data.image} onChange={(e) => setProductField("image", e.target.value)} className={inputCls} placeholder="https://…" />
+                  </div>
+                  {productModal.data.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={productModal.data.image} alt="" className="mt-6 w-10 h-10 rounded object-cover border border-gray-200 flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[1,2,3,4,5,6,7,8,9].map((i) => {
+                    const url = productModal.data.images?.[i - 1] ?? "";
+                    return (
+                    <div key={i} className="flex items-start gap-2">
+                      <input type="checkbox" className="mt-7 w-4 h-4 accent-red-500 flex-shrink-0" disabled={!url.trim()}
+                        checked={(photoPick["main"] || []).includes(i)} onChange={() => togglePick("main", i)} aria-label={`Select image ${i + 1}`} />
+                      <div className="flex-1 min-w-0">
+                        <label className={labelCls}>Image {i + 1}</label>
+                        <input type="text" value={url} onChange={(e) => { const arr = [...(productModal.data.images || [])]; arr[i - 1] = e.target.value; setProductField("images", arr); }} className={inputCls} placeholder="https://…" />
+                      </div>
+                      {url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={url} alt="" className="mt-6 w-10 h-10 rounded object-cover border border-gray-200 flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                      )}
+                    </div>
+                  ); })}
                   <div>
                     <label className={labelCls}>🎬 Video URL (mp4 / YouTube)</label>
                     <input type="text" value={productModal.data.video_url ?? ""} onChange={(e) => setProductField("video_url", e.target.value)} className={inputCls} placeholder="https://… or youtube.com/…" />
@@ -10598,9 +10647,39 @@ export default function AdminPage() {
                                     <input type="color" value={colorData.hex} onChange={(e) => updateHex(e.target.value)}
                                       className="w-8 h-7 rounded border border-gray-200 cursor-pointer p-0.5" title="Swatch color" />
                                   </div>
+                                  {(() => {
+                                    const key = "color:" + colorName;
+                                    const imgs = colorData.images || [];
+                                    const filled = imgs.map((u: string, i: number) => (u && u.trim() ? i : -1)).filter((i: number) => i >= 0);
+                                    const picked = photoPick[key] || [];
+                                    if (!filled.length) return null;
+                                    return (
+                                      <div className="flex items-center gap-3 flex-wrap text-xs">
+                                        <button type="button" className="text-[#3B5373] underline" onClick={() => setPhotoPick((m) => ({ ...m, [key]: picked.length === filled.length ? [] : filled }))}>
+                                          {picked.length === filled.length ? "Clear selection" : "Select all"}
+                                        </button>
+                                        {picked.length > 0 && (
+                                          <button type="button" className="px-3 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 font-medium"
+                                            onClick={() => {
+                                              setShoeCharmColorData(prev => {
+                                                const cur = prev[colorName] || colorData;
+                                                const keep = (cur.images || []).filter((u: string, i: number) => u && u.trim() && !picked.includes(i));
+                                                return { ...prev, [colorName]: { ...cur, images: [...keep, ...Array(Math.max(0, 10 - keep.length)).fill("")] } };
+                                              });
+                                              setPhotoPick((m) => ({ ...m, [key]: [] }));
+                                            }}>
+                                            Remove {picked.length} selected
+                                          </button>
+                                        )}
+                                        <span className="text-gray-400">then Save Color Images</span>
+                                      </div>
+                                    );
+                                  })()}
                                   <div className="space-y-1.5">
                                     {[0,1,2,3,4,5,6,7,8,9].map(idx => (
                                       <div key={idx} className="flex items-center gap-2">
+                                        <input type="checkbox" className="w-4 h-4 accent-red-500 flex-shrink-0" disabled={!(colorData.images?.[idx] || "").trim()}
+                                          checked={(photoPick["color:" + colorName] || []).includes(idx)} onChange={() => togglePick("color:" + colorName, idx)} aria-label={`Select ${colorName} image ${idx + 1}`} />
                                         <span className="text-[10px] text-gray-400 w-12 flex-shrink-0">Image {idx+1}</span>
                                         <input
                                           type="text"
