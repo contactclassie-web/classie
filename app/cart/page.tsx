@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { Product } from "@/lib/products";
 import { useShippingRules } from "@/lib/useShipping";
+import { isGiftSet } from "@/lib/orderTotals";
 import { shippingFee, freeShippingFrom } from "@/lib/shipping";
 
 function useSuggestedProducts() {
@@ -42,10 +43,12 @@ export default function CartPage() {
   const suggested = useSuggestedProducts();
 
   const rules      = useShippingRules();
-  const shipping   = shippingFee(total, rules);
+  // Gift sets ship free (same rule as checkout and the server).
+  const hasSet     = items.some((i) => isGiftSet(i.slug));
+  const shipping   = hasSet ? 0 : shippingFee(total, rules);
   const grandTotal = total + shipping;
   const freeFrom   = freeShippingFrom(rules);
-  const toFree     = freeFrom != null ? Math.max(0, freeFrom - total) : 0;
+  const toFree     = !hasSet && freeFrom != null ? Math.max(0, freeFrom - total) : 0;
 
   if (count === 0) {
     return (

@@ -1309,6 +1309,10 @@ export default function AdminPage() {
   // Shipping Rates (site_settings: shipping_tiers + shipping_default_fee)
   const [shipTiers, setShipTiers] = useState<{ threshold: number; fee: number }[]>([{ threshold: 999, fee: 99 }]);
   const [shipDefaultFee, setShipDefaultFee] = useState(0);
+  // Cash on delivery: fee and allowed cart range (site_settings cod_fee / cod_min / cod_max)
+  const [codFee, setCodFee] = useState(99);
+  const [codMin, setCodMin] = useState(299);
+  const [codMax, setCodMax] = useState(3000);
   const [shipLoading, setShipLoading] = useState(false);
   const [shipSaving, setShipSaving] = useState(false);
 
@@ -2174,9 +2178,12 @@ export default function AdminPage() {
   const fetchShippingRates = useCallback(async () => {
     setShipLoading(true);
     try {
-      const { data } = await supabase.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee"]);
+      const { data } = await supabase.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee", "cod_fee", "cod_min", "cod_max"]);
       const m: Record<string, string> = {};
       (data ?? []).forEach((r: { key: string; value: string }) => { m[r.key] = r.value; });
+      if (m.cod_fee !== undefined) setCodFee(Number(m.cod_fee) || 0);
+      if (m.cod_min !== undefined) setCodMin(Number(m.cod_min) || 0);
+      if (m.cod_max !== undefined) setCodMax(Number(m.cod_max) || 0);
       if (m.shipping_tiers) {
         try {
           const parsed = JSON.parse(m.shipping_tiers);
@@ -2198,6 +2205,9 @@ export default function AdminPage() {
       await upsertSettings([
         { key: "shipping_tiers", value: JSON.stringify(cleaned) },
         { key: "shipping_default_fee", value: String(shipDefaultFee) },
+        { key: "cod_fee", value: String(codFee) },
+        { key: "cod_min", value: String(codMin) },
+        { key: "cod_max", value: String(codMax) },
       ]);
       setShipTiers(cleaned);
     } finally {
@@ -3353,20 +3363,18 @@ export default function AdminPage() {
           await supabase.from("product_color_variants").insert({ group_id: groupId, product_slug: slug, color_name: colorName, color_hex: hex, image: imageJson, sort_order: i });
         }
       }
-      // Shop pages show the main photo, so a product with only colour sets
-      // would appear without a picture. Use the first colour's photos then.
+      // Shop pages and the product card use the main photo, so keep it in step
+      // with the first colour that has photos (e.g. Silver).
       const notes: string[] = [];
-      if (!(productModal.data.image || "").trim()) {
-        const firstSet = colors
-          .map((c) => (shoeCharmColorData[c]?.images || []).filter((u: string) => u.trim() !== ""))
-          .find((urls) => urls.length > 0);
-        if (firstSet) {
-          const patch = { image: firstSet[0], images: firstSet.slice(1, 10) };
-          const { error } = await supabase.from("products").update(patch).eq("slug", slug);
-          if (!error) {
-            setProductModal((m) => ({ ...m, data: { ...m.data, ...patch } }));
-            notes.push("The main photo was empty, so the first colour's photos are now the main photos.");
-          }
+      const firstSet = colors
+        .map((c) => (shoeCharmColorData[c]?.images || []).filter((u: string) => u.trim() !== ""))
+        .find((urls) => urls.length > 0);
+      if (firstSet && firstSet[0] !== (productModal.data.image || "")) {
+        const patch = { image: firstSet[0], images: firstSet.slice(1, 10) };
+        const { error } = await supabase.from("products").update(patch).eq("slug", slug);
+        if (!error) {
+          setProductModal((m) => ({ ...m, data: { ...m.data, ...patch } }));
+          notes.push("Main photos updated to match the first colour, so the shop page shows the new photos.");
         }
       }
       if (productModal.data.active === false) notes.push("This product is still hidden. Click the eye icon in the product list to show it on the website.");
@@ -8094,6 +8102,23 @@ export default function AdminPage() {
                         onChange={(e) => setShipDefaultFee(Number(e.target.value) || 0)}
                         className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                       <span className="text-xs text-gray-400">(0 = free shipping)</span>
+                    </div>
+
+                    <div className="pt-3 border-t border-gray-100 space-y-2">
+                      <p className="text-sm font-medium text-gray-700">Cash on delivery</p>
+                      <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                        <span className="text-sm text-gray-500 whitespace-nowrap">COD fee ₹</span>
+                        <input type="number" value={codFee} onChange={(e) => setCodFee(Number(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                        <span className="text-xs text-gray-400">(0 = no fee)</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                        <span className="text-sm text-gray-500 whitespace-nowrap">COD only for carts from ₹</span>
+                        <input type="number" value={codMin} onChange={(e) => setCodMin(Number(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                        <span className="text-sm text-gray-500">to ₹</span>
+                        <input type="number" value={codMax} onChange={(e) => setCodMax(Number(e.target.value) || 0)} className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                        <span className="text-xs text-gray-400">(0 = no limit)</span>
+                      </div>
+                      <p className="text-xs text-gray-400">Coupons never reduce delivery or the COD fee. Carts with a gift set always ship free.</p>
                     </div>
                   </>
                 )}

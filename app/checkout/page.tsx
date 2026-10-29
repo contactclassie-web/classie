@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
-import { useShippingRules } from "@/lib/useShipping";
-import { shippingFee } from "@/lib/shipping";
+import { usePaymentRules, useShippingRules } from "@/lib/useShipping";
+import { couponBase, orderTotals } from "@/lib/orderTotals";
 import { track } from "@/lib/analytics";
 import { gtagEvent } from "@/lib/gtag";
 import { Loader2, Lock, Tag, CheckCircle, XCircle, CreditCard, Truck } from "lucide-react";
@@ -56,6 +56,7 @@ export default function CheckoutPage() {
 
   // Delivery charge — from Admin > Shipping Rates (same rules the server uses).
   const shippingRules = useShippingRules();
+  const paymentRules = usePaymentRules();
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -99,7 +100,8 @@ export default function CheckoutPage() {
           code: couponCode,
           phone: form.customer_phone || undefined,
           email: form.customer_email || undefined,
-          order_value: total + shipping,
+          // Coupons count products only (not gift sets, delivery or COD fee).
+          order_value: couponBase(items),
         }),
       });
       const data = await res.json();
@@ -128,8 +130,16 @@ export default function CheckoutPage() {
     setCouponDiscount(0);
   };
 
-  const shipping = shippingFee(total, shippingRules);
-  const grandTotal = Math.max(0, total + shipping - couponDiscount);
+  // Same rules as the server (lib/orderTotals): delivery is checked after the
+  // coupon, gift sets ship free, COD adds a fee and has a cart-value range.
+  const totals = orderTotals(items, couponDiscount, shippingRules, paymentRules, paymentMethod);
+  const shipping = totals.shipping;
+  const grandTotal = totals.total;
+  const codFee = paymentRules.codFee;
+  // If the cart leaves the COD range, switch back to online payment.
+  useEffect(() => {
+    if (paymentMethod === "cod" && !totals.codAllowed) setPaymentMethod("online");
+  }, [paymentMethod, totals.codAllowed]);
 
   const [form, setForm] = useState({
     customer_name: "",
@@ -382,7 +392,7 @@ export default function CheckoutPage() {
                   </div>
                   <CreditCard className="w-5 h-5 flex-shrink-0" />
                   <div className="text-left">
-                    <p className="text-sm font-semibold">Pay Online</p>
+                    <p className="text-sm font-semibold">Pay Online{codFee > 0 && totals.codAllowed ? ` — save ₹${codFee}` : ""}</p>
                     <p className={`text-xs mt-0.5 ${paymentMethod === "online" ? "text-gray-300" : "text-classie-gray"}`}>
                       UPI, Cards, Net Banking, Wallets — Powered by Razorpay
                     </p>
@@ -397,8 +407,10 @@ export default function CheckoutPage() {
                 {/* COD */}
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod("cod")}
-                  className={`w-full border-2 rounded-lg px-5 py-4 flex items-center gap-4 transition-all ${
+                  onClick={() => totals.codAllowed && setPaymentMethod("cod")}
+                  disabled={!totals.codAllowed}
+                  aria-disabled={!totals.codAllowed}
+                  className={`w-full border-2 rounded-lg px-5 py-4 flex items-center gap-4 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                     paymentMethod === "cod"
                       ? "border-[#3B5373] bg-[#3B5373] text-white"
                       : "border-classie-border bg-white text-classie-black hover:border-classie-black"
@@ -411,9 +423,9 @@ export default function CheckoutPage() {
                   </div>
                   <Truck className="w-5 h-5 flex-shrink-0" />
                   <div className="text-left">
-                    <p className="text-sm font-semibold">Cash on Delivery (COD)</p>
+                    <p className="text-sm font-semibold">Cash on Delivery (COD){codFee > 0 ? ` · +₹${codFee} fee` : ""}</p>
                     <p className={`text-xs mt-0.5 ${paymentMethod === "cod" ? "text-gray-300" : "text-classie-gray"}`}>
-                      Pay when your order arrives at your door
+                      {totals.codAllowed ? "Pay when your order arrives at your door" : totals.codReason}
                     </p>
                   </div>
                 </button>
@@ -499,8 +511,7 @@ export default function CheckoutPage() {
                       <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5">Available Offers</p>
                       <div className="flex flex-wrap gap-2">
                         {[
-                          { code: "FIRST10", label: "10% OFF", sub: "No minimum" },
-                          { code: "CLASSIE15", label: "15% OFF", sub: "Min ₹2,000" },
+                          { code: "FIRST10", label: "10% OFF", sub: "First order · min ₹699" },
                         ].map((c) => (
                           <button
                             key={c.code}
@@ -509,7 +520,7 @@ export default function CheckoutPage() {
                             className="flex items-center gap-1.5 px-2.5 py-1.5 border border-dashed border-[#3B5373] rounded text-[11px] text-[#3B5373] hover:bg-[#3B5373] hover:text-white transition-colors"
                           >
                             <span className="font-mono font-semibold">{c.code}</span>
-                            <span className="text-[10px] opacity-70">• {c.label}</span>
+                            <span className="text-[10px] opacity-70">• {c.label} · {c.sub}</span>
                           </button>
                         ))}
                       </div>
@@ -534,6 +545,17 @@ export default function CheckoutPage() {
                     <span>Coupon Discount</span>
                     <span>−₹{couponDiscount.toLocaleString("en-IN")}</span>
                   </div>
+                )}
+                {totals.codFee > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-classie-gray">Cash on Delivery fee</span>
+                    <span>₹{totals.codFee}</span>
+                  </div>
+                )}
+                {paymentMethod === "cod" && totals.codFee > 0 && (
+                  <button type="button" onClick={() => setPaymentMethod("online")} className="w-full text-left text-xs text-emerald-700 bg-emerald-50 rounded px-3 py-2">
+                    Pay online and save ₹{totals.codFee} →
+                  </button>
                 )}
                 <div className="flex justify-between font-semibold text-base pt-2 border-t border-classie-border">
                   <span>Total</span>
@@ -562,7 +584,7 @@ export default function CheckoutPage() {
                     {paymentMethod === "online" ? (
                       <><CreditCard className="w-4 h-4" /> Pay ₹{grandTotal.toLocaleString("en-IN")} Online</>
                     ) : (
-                      <><Lock className="w-4 h-4" /> Place Order — COD</>
+                      <><Lock className="w-4 h-4" /> Place Order — COD ₹{grandTotal.toLocaleString("en-IN")}</>
                     )}
                   </>
                 )}
