@@ -19,6 +19,7 @@ export interface Product {
   promo_line?: string;
   description: string;
   featured_tab?: string | null;
+  created_at?: string;
 }
 
 export const products: Product[] = [
@@ -157,6 +158,7 @@ function mapDbProduct(row: DbProduct): Product {
     promo_line: (row as any).promo_line || "",
     description: row.description,
     featured_tab: row.featured_tab ?? null,
+    created_at: (row as any).created_at || undefined,
   };
 }
 

@@ -742,8 +742,28 @@ export default function ProductDetailClient({
               );
             })}
 
+            {/* ── Charm pages: 2 heels in one row; the size is picked on the heel page ── */}
+            {!isHeel && bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
+              <div style={{ marginTop: "8px" }}>
+                <p className="font-serif" style={{ fontSize: "18px", color: "#1a1a1a", marginBottom: "10px" }}>Complete the look</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {bundleOffers.filter(o => o.accessory_slug !== product.slug).slice(0, 2).map((offer) => (
+                    <Link key={offer.id} href={`/products/${offer.product.slug}`} className="group block">
+                      <div className="overflow-hidden bg-[#F7F4EF]" style={{ aspectRatio: "1 / 1" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={optimizeCloudinary(offer.product.image, 400)} alt={offer.product.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                      </div>
+                      <p className="truncate" style={{ fontSize: "12.5px", color: "#1a1a1a", marginTop: "8px" }}>{offer.product.title}</p>
+                      <p style={{ fontSize: "12.5px", fontWeight: 600, color: "#1a1a1a" }}>₹{offer.product.price.toLocaleString("en-IN")}</p>
+                      <span style={{ fontSize: "11px", color: "#3B5373", textDecoration: "underline" }}>Choose size →</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* ── Style it with Clip-ons ── */}
-            {bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
+            {isHeel && bundleOffers.filter(o => o.accessory_slug !== product.slug).length > 0 && (
               <div style={{ border: "1px solid #E8E3DD", borderRadius: "12px", overflow: "hidden", marginTop: "8px" }}>
                 <div style={{ padding: "12px 18px", borderBottom: "1px solid #E8E3DD", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff" }}>
                   <p style={{ fontFamily: "Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#1a1a1a" }}>{isHeel ? "Style it with Clip-ons" : "Complete the look"}</p>
