@@ -114,7 +114,7 @@ export const DEFAULT_GIFT_SETS: GiftSetsConfig = {
       items: [
         { slug: "satin-swirl-beige", variant: "", qty: 1 },
         { slug: "fauxbow-brown", variant: "", qty: 1 },
-        { slug: "flower-jute-shoe-charms", variant: "", qty: 1 },
+        { slug: "star-bloom-jute-shoe-charms", variant: "", qty: 1 },
       ],
       price: 849, compareAt: 0, images: [], askOnly: false, active: false,
     },
