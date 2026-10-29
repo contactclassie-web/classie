@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Heart, SlidersHorizontal, X } from "lucide-react";
 import { useWishlist } from "@/components/WishlistContext";
 import { useCart } from "@/components/CartContext";
-import { optimizeCloudinary } from "@/lib/cloudinary";
+import { blurStyle, optimizeCloudinary } from "@/lib/cloudinary";
 import { contentReader, parseTypeNames } from "@/lib/shopPageContent";
 
 export interface ListingProduct {
@@ -24,6 +24,7 @@ export interface ListingProduct {
   options: string[];
   isNew: boolean;          // added in the last 30 days
   pinned?: boolean;        // Admin → Featured Picks "latest" (sorted first)
+  cardPhoto?: boolean;     // image is the chosen shop-card photo (always shown first)
   soldOut?: boolean;       // every tracked option is at 0 (Admin → Manage products → stock)
 }
 
@@ -74,8 +75,9 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
   const needsChoice = p.options.length > 0 && p.variantType !== "none";
   const discount = p.comparePrice > p.price ? Math.round(((p.comparePrice - p.price) / p.comparePrice) * 100) : 0;
   const title = hidePair ? p.title.replace(/\s*\(pair\)\s*/i, " ").trim() : p.title.trim();
-  const first = wornFirst && p.image2 ? p.image2 : p.image;
-  const second = wornFirst && p.image2 ? p.image : p.image2;
+  const swap = wornFirst && !!p.image2 && !p.cardPhoto;
+  const first = swap ? p.image2 : p.image;
+  const second = swap ? p.image : p.image2;
   const sub = mode === "heels"
     ? p.heelType
     : p.variantType === "color" && p.options.length ? p.options.map((o) => o.charAt(0).toUpperCase() + o.slice(1)).join(", ") : "";
@@ -93,7 +95,7 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
     <Link href={`/products/${p.slug}`} className="group flex flex-col gap-2.5">
       <div className="relative overflow-hidden bg-[#F2EFEA] aspect-square">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={optimizeCloudinary(first, 600)} alt={title} loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" />
+        <img src={optimizeCloudinary(first, 600)} alt={title} loading="lazy" decoding="async" style={blurStyle(first)} className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" />
         {second && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={optimizeCloudinary(second, 600)} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-0 md:group-hover:opacity-100 transition-opacity duration-500" />

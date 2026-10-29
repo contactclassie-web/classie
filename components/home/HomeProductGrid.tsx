@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/components/CartContext";
-import { optimizeCloudinary } from "@/lib/cloudinary";
+import { blurStyle, optimizeCloudinary } from "@/lib/cloudinary";
 import type { Product } from "@/lib/products";
 
 interface Props {
@@ -12,14 +12,18 @@ interface Props {
   colors?: Record<string, Record<string, string>>;
   // product slug → { colour name (lowercase) → first photo of that colour }
   photos?: Record<string, Record<string, string>>;
+  // product slug → shop-card photo (Admin → Manage products); main photo shows on hover
+  cards?: Record<string, string>;
 }
 
-function QuickCard({ p, colors, photos }: { p: Product; colors?: Record<string, string>; photos?: Record<string, string> }) {
+function QuickCard({ p, colors, photos, card }: { p: Product; colors?: Record<string, string>; photos?: Record<string, string>; card?: string }) {
   const { addToCart } = useCart();
   const [choosing, setChoosing] = useState(false);
   const [added, setAdded] = useState(false);
   const options = p.variants?.options ?? [];
-  const second = (p.images ?? []).find((u) => u && u !== p.image);
+  const useCard = !!card && card !== p.image;
+  const first = useCard ? card! : p.image;
+  const second = useCard ? p.image : (p.images ?? []).find((u) => u && u !== p.image);
   const off = p.comparePrice > p.price ? Math.round(((p.comparePrice - p.price) / p.comparePrice) * 100) : 0;
 
   const add = (variant?: string) => {
@@ -42,7 +46,7 @@ function QuickCard({ p, colors, photos }: { p: Product; colors?: Record<string, 
       <div className="relative bg-[#f6f6f6] overflow-hidden">
         <Link href={`/products/${p.slug}`} aria-label={p.title} className="block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={optimizeCloudinary(p.image, 600)} alt={p.title} loading="lazy" decoding="async"
+          <img src={optimizeCloudinary(first, 600)} alt={p.title} loading="lazy" decoding="async" style={blurStyle(first)}
             className="w-full aspect-square object-cover" />
           {second && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -95,10 +99,10 @@ function QuickCard({ p, colors, photos }: { p: Product; colors?: Record<string, 
   );
 }
 
-export default function HomeProductGrid({ products, colors, photos }: Props) {
+export default function HomeProductGrid({ products, colors, photos, cards }: Props) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-2.5 gap-y-5 md:gap-x-6 md:gap-y-9">
-      {products.map((p) => <QuickCard key={p.slug} p={p} colors={colors?.[p.slug]} photos={photos?.[p.slug]} />)}
+      {products.map((p) => <QuickCard key={p.slug} p={p} colors={colors?.[p.slug]} photos={photos?.[p.slug]} card={cards?.[p.slug]} />)}
     </div>
   );
 }

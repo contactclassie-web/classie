@@ -4,7 +4,7 @@ import { publicSupabase } from "@/lib/supabasePublic";
 import CustomDesignForm from "@/components/custom/CustomDesignForm";
 import { SketchSvg } from "@/components/home/HomeSections";
 import { CUSTOM_PAGE_KEY, mergeCustomPage, splitList } from "@/lib/customDesigns";
-import { optimizeCloudinary } from "@/lib/cloudinary";
+import { blurStyle, optimizeCloudinary } from "@/lib/cloudinary";
 
 export const dynamic = "force-dynamic";
 
@@ -31,9 +31,10 @@ export async function generateMetadata(): Promise<Metadata> {
 const EB = "font-sans text-[10px] tracking-[0.3em] uppercase text-[#3B5373]";
 const H2 = "font-serif font-light text-[30px] md:text-[44px] leading-[1.1] text-[#1a1a1a]";
 
-function Img({ src, className, w = 800, alt = "" }: { src: string; className: string; w?: number; alt?: string }) {
+function Img({ src, className, w = 800, alt = "", eager = false }: { src: string; className: string; w?: number; alt?: string; eager?: boolean }) {
+  // Hero photos load straight away; the rest load as you scroll, over a blurred preview.
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={optimizeCloudinary(src, w)} alt={alt} loading="lazy" className={className} />;
+  return <img src={optimizeCloudinary(src, w)} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async" className={className} style={blurStyle(src)} />;
 }
 
 export default async function CustomDesignsPage() {
@@ -47,11 +48,11 @@ export default async function CustomDesignsPage() {
         <div className="max-w-[1280px] mx-auto md:grid md:grid-cols-2 md:items-center">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 md:gap-4 px-4 pt-5 md:p-14">
             {hero.sketchImage
-              ? <Img src={hero.sketchImage} w={700} alt="Customer's sketch" className="w-full aspect-square object-cover border border-[#ECEAE6] bg-white" />
+              ? <Img eager src={hero.sketchImage} w={700} alt="Customer's sketch" className="w-full aspect-square object-cover border border-[#ECEAE6] bg-white" />
               : <SketchSvg className="w-full aspect-square border border-[#ECEAE6]" />}
             <span className="font-serif text-[32px] text-[#3B5373]" aria-hidden>→</span>
             {hero.productImage
-              ? <Img src={hero.productImage} w={700} alt="The finished clip" className="w-full aspect-square object-cover border border-[#ECEAE6] bg-white" />
+              ? <Img eager src={hero.productImage} w={700} alt="The finished clip" className="w-full aspect-square object-cover border border-[#ECEAE6] bg-white" />
               : <span className="w-full aspect-square bg-white border border-[#ECEAE6]" />}
           </div>
           <div className="px-5 pt-5 pb-9 md:px-14 md:py-14 grid gap-3 md:gap-4">

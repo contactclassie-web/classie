@@ -233,9 +233,9 @@ export default function HomepageBuilder({ revalidate }: { revalidate: () => Prom
       </Panel>
 
       {/* ── Bestsellers / Heels ── */}
-      {(["bestsellers", "heels"] as const).map((k) => (
-        <Panel key={k} title={k === "bestsellers" ? "Bestselling shoe charms" : "Heels"}
-          note={k === "bestsellers" ? "Products tagged Bestseller in Featured Picks show first" : "Active heels"}>
+      {(["newArrivals", "bestsellers", "giftSets", "heels"] as const).map((k) => (
+        <Panel key={k} title={{ newArrivals: "New arrivals", bestsellers: "Bestselling shoe charms", giftSets: "Gift sets", heels: "Heels" }[k]}
+          note={{ newArrivals: "Products added in the last few days (newest first)", bestsellers: "Products tagged Bestseller in Featured Picks show first", giftSets: "Active sets from Gift Sets, in their order", heels: "Active heels" }[k]}>
           <div className="grid sm:grid-cols-2 gap-3">
             <Field label="Small line above" value={cfg[k].eyebrow} onChange={(v) => update(k, { eyebrow: v })} />
             <Field label="How many products" type="number" value={cfg[k].count} onChange={(v) => update(k, { count: Number(v) || 4 })} />
@@ -243,8 +243,9 @@ export default function HomepageBuilder({ revalidate }: { revalidate: () => Prom
             <Field label="Heading italic part" value={cfg[k].headingItalic} onChange={(v) => update(k, { headingItalic: v })} />
             <Field label="Link text" value={cfg[k].linkText} onChange={(v) => update(k, { linkText: v })} />
             <Field label="Link" value={cfg[k].linkUrl} onChange={(v) => update(k, { linkUrl: v })} />
+            {k === "newArrivals" && <Field label="Count as new for (days)" type="number" value={cfg.newArrivals.days} onChange={(v) => update("newArrivals", { days: Number(v) || 30 })} />}
           </div>
-          <p className="text-xs text-gray-500">Each card shows the product&apos;s main photo. For shoe charms, set the photo of the clip on a shoe as the main photo in Products.</p>
+          {k !== "giftSets" && <p className="text-xs text-gray-500">Cards show the &quot;Shop card photo&quot; chosen in Products → Manage products (else the main photo).</p>}
         </Panel>
       ))}
 

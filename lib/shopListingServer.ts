@@ -2,6 +2,7 @@ import { publicSupabase } from "@/lib/supabasePublic";
 import { loadGiftSets } from "@/lib/giftSetsServer";
 import type { ListingProduct, Occasion } from "@/components/shop/ShopListing";
 import { INVENTORY_KEY, isSoldOut, parseInventory } from "@/lib/inventory";
+import { CARD_PHOTOS_KEY, cardImages, parseCardPhotos, type CardPhotos } from "@/lib/cardPhotos";
 
 export const CHARM_CATEGORIES = ["shoe-charms", "clips", "bow"];
 export const DEFAULT_CHARM_TYPES = ["Rhinestone Shoe Charms", "Flower Shoe Charms", "Bow Shoe Charms", "Pearl Anklet"];
@@ -22,9 +23,9 @@ export function normalizeHeelType(s: string | null | undefined): string {
   return (s ?? "").trim().replace(/\s+/g, " ").toLowerCase().replace(/\b\w/g, (ch) => ch.toUpperCase());
 }
 
-export function toListing(r: Row): ListingProduct {
-  const image = r.image ?? "";
-  const image2 = (Array.isArray(r.images) ? r.images : []).find((u) => u && u !== image) ?? "";
+export function toListing(r: Row, cards: CardPhotos = {}): ListingProduct {
+  const main = r.image ?? "";
+  const [image, image2] = cardImages(cards, r.slug, main, (Array.isArray(r.images) ? r.images : []).find((u) => u && u !== main) ?? "");
   const vt = r.variant_type === "size" || r.variant_type === "color" ? r.variant_type : "none";
   return {
     slug: r.slug,
@@ -39,6 +40,7 @@ export function toListing(r: Row): ListingProduct {
     options: vt === "none" ? [] : (Array.isArray(r.variants) ? r.variants.filter((v) => String(v).trim() !== "") : []),
     isNew: isRecent(r.created_at),
     pinned: r.featured_tab === "latest",
+    cardPhoto: !!cards[r.slug],
   };
 }
 
@@ -46,14 +48,16 @@ const COLS = "slug,title,price,compare_price,image,images,tags,heel_type,variant
 
 export async function loadAllListingProducts(): Promise<{ heels: ListingProduct[]; charms: ListingProduct[] }> {
   const sb = publicSupabase(60);
-  const [{ data }, invRes] = await Promise.all([
+  const [{ data }, setRes] = await Promise.all([
     sb.from("products").select(COLS).eq("active", true).order("created_at", { ascending: false }),
-    sb.from("site_settings").select("value").eq("key", INVENTORY_KEY).maybeSingle(),
+    sb.from("site_settings").select("key,value").in("key", [INVENTORY_KEY, CARD_PHOTOS_KEY]),
   ]);
-  const inv = parseInventory(invRes.data?.value);
+  const setting = (k: string) => (setRes.data ?? []).find((x: { key: string }) => x.key === k)?.value as string | undefined;
+  const inv = parseInventory(setting(INVENTORY_KEY));
+  const cards = parseCardPhotos(setting(CARD_PHOTOS_KEY));
   const rows = (data ?? []) as Row[];
   const withStock = (r: Row): ListingProduct => {
-    const l = toListing(r);
+    const l = toListing(r, cards);
     return { ...l, soldOut: isSoldOut(inv, l.slug, l.options) };
   };
   return {
@@ -160,10 +164,12 @@ export async function loadEdit(slug: string): Promise<{ title: string; descripti
   if (!col) return null;
   const { data: links } = await sb.from("collection_products").select("product_slug,display_order").eq("collection_id", col.id).order("display_order", { ascending: true });
   const slugs = (links ?? []).map((l: { product_slug: string }) => l.product_slug);
-  const { data: rows } = slugs.length
-    ? await sb.from("products").select(COLS).in("slug", slugs).eq("active", true)
-    : { data: [] as Row[] };
-  const bySlug = new Map((rows ?? []).map((r: Row) => [r.slug, toListing(r)]));
+  const [{ data: rows }, { data: cardRow }] = await Promise.all([
+    slugs.length ? sb.from("products").select(COLS).in("slug", slugs).eq("active", true) : Promise.resolve({ data: [] as Row[] }),
+    sb.from("site_settings").select("value").eq("key", CARD_PHOTOS_KEY).maybeSingle(),
+  ]);
+  const cards = parseCardPhotos(cardRow?.value);
+  const bySlug = new Map((rows ?? []).map((r: Row) => [r.slug, toListing(r, cards)]));
   return {
     title: col.title ?? "",
     description: col.description ?? "",

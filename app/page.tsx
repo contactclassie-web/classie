@@ -1,4 +1,8 @@
 import { loadAllListingProducts } from "@/lib/shopListingServer";
+import { CARD_PHOTOS_KEY, parseCardPhotos } from "@/lib/cardPhotos";
+import { loadGiftSets } from "@/lib/giftSetsServer";
+import { setAvailable } from "@/lib/giftSets";
+import { SetCard } from "@/components/sets/SetCard";
 import { postCover } from "@/lib/blogProducts";
 import type { Metadata } from "next";
 import NewsletterSection from "@/components/NewsletterSection";
@@ -77,7 +81,7 @@ const FP_KEYS = [
   "adv_picks_mobile","adv_picks_desktop","adv_picks_gap","adv_picks_aspect","adv_picks_radius","adv_picks_card_h",
 ];
 const NL_KEYS = ["nl_eyebrow","nl_heading","nl_heading_italic","nl_subtext","nl_placeholder","nl_btn_text","nl_success_text"];
-const HOME_KEYS = [HOME_CONFIG_KEY, "shipping_tiers", "shipping_default_fee", "footer_whatsapp_url"];
+const HOME_KEYS = [HOME_CONFIG_KEY, "shipping_tiers", "shipping_default_fee", "footer_whatsapp_url", CARD_PHOTOS_KEY];
 
 export default async function HomePage() {
   const sb = publicSupabase();
@@ -98,6 +102,7 @@ export default async function HomePage() {
   const home = mergeHomeConfig(saved);
   const on = new Set<SectionId>(home.sections.filter((s) => s.on).map((s) => s.id));
   const amount = freeDeliveryThreshold(cfg.shipping_tiers, cfg.shipping_default_fee);
+  const cards = parseCardPhotos(cfg[CARD_PHOTOS_KEY]);
 
   // Only fetch what the switched-on sections need.
   const [journalRes, collectionsRes, featuresRes, siteCatsRes, legacyPicks] = await Promise.all([
@@ -137,10 +142,20 @@ export default async function HomePage() {
   const pickBestsellers = (): Product[] => {
     const charms = allProducts.filter((p) => p.category !== "heels");
     const tagged = charms.filter((p) => p.featured_tab === "bestseller");
-    const rest = charms.filter((p) => p.featured_tab !== "bestseller");
+    // Don't repeat products already shown in New arrivals.
+    const shownNew = new Set(on.has("newArrivals") ? newList.map((p) => p.slug) : []);
+    const rest = charms.filter((p) => p.featured_tab !== "bestseller" && !shownNew.has(p.slug));
     return [...tagged, ...rest].slice(0, home.bestsellers.count);
   };
   const heelsList = allProducts.filter((p) => p.category === "heels").slice(0, home.heels.count);
+  // New arrivals: added in the last N days, newest first (falls back to the newest products).
+  const newList = (() => {
+    const byDate = [...allProducts].filter((p) => p.created_at).sort((a, b) => (b.created_at! > a.created_at! ? 1 : -1));
+    const since = Date.now() - home.newArrivals.days * 864e5;
+    const recent = byDate.filter((p) => new Date(p.created_at!).getTime() >= since);
+    return (recent.length >= 2 ? recent : byDate).slice(0, home.newArrivals.count);
+  })();
+  const giftData = on.has("giftSets") ? await loadGiftSets() : null;
 
   const heroFallback = (heroRes.data ?? []).map((r: { image_url: string }) => r.image_url).filter(Boolean);
 
@@ -180,7 +195,31 @@ export default async function HomePage() {
         return (
           <section className={`${WRAP} py-10 md:py-16`}>
             <SectionHeading eyebrow={b.eyebrow} heading={b.heading} italic={b.headingItalic} linkText={b.linkText} linkUrl={b.linkUrl} />
-            <HomeProductGrid products={list} colors={colors} photos={colourPhotos} />
+            <HomeProductGrid products={list} colors={colors} photos={colourPhotos} cards={cards} />
+          </section>
+        );
+      }
+      case "newArrivals": {
+        if (!newList.length) return null;
+        const n = home.newArrivals;
+        return (
+          <section className={`${WRAP} py-10 md:py-16`}>
+            <SectionHeading eyebrow={n.eyebrow} heading={n.heading} italic={n.headingItalic} linkText={n.linkText} linkUrl={n.linkUrl} />
+            <HomeProductGrid products={newList} colors={colors} photos={colourPhotos} cards={cards} />
+          </section>
+        );
+      }
+      case "giftSets": {
+        if (!giftData) return null;
+        const sets = giftData.config.sets.filter((x) => x.active && !x.askOnly && setAvailable(x, giftData.products)).slice(0, home.giftSets.count);
+        if (!sets.length) return null;
+        const g = home.giftSets;
+        return (
+          <section className={`${WRAP} py-10 md:py-16`}>
+            <SectionHeading eyebrow={g.eyebrow} heading={g.heading} italic={g.headingItalic} linkText={g.linkText} linkUrl={g.linkUrl} />
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-8 md:gap-x-7">
+              {sets.map((x, i) => <div key={x.id} className={i === 2 ? "hidden md:block" : ""}><SetCard set={x} products={giftData.products} /></div>)}
+            </div>
           </section>
         );
       }
@@ -198,7 +237,7 @@ export default async function HomePage() {
         return (
           <section className={`${WRAP} py-10 md:py-16`}>
             <SectionHeading eyebrow={h.eyebrow} heading={h.heading} italic={h.headingItalic} linkText={h.linkText} linkUrl={h.linkUrl} />
-            <HomeProductGrid products={heelsList} colors={colors} photos={colourPhotos} />
+            <HomeProductGrid products={heelsList} colors={colors} photos={colourPhotos} cards={cards} />
           </section>
         );
       }

@@ -11,7 +11,7 @@ export type HeroSlide =
   | { type: "video"; url: string; poster: string };
 
 export type SectionId =
-  | "hero" | "trust" | "marketplace" | "types" | "bestsellers" | "freeDelivery" | "howItWorks"
+  | "hero" | "trust" | "marketplace" | "types" | "newArrivals" | "bestsellers" | "giftSets" | "freeDelivery" | "howItWorks"
   | "custom" | "edit" | "heels" | "instagram" | "journal" | "reviews" | "why" | "whatsapp" | "seo"
   | "legacyHero" | "legacyTrustBand" | "legacyOccasions" | "legacyFeaturedPicks" | "legacyPhilosophy" | "legacyNewsletter";
 
@@ -20,6 +20,8 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   trust: "Trust points under the hero",
   marketplace: "Amazon · Flipkart · Myntra line",
   types: "Shop by type (round photos)",
+  newArrivals: "New arrivals",
+  giftSets: "Gift sets",
   bestsellers: "Bestselling shoe charms",
   freeDelivery: "Free delivery banner",
   howItWorks: "How it works",
@@ -65,7 +67,9 @@ export interface HomeConfig {
   trust: { items: string };   // short points separated by "·"
   marketplace: { prefix: string; names: string; note: string };
   types: { heading: string; headingItalic: string; items: { label: string; image: string; link: string; note: string }[] };
+  newArrivals: { eyebrow: string; heading: string; headingItalic: string; count: number; days: number; linkText: string; linkUrl: string };
   bestsellers: { eyebrow: string; heading: string; headingItalic: string; count: number; linkText: string; linkUrl: string };
+  giftSets: { eyebrow: string; heading: string; headingItalic: string; count: number; linkText: string; linkUrl: string };
   freeDelivery: { eyebrow: string; heading: string; text: string; buttonText: string; buttonUrl: string; images: string[] };
   howItWorks: { heading: string; headingItalic: string; steps: { image: string; title: string; text: string }[] };
   custom: { eyebrow: string; heading: string; headingItalic: string; text: string; perk: string; buttonText: string; buttonUrl: string; sketchImage: string; productImage: string };
@@ -85,18 +89,20 @@ export const DEFAULT_HOME: HomeConfig = {
     { id: "trust", on: true },
     { id: "marketplace", on: false },
     { id: "types", on: true },
+    { id: "newArrivals", on: true },
     { id: "bestsellers", on: true },
-    { id: "freeDelivery", on: true },
     { id: "howItWorks", on: true },
-    { id: "custom", on: true },
-    { id: "edit", on: true },
+    { id: "giftSets", on: true },
     { id: "heels", on: true },
-    { id: "instagram", on: true },
-    { id: "journal", on: true },
     { id: "reviews", on: true },
-    { id: "why", on: true },
+    { id: "instagram", on: true },
+    { id: "custom", on: true },
+    { id: "journal", on: true },
     { id: "whatsapp", on: true },
     { id: "seo", on: true },
+    { id: "freeDelivery", on: false },
+    { id: "edit", on: false },
+    { id: "why", on: false },
     { id: "legacyHero", on: false },
     { id: "legacyTrustBand", on: false },
     { id: "legacyOccasions", on: false },
@@ -144,6 +150,23 @@ export const DEFAULT_HOME: HomeConfig = {
       { label: "Anklets", image: C + "v1785502275/b03551d4-2e7d-448f-bdf6-b5c570aa5e4b_oqnh1w.png", link: "/shop/clips", note: "₹379" },
       { label: "Heels", image: C + "v1783884222/060a9b45-5fab-4dd8-a8f5-f704de1a8b13_-_Copy_c2mjkz.png", link: "/shop/heels", note: "₹1,499+" },
     ],
+  },
+  newArrivals: {
+    eyebrow: "Just in",
+    heading: "New",
+    headingItalic: "arrivals",
+    count: 4,
+    days: 30,
+    linkText: "Shop all",
+    linkUrl: "/shop/clips",
+  },
+  giftSets: {
+    eyebrow: "Ready to gift",
+    heading: "Gift",
+    headingItalic: "sets",
+    count: 3,
+    linkText: "All sets",
+    linkUrl: "/gift-sets",
   },
   bestsellers: {
     eyebrow: "Most loved",
@@ -290,7 +313,9 @@ export function mergeHomeConfig(saved: unknown): HomeConfig {
     trust: mergeObj(DEFAULT_HOME.trust, s.trust),
     marketplace: mergeObj(DEFAULT_HOME.marketplace, s.marketplace),
     types: mergeObj(DEFAULT_HOME.types, s.types),
+    newArrivals: mergeObj(DEFAULT_HOME.newArrivals, s.newArrivals),
     bestsellers: mergeObj(DEFAULT_HOME.bestsellers, s.bestsellers),
+    giftSets: mergeObj(DEFAULT_HOME.giftSets, s.giftSets),
     freeDelivery: mergeObj(DEFAULT_HOME.freeDelivery, s.freeDelivery),
     howItWorks: mergeObj(DEFAULT_HOME.howItWorks, s.howItWorks),
     custom: mergeObj(DEFAULT_HOME.custom, s.custom),
@@ -303,6 +328,9 @@ export function mergeHomeConfig(saved: unknown): HomeConfig {
   };
   out.bestsellers.count = Math.min(16, Math.max(2, Number(out.bestsellers.count) || 8));
   out.heels.count = Math.min(12, Math.max(2, Number(out.heels.count) || 4));
+  out.newArrivals.count = Math.min(12, Math.max(2, Number(out.newArrivals.count) || 4));
+  out.newArrivals.days = Math.min(365, Math.max(1, Number(out.newArrivals.days) || 30));
+  out.giftSets.count = Math.min(6, Math.max(1, Number(out.giftSets.count) || 3));
   out.journal.count = Math.min(6, Math.max(1, Number(out.journal.count) || 3));
   return out;
 }
