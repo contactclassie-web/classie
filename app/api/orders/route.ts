@@ -4,6 +4,7 @@ import Razorpay from "razorpay";
 import { serverSupabase } from "@/lib/supabaseServer";
 import { isAdminRequest } from "@/lib/adminAuth";
 import { priceOrder } from "@/lib/orderPricing";
+import { deductStock } from "@/lib/inventoryServer";
 import { sendOrderEmails, sendReviewRequest } from "@/lib/emails";
 
 const getSupabase = serverSupabase;
@@ -63,7 +64,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Prices come from the database, not from the browser.
-    const priced = await priceOrder(supabase, items, { couponCode: coupon_code, phone: customer_phone, email: customer_email, method: payment_method === "online" ? "online" : "cod" });
+    const priced = await priceOrder(supabase, items, { couponCode: coupon_code, phone: customer_phone, email: customer_email, method: payment_method === "online" ? "online" : "cod",
+      // Online orders arrive after the customer has paid (stock was checked before payment), so always save them.
+      skipStockCheck: payment_method === "online" });
     if (!priced.ok) return NextResponse.json({ error: priced.error }, { status: 400 });
 
     const isOnline = payment_method === "online";
@@ -110,6 +113,9 @@ export async function POST(req: NextRequest) {
       console.error("Supabase insert error:", error);
       return NextResponse.json({ error: "Failed to save order" }, { status: 500 });
     }
+
+    // Take the sold items off the stock counts.
+    await deductStock(supabase, priced.stockUse).catch((e) => console.error("deductStock:", e));
 
     // Record coupon use (server side, so it can't be faked or skipped).
     if (priced.coupon && priced.discount > 0) {

@@ -4,7 +4,7 @@ import { getShopCategoryProducts, getShopCategorySettings } from "@/lib/products
 import ShopCategoryPageClient from "@/components/ShopCategoryPageClient";
 import { createClient } from "@supabase/supabase-js";
 
-export const revalidate = 3600;
+export const revalidate = 300; // product lists: refresh within 5 minutes of a change
 
 export async function generateMetadata(): Promise<Metadata> {
   const free = await loadFreeShippingAmount();

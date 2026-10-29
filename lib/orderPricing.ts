@@ -3,6 +3,7 @@ import { GIFT_SETS_KEY, mergeGiftSets } from "@/lib/giftSets";
 import { parseShipping } from "@/lib/shipping";
 import { checkCoupon, type CouponRow } from "@/lib/coupons";
 import { couponBase, orderTotals, parsePayment, PAYMENT_KEYS } from "@/lib/orderTotals";
+import { INVENTORY_KEY, parseInventory, stockOf, type Inventory } from "@/lib/inventory";
 
 // Works out what an order really costs from the database, so the amount a
 // customer pays can't be changed in the browser. Used by the Razorpay order
@@ -20,6 +21,8 @@ export type PricingResult =
   | {
       ok: true;
       items: PricedItem[];
+      /** Stock to take off once the order is saved: product slug → variant ("" = none) → qty */
+      stockUse: Record<string, Record<string, number>>;
       subtotal: number;
       shipping: number;
       discount: number;
@@ -35,7 +38,7 @@ const str = (v: unknown, max = 300) => (typeof v === "string" ? v.slice(0, max) 
 export async function priceOrder(
   sb: SupabaseClient,
   rawItems: unknown,
-  opts: { couponCode?: string | null; phone?: string | null; email?: string | null; method?: "cod" | "online" } = {},
+  opts: { couponCode?: string | null; phone?: string | null; email?: string | null; method?: "cod" | "online"; skipStockCheck?: boolean } = {},
 ): Promise<PricingResult> {
   if (!Array.isArray(rawItems) || rawItems.length === 0) return { ok: false, error: "No items in order" };
   if (rawItems.length > 50) return { ok: false, error: "Too many items in one order" };
@@ -58,7 +61,7 @@ export async function priceOrder(
       ? sb.from("products").select("slug,title,price,active").in("slug", productSlugs)
       : Promise.resolve({ data: [] as { slug: string; title: string; price: number; active: boolean }[], error: null }),
     sb.from("product_bundle_offers").select("main_product_slug,accessory_slug,discount_type,discount_value,active").eq("active", true),
-    sb.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee", ...PAYMENT_KEYS, ...(hasSets ? [GIFT_SETS_KEY] : [])]),
+    sb.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee", ...PAYMENT_KEYS, INVENTORY_KEY, ...(hasSets ? [GIFT_SETS_KEY] : [])]),
   ]);
   if (productsRes.error) return { ok: false, error: "Couldn't check prices. Please try again." };
 
@@ -67,10 +70,13 @@ export async function priceOrder(
   (settingsRes.data ?? []).forEach((r: { key: string; value: string }) => { cfg[r.key] = r.value; });
 
   let sets = new Map<string, number>();
+  const setItems = new Map<string, { slug: string; variant: string; qty: number }[]>();
   if (hasSets) {
     let saved: unknown = null;
     try { saved = cfg[GIFT_SETS_KEY] ? JSON.parse(cfg[GIFT_SETS_KEY]) : null; } catch { saved = null; }
-    sets = new Map(mergeGiftSets(saved).sets.filter((s) => s.active && !s.askOnly && s.price > 0).map((s) => [`set-${s.slug}`, s.price]));
+    const live = mergeGiftSets(saved).sets.filter((s) => s.active && !s.askOnly && s.price > 0);
+    sets = new Map(live.map((s) => [`set-${s.slug}`, s.price]));
+    live.forEach((s) => setItems.set(`set-${s.slug}`, s.items.map((i) => ({ slug: i.slug, variant: i.variant || "", qty: i.qty || 1 }))));
   }
 
   const inCart = new Set(items.map((it) => it.slug.toLowerCase()));
@@ -100,6 +106,25 @@ export async function priceOrder(
     priced.push({ slug: it.slug, title: it.title, price, image: it.image, quantity: it.quantity, ...(it.variant ? { variant: it.variant } : {}) });
   }
 
+  // Stock: refuse anything that is sold out or short (untracked = unlimited).
+  const inv: Inventory = parseInventory(cfg[INVENTORY_KEY]);
+  const stockUse: Record<string, Record<string, number>> = {};
+  const use = (slug: string, variant: string, qty: number) => { stockUse[slug] ??= {}; stockUse[slug][variant] = (stockUse[slug][variant] || 0) + qty; };
+  for (const it of priced) {
+    if (it.slug.startsWith("set-")) (setItems.get(it.slug) || []).forEach((c) => use(c.slug, c.variant, c.qty * it.quantity));
+    else use(it.slug, it.variant || "", it.quantity);
+  }
+  for (const [slug, byVariant] of Object.entries(stockUse)) {
+    for (const [variant, qty] of Object.entries(byVariant)) {
+      // A gift-set part without a colour counts against the product's total stock.
+      const tracked = variant || !inv[slug] ? stockOf(inv, slug, variant) : Object.values(inv[slug]).reduce((a, n) => a + Math.max(0, n), 0);
+      if (opts.skipStockCheck || tracked === undefined || tracked >= qty) continue;
+      const name = priced.find((p) => p.slug === slug)?.title || slug;
+      const label = `${name}${variant ? ` (${variant})` : ""}`;
+      return { ok: false, error: tracked <= 0 ? `Sorry, ${label} is sold out. Please remove it from your cart.` : `Only ${tracked} left of ${label}. Please lower the quantity.` };
+    }
+  }
+
   // Coupon on products only (never gift sets, delivery or the COD fee).
   let coupon: CouponRow | null = null;
   let couponError: string | null = null;
@@ -116,5 +141,5 @@ export async function priceOrder(
   const { subtotal, shipping, codFee, total } = t;
   discount = t.discount;
 
-  return { ok: true, items: priced, subtotal, shipping, discount, codFee, total, coupon, couponError };
+  return { ok: true, items: priced, stockUse, subtotal, shipping, discount, codFee, total, coupon, couponError };
 }

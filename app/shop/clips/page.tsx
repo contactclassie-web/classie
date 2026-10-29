@@ -4,7 +4,7 @@ import ShopListing from "@/components/shop/ShopListing";
 import { contentReader } from "@/lib/shopPageContent";
 import { DEFAULT_CHARM_TYPES, listingJsonLd, loadAllListingProducts, loadGiftSummary, loadSettings, parseList } from "@/lib/shopListingServer";
 
-export const revalidate = 3600;
+export const revalidate = 300; // product lists: refresh within 5 minutes of a change
 
 export async function generateMetadata(): Promise<Metadata> {
   const free = await loadFreeShippingAmount();

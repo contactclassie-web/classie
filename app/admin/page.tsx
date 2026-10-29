@@ -3110,6 +3110,14 @@ export default function AdminPage() {
     setProductModal({ open: true, mode: "edit", data: { ...p } });
     setProductCollectionId("");
     if (p.slug) {
+      // The list may be older than the database (e.g. a change made elsewhere
+      // since the page opened); load the latest copy so Save never undoes it.
+      supabase.from("products").select("*").eq("slug", p.slug).maybeSingle().then(({ data }) => {
+        if (data) {
+          setProductModal((m) => (m.open && m.data.slug === p.slug ? { ...m, data: { ...m.data, ...(data as DbProduct) } } : m));
+          setDbProducts((list) => list.map((x) => (x.slug === p.slug ? { ...x, ...(data as DbProduct) } : x)));
+        }
+      });
       loadBundleOffers(p.slug);
       loadColorVariants(p.slug);
       // Load which collection this product belongs to

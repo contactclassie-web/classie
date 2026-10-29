@@ -23,6 +23,7 @@ export interface ListingProduct {
   variantType: "size" | "color" | "none";
   options: string[];
   isNew: boolean;
+  soldOut?: boolean;       // every tracked option is at 0 (Admin → Manage products → stock)
 }
 
 export interface Occasion { title: string; slug: string; image: string; tag: string }
@@ -79,6 +80,7 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
     : p.variantType === "color" && p.options.length ? p.options.map((o) => o.charAt(0).toUpperCase() + o.slice(1)).join(", ") : "";
 
   const quickAdd = (e: React.MouseEvent) => {
+    if (p.soldOut) { e.preventDefault(); return; }
     if (needsChoice) return; // the link opens the product page to choose
     e.preventDefault();
     addToCart({ slug: p.slug, title: p.title, price: p.price, image: p.image, quantity: 1 });
@@ -95,7 +97,9 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
           // eslint-disable-next-line @next/next/no-img-element
           <img src={optimizeCloudinary(second, 600)} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-0 md:group-hover:opacity-100 transition-opacity duration-500" />
         )}
-        {discount > 0 && <span className="absolute top-2.5 left-2.5 bg-[#1a1a1a] text-white text-[10px] px-1.5 py-0.5">-{discount}%</span>}
+        {p.soldOut
+          ? <span className="absolute top-2.5 left-2.5 bg-white text-[#1a1a1a] text-[10px] font-semibold px-1.5 py-0.5 tracking-wide uppercase">Sold out</span>
+          : discount > 0 && <span className="absolute top-2.5 left-2.5 bg-[#1a1a1a] text-white text-[10px] px-1.5 py-0.5">-{discount}%</span>}
         <div className="absolute top-2.5 right-2.5 flex flex-col items-end gap-1.5">
           {p.isNew && <span className="bg-[#3B5373] text-white text-[10px] px-1.5 py-0.5 tracking-wide">NEW</span>}
           <button
@@ -111,7 +115,7 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
           onClick={quickAdd}
           className="hidden md:block absolute bottom-0 inset-x-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-[#3B5373] text-white text-[11px] tracking-[0.18em] uppercase py-3 text-center"
         >
-          {added ? "Added ✓" : needsChoice ? (p.variantType === "size" ? "Select size →" : "Choose colour →") : "Quick add"}
+          {p.soldOut ? "Sold out" : added ? "Added ✓" : needsChoice ? (p.variantType === "size" ? "Select size →" : "Choose colour →") : "Quick add"}
         </span>
       </div>
       <div className="flex flex-col gap-1">

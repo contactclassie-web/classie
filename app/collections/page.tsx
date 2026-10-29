@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.classie.co.in/collections" },
 };
 
-export const revalidate = 3600;
+export const revalidate = 300; // product lists: refresh within 5 minutes of a change
 
 const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
 

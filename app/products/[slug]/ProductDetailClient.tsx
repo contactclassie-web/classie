@@ -56,6 +56,7 @@ const CLIP_FEATURE_TILES: FeatureTile[] = [
 // Default tick list when Admin hasn't set one for the product.
 const FEATURE_CHECKS_HEELS = ["Cushioned comfort insole", "COD Available", "Easy 7-day returns", "Size exchange available"];
 const FEATURE_CHECKS_CLIPS = ["Sold as a pair", "No glue, no damage", "COD Available", "Works on heels, flats & sandals"];
+const CHARM_RETURN_TICK = "Damaged? Free replacement within 48 h";
 
 // ── Component ─────────────────────────────────────────────────────────────
 
@@ -70,6 +71,8 @@ export default function ProductDetailClient({
   initialReviews = [],
   clipFeatureTiles = [],
   freeShippingFrom = 999,
+  stock = {},
+  soldOut = false,
 }: {
   product: Product;
   related: Product[];
@@ -81,9 +84,18 @@ export default function ProductDetailClient({
   initialReviews?: ProductReview[];
   clipFeatureTiles?: FeatureTile[];
   freeShippingFrom?: number | null;
+  /** option → units left (only tracked options); "_" when the product has no options */
+  stock?: Record<string, number>;
+  soldOut?: boolean;
 }) {
   const isHeel = product.category === "heels";
   const needsSize = product.variants.type === "size" && product.variants.options.length > 0;
+  // Units left for an option (undefined = not tracked = available).
+  const left = (opt: string): number | undefined => {
+    const k = Object.keys(stock).find((x) => x.toLowerCase() === (opt || "_").toLowerCase());
+    return k === undefined ? undefined : stock[k];
+  };
+  const optionSoldOut = (opt: string) => { const n = left(opt); return n !== undefined && n <= 0; };
   const { addToCart } = useCart();
   const router = useRouter();
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
@@ -110,7 +122,8 @@ export default function ProductDetailClient({
     // Start on the first colour that has its own photos, using the product's
     // spelling of the colour so the right swatch is highlighted.
     if (product.variants.type !== "color" || !colorVariants.some(v => v.product_slug === product.slug)) return;
-    for (const col of product.variants.options) {
+    const inStockFirst = [...product.variants.options.filter((o) => !optionSoldOut(o)), ...product.variants.options.filter((o) => optionSoldOut(o))];
+    for (const col of inStockFirst) {
       const imgs = colorSetImages(col);
       if (imgs.length > 0) {
         setActiveImages(imgs);
@@ -123,7 +136,7 @@ export default function ProductDetailClient({
   }, [colorVariants]);
   // Sizes must be picked by the customer (no default) so nobody orders the
   // wrong size by accident; colours start on the first option.
-  const [selectedVariant, setSelectedVariant] = useState(needsSize ? "" : (product.variants.options[0] ?? ""));
+  const [selectedVariant, setSelectedVariant] = useState(needsSize ? "" : (product.variants.options.find((o) => !optionSoldOut(o)) ?? product.variants.options[0] ?? ""));
   const [sizeError, setSizeError] = useState(false);
   const sizeRef = useRef<HTMLDivElement>(null);
   const [qty, setQty] = useState(1);
@@ -224,9 +237,12 @@ export default function ProductDetailClient({
   const specs: string[][] = (product.specs && product.specs.length > 0)
     ? product.specs.map((r: {label:string;value:string}) => [r.label, r.value])
     : (SPECS[product.category] ?? []);
-  const featureChecks = (product.feature_checks && product.feature_checks.trim())
+  const featureChecks = ((product.feature_checks && product.feature_checks.trim())
     ? product.feature_checks.split("|").map((s: string) => s.trim()).filter(Boolean)
-    : (isHeel ? FEATURE_CHECKS_HEELS : FEATURE_CHECKS_CLIPS);
+    : (isHeel ? FEATURE_CHECKS_HEELS : FEATURE_CHECKS_CLIPS))
+    // Shoe charms can't be returned (only replaced if damaged), so never
+    // promise "7-day returns" on a charm page.
+    .map((t: string) => (!isHeel && /7[\s-]*day\s+return/i.test(t) ? CHARM_RETURN_TICK : t));
   const tiles = isHeel
     ? (featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES)
     : (clipFeatureTiles.length > 0 ? clipFeatureTiles : CLIP_FEATURE_TILES);
@@ -239,15 +255,20 @@ export default function ProductDetailClient({
     return false;
   };
 
+  // Sold out: the whole product, or the colour/size picked.
+  const selectionLeft = left(selectedVariant || (product.variants.options.length ? "" : "_"));
+  const unavailable = soldOut || (!!selectedVariant && optionSoldOut(selectedVariant)) || (!product.variants.options.length && optionSoldOut("_"));
+  const maxQty = selectionLeft !== undefined && selectionLeft > 0 ? selectionLeft : 50;
+
   const doAdd = () => {
-    if (!sizeChosen()) return;
-    addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined });
+    if (unavailable || !sizeChosen()) return;
+    addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: Math.min(qty, maxQty), variant: selectedVariant || undefined });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   };
 
   const doBuyNow = () => {
-    if (!sizeChosen()) return;
+    if (unavailable || !sizeChosen()) return;
     addToCart({ slug: product.slug, title: product.title, price: product.price, image: product.image, quantity: qty, variant: selectedVariant || undefined });
     router.push("/checkout");
   };
@@ -511,7 +532,7 @@ export default function ProductDetailClient({
                         >
                           <Image src={swatchSrc} alt={col} fill className="object-cover object-center" sizes="56px" />
                         </span>
-                        <span style={{ fontSize: "10px", color: "#888" }}>{col}</span>
+                        <span style={{ fontSize: "10px", color: optionSoldOut(col) ? "#b45309" : "#888" }}>{col}{optionSoldOut(col) ? " · Sold out" : ""}</span>
                       </button>
                     );
                   })}
@@ -534,14 +555,17 @@ export default function ProductDetailClient({
                       key={sz}
                       type="button"
                       aria-pressed={selectedVariant === sz}
+                      disabled={optionSoldOut(sz)}
+                      title={optionSoldOut(sz) ? `Size ${sz} is sold out` : undefined}
                       onClick={() => { setSelectedVariant(sz); setSizeError(false); }}
                       style={{
                         width: "48px", height: "48px", borderRadius: "50%",
                         border: `1.5px solid ${selectedVariant === sz ? "#3B5373" : "#E8E3DD"}`,
                         background: selectedVariant === sz ? "#3B5373" : "#fff",
-                        color: selectedVariant === sz ? "#fff" : "#1a1a1a",
+                        color: optionSoldOut(sz) ? "#c4c4c4" : selectedVariant === sz ? "#fff" : "#1a1a1a",
+                        textDecoration: optionSoldOut(sz) ? "line-through" : "none",
                         fontSize: "13px", fontWeight: selectedVariant === sz ? 600 : 500,
-                        cursor: "pointer", transition: "all 0.2s",
+                        cursor: optionSoldOut(sz) ? "not-allowed" : "pointer", transition: "all 0.2s",
                       }}
                     >
                       {sz}
@@ -597,7 +621,7 @@ export default function ProductDetailClient({
                 </button>
                 <span style={{ width: "36px", textAlign: "center", fontSize: "15px", fontWeight: 600 }}>{qty}</span>
                 <button
-                  onClick={() => setQty((q) => q + 1)}
+                  onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
                   className="flex items-center justify-center hover:bg-gray-50 transition-colors"
                   style={{ width: "42px", height: "52px", background: "none", border: "none", fontSize: "20px", cursor: "pointer", color: "#1a1a1a" }}
                 >
@@ -606,21 +630,27 @@ export default function ProductDetailClient({
               </div>
               <button
                 onClick={doAdd}
+                disabled={unavailable}
                 className="flex-1 flex items-center justify-center gap-2 transition-all duration-300"
                 style={{
                   height: "52px", borderRadius: "100px", border: "none",
-                  background: added ? "#16a34a" : "#3B5373",
+                  background: unavailable ? "#9aa3ae" : added ? "#16a34a" : "#3B5373",
                   color: "#fff", fontSize: "12.5px", fontWeight: 600,
-                  letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer",
+                  letterSpacing: "0.12em", textTransform: "uppercase", cursor: unavailable ? "not-allowed" : "pointer",
                 }}
               >
-                {added ? <><Check className="w-4 h-4" /> Added!</> : <><ShoppingBag className="w-4 h-4" /> Add to Cart</>}
+                {unavailable ? <>Sold out</> : added ? <><Check className="w-4 h-4" /> Added!</> : <><ShoppingBag className="w-4 h-4" /> Add to Cart</>}
               </button>
             </div>
 
             {/* Buy Now */}
+            {selectionLeft !== undefined && selectionLeft > 0 && selectionLeft <= 3 && !unavailable && (
+              <p style={{ fontSize: "12px", color: "#b45309", margin: "-6px 0 12px" }}>Only {selectionLeft} left{selectedVariant ? ` in ${selectedVariant}` : ""}.</p>
+            )}
             <button
               onClick={doBuyNow}
+              disabled={unavailable}
+              hidden={unavailable}
               className="w-full transition-all duration-200 hover:bg-[#3B5373] hover:text-white"
               style={{
                 height: "52px", borderRadius: "100px",
@@ -1072,11 +1102,12 @@ export default function ProductDetailClient({
           <button
             type="button"
             onClick={doAdd}
+            disabled={unavailable}
             tabIndex={showSticky ? 0 : -1}
             className="flex items-center justify-center gap-2 px-5 h-11 rounded-full text-white text-[11.5px] font-semibold tracking-[0.12em] uppercase transition-colors"
-            style={{ background: added ? "#16a34a" : "#3B5373" }}
+            style={{ background: unavailable ? "#9aa3ae" : added ? "#16a34a" : "#3B5373" }}
           >
-            {added ? <><Check className="w-4 h-4" /> Added</> : <><ShoppingBag className="w-4 h-4" /> Add to cart</>}
+            {unavailable ? <>Sold out</> : added ? <><Check className="w-4 h-4" /> Added</> : <><ShoppingBag className="w-4 h-4" /> Add to cart</>}
           </button>
         </div>
       </div>
