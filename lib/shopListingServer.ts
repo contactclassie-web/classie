@@ -25,7 +25,8 @@ export function normalizeHeelType(s: string | null | undefined): string {
 
 export function toListing(r: Row, cards: CardPhotos = {}): ListingProduct {
   const main = r.image ?? "";
-  const [image, image2] = cardImages(cards, r.slug, main, (Array.isArray(r.images) ? r.images : []).find((u) => u && u !== main) ?? "");
+  const photos = Array.isArray(r.images) ? r.images : [];
+  const [image, image2, hasCard] = cardImages(cards, r.slug, main, photos.find((u) => u && u !== main) ?? "", photos);
   const vt = r.variant_type === "size" || r.variant_type === "color" ? r.variant_type : "none";
   return {
     slug: r.slug,
@@ -40,7 +41,7 @@ export function toListing(r: Row, cards: CardPhotos = {}): ListingProduct {
     options: vt === "none" ? [] : (Array.isArray(r.variants) ? r.variants.filter((v) => String(v).trim() !== "") : []),
     isNew: isRecent(r.created_at),
     pinned: r.featured_tab === "latest",
-    cardPhoto: !!cards[r.slug],
+    cardPhoto: hasCard,
   };
 }
 

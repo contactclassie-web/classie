@@ -1,5 +1,5 @@
 import { loadAllListingProducts } from "@/lib/shopListingServer";
-import { CARD_PHOTOS_KEY, parseCardPhotos } from "@/lib/cardPhotos";
+import { CARD_PHOTOS_KEY, cardPhotoFor, parseCardPhotos } from "@/lib/cardPhotos";
 import { loadGiftSets } from "@/lib/giftSetsServer";
 import { setAvailable } from "@/lib/giftSets";
 import { SetCard } from "@/components/sets/SetCard";
@@ -102,7 +102,10 @@ export default async function HomePage() {
   const home = mergeHomeConfig(saved);
   const on = new Set<SectionId>(home.sections.filter((s) => s.on).map((s) => s.id));
   const amount = freeDeliveryThreshold(cfg.shipping_tiers, cfg.shipping_default_fee);
-  const cards = parseCardPhotos(cfg[CARD_PHOTOS_KEY]);
+  // slug → valid shop-card photo (skips ones picked before the main photo changed)
+  const cardMap = parseCardPhotos(cfg[CARD_PHOTOS_KEY]);
+  const cards: Record<string, string> = {};
+  for (const p of allProducts) { const c = cardPhotoFor(cardMap, p.slug, p.image, p.images); if (c) cards[p.slug] = c; }
 
   // Only fetch what the switched-on sections need.
   const [journalRes, collectionsRes, featuresRes, siteCatsRes, legacyPicks] = await Promise.all([
