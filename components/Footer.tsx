@@ -206,9 +206,7 @@ export default function Footer({ initialSettings }: FooterProps) {
           </div>
 
           {/* SHOP col */}
-          <div>
-            <h3 className={headingCls}>{data.footer_shop_heading || "SHOP"}</h3>
-            <ul className="space-y-3">
+          <FooterGroup title={data.footer_shop_heading || "SHOP"} headingCls={headingCls}>
               {shopLinks.map((link) => (
                 <li key={link.url}>
                   <Link href={link.url} className={linkCls}>
@@ -216,13 +214,10 @@ export default function Footer({ initialSettings }: FooterProps) {
                   </Link>
                 </li>
               ))}
-            </ul>
-          </div>
+          </FooterGroup>
 
           {/* HELP col */}
-          <div>
-            <h3 className={headingCls}>{data.footer_help_heading || "HELP"}</h3>
-            <ul className="space-y-3">
+          <FooterGroup title={data.footer_help_heading || "HELP"} headingCls={headingCls}>
               {helpLinks.map((link) => (
                 <li key={link.url}>
                   <Link href={link.url} className={linkCls}>
@@ -230,13 +225,10 @@ export default function Footer({ initialSettings }: FooterProps) {
                   </Link>
                 </li>
               ))}
-            </ul>
-          </div>
+          </FooterGroup>
 
           {/* COMPANY col */}
-          <div>
-            <h3 className={headingCls}>{data.footer_company_heading || "COMPANY"}</h3>
-            <ul className="space-y-3">
+          <FooterGroup title={data.footer_company_heading || "COMPANY"} headingCls={headingCls}>
               {companyLinks.map((link) => (
                 <li key={link.url}>
                   <Link href={link.url} className={linkCls}>
@@ -244,8 +236,7 @@ export default function Footer({ initialSettings }: FooterProps) {
                   </Link>
                 </li>
               ))}
-            </ul>
-          </div>
+          </FooterGroup>
 
         </div>
       </div>
@@ -276,5 +267,23 @@ export default function Footer({ initialSettings }: FooterProps) {
         </p>
       </div>
     </footer>
+  );
+}
+
+// Phones: each link list folds behind its heading; laptops: always open.
+function FooterGroup({ title, headingCls, children }: { title: string; headingCls: string; children: React.ReactNode }) {
+  return (
+    <div className="border-b border-white/10 md:border-0">
+      <details className="group md:hidden">
+        <summary className={`${headingCls} list-none cursor-pointer flex items-center justify-between py-4 !mb-0`}>
+          {title}<span className="text-white/50 transition-transform group-open:rotate-45" aria-hidden>+</span>
+        </summary>
+        <ul className="space-y-3 pb-5">{children}</ul>
+      </details>
+      <div className="hidden md:block">
+        <h3 className={headingCls}>{title}</h3>
+        <ul className="space-y-3">{children}</ul>
+      </div>
+    </div>
   );
 }

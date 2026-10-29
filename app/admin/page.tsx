@@ -9,6 +9,7 @@ import {
   Image as ImageIcon, Settings, LayoutTemplate, MessageSquare,
   LayoutDashboard, ShoppingCart, Layers, Grid3x3, Sparkles,
   Star, Camera, Palette, Home, Layout, Tag, Ruler, BookOpen, Activity, Gift, PenTool, FileText, Menu as MenuIcon,
+  ExternalLink,
 } from "lucide-react";
 import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import HomepageBuilder from "@/components/admin/HomepageBuilder";
@@ -18,6 +19,8 @@ import { ABOUT_GROUPS, type AboutGroup } from "@/lib/aboutContent";
 import PageContentEditor from "@/components/admin/PageContentEditor";
 import SiteTextAdmin from "@/components/admin/SiteTextAdmin";
 import DriveImport from "@/components/admin/DriveImport";
+import AdminHome from "@/components/admin/AdminHome";
+import OrdersBoard from "@/components/admin/OrdersBoard";
 import ProductManager, { type PMProduct } from "@/components/admin/ProductManager";
 import { CHARMS_GROUPS, COLLECTIONS_GROUPS, HEELS_GROUPS } from "@/lib/shopPageContent";
 
@@ -637,6 +640,7 @@ export default function AdminPage() {
 
   // Active tab
   const [tab, setTab] = useState<TabId>("dashboard");
+  const [showOldPages, setShowOldPages] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [secOpen, setSecOpen] = useState(false);
   const [productView, setProductView] = useState<"manage" | "list">("manage");
@@ -3988,69 +3992,77 @@ export default function AdminPage() {
 
   const mainSection: MainSection = TAB_TO_SECTION[tab];
 
+  // Grouped the way store admins usually are: today's work first, then
+  // products, customers, marketing, the website's pages, and settings.
+  // Old pages stay reachable under "Old pages" (nothing is removed).
   const SIDEBAR_GROUPS: {
     header?: string;
     items: { id: MainSection; label: string; icon: React.ElementType; badge?: number }[];
   }[] = [
     {
       items: [
-        { id: "dashboard", label: "Dashboard",  icon: LayoutDashboard },
-        { id: "orders",    label: "Orders",     icon: ShoppingCart, badge: orders.filter(o => o.status === "pending").length },
+        { id: "dashboard", label: "Home",   icon: LayoutDashboard },
+        { id: "orders",    label: "Orders", icon: ShoppingCart, badge: orders.filter(o => o.status === "pending" || o.status === "processing").length },
       ],
     },
     {
-      header: "CATALOG",
+      header: "PRODUCTS",
       items: [
-        { id: "catalog", label: "Products",  icon: ImageIcon, badge: dbProducts.length },
+        { id: "catalog",   label: "Products & stock", icon: ImageIcon, badge: dbProducts.length },
+        { id: "gift-sets", label: "Gift Sets",        icon: Gift },
       ],
     },
     {
-      header: "CONTENT",
+      header: "CUSTOMERS",
       items: [
-        { id: "homepage",   label: "Homepage",  icon: Home },
-        { id: "hot-deals",  label: "Hot Deals", icon: Tag },
-        { id: "blog",       label: "Blog",      icon: BookOpen },
+        { id: "messages",       label: "Messages",       icon: MessageSquare, badge: messages.length },
+        { id: "custom-designs", label: "Custom Designs", icon: PenTool },
       ],
     },
     {
-      header: "SHOP PAGES",
+      header: "MARKETING",
       items: [
-        { id: "heels",             label: "Heels",           icon: Layers },
-        { id: "clips-page",        label: "Shoe Charms",     icon: Sparkles },
-        { id: "bow-page",          label: "Bow Collection",  icon: Star },
-        { id: "collections-page",  label: "Collections",     icon: Grid3x3 },
-        { id: "style-ideas-page",  label: "Style Ideas",     icon: Camera },
-        { id: "gift-sets",         label: "Gift Sets",       icon: Gift },
-        { id: "custom-designs",    label: "Custom Designs",  icon: PenTool },
+        { id: "hot-deals",    label: "Offers & Coupons", icon: Tag },
+        { id: "blog",         label: "Journal",          icon: BookOpen },
+        { id: "live-tracker", label: "Visitors",         icon: Activity },
       ],
     },
     {
-      header: "INFO PAGES",
+      header: "WEBSITE PAGES",
       items: [
-        { id: "about-us",    label: "About Us",    icon: Users },
-        { id: "contact-us",  label: "Contact Us",  icon: MessageSquare },
+        { id: "homepage",         label: "Homepage",     icon: Home },
+        { id: "clips-page",       label: "Shoe Charms",  icon: Sparkles },
+        { id: "heels",            label: "Heels",        icon: Layers },
+        { id: "collections-page", label: "Collections",  icon: Grid3x3 },
+        { id: "style-ideas-page", label: "Style Ideas",  icon: Camera },
+        { id: "about-us",         label: "About Us",     icon: Users },
+        { id: "contact-us",       label: "Contact Us",   icon: MessageSquare },
       ],
     },
     {
-      header: "POLICIES",
+      header: "MENU & POLICIES",
       items: [
-        { id: "shipping-policy", label: "Shipping",         icon: Truck },
-        { id: "size-guide",      label: "Size Guide",       icon: Ruler },
-        { id: "returns",         label: "Returns",          icon: RefreshCw },
         { id: "site-text",       label: "Menu, FAQ & Legal", icon: FileText },
+        { id: "footer",          label: "Footer",            icon: Layout },
+        { id: "shipping-policy", label: "Shipping page",     icon: Truck },
+        { id: "returns",         label: "Returns page",      icon: RefreshCw },
+        { id: "size-guide",      label: "Size Guide",        icon: Ruler },
       ],
     },
     {
-      header: "SYSTEM",
+      header: "SETTINGS",
       items: [
-        { id: "settings",          label: "Settings",  icon: Settings },
-        { id: "footer",            label: "Footer",    icon: Layout },
-        { id: "advanced-settings", label: "Advanced",  icon: Palette },
-        { id: "messages",          label: "Messages",  icon: MessageSquare, badge: messages.length },
-        { id: "live-tracker",      label: "Live Tracker", icon: Activity },
-        { id: "shipping-rates",    label: "Shipping Rates", icon: IndianRupee },
+        { id: "shipping-rates",    label: "Delivery & COD", icon: IndianRupee },
+        { id: "settings",          label: "Store settings", icon: Settings },
+        { id: "advanced-settings", label: "Advanced",       icon: Palette },
       ],
     },
+    ...(showOldPages ? [{
+      header: "OLD PAGES",
+      items: [
+        { id: "bow-page" as MainSection, label: "Bow Collection (old)", icon: Star },
+      ],
+    }] : []),
   ];
 
   // ── Main layout ───────────────────────────────────────────────────────────
@@ -4134,9 +4146,15 @@ export default function AdminPage() {
               </div>
             );
           })}
+          <button type="button" onClick={() => setShowOldPages((v) => !v)} className="mt-3 w-full text-left px-3 py-1.5 text-[11px] text-white/40 hover:text-white/70">
+            {showOldPages ? "Hide old pages" : "Show old pages"}
+          </button>
         </nav>
 
-        {/* Sign Out */}
+        {/* View website + Sign Out */}
+        <a href="/" target="_blank" rel="noopener noreferrer" className="mx-3 mb-1 flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10">
+          <ExternalLink className="w-4 h-4" /> View website
+        </a>
         <div className="px-3 py-4 border-t border-white/10">
           <button
             onClick={handleLogout}
@@ -4159,16 +4177,16 @@ export default function AdminPage() {
           </button>
           <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-gray-800 capitalize">
-              {mainSection === "dashboard" ? "Dashboard" :
+              {mainSection === "dashboard" ? "Home" :
                mainSection === "homepage" ? "Homepage" :
-               mainSection === "catalog" ? "Catalog" :
+               mainSection === "catalog" ? "Products & stock" :
                mainSection === "heels" ? "Heels Page" :
                mainSection === "clips-page" ? "Shoe Charms Page" :
                mainSection === "bow-page" ? "Bow Page" :
                mainSection === "collections-page" ? "Collections Page" :
                mainSection === "style-ideas-page" ? "Style Ideas Page" :
                mainSection === "advanced-settings" ? "Advanced Settings" :
-               mainSection === "hot-deals" ? "Hot Deals" :
+               mainSection === "hot-deals" ? "Offers & Coupons" :
                mainSection === "about-us" ? "About Us" :
                mainSection === "contact-us" ? "Contact Us" :
                mainSection === "shipping-policy" ? "Shipping Policy" :
@@ -4176,13 +4194,13 @@ export default function AdminPage() {
                mainSection === "returns" ? "Returns & Exchanges" :
                mainSection === "site-text" ? "Menu, FAQ & Legal" :
                mainSection === "orders" ? "Orders" :
-               mainSection === "settings" ? "Settings" :
+               mainSection === "settings" ? "Store settings" :
                mainSection === "footer" ? "Footer" :
-               mainSection === "live-tracker" ? "Live Tracker" :
-               mainSection === "shipping-rates" ? "Shipping Rates" :
+               mainSection === "live-tracker" ? "Visitors" :
+               mainSection === "shipping-rates" ? "Delivery & COD" :
                mainSection === "gift-sets" ? "Gift Sets" :
                mainSection === "custom-designs" ? "Custom Designs" :
-               mainSection === "blog" ? "Blog" : "Messages"}
+               mainSection === "blog" ? "Journal" : "Messages"}
             </h1>
             <p className="text-xs text-gray-400 mt-0.5">Classie Admin Panel</p>
           </div>
@@ -4239,284 +4257,22 @@ export default function AdminPage() {
               DASHBOARD TAB
           ══════════════════════════════════════ */}
           {tab === "dashboard" && (
-            <div className="space-y-8">
-              {/* KPI Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                {[
-                  {
-                    label: "Total Revenue",
-                    value: `₹${totalRevenue.toLocaleString("en-IN")}`,
-                    icon: IndianRupee,
-                    color: "text-emerald-600",
-                    bg: "bg-emerald-50",
-                    sub: "Excl. cancelled orders",
-                  },
-                  {
-                    label: "Total Orders",
-                    value: orders.length.toString(),
-                    icon: ShoppingCart,
-                    color: "text-blue-600",
-                    bg: "bg-blue-50",
-                    sub: "All time",
-                  },
-                  {
-                    label: "Total Products",
-                    value: dbProducts.length.toString(),
-                    icon: Package,
-                    color: "text-purple-600",
-                    bg: "bg-purple-50",
-                    sub: `${dbProducts.filter(p => p.active).length} active`,
-                  },
-                  {
-                    label: "Pending Orders",
-                    value: pendingCount.toString(),
-                    icon: Clock,
-                    color: "text-amber-600",
-                    bg: "bg-amber-50",
-                    sub: "Awaiting processing",
-                    alert: false,
-                  },
-                ].map(({ label, value, icon: Icon, color, bg, sub }) => (
-                  <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center`}>
-                        <Icon className={`w-5 h-5 ${color}`} />
-                      </div>
-                    </div>
-                    <p className="text-2xl font-bold text-gray-800">{value}</p>
-                    <p className="text-sm font-medium text-gray-600 mt-0.5">{label}</p>
-                    <p className="text-xs text-gray-400 mt-1">{sub}</p>
-                  </div>
-                ))}
-                {/* Pending Reviews tile */}
-                <div className={`rounded-2xl p-5 border shadow-sm ${pendingReviewsCount > 0 ? "bg-orange-50 border-orange-200" : "bg-white border-gray-100"}`}>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${pendingReviewsCount > 0 ? "bg-orange-100" : "bg-gray-50"}`}>
-                      <span style={{ fontSize: "18px" }}>⭐</span>
-                    </div>
-                    {pendingReviewsCount > 0 && (
-                      <span className="text-xs font-semibold bg-orange-500 text-white px-2 py-0.5 rounded-full">New!</span>
-                    )}
-                  </div>
-                  <p className={`text-2xl font-bold ${pendingReviewsCount > 0 ? "text-orange-600" : "text-gray-800"}`}>{pendingReviewsCount}</p>
-                  <p className="text-sm font-medium text-gray-600 mt-0.5">Pending Reviews</p>
-                  {pendingReviewsCount > 0 ? (
-                    <div className="mt-2 space-y-1">
-                      {pendingReviewsList.slice(0, 3).map(r => (
-                        <p key={r.id} className="text-xs text-orange-700 font-medium truncate">
-                          {"⭐".repeat(r.rating)} <span className="font-semibold">{r.product_slug}</span> — {r.customer_name}
-                        </p>
-                      ))}
-                      {pendingReviewsList.length > 3 && (
-                        <p className="text-xs text-orange-400">+{pendingReviewsList.length - 3} more…</p>
-                      )}
-                      <p className="text-xs text-gray-400 mt-1">Products → 📝 to approve</p>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-gray-400 mt-1">No pending reviews</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Recent Orders */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                  <h2 className="font-semibold text-gray-700">Recent Orders</h2>
-                  <button onClick={() => setTab("orders")} className="text-xs text-[#3B5373] hover:underline">
-                    View all →
-                  </button>
-                </div>
-                {ordersLoading ? (
-                  <div className="p-8 text-center text-gray-400 text-sm">Loading…</div>
-                ) : recentOrders.length === 0 ? (
-                  <div className="p-8 text-center text-gray-400 text-sm">No orders yet.</div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="bg-gray-50 border-b border-gray-100">
-                          {["Order ID", "Customer", "Amount", "Status", "Date"].map((h) => (
-                            <th key={h} className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {recentOrders.map((order) => {
-                          const StatusIcon = STATUS_ICONS[order.status] ?? Clock;
-                          return (
-                            <tr key={order.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                              <td className="px-5 py-3.5">
-                                <span className="font-mono text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{order.id.slice(0, 8)}</span>
-                              </td>
-                              <td className="px-5 py-3.5">
-                                <p className="font-medium text-gray-700 text-xs">{order.customer_name}</p>
-                                <p className="text-[11px] text-gray-400">{order.city}</p>
-                              </td>
-                              <td className="px-5 py-3.5">
-                                <p className="font-semibold text-gray-800 text-xs">₹{order.total_amount.toLocaleString("en-IN")}</p>
-                              </td>
-                              <td className="px-5 py-3.5">
-                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${STATUS_STYLES[order.status] ?? "bg-gray-100 text-gray-600"}`}>
-                                  <StatusIcon className="w-3 h-3" />{order.status}
-                                </span>
-                              </td>
-                              <td className="px-5 py-3.5 text-xs text-gray-400">
-                                {new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
-              {/* Top Products */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                  <h2 className="font-semibold text-gray-700">Featured Products</h2>
-                  <button onClick={() => setTab("products")} className="text-xs text-[#3B5373] hover:underline">
-                    Manage →
-                  </button>
-                </div>
-                {featuredProducts.length === 0 ? (
-                  <div className="p-8 text-center text-gray-400 text-sm">No featured products yet.</div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="bg-gray-50 border-b border-gray-100">
-                          {["Product", "Category", "Price"].map((h) => (
-                            <th key={h} className="text-left px-5 py-3 text-xs uppercase tracking-wider text-gray-400 font-semibold">{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {featuredProducts.map((p) => (
-                          <tr key={p.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                            <td className="px-5 py-3.5">
-                              <div className="flex items-center gap-3">
-                                {p.image && (
-                                  <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                    <Image src={p.image} alt={p.title} fill className="object-cover" sizes="32px" />
-                                  </div>
-                                )}
-                                <p className="font-medium text-gray-700 text-xs">{p.title}</p>
-                              </div>
-                            </td>
-                            <td className="px-5 py-3.5">
-                              <span className="text-xs text-gray-400 capitalize">{p.category}</span>
-                            </td>
-                            <td className="px-5 py-3.5">
-                              <p className="text-xs font-semibold text-gray-700">₹{p.price.toLocaleString("en-IN")}</p>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
+            <AdminHome
+              orders={orders}
+              products={dbProducts as unknown as { slug: string; title: string; active?: boolean }[]}
+              pendingReviews={pendingReviewsCount}
+              messagesCount={messages.length}
+              ordersLoading={ordersLoading}
+              onGo={(t) => { setTab(t as TabId); window.scrollTo({ top: 0 }); }}
+              onAddProduct={openAddProduct}
+            />
           )}
 
           {/* ══════════════════════════════════════
               ORDERS TAB
           ══════════════════════════════════════ */}
           {tab === "orders" && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              {ordersLoading ? (
-                <div className="p-12 text-center text-gray-400 text-sm">Loading orders…</div>
-              ) : orders.length === 0 ? (
-                <div className="p-12 text-center">
-                  <ShoppingCart className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                  <p className="text-gray-400 text-sm">No orders yet.</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-100 bg-gray-50">
-                        {["Order","Customer","Items","Amount","Status","Date"].map((h) => (
-                          <th key={h} className="text-left px-5 py-3.5 text-xs uppercase tracking-wider text-gray-400 font-semibold">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order) => {
-                        const StatusIcon = STATUS_ICONS[order.status] ?? Clock;
-                        return (
-                          <tr key={order.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                            <td className="px-5 py-4">
-                              <span className="font-mono text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{order.id.slice(0, 8)}…</span>
-                            </td>
-                            <td className="px-5 py-4">
-                              <p className="font-medium text-gray-700">{order.customer_name}</p>
-                              <p className="text-xs text-gray-400 mt-0.5">{order.customer_phone}</p>
-                              <p className="text-xs text-gray-400">{order.city}, {order.state}</p>
-                            </td>
-                            <td className="px-5 py-4">
-                              <div className="space-y-1 max-w-[200px]">
-                                {order.items.slice(0, 2).map((item, i) => (
-                                  <p key={i} className="text-xs text-gray-400 truncate">
-                                    {item.quantity}× {item.title}{item.variant ? ` (${item.variant})` : ""}
-                                  </p>
-                                ))}
-                                {order.items.length > 2 && <p className="text-xs text-[#3B5373]">+{order.items.length - 2} more</p>}
-                              </div>
-                            </td>
-                            <td className="px-5 py-4">
-                              <p className="font-semibold text-gray-800">₹{order.total_amount.toLocaleString("en-IN")}</p>
-                              <p className="text-[10px] uppercase text-gray-400 mt-0.5">{order.payment_method}</p>
-                              {order.payment_id && (
-                                <p className="text-[10px] text-green-600 font-mono mt-0.5 truncate max-w-[120px]" title={order.payment_id}>
-                                  🔒 {order.payment_id.slice(0, 14)}…
-                                </p>
-                              )}
-                            </td>
-                            <td className="px-5 py-4">
-                              <div className="flex items-center gap-1.5 mb-2">
-                                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium ${STATUS_STYLES[order.status] ?? "bg-gray-100 text-gray-600"}`}>
-                                  <StatusIcon className="w-3 h-3" />{order.status}
-                                </span>
-                              </div>
-                              <select
-                                value={order.status}
-                                onChange={(e) => updateStatus(order.id, e.target.value)}
-                                disabled={updatingId === order.id}
-                                className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#3B5373] bg-white disabled:opacity-50"
-                              >
-                                {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                              </select>
-                              {order.status === "delivered" && (() => {
-                                const links = order.items.filter((it) => !!it.slug && !it.slug.startsWith("set-"))
-                                  .map((it) => `${it.title}: https://www.classie.co.in/products/${it.slug}#write-review`).join("\n");
-                                const msg = `Hi ${order.customer_name.split(" ")[0]}, thank you for shopping with CLASSIE! 💙 We hope you love your order. Could you rate it here? It really helps us:\n${links}\n\nA photo of you wearing it would make our day!`;
-                                return links ? (
-                                  <a href={`https://wa.me/91${order.customer_phone}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"
-                                    className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 hover:underline">
-                                    ★ Ask for review on WhatsApp
-                                  </a>
-                                ) : null;
-                              })()}
-                            </td>
-                            <td className="px-5 py-4">
-                              <p className="text-xs text-gray-400">
-                                {new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                              </p>
-                              <p className="text-xs text-gray-400">
-                                {new Date(order.created_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
-                              </p>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+            <OrdersBoard orders={orders} loading={ordersLoading} updatingId={updatingId} onStatus={updateStatus} />
           )}
 
           {/* ══════════════════════════════════════
@@ -7793,8 +7549,8 @@ export default function AdminPage() {
               </div>
 
               {/* Philosophy moved to Homepage → Philosophy tab */}
-              <div className="bg-blue-50 rounded-2xl border border-blue-100 p-4 text-sm text-blue-700">
-                Philosophy section settings have moved to <strong>Homepage → Philosophy tab</strong>.
+              <details className="bg-blue-50 rounded-2xl border border-blue-100 p-4 text-sm text-blue-700">
+                <summary className="cursor-pointer font-medium">Old: Philosophy section (switched off on the homepage; also in Homepage → Philosophy)</summary>
                 <div>
                   <label className={labelCls}>Eyebrow Text</label>
                   <input
@@ -7903,7 +7659,7 @@ export default function AdminPage() {
                   <Save className="w-4 h-4" />
                   {settingsSaving ? "Saving…" : "Save Philosophy"}
                 </button>
-              </div>
+              </details>
 
             </div>
           )}

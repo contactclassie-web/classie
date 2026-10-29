@@ -29,6 +29,8 @@ export default function BlogClient({ posts, categories: propCategories }: { post
   const featured = posts.find((p) => p.is_featured) || posts[0] || null;
   const categories = ["All", ...(propCategories ?? Array.from(new Set(posts.map((p) => p.category))))];
   const [activeFilter, setActiveFilter] = useState("All");
+  // 9 stories at a time, so the page stays short on phones.
+  const [shown, setShown] = useState(9);
 
   const latestPosts = posts.filter((p) => p.id !== featured?.id);
   const filteredPosts =
@@ -231,7 +233,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
               {categories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setActiveFilter(cat)}
+                  onClick={() => { setShown(9); setActiveFilter(cat); }}
                   style={{
                     fontFamily: "var(--font-poppins), sans-serif",
                     fontSize: "0.68rem",
@@ -304,7 +306,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
               }}
               className="blog-cards-grid"
             >
-              {filteredPosts.map((post) => (
+              {filteredPosts.slice(0, shown).map((post) => (
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}
@@ -393,6 +395,14 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                   </span>
                 </Link>
               ))}
+            </div>
+          )}
+          {filteredPosts.length > shown && (
+            <div style={{ textAlign: "center", marginTop: "40px" }}>
+              <button type="button" onClick={() => setShown((n) => n + 9)}
+                style={{ border: "1px solid #3B5373", color: "#3B5373", background: "#fff", padding: "12px 28px", fontSize: "11px", letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer" }}>
+                Load more stories ({filteredPosts.length - shown})
+              </button>
             </div>
           )}
         </section>
