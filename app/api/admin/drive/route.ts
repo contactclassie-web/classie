@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/adminAuth";
-import { driveConfigured, driveRobotEmail, folderInfo, listFolder, parseDriveId, thumbnail, downloadFile } from "@/lib/googleDrive";
+import { canOpen, driveConfigured, driveRobotEmail, folderInfo, listFolder, listShared, parseDriveId, thumbnail, downloadFile } from "@/lib/googleDrive";
 import { cloudinaryConfigured, uploadImage } from "@/lib/cloudinaryServer";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +9,7 @@ export const maxDuration = 60;
 // Admin-only: browse Drive folders shared with the website and copy chosen
 // photos to Cloudinary.
 //   GET  ?status=1          → which keys are set up
+//   GET  ?folder=           → all folders shared with the website
 //   GET  ?folder=<link|id>  → folder name, parent, subfolders and photos
 //   GET  ?thumb=<fileId>    → small preview image
 //   POST { fileId }         → uploads that photo to Cloudinary, returns { url }
@@ -29,9 +30,15 @@ export async function GET(req: NextRequest) {
       if (!t) return new NextResponse(null, { status: 404 });
       return new NextResponse(t.body, { headers: { "Content-Type": t.type, "Cache-Control": "private, max-age=3600" } });
     }
-    const id = parseDriveId(sp.get("folder") ?? "");
-    if (!id) return fail(new Error("Paste a Google Drive folder link."));
+    const raw = (sp.get("folder") ?? "").trim();
+    if (!raw) {
+      const shared = await listShared();
+      return NextResponse.json({ folder: { id: "", name: "Shared folders", parentId: "" }, folders: shared.map(({ id, name }) => ({ id, name })), photos: [] });
+    }
+    const id = parseDriveId(raw);
+    if (!id) return fail(new Error("That doesn't look like a Google Drive folder link."));
     const [info, items] = await Promise.all([folderInfo(id), listFolder(id)]);
+    if (!(await canOpen(info.parentId))) info.parentId = "";
     return NextResponse.json({
       folder: info,
       folders: items.filter((i) => i.isFolder).map(({ id, name }) => ({ id, name })),

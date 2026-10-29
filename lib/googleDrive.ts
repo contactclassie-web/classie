@@ -82,6 +82,20 @@ export async function folderInfo(id: string): Promise<{ id: string; name: string
   return { id: f.id, name: f.name, parentId: Array.isArray(f.parents) ? f.parents[0] ?? "" : "" };
 }
 
+/** Top-level folders shared with the website's robot email. */
+export async function listShared(): Promise<DriveItem[]> {
+  const q = encodeURIComponent("sharedWithMe = true and trashed = false and mimeType = 'application/vnd.google-apps.folder'");
+  const res = await driveFetch(`/files?q=${q}&fields=files(id,name,mimeType)&orderBy=name&pageSize=200&supportsAllDrives=true&includeItemsFromAllDrives=true`);
+  const data = await res.json();
+  return (data.files ?? []).map((f: { id: string; name: string; mimeType: string }) => ({ id: f.id, name: f.name, mimeType: f.mimeType, isFolder: true, size: 0 }));
+}
+
+/** True when the robot can open this folder (used to hide "Up" above shared folders). */
+export async function canOpen(id: string): Promise<boolean> {
+  if (!id) return false;
+  try { await driveFetch(`/files/${encodeURIComponent(id)}?fields=id&supportsAllDrives=true`); return true; } catch { return false; }
+}
+
 /** Photos and subfolders directly inside a folder. */
 export async function listFolder(id: string): Promise<DriveItem[]> {
   const out: DriveItem[] = [];

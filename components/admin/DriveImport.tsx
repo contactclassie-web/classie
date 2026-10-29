@@ -51,23 +51,23 @@ function Picker({ multiple, onClose, onDone }: { multiple: boolean; onClose: () 
 
   useEffect(() => {
     fetch("/api/admin/drive?status=1").then((r) => r.json()).then(setStatus).catch(() => setStatus({ drive: false, cloudinary: false, robotEmail: "" }));
-    try {
-      const last = localStorage.getItem(LAST_KEY);
-      if (last) { setLink(last); load(last); }
-    } catch { /* storage blocked */ }
+    let last = "";
+    try { last = localStorage.getItem(LAST_KEY) || ""; } catch { /* storage blocked */ }
+    load(last, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function load(target: string) {
-    if (!target.trim()) return;
+  // An empty target opens the list of all folders shared with the website.
+  async function load(target: string, fallbackHome = false) {
     setLoading(true); setError(""); setPicked([]);
     try {
-      const r = await fetch(`/api/admin/drive?folder=${encodeURIComponent(target)}`);
+      const r = await fetch(`/api/admin/drive?folder=${encodeURIComponent(target.trim())}`);
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "Could not open this folder.");
       setListing(data);
       try { localStorage.setItem(LAST_KEY, data.folder.id); } catch { /* ignore */ }
     } catch (e) {
+      if (fallbackHome && target) { setLoading(false); return load(""); }
       setListing(null);
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -127,10 +127,12 @@ function Picker({ multiple, onClose, onDone }: { multiple: boolean; onClose: () 
               <input
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
-                placeholder="Paste a Google Drive folder link"
+                placeholder="Or paste a Drive folder link"
                 className="flex-1 min-w-0 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#3B5373]"
               />
-              <button type="submit" disabled={loading || busy} className="px-4 py-2 bg-[#3B5373] text-white text-xs font-semibold rounded-lg disabled:opacity-50">{loading ? "Opening…" : "Open"}</button>
+              <button type="button" disabled={loading || busy} onClick={() => { setLink(""); load(""); }}
+                className="px-3 py-2 border border-gray-200 text-gray-600 text-xs font-medium rounded-lg disabled:opacity-50 whitespace-nowrap">All folders</button>
+              <button type="submit" disabled={loading || busy || !link.trim()} className="px-4 py-2 bg-[#3B5373] text-white text-xs font-semibold rounded-lg disabled:opacity-50">{loading ? "Opening…" : "Open"}</button>
             </form>
             {status?.robotEmail && (
               <p className="px-5 pt-2 text-[11px] text-gray-400 break-all">Folders must be shared (Viewer) with {status.robotEmail}</p>
@@ -141,11 +143,11 @@ function Picker({ multiple, onClose, onDone }: { multiple: boolean; onClose: () 
               {listing && (
                 <>
                   <div className="flex items-center gap-2 flex-wrap text-sm">
-                    {listing.folder.parentId && (
-                      <button type="button" onClick={() => { setLink(listing.folder.parentId); load(listing.folder.parentId); }} className="text-xs text-[#3B5373] underline">← Up</button>
+                    {listing.folder.id && (
+                      <button type="button" onClick={() => { setLink(listing.folder.parentId); load(listing.folder.parentId); }} className="text-xs text-[#3B5373] underline">← {listing.folder.parentId ? "Up" : "All folders"}</button>
                     )}
                     <span className="font-semibold text-gray-800">{listing.folder.name}</span>
-                    <span className="text-xs text-gray-400">{listing.photos.length} photos</span>
+                    {listing.folder.id && <span className="text-xs text-gray-400">{listing.photos.length} photos</span>}
                   </div>
                   {listing.folders.length > 0 && (
                     <div className="flex gap-2 flex-wrap">
@@ -158,7 +160,11 @@ function Picker({ multiple, onClose, onDone }: { multiple: boolean; onClose: () 
                       ))}
                     </div>
                   )}
-                  {listing.photos.length === 0 ? (
+                  {!listing.folder.id && listing.folders.length === 0 ? (
+                    <p className="text-xs text-gray-500">No folders are shared with the website yet. In Google Drive, share a folder (Viewer) with {status?.robotEmail || "the website's robot email"}.</p>
+                  ) : !listing.folder.id ? (
+                    <p className="text-xs text-gray-400">Open a folder to see its photos.</p>
+                  ) : listing.photos.length === 0 ? (
                     <p className="text-xs text-gray-400">No photos directly in this folder. Open a subfolder above.</p>
                   ) : (
                     <>
