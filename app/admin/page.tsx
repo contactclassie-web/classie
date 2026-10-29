@@ -18,6 +18,7 @@ import { ABOUT_GROUPS, type AboutGroup } from "@/lib/aboutContent";
 import PageContentEditor from "@/components/admin/PageContentEditor";
 import SiteTextAdmin from "@/components/admin/SiteTextAdmin";
 import DriveImport from "@/components/admin/DriveImport";
+import ProductManager, { type PMProduct } from "@/components/admin/ProductManager";
 import { CHARMS_GROUPS, COLLECTIONS_GROUPS, HEELS_GROUPS } from "@/lib/shopPageContent";
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
@@ -637,7 +638,8 @@ export default function AdminPage() {
   // Active tab
   const [tab, setTab] = useState<TabId>("dashboard");
   const [navOpen, setNavOpen] = useState(false);
-  const [secOpen, setSecOpen] = useState(false); // phone: admin menu drawer
+  const [secOpen, setSecOpen] = useState(false);
+  const [productView, setProductView] = useState<"manage" | "list">("manage"); // phone: admin menu drawer
 
   // Orders
   const [orders, setOrders] = useState<Order[]>([]);
@@ -4498,6 +4500,24 @@ export default function AdminPage() {
               PRODUCTS TAB
           ══════════════════════════════════════ */}
           {tab === "products" && (
+            <div className="flex gap-1 bg-white border border-gray-200 rounded-lg p-1 w-fit mb-4">
+              {([["manage", "Manage products"], ["list", "Simple list"]] as const).map(([id, label]) => (
+                <button key={id} type="button" onClick={() => setProductView(id)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md ${productView === id ? "bg-[#3B5373] text-white" : "text-gray-600"}`}>{label}</button>
+              ))}
+            </div>
+          )}
+          {tab === "products" && productView === "manage" && (
+            productsLoading ? <div className="p-12 text-center text-gray-400 text-sm">Loading products…</div> : (
+              <ProductManager
+                products={dbProducts as unknown as PMProduct[]}
+                onAdd={openAddProduct}
+                onEdit={(slug) => { const p = dbProducts.find((x) => x.slug === slug); if (p) openEditProduct(p); }}
+                onToggle={(slug) => { const p = dbProducts.find((x) => x.slug === slug); if (p) toggleProductActive(p); }}
+              />
+            )
+          )}
+          {tab === "products" && productView === "list" && (
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3 flex-wrap">
