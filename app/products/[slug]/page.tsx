@@ -5,6 +5,7 @@ import { products, getProductBySlugFromDB, getProductsFromDB, getTabProductsFrom
 import ProductDetailClient from "./ProductDetailClient";
 import { loadShippingRules } from "@/lib/shippingServer";
 import { shippingFee, freeShippingFrom } from "@/lib/shipping";
+import { INVENTORY_KEY, isSoldOut, parseInventory, stockMap } from "@/lib/inventory";
 export const revalidate = 300; // ISR: rebuild every 5 min, admin revalidation busts instantly
 export const dynamicParams = true; // allow new DB products not in generateStaticParams
 
@@ -138,6 +139,7 @@ export default async function ProductPage({ params }: Props) {
     bestsellerProductsRaw,
     reviewsRes,
     shippingRules,
+    inventoryRes,
   ] = await Promise.all([
     getProductsFromDB({ active: true }),
     supabase.from("product_bundle_offers").select("*").eq("main_product_slug", slug).eq("active", true).order("sort_order"),
@@ -150,7 +152,13 @@ export default async function ProductPage({ params }: Props) {
       { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, next: { revalidate: 300 } }
     ).catch(() => null),
     loadShippingRules(),
+    supabase.from("site_settings").select("value").eq("key", INVENTORY_KEY).maybeSingle(),
   ]);
+
+  // Stock (Admin → Products → Manage products). Untracked = always available.
+  const inventory = parseInventory(inventoryRes.data?.value);
+  const stock = stockMap(inventory, product.slug, product.variants.options);
+  const soldOut = isSoldOut(inventory, product.slug, product.variants.options);
 
   const related = allProducts
     .filter((p) => p.collection === product.collection && p.slug !== product.slug)
@@ -260,7 +268,7 @@ export default async function ProductPage({ params }: Props) {
           "url": productCanonical,
           "priceCurrency": "INR",
           "price": product.price,
-          "availability": "https://schema.org/InStock",
+          "availability": soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
           "itemCondition": "https://schema.org/NewCondition",
           "priceValidUntil": `${new Date().getFullYear() + 1}-12-31`,
           "seller": { "@type": "Organization", "name": "CLASSIE" },
@@ -306,6 +314,8 @@ export default async function ProductPage({ params }: Props) {
         bestsellerProducts={bestsellerProducts}
         colorVariants={colorVariants}
         initialReviews={initialReviews}
+        stock={stock}
+        soldOut={soldOut}
       />
     </>
   );

@@ -1,6 +1,7 @@
 import { publicSupabase } from "@/lib/supabasePublic";
 import { loadGiftSets } from "@/lib/giftSetsServer";
 import type { ListingProduct, Occasion } from "@/components/shop/ShopListing";
+import { INVENTORY_KEY, isSoldOut, parseInventory } from "@/lib/inventory";
 
 export const CHARM_CATEGORIES = ["shoe-charms", "clips", "bow"];
 export const DEFAULT_CHARM_TYPES = ["Rhinestone Shoe Charms", "Flower Shoe Charms", "Bow Shoe Charms", "Pearl Anklet"];
@@ -39,11 +40,19 @@ const COLS = "slug,title,price,compare_price,image,images,tags,heel_type,variant
 
 export async function loadAllListingProducts(): Promise<{ heels: ListingProduct[]; charms: ListingProduct[] }> {
   const sb = publicSupabase(60);
-  const { data } = await sb.from("products").select(COLS).eq("active", true).order("created_at", { ascending: false });
+  const [{ data }, invRes] = await Promise.all([
+    sb.from("products").select(COLS).eq("active", true).order("created_at", { ascending: false }),
+    sb.from("site_settings").select("value").eq("key", INVENTORY_KEY).maybeSingle(),
+  ]);
+  const inv = parseInventory(invRes.data?.value);
   const rows = (data ?? []) as Row[];
+  const withStock = (r: Row): ListingProduct => {
+    const l = toListing(r);
+    return { ...l, soldOut: isSoldOut(inv, l.slug, l.options) };
+  };
   return {
-    heels: rows.filter((r) => r.category === "heels").map(toListing),
-    charms: rows.filter((r) => CHARM_CATEGORIES.includes(r.category)).map(toListing),
+    heels: rows.filter((r) => r.category === "heels").map(withStock),
+    charms: rows.filter((r) => CHARM_CATEGORIES.includes(r.category)).map(withStock),
   };
 }
 
