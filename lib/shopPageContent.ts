@@ -127,7 +127,7 @@ export const CHARMS_GROUPS: PageGroup[] = [
     note: "How each charm looks in the grid.",
     fields: [
       {
-        key: "cp2_card_photo", label: "Main photo on each card", type: "select", def: "worn",
+        key: "cp2_card_photo", label: "Main photo on each card", type: "select", def: "main",
         options: [{ value: "worn", label: "Clip on a shoe (2nd photo), close-up on hover" }, { value: "main", label: "Main photo, 2nd photo on hover" }],
       },
       {

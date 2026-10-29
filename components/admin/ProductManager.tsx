@@ -4,7 +4,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, Eye, EyeOff, Pencil, Plus, Save, AlertTriangle } from "lucide-react";
 import { adminSupabase as supabase } from "@/lib/adminSupabase";
 import { loadSettingJson, saveSettingJson } from "@/lib/adminSettings";
-import { CARD_PHOTOS_KEY, type CardPhotos } from "@/lib/cardPhotos";
+import { CARD_PHOTOS_KEY, cardPhotoFor, parseCardPhotos, type CardPhotos } from "@/lib/cardPhotos";
 
 // Amazon-style product list: one row per product family, with its colour or
 // size variations underneath (photo, photo count, sales, stock).
@@ -65,7 +65,7 @@ export default function ProductManager({
     supabase.from("product_color_variants").select("product_slug,color_name,color_hex,image,group_id").order("sort_order").then(({ data }) => setColors((data ?? []) as ColorRow[]));
     supabase.from("orders").select("status,created_at,items").gte("created_at", since).then(({ data }) => setOrders((data ?? []) as Order[]));
     loadSettingJson(INV_KEY).then(({ value }) => { if (value && typeof value === "object") setInv(value as Inventory); });
-    loadSettingJson(CARD_PHOTOS_KEY).then(({ value }) => { if (value && typeof value === "object") setCards(value as CardPhotos); });
+    loadSettingJson(CARD_PHOTOS_KEY).then(({ value }) => { if (value && typeof value === "object") setCards(parseCardPhotos(JSON.stringify(value))); });
   }, []);
 
   // Units and revenue in the last 30 days, per "slug|variant" and per slug.
@@ -170,8 +170,9 @@ export default function ProductManager({
     } catch (e) { alert("Could not save: " + (e instanceof Error ? e.message : e)); }
     finally { setSaving(false); }
   };
-  const setCard = (slug: string, url: string | null) => {
-    setCards((prev) => { const next = { ...prev }; if (url) next[slug] = url; else delete next[slug]; return next; });
+  // Remembers the main photo it was picked against; changing the main photo later switches it off.
+  const setCard = (slug: string, url: string | null, main = "") => {
+    setCards((prev) => { const next = { ...prev }; if (url) next[slug] = { url, main }; else delete next[slug]; return next; });
     setCardsDirty(true);
   };
 
@@ -280,15 +281,15 @@ export default function ProductManager({
                           {single && (
                             <div className="mt-1.5">
                               <button type="button" onClick={() => setPickCard(pickCard === single.slug ? null : single.slug)} className="text-[11px] text-[#3B5373] underline">
-                                Shop card photo{cards[single.slug] ? " · chosen" : " · main photo"}
+                                Shop card photo{cardPhotoFor(cards, single.slug, single.image, single.images) ? " · chosen" : " · main photo"}
                               </button>
                               {pickCard === single.slug && (
                                 <div className="mt-1.5">
                                   <p className="text-[11px] text-gray-500 mb-1">Tap the photo to show first on shop cards (best: heel + clips on white). The main photo shows on hover.</p>
                                   <div className="flex gap-1 overflow-x-auto max-w-[420px] pb-1">
                                     {[single.image, ...(single.images || [])].filter((u, i, a) => u && a.indexOf(u) === i).map((u) => (
-                                      <button key={u} type="button" onClick={() => setCard(single.slug, u === single.image ? null : u)} title="Use as card photo"
-                                        className={`flex-shrink-0 rounded ${(cards[single.slug] || single.image) === u ? "ring-2 ring-[#3B5373] ring-offset-1" : ""}`}>
+                                      <button key={u} type="button" onClick={() => setCard(single.slug, u === single.image ? null : u, single.image)} title="Use as card photo"
+                                        className={`flex-shrink-0 rounded ${(cardPhotoFor(cards, single.slug, single.image, single.images) || single.image) === u ? "ring-2 ring-[#3B5373] ring-offset-1" : ""}`}>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img src={thumb(u, 80)} alt="" loading="lazy" className="w-11 h-11 rounded object-cover bg-gray-100" />
                                       </button>
