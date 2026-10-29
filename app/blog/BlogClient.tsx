@@ -174,6 +174,7 @@ export default function BlogClient({ posts, categories: propCategories }: { post
                       sizes="(max-width: 900px) 100vw, 55vw"
                       quality={95}
                       unoptimized
+                      priority
                     />
 
                   </div>

@@ -90,11 +90,17 @@ export default async function RootLayout({
     "footer_copyright","footer_shop_heading","footer_help_heading","footer_company_heading",
   ];
 
-  const [{ data: settingsRows }, { data: siteCategories }] = await Promise.all([
+  const [{ data: settingsRows }, { data: siteCategories }, { data: editRows }] = await Promise.all([
     sb.from("site_settings").select("key,value").in("key", LAYOUT_KEYS),
     sb.from("site_categories").select("name,slug,display_order,image_url,description")
       .eq("active", true).order("display_order"),
+    // "Collections" menu = the edits (The Date / Everyday / Festive Edit) from Catalog → Collections
+    sb.from("collections").select("title,slug,display_order,image_url,description")
+      .eq("active", true).order("display_order"),
   ]);
+  const edits = (editRows ?? []).map((c: { title: string; slug: string; display_order: number; image_url: string | null; description: string | null }) => ({
+    name: c.title, slug: c.slug, display_order: c.display_order, image_url: c.image_url ?? undefined, description: c.description ?? undefined,
+  }));
 
   const cfg: Record<string, string> = {};
   (settingsRows ?? []).forEach((r: { key: string; value: string }) => { cfg[r.key] = r.value; });
@@ -120,7 +126,7 @@ export default async function RootLayout({
         <AnalyticsTracker />
         <CartProvider>
           <WishlistProvider>
-            <Navbar initialSettings={cfg} initialCategories={siteCategories ?? []} />
+            <Navbar initialSettings={cfg} initialCategories={siteCategories ?? []} initialEdits={edits} />
             <main className="min-h-screen">{children}</main>
             <Footer initialSettings={cfg} />
           </WishlistProvider>

@@ -33,7 +33,7 @@ const DEFAULT_SHOP_LINKS: FooterLink[] = [
   { text: "Bow Collection", url: "/shop/bow" },
   { text: "The Date Edit", url: "/the-date-edit" },
   { text: "The Festive Edit", url: "/the-festive-edit" },
-  { text: "Hot Deals", url: "/hot-deals" },
+  { text: "Offers", url: "/hot-deals" },
 ];
 
 const DEFAULT_HELP_LINKS: FooterLink[] = [

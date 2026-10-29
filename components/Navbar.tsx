@@ -32,6 +32,7 @@ interface Category { name: string; slug: string; display_order: number; image_ur
 interface NavbarProps {
   initialSettings?: Record<string, string>;
   initialCategories?: Category[];
+  initialEdits?: Category[];   // Collections menu: The Date / Everyday / Festive Edit
 }
 
 const LOGO_FALLBACK = "https://res.cloudinary.com/dbzt3soyi/image/upload/v1780757501/unnamed_5_nzzrwl.jpg";
@@ -40,7 +41,7 @@ const DEFAULT_CATS: Category[] = [
   { name: "Clip-ons", slug: "clips", display_order: 2 },
 ];
 
-export default function Navbar({ initialSettings, initialCategories }: NavbarProps) {
+export default function Navbar({ initialSettings, initialCategories, initialEdits }: NavbarProps) {
   const pathname = usePathname();
   const { count } = useCart();
   const { count: wishCount } = useWishlist();
@@ -73,9 +74,10 @@ export default function Navbar({ initialSettings, initialCategories }: NavbarPro
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // First 2 categories shown as direct links, rest in Collections dropdown
+  // Categories (Heels, Shoe Charms) are direct links; the Collections menu
+  // opens the edits so it doesn't repeat them (falls back to the categories).
   const directLinks = categories.slice(0, 2);
-  const dropdownLinks = categories;
+  const dropdownLinks = initialEdits && initialEdits.length > 0 ? initialEdits : categories;
 
   // The Admin panel has its own header/sidebar — the public storefront chrome must not wrap it.
   if (pathname?.startsWith("/admin")) return null;
