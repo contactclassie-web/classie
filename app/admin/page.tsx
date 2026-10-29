@@ -17,6 +17,7 @@ import CustomDesignsAdmin from "@/components/admin/CustomDesignsAdmin";
 import { ABOUT_GROUPS, type AboutGroup } from "@/lib/aboutContent";
 import PageContentEditor from "@/components/admin/PageContentEditor";
 import SiteTextAdmin from "@/components/admin/SiteTextAdmin";
+import DriveImport from "@/components/admin/DriveImport";
 import { CHARMS_GROUPS, COLLECTIONS_GROUPS, HEELS_GROUPS } from "@/lib/shopPageContent";
 
 // ── Interfaces ─────────────────────────────────────────────────────────────
@@ -9957,7 +9958,10 @@ export default function AdminPage() {
               </div>
               {/* Cover Image */}
               <div>
-                <label className={labelCls}>Cover Image URL</label>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <label className={labelCls} style={{ marginBottom: 0 }}>Cover Image URL</label>
+                  <DriveImport multiple={false} label="From Drive" onImported={(urls) => setBlogModal(m => ({ ...m, data: { ...m.data, cover_image: urls[0] } }))} />
+                </div>
                 <input
                   type="text"
                   value={blogModal.data.cover_image}
@@ -10257,7 +10261,16 @@ export default function AdminPage() {
 
               {/* ── Images + Video ── */}
               <div className="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50/50">
-                <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">📸 Images &amp; Video</p>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">📸 Images &amp; Video</p>
+                  <DriveImport onImported={(urls) => setProductModal((m) => {
+                    // Fill the main photo first, then the next empty slots (max 10 photos).
+                    let main = m.data.image || "";
+                    const rest = (m.data.images || []).filter((u: string) => u && u.trim());
+                    for (const u of urls) { if (!main) main = u; else rest.push(u); }
+                    return { ...m, data: { ...m.data, image: main, images: rest.slice(0, 9) } };
+                  })} />
+                </div>
                 <div>
                   <label className={labelCls}>Image 1 — Main</label>
                   <input type="text" value={productModal.data.image} onChange={(e) => setProductField("image", e.target.value)} className={inputCls} placeholder="https://…" />
@@ -10531,8 +10544,14 @@ export default function AdminPage() {
                                   <div className="flex items-center gap-3">
                                     <div className="w-5 h-5 rounded-full border border-gray-200 flex-shrink-0" style={{ background: colorData.hex }} />
                                     <span className="text-sm font-semibold text-gray-800">{colorName}</span>
+                                    <DriveImport label="From Drive" className="ml-auto" onImported={(urls) => setShoeCharmColorData(prev => {
+                                      const cur = prev[colorName] || colorData;
+                                      const filled = (cur.images || []).filter((u: string) => u && u.trim());
+                                      const next = [...filled, ...urls].slice(0, 10);
+                                      return { ...prev, [colorName]: { ...cur, images: [...next, ...Array(10 - next.length).fill("")] } };
+                                    })} />
                                     <input type="color" value={colorData.hex} onChange={(e) => updateHex(e.target.value)}
-                                      className="ml-auto w-8 h-7 rounded border border-gray-200 cursor-pointer p-0.5" title="Swatch color" />
+                                      className="w-8 h-7 rounded border border-gray-200 cursor-pointer p-0.5" title="Swatch color" />
                                   </div>
                                   <div className="space-y-1.5">
                                     {[0,1,2,3,4,5,6,7,8,9].map(idx => (
