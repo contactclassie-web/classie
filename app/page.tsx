@@ -156,7 +156,13 @@ export default async function HomePage() {
     const byDate = [...allProducts].filter((p) => p.created_at).sort((a, b) => (b.created_at! > a.created_at! ? 1 : -1));
     const since = Date.now() - home.newArrivals.days * 864e5;
     const recent = byDate.filter((p) => new Date(p.created_at!).getTime() >= since);
-    return (recent.length >= 2 ? recent : byDate).slice(0, home.newArrivals.count);
+    // Fill up to an even number so no card sits alone in a row of two.
+    let list = (recent.length >= 2 ? recent : byDate).slice(0, home.newArrivals.count);
+    if (list.length % 2 === 1) {
+      const extra = byDate.find((p) => !list.includes(p));
+      list = extra && list.length < home.newArrivals.count ? [...list, extra] : list.slice(0, list.length - 1 || 1);
+    }
+    return list;
   })();
   const giftData = on.has("giftSets") ? await loadGiftSets() : null;
 

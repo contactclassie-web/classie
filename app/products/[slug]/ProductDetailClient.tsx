@@ -928,8 +928,8 @@ export default function ProductDetailClient({
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           {/* Header */}
           <div className="text-center" style={{ marginBottom: "32px" }}>
-            <h2 className="font-serif" style={{ fontSize: "30px", letterSpacing: "0.06em", textTransform: "uppercase", color: "#3B5373", marginBottom: "16px" }}>
-              Shop the Full Collection
+            <h2 className="font-serif" style={{ fontSize: "32px", fontWeight: 300, color: "#1a1a1a", marginBottom: "16px" }}>
+              You may also <em style={{ color: "#3B5373" }}>like</em>
             </h2>
             <div style={{ display: "inline-flex", borderBottom: "2px solid #E8E3DD" }}>
               {(["latest", "bestseller"] as const).map((t) => (
