@@ -40,14 +40,24 @@ export default function HomeHero({ hero, fallbackImages }: Props) {
 
   const go = useCallback((n: number) => setIdx((n + count) % count), [count]);
 
+  // Phones show only the first slide (still, no dots or swipe): one calm frame.
+  const [phone, setPhone] = useState(false);
   useEffect(() => {
-    if (count < 2 || paused) return;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const on = () => { setPhone(mq.matches); if (mq.matches) setIdx(0); };
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+
+  useEffect(() => {
+    if (count < 2 || paused || phone) return;
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => {
       if (document.visibilityState === "visible") setIdx((i) => (i + 1) % count);
     }, hero.intervalSec * 1000);
     return () => clearInterval(t);
-  }, [count, paused, hero.intervalSec]);
+  }, [count, paused, phone, hero.intervalSec]);
 
   // Only the visible video plays; the rest stay paused to save data.
   useEffect(() => {
@@ -66,7 +76,7 @@ export default function HomeHero({ hero, fallbackImages }: Props) {
         onMouseLeave={() => setPaused(false)}
         onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
         onTouchEnd={(e) => {
-          if (touchX.current === null) return;
+          if (touchX.current === null || phone) return;
           const dx = e.changedTouches[0].clientX - touchX.current;
           if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
           touchX.current = null;
@@ -76,7 +86,7 @@ export default function HomeHero({ hero, fallbackImages }: Props) {
           {slides.map((s, i) => (
             <div
               key={i}
-              className={`absolute inset-0 transition-opacity duration-700 ${i === idx ? "opacity-100 z-[1]" : "opacity-0 z-0"}`}
+              className={`absolute inset-0 transition-opacity duration-[1200ms] ${i === idx ? "opacity-100 z-[1]" : "opacity-0 z-0"}`}
               aria-hidden={i !== idx}
             >
               {s.type === "beforeafter" && (
@@ -105,7 +115,7 @@ export default function HomeHero({ hero, fallbackImages }: Props) {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={optimizeCloudinary(s.url, 1400)}
-                    alt=""
+                    alt="CLASSIE heels with crystal shoe clips"
                     className="w-full h-full object-cover"
                     loading={i === 0 ? "eager" : "lazy"}
                   />
@@ -138,7 +148,7 @@ export default function HomeHero({ hero, fallbackImages }: Props) {
           )}
         </div>
         {count > 1 && (
-          <div className="flex justify-center gap-2 py-3 md:absolute md:bottom-3 md:right-5 md:z-[2] md:py-0">
+          <div className="hidden md:flex justify-center gap-2 md:absolute md:bottom-3 md:right-5 md:z-[2]">
             {slides.map((_, i) => (
               <button key={i} type="button" aria-label={`Slide ${i + 1}`} onClick={() => go(i)}
                 className={`h-1.5 rounded-full transition-all ${i === idx ? "w-6 bg-[#3B5373]" : "w-1.5 bg-[#3B5373]/30"}`} />

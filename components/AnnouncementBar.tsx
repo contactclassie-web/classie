@@ -20,8 +20,10 @@ const BAR_STYLE: React.CSSProperties = {
   padding: "5px 16px",
   textAlign: "center",
   fontFamily: "var(--font-poppins), sans-serif",
-  fontSize: "11px",
-  letterSpacing: "0.16em",
+  // Shrinks a little on narrow phones so the line stays on one row.
+  fontSize: "clamp(9.5px, 2.7vw, 11px)",
+  letterSpacing: "clamp(0.06em, 0.9vw, 0.16em)",
+  whiteSpace: "nowrap",
   textTransform: "uppercase",
   color: "rgba(255,255,255,0.9)",
   overflow: "hidden",

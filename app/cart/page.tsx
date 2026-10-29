@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { Product } from "@/lib/products";
 import { useShippingRules } from "@/lib/useShipping";
+import { useCartPhotos } from "@/lib/useCartPhotos";
 import { isGiftSet } from "@/lib/orderTotals";
 import { shippingFee, freeShippingFrom } from "@/lib/shipping";
 
@@ -43,6 +44,7 @@ export default function CartPage() {
   const suggested = useSuggestedProducts();
 
   const rules      = useShippingRules();
+  const photoFor   = useCartPhotos(items);
   // Gift sets ship free (same rule as checkout and the server).
   const hasSet     = items.some((i) => isGiftSet(i.slug));
   const shipping   = hasSet ? 0 : shippingFee(total, rules);
@@ -87,7 +89,7 @@ export default function CartPage() {
           {items.map((item) => (
             <div key={`${item.slug}-${item.variant}`} className="flex gap-4 p-4 border border-classie-border rounded-2xl bg-white">
               <div className="relative w-24 h-24 flex-shrink-0 bg-[#f5f5f5] rounded-xl overflow-hidden">
-                <Image src={item.image} alt={item.title} fill className="object-cover object-center" sizes="96px" />
+                <Image src={photoFor(item)} alt={item.title} fill className="object-cover object-center" sizes="96px" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between gap-2">

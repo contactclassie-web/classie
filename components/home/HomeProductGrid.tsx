@@ -50,7 +50,7 @@ function QuickCard({ p, colors, photos, card }: { p: Product; colors?: Record<st
             className="w-full aspect-square object-cover" />
           {second && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={optimizeCloudinary(second, 600)} alt="" loading="lazy" decoding="async"
+            <img src={optimizeCloudinary(second, 600)} alt={`${p.title}, another view`} loading="lazy" decoding="async"
               className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           )}
         </Link>
@@ -75,14 +75,11 @@ function QuickCard({ p, colors, photos, card }: { p: Product; colors?: Record<st
         )}
       </div>
       <Link href={`/products/${p.slug}`} className="font-sans text-[12.5px] md:text-[13.5px] leading-snug text-[#1a1a1a] line-clamp-2 min-h-[2.7em]">
-        {p.title}
+        {p.title.replace(/\s*\(pair\)\s*/i, " ").trim()}
       </Link>
       <div className="flex items-center justify-between gap-2">
         <span className="font-sans text-[13.5px] font-semibold text-[#1a1a1a] tabular-nums">
           ₹{p.price.toLocaleString("en-IN")}
-          {off > 0 && (
-            <span className="ml-1.5 font-normal text-[11px] text-[#9a9a9a] line-through">₹{p.comparePrice.toLocaleString("en-IN")}</span>
-          )}
         </span>
         {dots.length > 0 && (
           <span className="flex items-center gap-[3px]">

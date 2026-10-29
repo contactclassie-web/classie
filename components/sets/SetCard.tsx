@@ -3,18 +3,18 @@ import { optimizeCloudinary } from "@/lib/cloudinary";
 import { pieceCount, setCompareAt, setImages, setKind, setOfferLine, setTagLabel, type GiftSet, type SetProduct } from "@/lib/giftSets";
 
 // Up to three photos arranged as one tile: one tall on the left, two stacked.
-export function SetCollage({ images, className = "" }: { images: string[]; className?: string }) {
+export function SetCollage({ images, className = "", alt = "" }: { images: string[]; className?: string; alt?: string }) {
   const imgs = images.slice(0, 3);
   if (!imgs.length) return <div className={`aspect-square bg-[#F7F4EF] ${className}`} />;
   if (imgs.length === 1) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={optimizeCloudinary(imgs[0], 800)} alt="" loading="lazy" className={`w-full aspect-square object-cover ${className}`} />;
+    return <img src={optimizeCloudinary(imgs[0], 800)} alt={alt} loading="lazy" className={`w-full aspect-square object-cover ${className}`} />;
   }
   return (
     <div className={`grid gap-[2px] aspect-square ${imgs.length === 2 ? "grid-cols-2" : "grid-cols-[1.4fr_1fr] grid-rows-2"} ${className}`}>
       {imgs.map((u, i) => (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={i} src={optimizeCloudinary(u, 600)} alt="" loading="lazy"
+        <img key={i} src={optimizeCloudinary(u, 600)} alt={alt ? `${alt}, piece ${i + 1}` : ""} loading="lazy"
           className={`w-full h-full object-cover ${imgs.length === 3 && i === 0 ? "row-span-2" : ""}`} />
       ))}
     </div>
@@ -34,7 +34,7 @@ export function SetCard({ set, products }: { set: GiftSet; products: Record<stri
   return (
     <Link href={`/gift-sets/${set.slug}`} className="group grid gap-1.5 content-start">
       <div className="relative overflow-hidden bg-[#f6f6f6]">
-        <div className="transition-transform duration-500 group-hover:scale-[1.03]"><SetCollage images={imgs} /></div>
+        <div className="transition-transform duration-500 group-hover:scale-[1.03]"><SetCollage images={imgs} alt={`${set.name} gift set`} /></div>
         <span className="absolute left-2 bottom-2 bg-white px-2 py-1.5 font-sans text-[9.5px] font-semibold tracking-[0.08em] uppercase text-[#3B5373]">
           {set.askOnly ? `${pieceCount(set)}+ pairs` : `${kind} · ${setOfferLine(save)}`}
         </span>
@@ -48,7 +48,6 @@ export function SetCard({ set, products }: { set: GiftSet; products: Record<stri
         ) : (
           <>
             <span className="font-sans text-[14.5px] md:text-[15.5px] font-semibold text-[#1a1a1a] tabular-nums">₹{set.price.toLocaleString("en-IN")}</span>
-            {save > 0 && <span className="font-sans text-[11.5px] text-[#9a9a9a] line-through tabular-nums">₹{compare.toLocaleString("en-IN")}</span>}
           </>
         )}
       </div>

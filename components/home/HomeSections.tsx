@@ -151,7 +151,7 @@ export function FreeDeliveryBanner({ c, amount }: { c: HomeConfig["freeDelivery"
         </div>
         {imgs.length > 0 && (
           <div className="grid grid-cols-3 gap-1.5 md:gap-3">
-            {imgs.map((u, i) => <Img key={i} src={u} w={480} className="w-full aspect-square object-cover bg-white" />)}
+            {imgs.map((u, i) => <Img key={i} src={u} alt="CLASSIE crystal shoe clip on a heel" w={480} className="w-full aspect-square object-cover bg-white" />)}
           </div>
         )}
       </div>
@@ -310,14 +310,63 @@ export function WhatsAppJoin({ c, url }: { c: HomeConfig["whatsapp"]; url: strin
   );
 }
 
+// SEO text in a closed "About CLASSIE" panel just above the footer.
 export function SeoBlock({ c, amount }: { c: HomeConfig["seo"]; amount: number | null }) {
   if (!c.heading && !c.text) return null;
   // Without a free tier, drop the sentence that mentions the amount.
   const text = amount ? withAmount(c.text, amount) : c.text.split(/(?<=\.)\s+/).filter((s) => !s.includes("{amount}")).join(" ");
   return (
-    <section className="max-w-3xl mx-auto px-6 py-10 md:py-12 text-center border-t border-gray-100 grid gap-3">
-      {c.heading && <h2 className="font-serif font-light text-[20px] md:text-[24px] text-[#1a1a1a]">{c.heading}</h2>}
-      {text && <p className="font-sans text-[12.5px] md:text-[13px] text-[#6b6b6b] leading-relaxed">{text}</p>}
+    <section className="max-w-3xl mx-auto px-6 py-5 border-t border-gray-100">
+      <details className="group">
+        <summary className="list-none cursor-pointer flex items-center justify-center gap-2 font-sans text-[11px] tracking-[0.16em] uppercase text-[#6b6b6b]">
+          About CLASSIE <span className="transition-transform group-open:rotate-45" aria-hidden>+</span>
+        </summary>
+        <div className="grid gap-2 pt-4 text-center">
+          {c.heading && <h2 className="font-serif font-light text-[18px] md:text-[20px] text-[#1a1a1a]">{c.heading}</h2>}
+          {text && <p className="font-sans text-[12.5px] text-[#6b6b6b] leading-relaxed">{text}</p>}
+        </div>
+      </details>
+    </section>
+  );
+}
+
+// One quiet band: Instagram, the latest journal posts and the WhatsApp list.
+export function ExtrasBand({ ig, posts, whatsapp, whatsappUrl }: {
+  ig: { image: string; link: string }[]; posts: JournalPost[]; whatsapp: HomeConfig["whatsapp"]; whatsappUrl: string;
+}) {
+  const igLink = ig[0]?.link || "https://www.instagram.com/_classie_in/";
+  return (
+    <section className="bg-[#F7F4EF]">
+      <div className={`${WRAP} py-9 md:py-12 grid gap-8 md:grid-cols-3 md:gap-10`}>
+        <div className="grid gap-3 content-start">
+          <span className={EYEBROW}>Style diaries</span>
+          <div className="grid grid-cols-3 gap-1.5">
+            {ig.slice(0, 3).map((x, i) => (
+              <a key={i} href={x.link || igLink} target="_blank" rel="noopener noreferrer" aria-label="CLASSIE on Instagram">
+                <Img src={x.image} alt="CLASSIE shoe clips styled on Instagram" w={240} className="w-full aspect-square object-cover" />
+              </a>
+            ))}
+          </div>
+          <a href={igLink} target="_blank" rel="noopener noreferrer" className="font-sans text-[11px] tracking-[0.14em] uppercase text-[#3B5373] border-b border-[#3B5373] justify-self-start pb-0.5">Follow @_classie_in</a>
+        </div>
+        <div className="grid gap-3 content-start">
+          <span className={EYEBROW}>From the journal</span>
+          {posts.slice(0, 3).map((p) => (
+            <Link key={p.slug} href={`/blog/${p.slug}`} className="font-serif text-[17px] md:text-[19px] leading-snug text-[#1a1a1a] hover:text-[#3B5373]">{p.title}</Link>
+          ))}
+          <Link href="/blog" className="font-sans text-[11px] tracking-[0.14em] uppercase text-[#3B5373] border-b border-[#3B5373] justify-self-start pb-0.5">All posts</Link>
+        </div>
+        {whatsappUrl && (
+          <div className="grid gap-3 content-start">
+            <span className={EYEBROW}>New designs first</span>
+            <p className="font-serif text-[20px] md:text-[24px] leading-snug text-[#1a1a1a]">{whatsapp.heading}</p>
+            {whatsapp.text && <p className="font-sans text-[12.5px] text-[#6b6b6b]">{whatsapp.text}</p>}
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="justify-self-start border border-[#3B5373] text-[#3B5373] text-[11px] tracking-[0.16em] uppercase px-5 py-3 hover:bg-[#3B5373] hover:text-white transition-colors">
+              {whatsapp.buttonText || "Join on WhatsApp"}
+            </a>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

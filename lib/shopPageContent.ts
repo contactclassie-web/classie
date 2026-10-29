@@ -114,7 +114,7 @@ export const CHARMS_GROUPS: PageGroup[] = [
     id: "how", label: "3 · How it works strip",
     note: "Thin strip above the products.",
     fields: [
-      onOff("cp2_how_show", "Show this strip"),
+      onOff("cp2_how_show", "Show this strip (the product pages show these steps)", "off"),
       t("cp2_how_title", "Title", "How it works"),
       t("cp2_how_1", "Step 1", "Open the clip"),
       t("cp2_how_2", "Step 2", "Slide it onto the edge or strap"),
