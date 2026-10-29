@@ -138,7 +138,8 @@ export default function HotDealsPage() {
     const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
     const [{ data: sRows }, { data: cData }] = await Promise.all([
       sb.from("site_settings").select("key,value").like("key", "hd_%"),
-      sb.from("coupons").select("*").eq("active", true).order("display_order", { ascending: true }),
+      // Display order below 0 = hidden coupon (works at checkout, not listed here).
+      sb.from("coupons").select("*").eq("active", true).gte("display_order", 0).order("display_order", { ascending: true }),
     ]);
     const cfg: Record<string, string> = {};
     (sRows ?? []).forEach((r: { key: string; value: string }) => { cfg[r.key] = r.value; });

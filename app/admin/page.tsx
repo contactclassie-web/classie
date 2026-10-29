@@ -12007,6 +12007,7 @@ export default function AdminPage() {
                   <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider font-medium">Display Order</p>
                   <input type="number" value={couponModal.data.display_order ?? 0} onChange={e => setCouponModal(m => ({ ...m, data: { ...m.data, display_order: parseInt(e.target.value) || 0 } }))}
                     className={inputCls} />
+                  <p className="text-[10px] text-gray-400 mt-1">Use -1 to hide this coupon from the Hot Deals page (it still works at checkout).</p>
                 </div>
               </div>
               {/* Title */}

@@ -15,6 +15,14 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Old product links (copies made in admin) → clean names. 301 so Google
+      // moves the ranking to the new address.
+      ...[
+        ['flower-jute-shoe-charms-copy-9968-copy-8159-copy-7301-copy-2783', 'teal-blossom-jute-shoe-charms'],
+        ['flower-jute-shoe-charms-copy-9968-copy-8159', 'sunny-daisy-jute-shoe-charms'],
+        ['flower-jute-shoe-charms-copy-9968', 'floral-jute-shoe-charms'],
+        ['flower-jute-shoe-charms', 'star-bloom-jute-shoe-charms'],
+      ].map(([from, to]) => ({ source: `/products/${from}`, destination: `/products/${to}`, statusCode: 301 })),
       // /shop/bow → /shop/clips (bow products moved to shoe-charms)
       {
         source: '/shop/bow',
