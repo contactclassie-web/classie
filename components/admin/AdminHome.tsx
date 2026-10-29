@@ -113,7 +113,7 @@ export default function AdminHome({
   const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "—");
 
   return (
-    <div className="space-y-6 max-w-[1200px]">
+    <div className="space-y-6 w-full min-w-0">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-gray-400">{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}</p>
@@ -130,7 +130,7 @@ export default function AdminHome({
       {/* To do */}
       <section>
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 mb-2.5">To do</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 [&>*:last-child]:col-span-2 md:[&>*:last-child]:col-span-1">
           {tasks.map(({ n, label, sub, icon: Icon, go }) => (
             <button key={label} type="button" onClick={() => onGo(go)}
               className={`text-left rounded-xl border p-4 transition-colors ${n > 0 ? "bg-white border-[#3B5373]/25 hover:border-[#3B5373]" : "bg-white/60 border-gray-100 hover:border-gray-200"}`}>
@@ -156,7 +156,7 @@ export default function AdminHome({
             ))}
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 [&>*:last-child]:col-span-2 md:[&>*:last-child]:col-span-1">
           {[
             ["Sales", rs(sales), "Excl. cancelled"],
             ["Orders", String(inRange.length), ""],
@@ -201,7 +201,7 @@ export default function AdminHome({
         )}
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
         {/* Orders to pack */}
         <section className="bg-white rounded-xl border border-gray-100">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">

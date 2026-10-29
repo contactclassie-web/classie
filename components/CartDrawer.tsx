@@ -33,8 +33,11 @@ export default function CartDrawer() {
 
   useEffect(() => { if (drawerOpen && items.length === 0) closeDrawer(); }, [drawerOpen, items.length, closeDrawer]);
 
+  // The admin has no shopping bag.
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
-    <div aria-hidden={!drawerOpen} className={`fixed inset-0 z-[200] ${drawerOpen ? "" : "pointer-events-none"}`}>
+    <div aria-hidden={!drawerOpen} className={`fixed inset-0 z-[200] overflow-hidden ${drawerOpen ? "" : "pointer-events-none"}`}>
       <div
         onClick={closeDrawer}
         className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${drawerOpen ? "opacity-100" : "opacity-0"}`}
