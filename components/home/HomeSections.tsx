@@ -58,6 +58,21 @@ export function SketchSvg({ className = "" }: { className?: string }) {
 
 // Sections --------------------------------------------------------------------
 
+// Three quiet trust points under the hero.
+export function TrustPoints({ c }: { c: HomeConfig["trust"] }) {
+  const items = c.items.split("·").map((x) => x.trim()).filter(Boolean);
+  if (!items.length) return null;
+  return (
+    <div className="border-b border-[#ECEAE6] bg-white">
+      <ul className={`${WRAP} grid md:flex md:justify-center md:gap-x-3 py-3 font-sans text-[10.5px] md:text-[12px] leading-snug tracking-[0.03em] text-[#6b6b6b] text-center`} style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
+        {items.map((t, i) => (
+          <li key={t} className="flex items-center justify-center gap-3 px-1">{i > 0 && <span aria-hidden className="hidden md:inline text-[#c9c3ba]">·</span>}{t}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function MarketplaceStrip({ c }: { c: HomeConfig["marketplace"] }) {
   const names = c.names.split(",").map((s) => s.trim()).filter(Boolean);
   if (!names.length && !c.note) return null;

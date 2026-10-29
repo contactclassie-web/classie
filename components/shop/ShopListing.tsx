@@ -22,7 +22,8 @@ export interface ListingProduct {
   heelType: string;        // normalised, e.g. "Block Heel"
   variantType: "size" | "color" | "none";
   options: string[];
-  isNew: boolean;
+  isNew: boolean;          // added in the last 30 days
+  pinned?: boolean;        // Admin → Featured Picks "latest" (sorted first)
   soldOut?: boolean;       // every tracked option is at 0 (Admin → Manage products → stock)
 }
 
@@ -97,9 +98,8 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
           // eslint-disable-next-line @next/next/no-img-element
           <img src={optimizeCloudinary(second, 600)} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-0 md:group-hover:opacity-100 transition-opacity duration-500" />
         )}
-        {p.soldOut
-          ? <span className="absolute top-2.5 left-2.5 bg-white text-[#1a1a1a] text-[10px] font-semibold px-1.5 py-0.5 tracking-wide uppercase">Sold out</span>
-          : discount > 0 && <span className="absolute top-2.5 left-2.5 bg-[#1a1a1a] text-white text-[10px] px-1.5 py-0.5">-{discount}%</span>}
+        {/* No % badges on cards (premium look): the MRP is shown struck through under the title. */}
+        {p.soldOut && <span className="absolute top-2.5 left-2.5 bg-white text-[#1a1a1a] text-[10px] font-semibold px-1.5 py-0.5 tracking-wide uppercase">Sold out</span>}
         <div className="absolute top-2.5 right-2.5 flex flex-col items-end gap-1.5">
           {p.isNew && <span className="bg-[#3B5373] text-white text-[10px] px-1.5 py-0.5 tracking-wide">NEW</span>}
           <button
@@ -179,7 +179,7 @@ export default function ShopListing(props: Props) {
     } else if (charmType) {
       list = list.filter((p) => hasTag(p, charmType));
     }
-    if (sort === "featured") list.sort((a, b) => Number(b.isNew) - Number(a.isNew));
+    if (sort === "featured") list.sort((a, b) => Number(b.isNew) - Number(a.isNew) || Number(!!b.pinned) - Number(!!a.pinned));
     if (sort === "price-asc") list.sort((a, b) => a.price - b.price);
     if (sort === "price-desc") list.sort((a, b) => b.price - a.price);
     return list;
