@@ -1,12 +1,13 @@
 // Default text for the menu, FAQ and policy pages. Everything here can be
 // changed in Admin → "Menu, FAQ & Legal"; the saved version replaces these.
 
-export interface NavLink { label: string; href: string; wide?: boolean }
+// wide: big desktops only. mobileOnly: phone menu only (the footer links them on desktop).
+export interface NavLink { label: string; href: string; wide?: boolean; mobileOnly?: boolean }
 export interface NavLinks { left: NavLink[]; right: NavLink[] }
 export const NAV_KEY = "nav_links_v1";
 export const DEFAULT_NAV: NavLinks = {
-  left: [{ label: "Gift Sets", href: "/gift-sets" }, { label: "Style Ideas", href: "/style-ideas", wide: true }],
-  right: [{ label: "Custom Designs", href: "/custom-designs" }, { label: "Journal", href: "/blog" }, { label: "About Us", href: "/about", wide: true }],
+  left: [{ label: "Gift Sets", href: "/gift-sets" }, { label: "Style Ideas", href: "/style-ideas", mobileOnly: true }],
+  right: [{ label: "Custom", href: "/custom-designs" }, { label: "Journal", href: "/blog", mobileOnly: true }, { label: "About Us", href: "/about", mobileOnly: true }],
 };
 
 export interface FaqItem { q: string; a: string }

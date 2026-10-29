@@ -125,7 +125,6 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
         {sub && <span className="text-[11.5px] md:text-[12px] text-[#6b6b6b] line-clamp-1">{sub}</span>}
         <span className="text-[13px] md:text-[14px] font-semibold text-[#1a1a1a]">
           {inr(p.price)}
-          {discount > 0 && <span className="ml-1.5 font-normal text-[11px] md:text-[12px] text-[#8a8a8a] line-through">{inr(p.comparePrice)}</span>}
         </span>
       </div>
     </Link>

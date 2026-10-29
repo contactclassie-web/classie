@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { optimizeCloudinary } from "@/lib/cloudinary";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Check, ChevronRight, Plus, Minus, Truck, Banknote, RotateCcw, ShieldCheck, Sparkles, Heart, Lock, Gift, Leaf, Footprints, Sun, Moon, Shirt, type LucideIcon } from "lucide-react";
+import { ShoppingBag, Check, ChevronRight, Plus, Minus, Truck, Banknote, RotateCcw, ShieldCheck, Sparkles, Heart, Lock, Gift, Leaf, Footprints, Sun, Moon, Shirt, Ruler, Triangle, type LucideIcon } from "lucide-react";
 import { Product } from "@/lib/products";
 import { useCart } from "@/components/CartContext";
 import ProductCard from "@/components/ProductCard";
@@ -69,7 +69,7 @@ const repeatsTitle = (tick: string, title: string) => {
 };
 // Thin navy line icons for the "Designed for every moment" tiles (no emoji).
 const TILE_ICONS: [RegExp, LucideIcon][] = [
-  [/comfort|cushion|insole|walk/i, Footprints], [/secure|hold|grip/i, Lock], [/vegan|cruelty|eco/i, Leaf],
+  [/comfort|cushion|insole|walk/i, Footprints], [/heel$/i, Ruler], [/toe/i, Triangle], [/wear it with/i, Shirt], [/secure|hold|grip/i, Lock], [/vegan|cruelty|eco/i, Leaf],
   [/pair|gift/i, Gift], [/care|craft|made|premium|quality/i, Heart], [/season|summer|sun/i, Sun],
   [/night|evening/i, Moon], [/casual|formal|wear it|anywhere|styl|outfit/i, Shirt],
 ];
@@ -177,8 +177,8 @@ export default function ProductDetailClient({
   // Links in review-request emails/WhatsApp end with #write-review: open the form.
   useEffect(() => {
     if (window.location.hash === "#write-review") {
-      reviewsRef.current?.scrollIntoView();
       setShowWriteReview(true);
+      setTimeout(() => reviewsRef.current?.scrollIntoView(), 50);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -218,6 +218,8 @@ export default function ProductDetailClient({
   const [currentIndex, setCurrentIndex] = useState(0);
   const mainImage = galleryImages[currentIndex] ?? galleryImages[0];
   const [showVideo, setShowVideo] = useState(false);
+  // Desktop: hover the main photo to see the crystals up close (2× at the cursor).
+  const [zoom, setZoom] = useState<{ x: number; y: number } | null>(null);
 
   const goPrev = () => { setShowVideo(false); setCurrentIndex(i => (i - 1 + galleryImages.length) % galleryImages.length); };
   const goNext = () => { setShowVideo(false); setCurrentIndex(i => (i + 1) % galleryImages.length); };
@@ -273,8 +275,17 @@ export default function ProductDetailClient({
     { Icon: Banknote, text: "COD available" },
     isHeel ? { Icon: RotateCcw, text: "7-day easy returns" } : { Icon: ShieldCheck, text: "Damaged? Free replacement" },
   ];
+  // Heels: facts from the product's own specs (height, heel, toe, insole)
+  // instead of general lines; falls back to Admin's tiles when specs are missing.
+  const spec = (re: RegExp) => specs.find(([l]) => re.test(l || ""))?.[1]?.trim() || "";
+  const heelFacts: FeatureTile[] = isHeel ? [
+    spec(/height/i) && { icon: "", title: spec(/height/i).replace(/inches?/i, "inch") + " heel", desc: spec(/heel type/i) || "Steady, balanced height" },
+    { icon: "", title: "Cushioned insole", desc: "Soft padding under the ball of the foot for long hours" },
+    spec(/toe/i) && { icon: "", title: spec(/toe/i), desc: spec(/closure|strap/i) || "Clean, elongating line" },
+    { icon: "", title: "Wear it with", desc: "Sarees, dresses or office trousers. Add a CLASSIE clip for parties." },
+  ].filter(Boolean) as FeatureTile[] : [];
   const tiles = isHeel
-    ? (featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES)
+    ? (heelFacts.length >= 3 ? heelFacts : featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES)
     : (clipFeatureTiles.length > 0 ? clipFeatureTiles : CLIP_FEATURE_TILES);
 
   // Returns false (and points at the size buttons) when a size is still needed.
@@ -289,6 +300,13 @@ export default function ProductDetailClient({
   const selectionLeft = left(selectedVariant || (product.variants.options.length ? "" : "_"));
   const unavailable = soldOut || (!!selectedVariant && optionSoldOut(selectedVariant)) || (!product.variants.options.length && optionSoldOut("_"));
   const maxQty = selectionLeft !== undefined && selectionLeft > 0 ? selectionLeft : 50;
+
+  // "Mon, 3 Nov – Wed, 5 Nov": a 4–6 day estimate, worked out in the browser so it is always today's date.
+  const [deliveryBy, setDeliveryBy] = useState("4–6 days");
+  useEffect(() => {
+    const fmt = (d: number) => new Date(Date.now() + d * 864e5).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+    setDeliveryBy(`${fmt(4)} – ${fmt(6)}`);
+  }, []);
 
   // Bag/checkout/email photo: the chosen colour's first photo (e.g. Gold), else the main photo.
   const cartImage = (product.variants.type === "color" && selectedVariant && colorSetImages(selectedVariant)[0]) || product.image;
@@ -354,7 +372,14 @@ export default function ProductDetailClient({
                   src={optimizeCloudinary(mainImage, GALLERY_W)}
                   alt={product.title}
                   fill
-                  className="object-contain object-center"
+                  className="object-contain object-center transition-transform duration-200 md:cursor-zoom-in"
+                  style={zoom ? { transform: "scale(2)", transformOrigin: `${zoom.x}% ${zoom.y}%` } : undefined}
+                  onMouseMove={(e) => {
+                    if (!window.matchMedia("(hover: hover) and (min-width: 768px)").matches) return;
+                    const r = e.currentTarget.getBoundingClientRect();
+                    setZoom({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+                  }}
+                  onMouseLeave={() => setZoom(null)}
                   sizes="(max-width: 768px) 100vw, 52vw"
                   priority
                   unoptimized
@@ -472,8 +497,8 @@ export default function ProductDetailClient({
                 <span style={{ fontSize: "15px", color: "#888", textDecoration: "line-through" }}>₹{product.comparePrice.toLocaleString("en-IN")}</span>
               )}
               {discount > 0 && (
-                <span style={{ background: "#ECFDF5", color: "#059669", fontSize: "11px", fontWeight: 600, padding: "3px 10px", borderRadius: "100px" }}>
-                  {discount}% OFF
+                <span style={{ color: "#888", fontSize: "12px" }}>
+                  {discount}% off
                 </span>
               )}
             </div>
@@ -481,10 +506,8 @@ export default function ProductDetailClient({
             {/* ── Color Variants (cross-product navigation — heels only) ── */}
             {colorVariants.length > 1 && colorVariants.some(v => v.product_slug !== product.slug) && (
               <div style={{ marginBottom: "20px" }}>
-                <p style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", marginBottom: "2px" }}>Available in</p>
-                <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#888", marginBottom: "12px" }}>
-                  {colorVariants.find(v => v.product_slug === product.slug)?.color_name || ""}
-                </p>
+                {/* Each swatch carries its own name, so the colour isn't repeated above them. */}
+                <p style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", marginBottom: "12px" }}>Available in</p>
                 <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "flex-start" }}>
                   {colorVariants.map((v) => {
                     const isActive = v.product_slug === product.slug;
@@ -641,7 +664,7 @@ export default function ProductDetailClient({
 
             {/* Qty + Add to Cart */}
             <div ref={atcRef} className="flex items-center gap-2.5" style={{ marginBottom: "10px" }}>
-              <div className="flex items-center overflow-hidden" style={{ border: "1.5px solid #E8E3DD", borderRadius: "100px", height: "52px" }}>
+              <div className="flex items-center overflow-hidden" style={{ border: "1.5px solid #E8E3DD", borderRadius: 0, height: "52px" }}>
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                   className="flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -663,7 +686,7 @@ export default function ProductDetailClient({
                 disabled={unavailable}
                 className="flex-1 flex items-center justify-center gap-2 transition-all duration-300"
                 style={{
-                  height: "52px", borderRadius: "100px", border: "none",
+                  height: "52px", borderRadius: 0, border: "none",
                   background: unavailable ? "#9aa3ae" : added ? "#16a34a" : "#3B5373",
                   color: "#fff", fontSize: "12.5px", fontWeight: 600,
                   letterSpacing: "0.12em", textTransform: "uppercase", cursor: unavailable ? "not-allowed" : "pointer",
@@ -683,7 +706,7 @@ export default function ProductDetailClient({
               hidden={unavailable}
               className="w-full transition-all duration-200 hover:bg-[#3B5373] hover:text-white"
               style={{
-                height: "52px", borderRadius: "100px",
+                height: "52px", borderRadius: 0,
                 border: "1.5px solid #3B5373", color: "#3B5373",
                 background: "#fff", fontSize: "12.5px", fontWeight: 600,
                 letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer",
@@ -692,6 +715,22 @@ export default function ProductDetailClient({
             >
               Buy it Now
             </button>
+
+            {/* Delivery estimate: 4–6 days (we ship within a day; most pincodes take 3–5) */}
+            {!unavailable && (
+              <p style={{ fontSize: "12.5px", color: "#444", margin: "-4px 0 14px" }}>
+                Order today, delivered by <strong style={{ fontWeight: 600 }}>{deliveryBy}</strong>
+              </p>
+            )}
+
+            {/* How to wear (charms): moved here from the shop grid */}
+            {!isHeel && (
+              <ol className="grid grid-cols-3 gap-2" style={{ marginBottom: "16px", fontSize: "11.5px", color: "#444", lineHeight: 1.35 }}>
+                {["Open the clip", "Slide it onto the edge or strap", "Press shut"].map((t, i) => (
+                  <li key={t} className="flex items-start gap-1.5"><span style={{ color: "#B08D57", fontWeight: 600 }}>{i + 1}</span>{t}</li>
+                ))}
+              </ol>
+            )}
 
             {/* Trust row — the only place delivery / COD / returns are shown */}
             <ul className="grid grid-cols-3" style={{ borderTop: "1px solid #E8E3DD", borderBottom: "1px solid #E8E3DD", padding: "14px 0", marginBottom: "22px" }}>
@@ -803,7 +842,7 @@ export default function ProductDetailClient({
                           <span style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>₹{discountedPrice.toLocaleString("en-IN")}</span>
                           <span style={{ fontSize: "11px", color: "#bbb", textDecoration: "line-through" }}>₹{offer.product.price.toLocaleString("en-IN")}</span>
                           {bundleDiscount > 0 && (
-                            <span style={{ fontSize: "10px", background: "#ECFDF5", color: "#059669", fontWeight: 600, padding: "2px 7px", borderRadius: "100px" }}>{bundleDiscount}% off</span>
+                            <span style={{ fontSize: "11px", color: "#888" }}>{bundleDiscount}% off</span>
                           )}
                         </div>
                       </div>
@@ -812,7 +851,7 @@ export default function ProductDetailClient({
                         onClick={() => addBundleItem(offer)}
                         className="flex-shrink-0 transition-all"
                         style={{
-                          padding: "8px 18px", borderRadius: "100px",
+                          padding: "8px 18px", borderRadius: 0,
                           border: addedBundle[offer.id] ? "1.5px solid #16a34a" : "1.5px solid #3B5373",
                           background: "transparent",
                           color: addedBundle[offer.id] ? "#16a34a" : "#3B5373",
@@ -870,7 +909,7 @@ export default function ProductDetailClient({
       <div style={{ background: "#f7f7f7", padding: "40px 0" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           <h2 className="font-serif text-center" style={{ fontSize: "28px", color: "#3B5373", marginBottom: "32px" }}>
-            Designed for Every Moment
+            {isHeel ? "The details" : "Designed for Every Moment"}
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: `repeat(${isDesktop ? 4 : 2}, 1fr)`, gap: "12px" }}>
             {tiles.map((tile, i) => (
@@ -949,7 +988,9 @@ export default function ProductDetailClient({
       </div>
 
       {/* ── Customer Reviews ── */}
-      <div id="reviews" ref={reviewsRef} style={{ background: "#f7f7f7", padding: reviews.length > 0 ? "40px 0" : "24px 0" }}>
+      {/* Hidden until the product has a review (an empty block reads as "nobody buys here").
+          Review-request links (#write-review) still open the form. */}
+      <div id="reviews" ref={reviewsRef} style={{ background: "#f7f7f7", padding: reviews.length > 0 ? "40px 0" : "24px 0", display: reviews.length > 0 || showWriteReview ? undefined : "none" }}>
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-14">
           {/* Header: score + bars */}
           {(() => {
@@ -1046,7 +1087,7 @@ export default function ProductDetailClient({
                 <p style={{ fontSize: "13px", color: "#888", marginTop: "6px" }}>Your review will appear after approval.</p>
                 <button
                   onClick={() => { setShowWriteReview(false); setReviewSubmitted(false); setReviewForm({ name: "", rating: 5, text: "" }); }}
-                  style={{ marginTop: "20px", padding: "10px 28px", background: "#3B5373", color: "#fff", border: "none", borderRadius: "100px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+                  style={{ marginTop: "20px", padding: "10px 28px", background: "#3B5373", color: "#fff", border: "none", borderRadius: 0, fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
                 >
                   Done
                 </button>
@@ -1112,7 +1153,7 @@ export default function ProductDetailClient({
                 <button
                   type="submit"
                   disabled={reviewSubmitting}
-                  style={{ width: "100%", height: "48px", background: "#3B5373", color: "#fff", border: "none", borderRadius: "100px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: reviewSubmitting ? "not-allowed" : "pointer", opacity: reviewSubmitting ? 0.7 : 1 }}
+                  style={{ width: "100%", height: "48px", background: "#3B5373", color: "#fff", border: "none", borderRadius: 0, fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: reviewSubmitting ? "not-allowed" : "pointer", opacity: reviewSubmitting ? 0.7 : 1 }}
                 >
                   {reviewSubmitting ? "Submitting…" : "Submit Review"}
                 </button>
@@ -1143,7 +1184,7 @@ export default function ProductDetailClient({
             onClick={doAdd}
             disabled={unavailable}
             tabIndex={showSticky ? 0 : -1}
-            className="flex items-center justify-center gap-2 px-5 h-11 rounded-full text-white text-[11.5px] font-semibold tracking-[0.12em] uppercase transition-colors"
+            className="flex items-center justify-center gap-2 px-5 h-11 text-white text-[11.5px] font-semibold tracking-[0.12em] uppercase transition-colors"
             style={{ background: unavailable ? "#9aa3ae" : added ? "#16a34a" : "#3B5373" }}
           >
             {unavailable ? <>Sold out</> : added ? <><Check className="w-4 h-4" /> Added</> : <><ShoppingBag className="w-4 h-4" /> Add to cart</>}

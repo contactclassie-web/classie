@@ -1,3 +1,4 @@
+import { colourPhotoKey, firstColourPhotos, type ColourRow } from "@/lib/variantPhotos";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { GIFT_SETS_KEY, mergeGiftSets } from "@/lib/giftSets";
 import { parseShipping } from "@/lib/shipping";
@@ -56,13 +57,18 @@ export async function priceOrder(
   const productSlugs = Array.from(new Set(items.filter((it) => !it.slug.startsWith("set-")).map((it) => it.slug)));
   const hasSets = items.some((it) => it.slug.startsWith("set-"));
 
-  const [productsRes, offersRes, settingsRes] = await Promise.all([
+  const [productsRes, offersRes, settingsRes, coloursRes] = await Promise.all([
     productSlugs.length
-      ? sb.from("products").select("slug,title,price,active").in("slug", productSlugs)
-      : Promise.resolve({ data: [] as { slug: string; title: string; price: number; active: boolean }[], error: null }),
+      ? sb.from("products").select("slug,title,price,active,image").in("slug", productSlugs)
+      : Promise.resolve({ data: [] as { slug: string; title: string; price: number; active: boolean; image: string | null }[], error: null }),
     sb.from("product_bundle_offers").select("main_product_slug,accessory_slug,discount_type,discount_value,active").eq("active", true),
     sb.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee", ...PAYMENT_KEYS, INVENTORY_KEY, ...(hasSets ? [GIFT_SETS_KEY] : [])]),
+    productSlugs.length
+      ? sb.from("product_color_variants").select("product_slug,color_name,image").in("product_slug", productSlugs)
+      : Promise.resolve({ data: [] as ColourRow[] }),
   ]);
+  // Order photo (admin list + emails): the chosen colour's first photo, else the main photo.
+  const colourPhotos = firstColourPhotos((coloursRes.data ?? []) as ColourRow[]);
   if (productsRes.error) return { ok: false, error: "Couldn't check prices. Please try again." };
 
   const products = new Map((productsRes.data ?? []).map((p) => [p.slug, p]));
@@ -103,7 +109,8 @@ export async function priceOrder(
       if (allowed.includes(it.clientPrice)) price = it.clientPrice;
       if (!it.title) it.title = p.title;
     }
-    priced.push({ slug: it.slug, title: it.title, price, image: it.image, quantity: it.quantity, ...(it.variant ? { variant: it.variant } : {}) });
+    const dbImage = it.slug.startsWith("set-") ? "" : (colourPhotos.get(colourPhotoKey(it.slug, it.variant)) || products.get(it.slug)?.image || "");
+    priced.push({ slug: it.slug, title: it.title, price, image: dbImage || it.image, quantity: it.quantity, ...(it.variant ? { variant: it.variant } : {}) });
   }
 
   // Stock: refuse anything that is sold out or short (untracked = unlimited).

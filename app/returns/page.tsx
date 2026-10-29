@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { RotateCcw, ArrowLeftRight, ShieldCheck } from "lucide-react";
 
 export const revalidate = 3600;
 export const metadata: Metadata = { title: "Returns & Exchanges", alternates: { canonical: "/returns" } };
@@ -17,15 +18,15 @@ export default async function ReturnsPage() {
 
   const eyebrow = cfg.re_eyebrow ?? "CLASSIE";
   const heading = cfg.re_heading ?? "Returns & Exchanges";
-  const sub     = cfg.re_sub     ?? "Hassle-free returns within 7 days of delivery";
+  const sub     = cfg.re_sub     ?? "Heels: 7-day returns and free size exchange · Shoe charms: damaged? free replacement within 48 h";
   const updated = cfg.re_updated ?? "Last updated: June 2025";
 
-  const tile1Title = cfg.re_tile1_title ?? "7-Day Returns";
-  const tile1Sub   = cfg.re_tile1_sub   ?? "Return within 7 days of delivery";
-  const tile2Title = cfg.re_tile2_title ?? "Free Size Exchange";
-  const tile2Sub   = cfg.re_tile2_sub   ?? "Subject to stock availability";
-  const tile3Title = cfg.re_tile3_title ?? "Refund in 5–7 Days";
-  const tile3Sub   = cfg.re_tile3_sub   ?? "After product inspection";
+  const tile1Title = cfg.re_tile1_title ?? "Heels: 7-day returns";
+  const tile1Sub   = cfg.re_tile1_sub   ?? "Unworn, in the original box";
+  const tile2Title = cfg.re_tile2_title ?? "Free size exchange";
+  const tile2Sub   = cfg.re_tile2_sub   ?? "For heels, subject to stock";
+  const tile3Title = cfg.re_tile3_title ?? "Shoe charms";
+  const tile3Sub   = cfg.re_tile3_sub   ?? "Damaged? Free replacement within 48 h";
 
   const eligibleHeading   = cfg.re_eligible_heading   ?? "Eligible Returns";
   const eligibleBody      = cfg.re_eligible_body      ?? `Products are eligible for return if:\n\n• Returned within 7 days of delivery\n• Unused, unworn, and in original condition\n• In original packaging with all tags attached\n• Accompanied by the original invoice`;
@@ -41,9 +42,9 @@ export default async function ReturnsPage() {
   const ctaText = cfg.re_cta_text ?? "Need help with a return or exchange?";
 
   const tiles = [
-    { emoji: "♻️", title: tile1Title, sub: tile1Sub },
-    { emoji: "🔄", title: tile2Title, sub: tile2Sub },
-    { emoji: "💰", title: tile3Title, sub: tile3Sub },
+    { Icon: RotateCcw, title: tile1Title, sub: tile1Sub },
+    { Icon: ArrowLeftRight, title: tile2Title, sub: tile2Sub },
+    { Icon: ShieldCheck, title: tile3Title, sub: tile3Sub },
   ];
 
   const sections = [
@@ -81,13 +82,13 @@ export default async function ReturnsPage() {
       {/* ── KPI Tiles ────────────────────────────────── */}
       <section className="py-14 px-4" style={{ backgroundColor: "#fff" }}>
         <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {tiles.map(({ emoji, title, sub: tileSub }) => (
+          {tiles.map(({ Icon, title, sub: tileSub }) => (
             <div
               key={title}
               className="flex items-center gap-5 bg-white rounded-xl shadow-sm px-6 py-5"
               style={{ borderLeft: "3px solid #3B5373" }}
             >
-              <span className="text-3xl flex-shrink-0">{emoji}</span>
+              <Icon className="w-7 h-7 flex-shrink-0" strokeWidth={1.3} color="#3B5373" aria-hidden />
               <div>
                 <p className="font-bold text-base" style={{ color: "#1a1a1a" }}>
                   {title}

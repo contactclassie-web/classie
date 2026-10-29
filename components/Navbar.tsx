@@ -160,7 +160,7 @@ export default function Navbar({ initialSettings, initialCategories, initialEdit
             )}
 
             {/* Static left links */}
-            {leftLinks.map((l) => (
+            {leftLinks.filter((l) => !l.mobileOnly).map((l) => (
               <Link key={l.href} href={l.href} className={`${NAV_LINK_CLS} ${l.wide ? "hidden xl:inline" : ""}`}>{l.label}</Link>
             ))}
           </div>
@@ -180,7 +180,7 @@ export default function Navbar({ initialSettings, initialCategories, initialEdit
 
           {/* Right links + icons */}
           <div className="flex items-center gap-5 xl:gap-7">
-            {rightLinks.map((l) => (
+            {rightLinks.filter((l) => !l.mobileOnly).map((l) => (
               <Link key={l.href} href={l.href} className={`${NAV_LINK_CLS} ${l.wide ? "hidden xl:inline" : ""}`}>{l.label}</Link>
             ))}
             <button type="button" aria-label="Search" onClick={() => setSearchOpen(true)} className="text-[#1a1a1a] hover:text-[#3B5373] transition-colors">

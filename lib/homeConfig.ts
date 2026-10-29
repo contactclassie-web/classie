@@ -11,13 +11,14 @@ export type HeroSlide =
   | { type: "video"; url: string; poster: string };
 
 export type SectionId =
-  | "hero" | "trust" | "marketplace" | "types" | "newArrivals" | "bestsellers" | "giftSets" | "freeDelivery" | "howItWorks"
+  | "hero" | "extras" | "trust" | "marketplace" | "types" | "newArrivals" | "bestsellers" | "giftSets" | "freeDelivery" | "howItWorks"
   | "custom" | "edit" | "heels" | "instagram" | "journal" | "reviews" | "why" | "whatsapp" | "seo"
   | "legacyHero" | "legacyTrustBand" | "legacyOccasions" | "legacyFeaturedPicks" | "legacyPhilosophy" | "legacyNewsletter";
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   hero: "Hero banner (slider)",
   trust: "Trust points under the hero",
+  extras: "Instagram · Journal · WhatsApp band",
   marketplace: "Amazon · Flipkart · Myntra line",
   types: "Shop by type (round photos)",
   newArrivals: "New arrivals",
@@ -87,19 +88,20 @@ export const DEFAULT_HOME: HomeConfig = {
   sections: [
     { id: "hero", on: true },
     { id: "trust", on: true },
-    { id: "marketplace", on: false },
     { id: "types", on: true },
     { id: "newArrivals", on: true },
     { id: "bestsellers", on: true },
-    { id: "howItWorks", on: true },
     { id: "giftSets", on: true },
     { id: "heels", on: true },
-    { id: "reviews", on: true },
-    { id: "instagram", on: true },
+    { id: "howItWorks", on: true },
     { id: "custom", on: true },
-    { id: "journal", on: true },
-    { id: "whatsapp", on: true },
+    { id: "extras", on: true },
     { id: "seo", on: true },
+    { id: "marketplace", on: false },
+    { id: "instagram", on: false },
+    { id: "journal", on: false },
+    { id: "whatsapp", on: false },
+    { id: "reviews", on: false },
     { id: "freeDelivery", on: false },
     { id: "edit", on: false },
     { id: "why", on: false },

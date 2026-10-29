@@ -71,7 +71,7 @@ export const DEFAULT_GIFT_SETS: GiftSetsConfig = {
       { title: "FREE delivery on bigger sets", sub: "Sets above the free delivery amount ship free." },
       { title: "Ready to gift", sub: "All pieces packed together." },
     ],
-    returnNote: "Sets are returned as a complete set within 7 days of delivery.",
+    returnNote: "Damaged? Free replacement within 48 h of delivery. Just send us a photo on WhatsApp.",
     giftNote: "All pieces packed together.",
     emptyText: "New sets are on their way. Message us on WhatsApp to get one made for you.",
     seoHeading: "Shoe Clip Gift Sets Online in India",

@@ -8,6 +8,7 @@ import { useCart } from "@/components/CartContext";
 import { useShippingRules } from "@/lib/useShipping";
 import { isGiftSet } from "@/lib/orderTotals";
 import { freeShippingFrom } from "@/lib/shipping";
+import { useCartPhotos } from "@/lib/useCartPhotos";
 
 const rs = (n: number) => "₹" + n.toLocaleString("en-IN");
 
@@ -58,6 +59,7 @@ function DrawerBody({ items, total, onClose, updateQuantity, removeFromCart }: {
   removeFromCart: ReturnType<typeof useCart>["removeFromCart"];
 }) {
   const rules = useShippingRules();
+  const photoFor = useCartPhotos(items);
   const hasSet = items.some((i) => isGiftSet(i.slug));
   const freeFrom = freeShippingFrom(rules);
   const toFree = !hasSet && freeFrom != null ? Math.max(0, freeFrom - total) : 0;
@@ -95,7 +97,7 @@ function DrawerBody({ items, total, onClose, updateQuantity, removeFromCart }: {
         {items.map((it) => (
           <li key={`${it.slug}-${it.variant ?? ""}`} className="flex gap-3 py-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={it.image} alt={it.title} className="w-16 h-20 object-cover bg-[#faf8f6] shrink-0" />
+            <img src={photoFor(it)} alt={it.title} className="w-16 h-20 object-cover bg-[#faf8f6] shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-classie-black leading-snug line-clamp-2">{it.title}</p>
               {it.variant && <p className="text-xs text-classie-gray mt-0.5">{it.variant}</p>}

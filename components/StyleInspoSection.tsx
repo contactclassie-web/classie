@@ -102,7 +102,7 @@ export default function StyleInspoSection({ initialImages, initialSettings }: Pr
             <a key={i} href={item.link_url || "#"} target="_blank" rel="noopener noreferrer"
               className="group relative overflow-hidden bg-[#c8d6e5]" style={{ aspectRatio: "1 / 1" }}>
               {item.image_url && (
-                <Image src={item.image_url} alt="Style Inspo" fill
+                <Image src={item.image_url} alt="CLASSIE shoe clips styled on heels" fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 768px) 33vw, 16vw" />
               )}

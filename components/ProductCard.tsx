@@ -52,19 +52,12 @@ export default function ProductCard({ product, cardStyle }: { product: Product; 
       {/* ── Product info */}
       <div className="pt-3 pb-1">
         <p className="text-sm font-light text-gray-800 leading-snug line-clamp-2" style={{ fontFamily: "var(--font-poppins), sans-serif", fontWeight: 300 }}>
-          {product.title}
+          {product.title.replace(/\s*\(pair\)\s*/i, " ").trim()}
         </p>
         <div className="flex items-center gap-2 mt-1.5">
           <span className="text-sm text-[#1a1a1a]">
             ₹{product.price.toLocaleString("en-IN")}
           </span>
-          {discount > 0 && (
-            <>
-              <span className="line-through text-gray-400 text-xs">
-                ₹{product.comparePrice.toLocaleString("en-IN")}
-              </span>
-            </>
-          )}
         </div>
       </div>
     </Link>

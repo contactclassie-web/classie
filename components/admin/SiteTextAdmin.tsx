@@ -77,6 +77,9 @@ function LinkList({ title, links, onChange }: { title: string; links: NavLink[];
             <label className="flex items-center gap-1.5 text-[11px] text-gray-500 mr-2" title="Hidden on small laptops so the menu does not crowd the logo. Always shown in the phone menu.">
               <input type="checkbox" checked={!!l.wide} onChange={(e) => set(i, { wide: e.target.checked })} /> Big screens only
             </label>
+            <label className="flex items-center gap-1.5 text-[11px] text-gray-500 mr-2" title="Shown only in the phone menu; on desktop the footer links to it.">
+              <input type="checkbox" checked={!!l.mobileOnly} onChange={(e) => set(i, { mobileOnly: e.target.checked })} /> Phone menu only
+            </label>
             <button type="button" className={btnSm} disabled={i === 0} onClick={() => onChange(move(links, i, -1))} aria-label="Move up">↑</button>
             <button type="button" className={btnSm} disabled={i === links.length - 1} onClick={() => onChange(move(links, i, 1))} aria-label="Move down">↓</button>
             <button type="button" className={btnSm} onClick={() => onChange(links.filter((_, j) => j !== i))} aria-label="Remove"><Trash2 className="w-3.5 h-3.5" /></button>

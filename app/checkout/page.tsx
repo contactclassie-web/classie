@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
 import { usePaymentRules, useShippingRules } from "@/lib/useShipping";
+import { useCartPhotos } from "@/lib/useCartPhotos";
 import { couponBase, orderTotals } from "@/lib/orderTotals";
 import { track } from "@/lib/analytics";
 import { gtagEvent } from "@/lib/gtag";
@@ -56,6 +57,7 @@ export default function CheckoutPage() {
 
   // Delivery charge — from Admin > Shipping Rates (same rules the server uses).
   const shippingRules = useShippingRules();
+  const photoFor = useCartPhotos(items);
   const paymentRules = usePaymentRules();
 
   useEffect(() => {
@@ -153,6 +155,23 @@ export default function CheckoutPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Pincode → city and state (India Post lookup through /api/pincode). Never
+  // overwrites what the customer typed; a failed lookup just leaves the fields.
+  const [pinNote, setPinNote] = useState("");
+  const handlePincode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const pin = e.target.value.replace(/\D/g, "").slice(0, 6);
+    setForm((f) => ({ ...f, pincode: pin }));
+    setPinNote("");
+    if (pin.length !== 6) return;
+    fetch(`/api/pincode/${pin}`).then((r) => r.json()).then((d: { ok?: boolean; city?: string; state?: string }) => {
+      if (!d?.ok) return;
+      const norm = (x: string) => x.toLowerCase().replace(/\band\b/g, "&").replace(/^nct of /, "").replace(/\s+/g, " ").trim();
+      const state = INDIA_STATES.find((st) => norm(st) === norm(d.state || "")) || "";
+      setForm((f) => ({ ...f, city: f.city || d.city || "", state: f.state || state }));
+      setPinNote([d.city, state || d.state].filter(Boolean).join(", "));
+    }).catch(() => {});
   };
 
   // ── Place order in DB ─────────────────────────────────────────────────
@@ -333,6 +352,12 @@ export default function CheckoutPage() {
                 Delivery Address
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Pincode first: city and state fill in from it */}
+                <div>
+                  <Field label="Pincode *" name="pincode" value={form.pincode} onChange={handlePincode} required pattern="[0-9]{6}" placeholder="6-digit pincode" />
+                  {pinNote && <p className="text-[11px] text-classie-gray mt-1">{pinNote}</p>}
+                </div>
+                <div className="hidden sm:block" />
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-classie-gray uppercase tracking-wider mb-1.5">
                     Street Address *
@@ -365,7 +390,6 @@ export default function CheckoutPage() {
                     ))}
                   </select>
                 </div>
-                <Field label="Pincode *" name="pincode" value={form.pincode} onChange={handleChange} required pattern="[0-9]{6}" placeholder="6-digit pincode" />
               </div>
             </section>
 
@@ -442,7 +466,7 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={`${item.slug}-${item.variant}`} className="flex gap-3">
                     <div className="relative w-14 h-14 flex-shrink-0 rounded overflow-hidden bg-classie-light">
-                      <Image src={item.image} alt={item.title} fill className="object-cover" sizes="56px" />
+                      <Image src={photoFor(item)} alt={item.title} fill className="object-cover" sizes="56px" />
                       <span className="absolute -top-1 -right-1 bg-[#3B5373] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                         {item.quantity}
                       </span>
@@ -590,7 +614,10 @@ export default function CheckoutPage() {
                 )}
               </button>
 
-              <p className="text-[11px] text-classie-gray text-center mt-3">
+              <p className="text-[11.5px] text-[#444] text-center mt-3">
+                COD available · Damaged? Free replacement · WhatsApp help
+              </p>
+              <p className="text-[11px] text-classie-gray text-center mt-1.5">
                 By placing your order you agree to our{" "}
                 <a href="/terms" className="underline">Terms of Service</a>
               </p>

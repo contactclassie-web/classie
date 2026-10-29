@@ -17,7 +17,7 @@ import HeroSection from "@/components/HeroSection";
 import HomeHero from "@/components/home/HomeHero";
 import HomeProductGrid from "@/components/home/HomeProductGrid";
 import {
-  SectionHeading, TrustPoints, MarketplaceStrip, ShopByType, FreeDeliveryBanner, HowItWorks, CustomDesigns,
+  SectionHeading, TrustPoints, ExtrasBand, MarketplaceStrip, ShopByType, FreeDeliveryBanner, HowItWorks, CustomDesigns,
   SeasonEdit, Journal, WhyBuyHere, WhatsAppJoin, SeoBlock, type JournalPost,
 } from "@/components/home/HomeSections";
 import {
@@ -109,7 +109,7 @@ export default async function HomePage() {
 
   // Only fetch what the switched-on sections need.
   const [journalRes, collectionsRes, featuresRes, siteCatsRes, legacyPicks] = await Promise.all([
-    on.has("journal")
+    (on.has("journal") || on.has("extras"))
       ? sb.from("blog_posts").select("slug,title,cover_image,category,content").eq("active", true).order("published_at", { ascending: false }).limit(home.journal.count)
       : Promise.resolve({ data: [] as JournalPost[] }),
     on.has("legacyOccasions")
@@ -187,6 +187,8 @@ export default async function HomePage() {
         return <HomeHero hero={home.hero} fallbackImages={heroFallback} />;
       case "trust":
         return <TrustPoints c={home.trust} />;
+      case "extras":
+        return <ExtrasBand ig={igImages} posts={journalPosts} whatsapp={home.whatsapp} whatsappUrl={home.whatsapp.url || cfg.footer_whatsapp_url || ""} />;
       case "marketplace":
         return <MarketplaceStrip c={home.marketplace} />;
       case "types":
@@ -307,7 +309,7 @@ export default async function HomePage() {
 
   // Journal teaser: real CLASSIE photos as covers (no stock photos), no post text to the browser
   let journalPosts: JournalPost[] = [];
-  if (on.has("journal")) {
+  if (on.has("journal") || on.has("extras")) {
     const { heels, charms } = await loadAllListingProducts();
     journalPosts = ((journalRes.data ?? []) as (JournalPost & { content: string | null })[]).map(({ content, ...p }) => ({
       ...p,
