@@ -63,11 +63,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Prices come from the database, not from the browser.
-    const priced = await priceOrder(supabase, items, { couponCode: coupon_code, phone: customer_phone, email: customer_email });
+    const priced = await priceOrder(supabase, items, { couponCode: coupon_code, phone: customer_phone, email: customer_email, method: payment_method === "online" ? "online" : "cod" });
     if (!priced.ok) return NextResponse.json({ error: priced.error }, { status: 400 });
 
     const isOnline = payment_method === "online";
-    let paymentLabel = isOnline ? "online" : "cod";
+    // The COD fee is part of total_amount; the label shows it in Admin → Orders.
+    let paymentLabel = isOnline ? "online" : priced.codFee > 0 ? `cod (+₹${priced.codFee} COD fee)` : "cod";
     if (isOnline) {
       if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
         return NextResponse.json({ error: "Payment details missing" }, { status: 400 });

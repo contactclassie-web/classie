@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const sb = serverSupabase()
     if (!sb) return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
 
-    const priced = await priceOrder(sb, items, { couponCode: coupon_code, phone, email })
+    const priced = await priceOrder(sb, items, { couponCode: coupon_code, phone, email, method: 'online' })
     if (!priced.ok) return NextResponse.json({ error: priced.error }, { status: 400 })
     if (priced.total <= 0) return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
 

@@ -1,7 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { GIFT_SETS_KEY, mergeGiftSets } from "@/lib/giftSets";
-import { parseShipping, shippingFee } from "@/lib/shipping";
+import { parseShipping } from "@/lib/shipping";
 import { checkCoupon, type CouponRow } from "@/lib/coupons";
+import { couponBase, orderTotals, parsePayment, PAYMENT_KEYS } from "@/lib/orderTotals";
 
 // Works out what an order really costs from the database, so the amount a
 // customer pays can't be changed in the browser. Used by the Razorpay order
@@ -22,6 +23,7 @@ export type PricingResult =
       subtotal: number;
       shipping: number;
       discount: number;
+      codFee: number;
       total: number;
       coupon: CouponRow | null;
       couponError: string | null;
@@ -33,7 +35,7 @@ const str = (v: unknown, max = 300) => (typeof v === "string" ? v.slice(0, max) 
 export async function priceOrder(
   sb: SupabaseClient,
   rawItems: unknown,
-  opts: { couponCode?: string | null; phone?: string | null; email?: string | null } = {},
+  opts: { couponCode?: string | null; phone?: string | null; email?: string | null; method?: "cod" | "online" } = {},
 ): Promise<PricingResult> {
   if (!Array.isArray(rawItems) || rawItems.length === 0) return { ok: false, error: "No items in order" };
   if (rawItems.length > 50) return { ok: false, error: "Too many items in one order" };
@@ -56,7 +58,7 @@ export async function priceOrder(
       ? sb.from("products").select("slug,title,price,active").in("slug", productSlugs)
       : Promise.resolve({ data: [] as { slug: string; title: string; price: number; active: boolean }[], error: null }),
     sb.from("product_bundle_offers").select("main_product_slug,accessory_slug,discount_type,discount_value,active").eq("active", true),
-    sb.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee", ...(hasSets ? [GIFT_SETS_KEY] : [])]),
+    sb.from("site_settings").select("key,value").in("key", ["shipping_tiers", "shipping_default_fee", ...PAYMENT_KEYS, ...(hasSets ? [GIFT_SETS_KEY] : [])]),
   ]);
   if (productsRes.error) return { ok: false, error: "Couldn't check prices. Please try again." };
 
@@ -98,18 +100,21 @@ export async function priceOrder(
     priced.push({ slug: it.slug, title: it.title, price, image: it.image, quantity: it.quantity, ...(it.variant ? { variant: it.variant } : {}) });
   }
 
-  const subtotal = priced.reduce((s, it) => s + it.price * it.quantity, 0);
-  const shipping = shippingFee(subtotal, parseShipping(cfg.shipping_tiers, cfg.shipping_default_fee));
-
+  // Coupon on products only (never gift sets, delivery or the COD fee).
   let coupon: CouponRow | null = null;
   let couponError: string | null = null;
   let discount = 0;
   if (opts.couponCode) {
-    const r = await checkCoupon(sb, opts.couponCode, { phone: opts.phone, email: opts.email, orderValue: subtotal + shipping });
+    const r = await checkCoupon(sb, opts.couponCode, { phone: opts.phone, email: opts.email, orderValue: couponBase(priced) });
     if (r.valid) { coupon = r.coupon; discount = r.discount; }
     else couponError = r.error;
   }
 
-  const total = Math.max(0, subtotal + shipping - discount);
-  return { ok: true, items: priced, subtotal, shipping, discount, total, coupon, couponError };
+  const method = opts.method === "cod" ? "cod" : "online";
+  const t = orderTotals(priced, discount, parseShipping(cfg.shipping_tiers, cfg.shipping_default_fee), parsePayment(cfg), method);
+  if (method === "cod" && !t.codAllowed) return { ok: false, error: t.codReason };
+  const { subtotal, shipping, codFee, total } = t;
+  discount = t.discount;
+
+  return { ok: true, items: priced, subtotal, shipping, discount, codFee, total, coupon, couponError };
 }
