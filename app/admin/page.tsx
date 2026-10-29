@@ -10128,11 +10128,19 @@ export default function AdminPage() {
       {productModal.open && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-2xl my-8 shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-800">
-                {productModal.mode === "add" ? "Add Product" : "Edit Product"}
-              </h2>
-              <button onClick={closeProductModal} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+            <div className="flex items-center justify-between gap-3 px-6 py-4 border-b border-gray-100">
+              {/* Product name and photo stay visible while the form below scrolls */}
+              <div className="flex items-center gap-3 min-w-0">
+                {productModal.data.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={productModal.data.image.replace("/image/upload/", "/image/upload/w_96,h_96,c_fill,f_auto,q_auto/")} alt="" className="w-10 h-10 rounded-lg object-cover bg-gray-100 flex-shrink-0" />
+                )}
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider text-gray-400">{productModal.mode === "add" ? "Add Product" : "Edit Product"}</p>
+                  <h2 className="font-semibold text-gray-800 truncate">{productModal.data.title || "New product"}</h2>
+                </div>
+              </div>
+              <button onClick={closeProductModal} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
