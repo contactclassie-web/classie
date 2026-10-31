@@ -238,7 +238,7 @@ export default function Navbar({ initialSettings, initialCategories, initialEdit
       </div>
 
       {/* ── Mobile Drawer ── */}
-      <div className={`lg:hidden fixed inset-y-0 right-0 w-72 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl ${open ? "translate-x-0" : "translate-x-full"}`}>
+      <div className={`lg:hidden fixed inset-y-0 right-0 w-72 bg-white z-50 transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0 shadow-2xl" : "translate-x-full"}`}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
           <span className="text-sm tracking-[0.3em] uppercase font-light text-[#3B5373]">Menu</span>
           <button aria-label="Close menu" onClick={() => setOpen(false)} className="text-[#1a1a1a]"><X className="w-5 h-5" /></button>

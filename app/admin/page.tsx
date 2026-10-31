@@ -9366,11 +9366,12 @@ export default function AdminPage() {
                   <div key={num} className="border border-gray-100 rounded-xl p-4 space-y-3">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tip {num}</p>
                     <div className="grid grid-cols-4 gap-3">
-                      <div>
+                      {/* The page now shows fixed line icons; the old emoji field is kept but hidden */}
+                      <div className="hidden">
                         <label className={labelCls}>Icon</label>
                         <input type="text" value={icon} onChange={e => setIcon(e.target.value)} className={inputCls} placeholder="📏" />
                       </div>
-                      <div className="col-span-3">
+                      <div className="col-span-4">
                         <label className={labelCls}>Title</label>
                         <input type="text" value={title} onChange={e => setTitle(e.target.value)} className={inputCls} />
                       </div>

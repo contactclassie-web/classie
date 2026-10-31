@@ -98,7 +98,7 @@ export function ProductCard({ p, mode, wornFirst, hidePair }: { p: ListingProduc
         <img src={optimizeCloudinary(first, 600)} alt={title} loading="lazy" decoding="async" style={blurStyle(first)} className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" />
         {second && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={optimizeCloudinary(second, 600)} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-0 md:group-hover:opacity-100 transition-opacity duration-500" />
+          <img src={optimizeCloudinary(second, 600)} alt={`${title}, second view`} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-0 md:group-hover:opacity-100 transition-opacity duration-500" />
         )}
         {/* No % badges on cards (premium look): the MRP is shown struck through under the title. */}
         {p.soldOut && <span className="absolute top-2.5 left-2.5 bg-white text-[#1a1a1a] text-[10px] font-semibold px-1.5 py-0.5 tracking-wide uppercase">Sold out</span>}
@@ -295,7 +295,7 @@ export default function ShopListing(props: Props) {
         <div className="md:order-2 relative">
           {props.heroImage
             // eslint-disable-next-line @next/next/no-img-element
-            ? <img src={optimizeCloudinary(props.heroImage, 1200)} alt="" className="w-full h-[180px] md:h-[340px] object-cover" style={{ objectPosition: "center 35%" }} fetchPriority="high" />
+            ? <img src={optimizeCloudinary(props.heroImage, 1200)} alt={props.mode === "heels" ? "CLASSIE heels" : "CLASSIE shoe charms on heels"} className="w-full h-[180px] md:h-[340px] object-cover" style={{ objectPosition: "center 35%" }} fetchPriority="high" />
             : <div className="h-[120px] md:h-[340px]" />}
         </div>
         <div className="md:order-1 px-4 pt-5 pb-5 md:px-16 lg:pl-[8vw] md:py-10 flex flex-col justify-center gap-2 md:gap-3.5">
