@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { Ruler, Footprints, MessageCircle } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 
 export const revalidate = 3600;
@@ -174,17 +175,17 @@ export default async function SizeGuidePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               {
-                icon:  c("sg_tip1_icon",  "📏"),
+                icon:  <Ruler className="w-7 h-7 text-[#3B5373]" strokeWidth={1.4} />,
                 title: c("sg_tip1_title", "Measure in the Evening"),
                 body:  c("sg_tip1_body",  "Feet tend to swell throughout the day. Measure in the evening for the most accurate size."),
               },
               {
-                icon:  c("sg_tip2_icon",  "👟"),
+                icon:  <Footprints className="w-7 h-7 text-[#3B5373]" strokeWidth={1.4} />,
                 title: c("sg_tip2_title", "If Between Sizes"),
                 body:  c("sg_tip2_body",  "We recommend sizing up. A slightly larger heel is easier to style than one that's too tight."),
               },
               {
-                icon:  c("sg_tip3_icon",  "💬"),
+                icon:  <MessageCircle className="w-7 h-7 text-[#3B5373]" strokeWidth={1.4} />,
                 title: c("sg_tip3_title", "Need Help?"),
                 body:  c("sg_tip3_body",  "Contact our team via WhatsApp or email — we're happy to help you find the right size."),
               },
@@ -193,7 +194,7 @@ export default async function SizeGuidePage() {
                 key={title}
                 className="rounded-2xl border border-gray-100 p-6 flex flex-col gap-3 shadow-sm"
               >
-                <span className="text-4xl">{icon}</span>
+                {icon}
                 <p className="font-semibold text-[#1a1a1a] text-sm">{title}</p>
                 <p className="text-xs text-[#666] leading-relaxed">{body}</p>
               </div>

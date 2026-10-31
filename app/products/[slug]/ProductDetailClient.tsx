@@ -58,6 +58,8 @@ const FEATURE_CHECKS_HEELS = ["Cushioned comfort insole", "COD Available", "Easy
 const FEATURE_CHECKS_CLIPS = ["Sold as a pair", "No glue, no damage", "COD Available", "Works on heels, flats & sandals"];
 // Trust lines (delivery, COD, returns, first-order offer) are shown once, in the
 // row under the buttons, so they're dropped from the tick list and promo line.
+// "Radiance Heart Crystal Clip (Pair)" → "Radiance Heart Crystal Clip" for small product rows
+const noPair = (t: string) => t.replace(/\s*\(pair\)\s*/i, " ").trim();
 const TRUST_RE = /shipping|delivery|\bcod\b|cash on delivery|return|replacement|exchange|first order|% off/i;
 const EMOJI_RE = new RegExp("[\\p{Extended_Pictographic}\\u2726\\uFE0F]", "gu");
 const stripEmoji = (t: string) => t.replace(EMOJI_RE, "").trim();
@@ -284,6 +286,11 @@ export default function ProductDetailClient({
     spec(/toe/i) && { icon: "", title: spec(/toe/i), desc: spec(/closure|strap/i) || "Clean, elongating line" },
     { icon: "", title: "Wear it with", desc: "Sarees, dresses or office trousers. Add a CLASSIE clip for parties." },
   ].filter(Boolean) as FeatureTile[] : [];
+  // "3 inch slim sculpted heel · Cushioned insole" under the heel name
+  const heelLine = [
+    spec(/height/i) && `${spec(/height/i).replace(/inches?/i, "inch")} ${(spec(/heel type/i) || "heel").toLowerCase()}`,
+    "Cushioned insole",
+  ].filter(Boolean).join(" · ");
   const tiles = isHeel
     ? (heelFacts.length >= 3 ? heelFacts : featureTiles.length > 0 ? featureTiles : DEFAULT_FEATURE_TILES)
     : (clipFeatureTiles.length > 0 ? clipFeatureTiles : CLIP_FEATURE_TILES);
@@ -471,7 +478,7 @@ export default function ProductDetailClient({
 
             {/* Subtitle / description short */}
             <p style={{ fontSize: "13px", color: "#888", marginBottom: "14px", fontStyle: "italic" }}>
-              {isHeel ? "Premium Heel Collection" : "Sold as a pair · Clip on in seconds"}
+              {isHeel ? heelLine : "Sold as a pair · Clip on in seconds"}
             </p>
 
             {/* Stars — dynamic from reviews */}
@@ -792,7 +799,7 @@ export default function ProductDetailClient({
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={optimizeCloudinary(offer.product.image, 400)} alt={offer.product.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                       </div>
-                      <p className="truncate" style={{ fontSize: "12.5px", color: "#1a1a1a", marginTop: "8px" }}>{offer.product.title}</p>
+                      <p className="truncate" style={{ fontSize: "12.5px", color: "#1a1a1a", marginTop: "8px" }}>{noPair(offer.product.title)}</p>
                       <p style={{ fontSize: "12.5px", fontWeight: 600, color: "#1a1a1a" }}>₹{offer.product.price.toLocaleString("en-IN")}</p>
                       <span style={{ fontSize: "11px", color: "#3B5373", textDecoration: "underline" }}>Choose size →</span>
                     </Link>
@@ -825,7 +832,7 @@ export default function ProductDetailClient({
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <p style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", marginBottom: "3px" }} className="truncate">
-                          {offer.product.title}
+                          {noPair(offer.product.title)}
                         </p>
                         {offer.product.variants.type !== "none" && offer.product.variants.options.length > 0 && (
                           <select

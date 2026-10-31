@@ -46,7 +46,7 @@ export default function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Your bag"
-        className={`absolute right-0 top-0 h-full w-full max-w-[400px] bg-white shadow-2xl flex flex-col transition-transform duration-300 ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`absolute right-0 top-0 h-full w-full max-w-[400px] bg-white flex flex-col transition-transform duration-300 ${drawerOpen ? "translate-x-0 shadow-2xl" : "translate-x-full"}`}
       >
         {drawerOpen && <DrawerBody items={items} total={total} onClose={closeDrawer} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />}
       </aside>

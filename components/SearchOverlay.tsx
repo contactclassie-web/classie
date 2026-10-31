@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { optimizeCloudinary } from "@/lib/cloudinary";
+import { searchItems } from "@/lib/productSearch";
 
 interface Item {
   slug: string;
@@ -25,36 +26,6 @@ const QUICK = [
   { label: "Custom designs", href: "/custom-designs" },
 ];
 const SUGGEST = ["Bow", "Crystal", "Pearl", "Bridal", "Jute", "Black heels"];
-
-// Words people type that mean the same thing as words in our titles.
-const SYNONYMS: Record<string, string[]> = {
-  clip: ["clip", "charm"], clips: ["clip", "charm"], charm: ["charm", "clip"], charms: ["charm", "clip"],
-  heel: ["heel", "pump", "sandal"], heels: ["heel", "pump", "sandal"], sandal: ["sandal", "heel"],
-  stone: ["crystal", "rhinestone", "stone"], diamond: ["crystal", "rhinestone"], rhinestone: ["rhinestone", "crystal"],
-  wedding: ["bridal", "wedding", "pearl"], bride: ["bridal", "pearl"], bridal: ["bridal", "pearl"],
-  moti: ["pearl"], phool: ["flower", "floral", "bloom"], flower: ["flower", "floral", "bloom", "daisy", "sunflower"],
-};
-
-function norm(s: string) {
-  return s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9 ]+/g, " ");
-}
-
-function score(it: Item, words: string[]): number {
-  const title = norm(it.title);
-  const rest = norm(`${it.category} ${(it.tags ?? []).join(" ")} ${it.description ?? ""}`);
-  let total = 0;
-  for (const w of words) {
-    const alts = SYNONYMS[w] ?? [w];
-    let best = 0;
-    for (const a of alts) {
-      if (title.includes(a)) best = Math.max(best, title.split(" ").some((t) => t.startsWith(a)) ? 3 : 2);
-      else if (rest.includes(a)) best = Math.max(best, 1);
-    }
-    if (!best) return 0;
-    total += best;
-  }
-  return total;
-}
 
 export default function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
@@ -76,15 +47,7 @@ export default function SearchOverlay({ open, onClose }: { open: boolean; onClos
     return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
   }, [open, onClose, items]);
 
-  const results = useMemo(() => {
-    const words = norm(q).split(" ").filter((w) => w.length > 1);
-    if (!words.length || !items) return [];
-    return items
-      .map((it) => ({ it, s: score(it, words) }))
-      .filter((x) => x.s > 0)
-      .sort((a, b) => b.s - a.s || (a.it.category === "heels" ? 1 : 0) - (b.it.category === "heels" ? 1 : 0))
-      .map((x) => x.it);
-  }, [q, items]);
+  const results = useMemo(() => (items ? searchItems(items, q) : []), [q, items]);
 
   if (!open) return null;
 
@@ -96,7 +59,7 @@ export default function SearchOverlay({ open, onClose }: { open: boolean; onClos
       <div className="relative bg-white w-full max-h-[85vh] overflow-y-auto shadow-xl">
         <div className="max-w-3xl mx-auto px-4 md:px-6 pt-4 pb-6">
           <form
-            onSubmit={(e) => { e.preventDefault(); if (results[0]) go(`/products/${results[0].slug}`); }}
+            onSubmit={(e) => { e.preventDefault(); if (results[0]) go(`/products/${results[0].slug}`); else if (q.trim()) go(`/search?q=${encodeURIComponent(q.trim())}`); }}
             className="flex items-center gap-3 border-b border-[#1a1a1a] pb-2"
           >
             <Search className="w-5 h-5 text-[#6b6b6b] flex-shrink-0" strokeWidth={1.6} />

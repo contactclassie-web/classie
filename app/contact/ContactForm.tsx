@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
+import { User, AtSign, Phone, MessageCircle } from "lucide-react";
 
 function BottomBorderField({ icon, name, type = "text", placeholder, value, onChange, required }: {
-  icon: string; name: string; type?: string; placeholder: string;
+  icon?: React.ReactNode; name: string; type?: string; placeholder: string;
   value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; required?: boolean;
 }) {
   return (
     <div className="flex items-center border-b border-[#d0d0d0] focus-within:border-[#3B5373] transition-colors pb-1">
-      {icon && <span className="text-base mr-3 text-[#888] select-none flex-shrink-0">{icon}</span>}
+      {icon && <span className="mr-3 text-[#888] select-none flex-shrink-0">{icon}</span>}
       <input type={type} name={name} placeholder={placeholder} value={value} onChange={onChange}
         required={required}
         className="flex-1 bg-transparent text-sm text-[#1a1a1a] placeholder-[#aaa] outline-none py-1.5" />
@@ -52,13 +53,13 @@ export default function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {status === "error" && <p className="text-red-500 text-sm">{errorMsg}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <BottomBorderField icon="👤" name="first_name" placeholder="First Name" value={form.first_name} onChange={handleChange} required />
-        <BottomBorderField icon="" name="last_name" placeholder="Last Name" value={form.last_name} onChange={handleChange} />
+        <BottomBorderField icon={<User className="w-4 h-4" strokeWidth={1.5} />} name="first_name" placeholder="First Name" value={form.first_name} onChange={handleChange} required />
+        <BottomBorderField name="last_name" placeholder="Last Name" value={form.last_name} onChange={handleChange} />
       </div>
-      <BottomBorderField icon="@" name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} required />
-      <BottomBorderField icon="📞" name="phone" type="tel" placeholder="Phone Number" value={form.phone} onChange={handleChange} />
+      <BottomBorderField icon={<AtSign className="w-4 h-4" strokeWidth={1.5} />} name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} required />
+      <BottomBorderField icon={<Phone className="w-4 h-4" strokeWidth={1.5} />} name="phone" type="tel" placeholder="Phone Number" value={form.phone} onChange={handleChange} />
       <div className="flex items-start border-b border-[#d0d0d0] focus-within:border-[#3B5373] transition-colors pb-1">
-        <span className="text-base mt-2 mr-3 text-[#888] select-none">💬</span>
+        <span className="mt-2 mr-3 text-[#888] select-none"><MessageCircle className="w-4 h-4" strokeWidth={1.5} /></span>
         <textarea name="message" placeholder="Your message…" value={form.message} onChange={handleChange}
           required rows={4} className="flex-1 bg-transparent text-sm text-[#1a1a1a] placeholder-[#aaa] outline-none resize-none py-1" />
       </div>

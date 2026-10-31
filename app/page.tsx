@@ -3,7 +3,7 @@ import { CARD_PHOTOS_KEY, cardPhotoFor, parseCardPhotos } from "@/lib/cardPhotos
 import { loadGiftSets } from "@/lib/giftSetsServer";
 import { setAvailable } from "@/lib/giftSets";
 import { SetCard } from "@/components/sets/SetCard";
-import { postCover } from "@/lib/blogProducts";
+import { postCover, productsInPost } from "@/lib/blogProducts";
 import type { Metadata } from "next";
 import NewsletterSection from "@/components/NewsletterSection";
 import OccasionSection from "@/components/OccasionSection";
@@ -110,7 +110,7 @@ export default async function HomePage() {
   // Only fetch what the switched-on sections need.
   const [journalRes, collectionsRes, featuresRes, siteCatsRes, legacyPicks] = await Promise.all([
     (on.has("journal") || on.has("extras"))
-      ? sb.from("blog_posts").select("slug,title,cover_image,category,content").eq("active", true).order("published_at", { ascending: false }).limit(home.journal.count)
+      ? sb.from("blog_posts").select("slug,title,cover_image,category,content").eq("active", true).order("published_at", { ascending: false }).limit(home.journal.count + 6)
       : Promise.resolve({ data: [] as JournalPost[] }),
     on.has("legacyOccasions")
       ? sb.from("collections").select("*").eq("active", true).order("display_order", { ascending: true })
@@ -317,10 +317,14 @@ export default async function HomePage() {
   let journalPosts: JournalPost[] = [];
   if (on.has("journal") || on.has("extras")) {
     const { heels, charms } = await loadAllListingProducts();
-    journalPosts = ((journalRes.data ?? []) as (JournalPost & { content: string | null })[]).map(({ content, ...p }) => ({
-      ...p,
-      cover_image: postCover({ ...p, content }, heels, charms) || null,
-    }));
+    // Skip posts about a sold-out product: the teaser should lead to something you can buy
+    journalPosts = ((journalRes.data ?? []) as (JournalPost & { content: string | null })[])
+      .filter((p) => !productsInPost(p, [...heels, ...charms])[0]?.soldOut)
+      .slice(0, home.journal.count)
+      .map(({ content, ...p }) => ({
+        ...p,
+        cover_image: postCover({ ...p, content }, heels, charms) || null,
+      }));
   }
 
   // Google: who CLASSIE is (logo, socials, contact) and the site name
