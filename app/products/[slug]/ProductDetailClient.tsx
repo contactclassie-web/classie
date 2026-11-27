@@ -1048,7 +1048,7 @@ export default function ProductDetailClient({
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
                     {reviews.map((rev) => {
                       const dateStr = rev.review_date
-                        ? new Date(rev.review_date).toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" })
+                        ? new Date(rev.review_date).toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" })
                         : "";
                       return (
                         <div key={rev.id} style={{ background: "#fff", borderRadius: "8px", padding: "24px", border: "1px solid #E8E3DD" }}>
