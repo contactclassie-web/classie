@@ -22,7 +22,7 @@ interface BlogPost {
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "Asia/Kolkata" });
 }
 
 export default function BlogClient({ posts, categories: propCategories }: { posts: BlogPost[]; categories?: string[] }) {
