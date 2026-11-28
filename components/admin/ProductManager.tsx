@@ -30,6 +30,18 @@ function parseImgs(raw: string | null): string[] {
   try { return (JSON.parse(raw) as unknown[]).filter((u): u is string => typeof u === "string" && u.trim() !== ""); } catch { return []; }
 }
 
+// One stock box. Kept outside ProductManager: a component made inside it would be
+// re-created on every key press, which closes the box after the first digit.
+function StockInput({ value, onChange, label }: { value: number | undefined; onChange: (raw: string) => void; label?: string }) {
+  return (
+    <label className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+      {label && <span className="min-w-[1.5rem] text-right">{label}</span>}
+      <input type="number" min={0} inputMode="numeric" value={value ?? ""} onChange={(e) => onChange(e.target.value)}
+        placeholder="—" className={`w-14 px-2 py-1 border rounded text-xs text-gray-800 focus:outline-none focus:border-[#3B5373] ${value === 0 ? "border-red-300 bg-red-50" : "border-gray-200"}`} />
+    </label>
+  );
+}
+
 type Child = {
   key: string; slug: string; label: string; hex?: string; photos: string[];
   price: number; mrp: number; active: boolean; stockKeys: string[]; product?: PMProduct; sizes?: string[];
@@ -51,6 +63,7 @@ export default function ProductManager({
   const [orders, setOrders] = useState<Order[]>([]);
   const [inv, setInv] = useState<Inventory>({});
   const [dirty, setDirty] = useState(false);
+  const [edits, setEdits] = useState<Record<string, Record<string, number | null>>>({});
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [view, setView] = useState<"all" | "fix" | "active" | "inactive" | "low">("all");
@@ -152,21 +165,32 @@ export default function ProductManager({
     return any ? t : undefined;
   };
   const setStock = (slug: string, key: string, raw: string) => {
+    const n = raw === "" ? null : Math.max(0, Math.floor(Number(raw) || 0));
     setInv((prev) => {
       const next = { ...prev, [slug]: { ...(prev[slug] || {}) } };
-      if (raw === "") delete next[slug][key]; else next[slug][key] = Math.max(0, Math.floor(Number(raw) || 0));
+      if (n === null) delete next[slug][key]; else next[slug][key] = n;
       return next;
     });
+    setEdits((prev) => ({ ...prev, [slug]: { ...(prev[slug] || {}), [key]: n } }));
     setDirty(true);
   };
   const saveStock = async () => {
     setSaving(true);
     try {
-      if (dirty) { await saveSettingJson(INV_KEY, inv); setDirty(false); }
-      if (cardsDirty) {
-        await saveSettingJson(CARD_PHOTOS_KEY, cards); setCardsDirty(false);
-        fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).catch(() => {});
+      if (dirty) {
+        const { value } = await loadSettingJson(INV_KEY);
+        const latest: Inventory = value && typeof value === "object" ? (value as Inventory) : {};
+        for (const [slug, row] of Object.entries(edits)) {
+          latest[slug] = { ...(latest[slug] || {}) };
+          for (const [k, n] of Object.entries(row)) { if (n === null) delete latest[slug][k]; else latest[slug][k] = n; }
+          if (!Object.keys(latest[slug]).length) delete latest[slug];
+        }
+        await saveSettingJson(INV_KEY, latest);
+        setInv(latest); setEdits({}); setDirty(false);
       }
+      if (cardsDirty) { await saveSettingJson(CARD_PHOTOS_KEY, cards); setCardsDirty(false); }
+      // Show the new stock / card photos on the website straight away
+      fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }).catch(() => {});
     } catch (e) { alert("Could not save: " + (e instanceof Error ? e.message : e)); }
     finally { setSaving(false); }
   };
@@ -190,12 +214,8 @@ export default function ProductManager({
     (view === "all" || (view === "fix" && f.issues.length > 0) || (view === "active" && f.products.some((p) => p.active)) ||
       (view === "inactive" && f.products.every((p) => !p.active)) || (view === "low" && isLow(f))));
 
-  const StockInput = ({ slug, k, label }: { slug: string; k: string; label?: string }) => (
-    <label className="inline-flex items-center gap-1 text-[11px] text-gray-500">
-      {label && <span className="w-6 text-right">{label}</span>}
-      <input type="number" min={0} inputMode="numeric" value={stockOf(slug, k) ?? ""} onChange={(e) => setStock(slug, k, e.target.value)}
-        placeholder="—" className={`w-14 px-2 py-1 border rounded text-xs text-gray-800 focus:outline-none focus:border-[#3B5373] ${stockOf(slug, k) === 0 ? "border-red-300 bg-red-50" : "border-gray-200"}`} />
-    </label>
+  const Stock = (slug: string, k: string, label?: string) => (
+    <StockInput key={k} value={stockOf(slug, k)} onChange={(raw) => setStock(slug, k, raw)} label={label} />
   );
   const Pill = ({ on }: { on: boolean }) => (
     <span className={`inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${on ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>{on ? "Active" : "Inactive"}</span>
@@ -218,6 +238,15 @@ export default function ProductManager({
           <option value="all">All categories</option><option value="heels">Heels</option><option value="charms">Shoe charms</option>
         </select>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or link…" className="border border-gray-200 text-xs px-3 py-1.5 rounded-lg w-44" />
+        {shown.some((f) => f.children.length) && (() => {
+          const allOpen = shown.every((f) => !f.children.length || open[f.key]);
+          return (
+            <button type="button" onClick={() => setOpen((o) => { const n = { ...o }; for (const f of shown) if (f.children.length) n[f.key] = !allOpen; return n; })}
+              className="px-3.5 py-1.5 rounded-lg text-xs font-medium border border-[#3B5373] text-[#3B5373] bg-white">
+              {allOpen ? "Close all" : "Show all stock boxes"}
+            </button>
+          );
+        })()}
         <div className="ml-auto flex gap-2">
           {(dirty || cardsDirty) && (
             <button type="button" onClick={saveStock} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white text-xs font-semibold rounded-lg disabled:opacity-50">
@@ -312,7 +341,7 @@ export default function ProductManager({
                       {single && Number(single.compare_price) > Number(single.price) && <span className="block text-[11px] text-gray-400 line-through">{rs(Number(single.compare_price))}</span>}
                     </td>
                     <td className="px-3 py-3 align-top text-xs">
-                      {f.children.length === 0 ? <StockInput slug={f.products[0].slug} k={NONE} /> :
+                      {f.children.length === 0 ? Stock(f.products[0].slug, NONE) :
                         t === undefined ? <span className="text-gray-300">—</span> : <span className={t === 0 ? "text-red-600 font-semibold" : t <= 2 ? "text-amber-600 font-semibold" : "text-gray-800"}>{t} {t === 0 ? "· sold out" : t <= 2 ? "· low" : ""}</span>}
                     </td>
                     <td className="px-3 py-3 align-top">
@@ -357,7 +386,7 @@ export default function ProductManager({
                       </td>
                       <td className="px-3 py-3 align-top">
                         <div className="flex flex-wrap gap-1.5 max-w-[260px]">
-                          {c.sizes?.length ? c.sizes.map((s) => <StockInput key={s} slug={c.slug} k={s} label={s} />) : <StockInput slug={c.slug} k={c.stockKeys[0]} />}
+                          {c.sizes?.length ? c.sizes.map((s) => Stock(c.slug, s, s)) : Stock(c.slug, c.stockKeys[0])}
                         </div>
                       </td>
                       <td className="px-3 py-3 align-top">
@@ -377,6 +406,14 @@ export default function ProductManager({
           </tbody>
         </table>
       </div>
+      {(dirty || cardsDirty) && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md flex items-center justify-between gap-3 bg-[#1f2937] text-white rounded-xl px-4 py-3 shadow-lg">
+          <span className="text-xs">You have unsaved {dirty && cardsDirty ? "changes" : dirty ? "stock changes" : "card photo changes"}.</span>
+          <button type="button" onClick={saveStock} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white text-xs font-semibold rounded-lg disabled:opacity-50">
+            <Save className="w-3.5 h-3.5" /> {saving ? "Saving…" : "Save"}
+          </button>
+        </div>
+      )}
       <p className="text-[11px] text-gray-400">Stock 0 shows "Sold out" on the website and stops new orders for that colour or size. Empty = not tracked (always available). Sales count paid and pending orders from the last 30 days.</p>
     </div>
   );
