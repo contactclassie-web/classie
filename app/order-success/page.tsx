@@ -6,6 +6,7 @@ import Link from "next/link";
 import { CheckCircle2, Package, Truck, Home } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { gtagEvent } from "@/lib/gtag";
+import { track as fbTrack, cartContents, orderLines } from "@/lib/metaPixel";
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
@@ -24,6 +25,21 @@ function OrderSuccessContent() {
 
     track({ type: "purchase", orderId, value: amount });
     gtagEvent("purchase", { transaction_id: orderId, currency: "INR", value: amount });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId]);
+
+  // Meta Pixel Purchase: once per order. Kept in both storages so a refresh, the
+  // back button or a reopened tab never sends it twice.
+  useEffect(() => {
+    if (orderId === "—") return;
+    const key = `classie_fb_purchase_${orderId}`;
+    try {
+      if (sessionStorage.getItem(key) || localStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+      localStorage.setItem(key, "1");
+    } catch { /* storage unavailable: send once for this page view */ }
+    const lines = orderLines(orderId); // empty if the order was placed in another tab/browser
+    fbTrack("Purchase", { ...(lines.length ? cartContents(lines) : { content_type: "product" }), currency: "INR", value: amount }, { eventID: orderId });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 

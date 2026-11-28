@@ -12,6 +12,7 @@ import ProductCard from "@/components/ProductCard";
 import { supabase } from "@/lib/supabase";
 import { BundleOfferWithProduct, FeatureTile, ColorVariant, ProductReview } from "./page";
 import CloudVideo from "@/components/CloudVideo";
+import { track as fbTrack } from "@/lib/metaPixel";
 
 // Cloudinary already serves the gallery as small WebP/AVIF at this width.
 const GALLERY_W = 1000;
@@ -122,6 +123,14 @@ export default function ProductDetailClient({
   const { addToCart } = useCart();
   const router = useRouter();
   const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+
+  // Meta Pixel: once per product viewed (not on re-renders or colour/size picks).
+  const fbViewed = useRef<string | null>(null);
+  useEffect(() => {
+    if (fbViewed.current === product.slug) return;
+    fbViewed.current = product.slug;
+    fbTrack("ViewContent", { content_ids: [product.slug], content_type: "product", content_name: product.title, currency: "INR", value: product.price });
+  }, [product.slug, product.title, product.price]);
 
   // Prefetch color variant pages on mount for instant navigation
   useEffect(() => {
