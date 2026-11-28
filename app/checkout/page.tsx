@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
@@ -9,6 +9,7 @@ import { useCartPhotos } from "@/lib/useCartPhotos";
 import { couponBase, orderTotals } from "@/lib/orderTotals";
 import { track } from "@/lib/analytics";
 import { gtagEvent } from "@/lib/gtag";
+import { track as fbTrack, cartContents, rememberOrderLines } from "@/lib/metaPixel";
 import { Loader2, Lock, Tag, CheckCircle, XCircle, CreditCard, Truck } from "lucide-react";
 
 const INDIA_STATES = [
@@ -71,6 +72,14 @@ export default function CheckoutPage() {
     // Fire once per checkout page load, not on every cart mutation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Meta Pixel: once per page load, as soon as the cart (read from this browser) has items.
+  const fbCheckoutSent = useRef(false);
+  useEffect(() => {
+    if (fbCheckoutSent.current || items.length === 0) return;
+    fbCheckoutSent.current = true;
+    fbTrack("InitiateCheckout", { ...cartContents(items), currency: "INR", value: total });
+  }, [items, total]);
 
   // ── Coupon state ──────────────────────────────────────────────────────
   const [couponCode, setCouponCode] = useState("");
@@ -261,6 +270,7 @@ export default function CheckoutPage() {
 
             // Place order in DB (the server checks the payment again)
             const data = await placeOrderInDB("online", response);
+            rememberOrderLines(data.id, items);
             clearCart();
             router.push(`/order-success?id=${data.id}&method=online&amount=${data.total_amount ?? grandTotal}`);
           } catch (err: unknown) {
@@ -292,6 +302,7 @@ export default function CheckoutPage() {
     setError("");
     try {
       const data = await placeOrderInDB("cod");
+      rememberOrderLines(data.id, items);
       clearCart();
       router.push(`/order-success?id=${data.id}&method=cod&amount=${data.total_amount ?? grandTotal}`);
     } catch (err: unknown) {

@@ -5,6 +5,8 @@ import { WishlistProvider } from "@/components/WishlistContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
+import MetaPixel from "@/components/MetaPixel";
+import { Suspense } from "react";
 import { publicSupabase } from "@/lib/supabasePublic";
 import Script from "next/script";
 import { Cormorant_Garamond, Poppins } from "next/font/google";
@@ -63,6 +65,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [{ url: "https://www.classie.co.in/icon.png", width: 512, height: 512 }],
   },
+  // Meta domain verification — only when the code is set in Vercel.
+  ...(process.env.NEXT_PUBLIC_META_DOMAIN_VERIFICATION
+    ? { other: { "facebook-domain-verification": process.env.NEXT_PUBLIC_META_DOMAIN_VERIFICATION } }
+    : {}),
 };
 
 export default async function RootLayout({
@@ -124,6 +130,9 @@ export default async function RootLayout({
       </head>
       <body className={`${cormorant.variable} ${poppins.variable}`}>
         <AnalyticsTracker />
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
         <CartProvider>
           <WishlistProvider>
             <Navbar initialSettings={cfg} initialCategories={siteCategories ?? []} initialEdits={edits} />
