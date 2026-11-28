@@ -14,7 +14,7 @@ import {
 } from "@/lib/cart";
 import { track } from "@/lib/analytics";
 import { gtagEvent } from "@/lib/gtag";
-import { track as fbTrack } from "@/lib/metaPixel";
+import { track as fbTrack, line } from "@/lib/metaPixel";
 
 interface CartContextType {
   items: CartItem[];
@@ -54,7 +54,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     // Every add button (product page, listings, gift sets, "Add 2" bundles) comes through here.
     fbTrack("AddToCart", {
       content_ids: [item.slug],
-      contents: [{ id: item.slug, quantity: item.quantity }],
+      contents: [line(item)],
       content_type: "product",
       currency: "INR",
       value: item.price * item.quantity,

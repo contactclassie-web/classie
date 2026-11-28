@@ -39,7 +39,7 @@ function OrderSuccessContent() {
       localStorage.setItem(key, "1");
     } catch { /* storage unavailable: send once for this page view */ }
     const lines = orderLines(orderId); // empty if the order was placed in another tab/browser
-    fbTrack("Purchase", { ...(lines.length ? cartContents(lines) : { content_type: "product" }), currency: "INR", value: amount }, { eventID: orderId });
+    fbTrack("Purchase", { ...(lines.length ? cartContents(lines) : { content_type: "product" }), currency: "INR", value: amount, payment_method: isCOD ? "cod" : "online" }, { eventID: orderId });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 

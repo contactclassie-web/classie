@@ -25,12 +25,18 @@ export function track(event: string, params: Params = {}, opts?: { eventID?: str
   } catch { /* tracking must never break the store */ }
 }
 
-type Line = { slug: string; quantity: number };
+// content_ids are always the product slug (same in every event); the chosen
+// colour or size goes in contents[].variant.
+type Line = { slug: string; quantity: number; variant?: string };
+
+export function line(i: Line) {
+  return i.variant ? { id: i.slug, quantity: i.quantity, variant: i.variant } : { id: i.slug, quantity: i.quantity };
+}
 
 export function cartContents(items: Line[]) {
   return {
-    content_ids: items.map((i) => i.slug),
-    contents: items.map((i) => ({ id: i.slug, quantity: i.quantity })),
+    content_ids: Array.from(new Set(items.map((i) => i.slug))),
+    contents: items.map(line),
     content_type: "product",
     num_items: items.reduce((n, i) => n + i.quantity, 0),
   };
@@ -42,7 +48,7 @@ const ORDER_KEY = "classie_fb_order";
 
 export function rememberOrderLines(orderId: string, items: Line[]) {
   try {
-    sessionStorage.setItem(ORDER_KEY, JSON.stringify({ id: orderId, items: items.map((i) => ({ slug: i.slug, quantity: i.quantity })) }));
+    sessionStorage.setItem(ORDER_KEY, JSON.stringify({ id: orderId, items: items.map((i) => ({ slug: i.slug, quantity: i.quantity, variant: i.variant || undefined })) }));
   } catch { /* storage unavailable */ }
 }
 
